@@ -1,0 +1,15 @@
+# Node Dependencies
+node_modules/
+npm-debug.log*
+
+# Environment Variables
+.env
+.env.local
+
+# Local Netlify & Build Folders
+.netlify/
+.cache/
+
+# OS metadata
+.DS_Store
+Thumbs.db
