@@ -83,7 +83,7 @@ const UIComponents = {
             html += announcements.map(ann => `
                 <div class="box-card announcement-card ${ann.premium ? 'premium-ann' : ''}" data-id="${ann.id}" style="cursor: pointer;">
                     <div class="card-image-wrapper">
-                        <img src="${ann.image || 'images/luxury_tea_announcement.jpg'}" class="card-image" alt="${ann.title}" onerror="window.handleImageError && window.handleImageError(this, 'announcement')">
+                        <img src="${ann.image || 'images/luxury_tea_announcement.jpg'}" class="card-image" alt="${ann.title}" onerror="window.handleImageError && window.handleImageError(this, 'announcement')" loading="lazy" decoding="async">
                         <div class="card-image-overlay"></div>
                         <span class="box-badge ${ann.premium ? 'status-booked' : 'status-available'}">${ann.tag}</span>
                     </div>
@@ -286,7 +286,7 @@ const UIComponents = {
             return `
                 <div class="box-card product-connoisseur-card status-available">
                     <div class="card-image-wrapper" style="height: auto !important; aspect-ratio: 4/3; background: rgba(0,0,0,0.35); position: relative;">
-                        <img src="${p.image || 'images/Product.jpeg'}" class="card-image" alt="${p.name}" style="object-fit: contain; width: 100%; height: 100%;" onerror="window.handleImageError && window.handleImageError(this, 'product')">
+                        <img src="${p.image || 'images/Product.jpeg'}" class="card-image" alt="${p.name}" style="object-fit: contain; width: 100%; height: 100%;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
                         <div class="card-image-overlay"></div>
                         <span class="box-badge status-available" style="border-radius: 20px; font-size: 0.72rem;">${p.stock || _t('stock_available', 'Available')}</span>
                         ${p.elevation ? `<span class="elevation-badge">${p.elevation}</span>` : ''}
@@ -393,7 +393,7 @@ const UIComponents = {
                 <!-- Left Side: Showcase Card -->
                 <div class="showcase-card" style="display: flex; flex-direction: column;">
                     <div class="card-image-wrapper" style="position: relative; border-radius: 4px; overflow: hidden; border: var(--border-gold); height: auto !important; aspect-ratio: 4/3;">
-                        <img src="${defaultBox.image || 'images/Gift%20Box.jpeg'}" class="card-image" id="selected-box-image" alt="Luxury Tea Chest" style="width: 100%; height: 100%; object-fit: contain; background: rgba(0,0,0,0.25); display: block;" onerror="window.handleImageError && window.handleImageError(this, 'box')">
+                        <img src="${defaultBox.image || 'images/Gift%20Box.jpeg'}" class="card-image" id="selected-box-image" alt="Luxury Tea Chest" style="width: 100%; height: 100%; object-fit: contain; background: rgba(0,0,0,0.25); display: block;" onerror="window.handleImageError && window.handleImageError(this, 'box')" loading="lazy" decoding="async">
                         <div class="card-image-overlay"></div>
                         <span id="selected-box-badge" class="box-badge ${defaultBadgeClass}">${defaultStatusText}</span>
                     </div>
@@ -954,7 +954,7 @@ const UIComponents = {
                                                 </div>
 
                                                 <div style="display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap;">
-                                                    <img src="${item.slipImage}" alt="Deposit Slip Preview" style="max-width: 240px; max-height: 160px; border-radius: 6px; border: 1px solid rgba(212,175,55,0.4); object-fit: contain; background: #000; cursor: pointer;" onclick="window.open(this.src)" title="Click to view full size" onerror="window.handleImageError && window.handleImageError(this, 'slip')">
+                                                    <img src="${item.slipImage}" alt="Deposit Slip Preview" style="max-width: 240px; max-height: 160px; border-radius: 6px; border: 1px solid rgba(212,175,55,0.4); object-fit: contain; background: #000; cursor: pointer;" onclick="window.open(this.src)" title="Click to view full size" onerror="window.handleImageError && window.handleImageError(this, 'slip')" loading="lazy" decoding="async">
                                                     <div style="flex: 1; min-width: 200px;">
                                                         <div style="font-size: 0.8rem; color: var(--color-text-primary); margin-bottom: 0.5rem; line-height: 1.5;">
                                                             Review the bank teller stamp, account number (0083-1001-5271-8843), and deposit amount of <strong>$${item.amount.toFixed(2)} USD</strong>.
@@ -1240,7 +1240,7 @@ const UIComponents = {
                                     ` : boxes.map(box => `
                                         <tr>
                                             <td>
-                                                <img src="${box.image || 'images/Gift%20Box.jpeg'}" alt="${box.name}" style="width: 44px; height: 44px; object-fit: contain; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); background: rgba(0,0,0,0.4); display: block;" onerror="window.handleImageError && window.handleImageError(this, 'box')">
+                                                <img src="${box.image || 'images/Gift%20Box.jpeg'}" alt="${box.name}" style="width: 44px; height: 44px; object-fit: contain; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); background: rgba(0,0,0,0.4); display: block;" onerror="window.handleImageError && window.handleImageError(this, 'box')" loading="lazy" decoding="async">
                                             </td>
                                             <td class="font-mono text-gold font-bold" style="font-size: 1.1rem;">#${String(box.id).padStart(2, '0')}</td>
                                             <td>
@@ -1511,7 +1511,7 @@ const UIComponents = {
                                     ${products.map(prod => `
                                         <tr>
                                             <td>
-                                                <img src="${prod.image || 'images/Product.jpeg'}" alt="${prod.name}" style="width: 44px; height: 44px; object-fit: contain; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); background: rgba(0,0,0,0.4); display: block;" onerror="window.handleImageError && window.handleImageError(this, 'product')">
+                                                <img src="${prod.image || 'images/Product.jpeg'}" alt="${prod.name}" style="width: 44px; height: 44px; object-fit: contain; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); background: rgba(0,0,0,0.4); display: block;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
                                             </td>
                                             <td><strong>${prod.name}</strong><br><small style="color:var(--color-text-muted);">${prod.leafGrade}</small></td>
                                             <td>${prod.category}</td>
@@ -1899,7 +1899,7 @@ const UIComponents = {
                     </div>
                 </div>
                 <div class="heritage-visual-wrapper">
-                    <img src="images/luxury_tea_estate.jpg" alt="Ceylon Wild Tea Estate Slopes in Wallawela, Ettampitiya" onerror="window.handleImageError && window.handleImageError(this, 'gallery')">
+                    <img src="images/luxury_tea_estate.jpg" alt="Ceylon Wild Tea Estate Slopes in Wallawela, Ettampitiya" onerror="window.handleImageError && window.handleImageError(this, 'gallery')" loading="lazy" decoding="async">
                     <div class="card-image-overlay"></div>
                 </div>
             </div>
@@ -2064,7 +2064,7 @@ const UIComponents = {
                     </div>
                     <div style="position: relative;">
                         <div style="position: relative; border-radius: 16px; overflow: hidden; border: 1.5px solid rgba(212,175,55,0.4); box-shadow: 0 16px 40px rgba(0,0,0,0.7), 0 0 25px rgba(212,175,55,0.15);">
-                            <img src="images/luxury_tea_estate.jpg" alt="Misty Slopes of Rock One Wild Tea Estate in Ettampitiya" style="width: 100%; height: auto; display: block; aspect-ratio: 4/3; object-fit: cover;" onerror="window.handleImageError && window.handleImageError(this, 'gallery')">
+                            <img src="images/luxury_tea_estate.jpg" alt="Misty Slopes of Rock One Wild Tea Estate in Ettampitiya" style="width: 100%; height: auto; display: block; aspect-ratio: 4/3; object-fit: cover;" onerror="window.handleImageError && window.handleImageError(this, 'gallery')" loading="lazy" decoding="async">
                             <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1.25rem; background: linear-gradient(0deg, rgba(2, 10, 5, 0.95) 0%, transparent 100%);">
                                 <span style="display: block; color: var(--color-white); font-size: 0.9rem; font-weight: 600;">Wallawela High-Altitude Ridge</span>
                                 <span style="color: var(--color-gold); font-size: 0.75rem;">1,240m Elevation • Badulla District, Sri Lanka</span>
@@ -2808,7 +2808,7 @@ const UIComponents = {
                             <div class="landmark-photo-card" style="background: rgba(4, 14, 8, 0.75); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
                                 <!-- Photo Container -->
                                 <div style="position: relative; height: 180px; overflow: hidden; background: #030805;">
-                                    <img src="${place.image}" alt="${place.name}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;" class="landmark-img" onerror="window.handleImageError && window.handleImageError(this, 'product')">
+                                    <img src="${place.image}" alt="${place.name}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;" class="landmark-img" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
                                     <div style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(4, 14, 8, 0.95) 100%);"></div>
                                     <div style="position: absolute; top: 10px; right: 10px; background: rgba(4, 14, 8, 0.85); backdrop-filter: blur(8px); border: 1px solid rgba(212, 175, 55, 0.45); color: #ffd875; font-size: 0.72rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.6);">
                                         ${place.dist} • ~${place.time}
@@ -3011,7 +3011,7 @@ const UIComponents = {
                     <!-- Left: Terroir & Sensory Spectrum Bars -->
                     <div>
                         <div style="position:relative; border-radius:12px; overflow:hidden; border:1px solid rgba(212,175,55,0.3); margin-bottom:1.25rem; aspect-ratio:16/9; background:#000;">
-                            <img src="${product.image || 'images/Product.jpeg'}" alt="${product.name}" style="width:100%; height:100%; object-fit:contain;" onerror="window.handleImageError && window.handleImageError(this, 'product')">
+                            <img src="${product.image || 'images/Product.jpeg'}" alt="${product.name}" style="width:100%; height:100%; object-fit:contain;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
                             <span style="position:absolute; bottom:0.6rem; left:0.6rem; background:rgba(4,14,8,0.85); border:1px solid var(--color-gold); color:var(--color-gold); font-size:0.7rem; padding:0.25rem 0.65rem; border-radius:12px; font-weight:600;">
                                 Batch Ref: ROW-${(product.id || 'P1').toUpperCase()}
                             </span>
@@ -3846,7 +3846,7 @@ const UIComponents = {
             return `
                 <div class="cart-item-row" data-cart-key="${item.cartKey}" style="display: flex; gap: 1rem; align-items: flex-start; padding: 1.15rem 0; border-bottom: 1px solid rgba(212,175,55,0.12);">
                     <div class="cart-item-img-box" style="width: 68px; height: 68px; border-radius: 10px; overflow: hidden; background: rgba(0,0,0,0.4); border: 1px solid rgba(212,175,55,0.25); flex-shrink: 0; position: relative;">
-                        <img src="${item.image || 'images/Product.jpeg'}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: contain;" onerror="window.handleImageError && window.handleImageError(this, 'product')">
+                        <img src="${item.image || 'images/Product.jpeg'}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: contain;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
                     </div>
                     
                     <div class="cart-item-info" style="flex: 1; min-width: 0;">

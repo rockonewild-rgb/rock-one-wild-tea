@@ -1744,27 +1744,30 @@ Rock One Wild Tea Sanctuary Concierge Team
         };
     }
 
-    // Synchronize Store state with the Backend SQLite Database
+    // Synchronize Store state with the Backend SQLite Database in Parallel (Ultra Fast)
     async syncWithBackend() {
         if (typeof TeaFactoryAPI === 'undefined') return;
         try {
             const isOnline = await TeaFactoryAPI.isOnline();
-            if (!isOnline) {
-                console.log('🌿 [Store] Backend offline, using cached store.');
-                return;
-            }
-            console.log('🌿 [Store] Connected to Rock One REST API Server. Syncing database records...');
+            if (!isOnline) return;
+
+            // Fetch all resources concurrently in 1 parallel batch
+            const [prodRes, boxRes, tourRes, revRes, annRes] = await Promise.allSettled([
+                TeaFactoryAPI.fetchProducts(),
+                TeaFactoryAPI.fetchBoxes(),
+                TeaFactoryAPI.fetchTourSlots(),
+                TeaFactoryAPI.fetchReviews(),
+                TeaFactoryAPI.fetchAnnouncements()
+            ]);
 
             // 1. Sync Products
-            const dbProducts = await TeaFactoryAPI.fetchProducts();
-            if (dbProducts && Array.isArray(dbProducts) && dbProducts.length > 0) {
-                this.state.products = dbProducts;
+            if (prodRes.status === 'fulfilled' && Array.isArray(prodRes.value) && prodRes.value.length > 0) {
+                this.state.products = prodRes.value;
             }
 
             // 2. Sync Collector Boxes
-            const dbBoxes = await TeaFactoryAPI.fetchBoxes();
-            if (dbBoxes && Array.isArray(dbBoxes) && dbBoxes.length > 0) {
-                this.state.boxes = dbBoxes.map(b => ({
+            if (boxRes.status === 'fulfilled' && Array.isArray(boxRes.value) && boxRes.value.length > 0) {
+                this.state.boxes = boxRes.value.map(b => ({
                     id: b.number,
                     number: b.number,
                     name: b.name,
@@ -1777,15 +1780,13 @@ Rock One Wild Tea Sanctuary Concierge Team
             }
 
             // 3. Sync Tour Slots
-            const dbTours = await TeaFactoryAPI.fetchTourSlots();
-            if (dbTours && Array.isArray(dbTours) && dbTours.length > 0) {
-                this.state.tourSlots = dbTours;
+            if (tourRes.status === 'fulfilled' && Array.isArray(tourRes.value) && tourRes.value.length > 0) {
+                this.state.tourSlots = tourRes.value;
             }
 
             // 4. Sync Reviews
-            const dbReviews = await TeaFactoryAPI.fetchReviews();
-            if (dbReviews && dbReviews.data && Array.isArray(dbReviews.data)) {
-                this.state.reviews = dbReviews.data.map(r => ({
+            if (revRes.status === 'fulfilled' && revRes.value?.data && Array.isArray(revRes.value.data)) {
+                this.state.reviews = revRes.value.data.map(r => ({
                     id: r.id,
                     name: r.author,
                     role: r.role,
@@ -1798,9 +1799,8 @@ Rock One Wild Tea Sanctuary Concierge Team
             }
 
             // 5. Sync Announcements
-            const dbAnn = await TeaFactoryAPI.fetchAnnouncements();
-            if (dbAnn && Array.isArray(dbAnn) && dbAnn.length > 0) {
-                this.state.announcements = dbAnn.map(a => ({
+            if (annRes.status === 'fulfilled' && Array.isArray(annRes.value) && annRes.value.length > 0) {
+                this.state.announcements = annRes.value.map(a => ({
                     id: a.id,
                     tag: a.tag,
                     date: a.date_str,
@@ -1812,7 +1812,7 @@ Rock One Wild Tea Sanctuary Concierge Team
             }
 
             this.saveState();
-            console.log('🌿 [Store] Database synchronization complete.');
+            console.log('🌿 [Store] Parallel database sync complete.');
         } catch (e) {
             console.warn('🌿 [Store] Sync notice:', e.message);
         }
