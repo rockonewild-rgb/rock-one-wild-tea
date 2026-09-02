@@ -20,6 +20,9 @@ async function sendInquiryEmails(inquiry) {
 
     // 1. Notification Email to Tea Factory Concierge Desk
     try {
+        const cleanPhone = (inquiry.phone || '').replace(/[^0-9+]/g, '');
+        const waLink = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}?text=Hello%20${encodeURIComponent(inquiry.full_name)},%20thank%20you%20for%20contacting%20Rock%20One%20Wild%20Tea%20Estate%20[Ref:%20${inquiry.id}].` : 'https://wa.me/94771757556';
+
         const adminEmail = await resend.emails.send({
             from: SENDER_EMAIL,
             to: CONCIERGE_INBOX,
@@ -29,35 +32,58 @@ async function sendInquiryEmails(inquiry) {
                 <div style="background-color: #040e08; font-family: 'Helvetica Neue', Arial, sans-serif; color: #f5f5f5; padding: 40px 20px; max-width: 650px; margin: 0 auto; border-radius: 12px; border: 1px solid #d4af37;">
                     <!-- Header -->
                     <div style="text-align: center; padding-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
-                        <span style="color: #d4af37; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; font-weight: bold;">Rock One Wild Tea Estate</span>
-                        <h1 style="color: #ffffff; font-size: 22px; margin: 10px 0 0 0; font-family: Georgia, serif;">New Tea Concierge Inquiry</h1>
-                        <p style="color: #86efac; font-size: 13px; margin: 5px 0 0 0;">Dossier Reference: <strong>${inquiry.id}</strong></p>
+                        <span style="color: #d4af37; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; font-weight: bold;">Rock One Wild Tea Estate &bull; Concierge Desk</span>
+                        <h1 style="color: #ffffff; font-size: 22px; margin: 10px 0 0 0; font-family: Georgia, serif;">New Client Inquiry Dossier</h1>
+                        <p style="color: #86efac; font-size: 13px; margin: 5px 0 0 0;">Dossier Reference: <strong style="color:#ffd875;">${inquiry.id}</strong></p>
                     </div>
 
-                    <!-- Customer Details Card -->
-                    <div style="background: rgba(255, 255, 255, 0.04); border-radius: 8px; padding: 20px; margin: 25px 0; border: 1px solid rgba(255, 255, 255, 0.1);">
-                        <h3 style="color: #d4af37; font-size: 14px; margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Patron Information</h3>
-                        <p style="margin: 6px 0; font-size: 14px;"><strong>Full Name:</strong> ${inquiry.full_name}</p>
-                        <p style="margin: 6px 0; font-size: 14px;"><strong>Email:</strong> <a href="mailto:${inquiry.email}" style="color: #86efac; text-decoration: none;">${inquiry.email}</a></p>
-                        <p style="margin: 6px 0; font-size: 14px;"><strong>Phone:</strong> ${inquiry.phone || 'Not provided'}</p>
-                        <p style="margin: 6px 0; font-size: 14px;"><strong>Service of Interest:</strong> <span style="color: #ffd875;">${inquiry.service_interested || 'General Inquiry'}</span></p>
-                        <p style="margin: 6px 0; font-size: 14px;"><strong>Budget Range:</strong> ${inquiry.budget_range || 'Not specified'}</p>
+                    <!-- Structured Data Table -->
+                    <div style="background: rgba(255, 255, 255, 0.04); border-radius: 8px; padding: 22px; margin: 25px 0; border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <h3 style="color: #d4af37; font-size: 13px; margin-top: 0; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 8px;">Patron Information & Request Scope</h3>
+                        
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
+                            <tr>
+                                <td style="padding: 8px 0; color: #9ca3af; width: 40%;"><strong>Full Name:</strong></td>
+                                <td style="padding: 8px 0; color: #ffffff; font-weight: bold;">${inquiry.full_name}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #9ca3af;"><strong>Email Address:</strong></td>
+                                <td style="padding: 8px 0;"><a href="mailto:${inquiry.email}" style="color: #86efac; text-decoration: none; font-weight: bold;">${inquiry.email}</a></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #9ca3af;"><strong>Phone / WhatsApp:</strong></td>
+                                <td style="padding: 8px 0; color: #ffffff;">${inquiry.phone || 'Not provided'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #9ca3af;"><strong>Service Requested:</strong></td>
+                                <td style="padding: 8px 0; color: #ffd875; font-weight: bold;">${inquiry.service_interested || 'General Inquiry'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #9ca3af;"><strong>Budget Scope:</strong></td>
+                                <td style="padding: 8px 0; color: #ffffff;">${inquiry.budget_range || 'Not specified'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #9ca3af;"><strong>Submission Date:</strong></td>
+                                <td style="padding: 8px 0; color: #d1d5db;">${new Date().toLocaleString('en-US', { timeZone: 'Asia/Colombo' })} (Sri Lanka Time)</td>
+                            </tr>
+                        </table>
                     </div>
 
                     <!-- Message Body -->
-                    <div style="background: rgba(4, 28, 14, 0.85); border-left: 3px solid #d4af37; padding: 18px; margin: 20px 0; border-radius: 4px;">
-                        <h4 style="color: #d4af37; margin: 0 0 8px 0; font-size: 13px; text-transform: uppercase;">Message & Project Details</h4>
-                        <p style="color: #e5e5e5; font-size: 14px; line-height: 1.7; margin: 0; white-space: pre-wrap;">${inquiry.message}</p>
+                    <div style="background: rgba(4, 28, 14, 0.9); border-left: 3px solid #d4af37; padding: 18px; margin: 20px 0; border-radius: 4px;">
+                        <h4 style="color: #d4af37; margin: 0 0 10px 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Message / Project Requirements:</h4>
+                        <p style="color: #f3f4f6; font-size: 14px; line-height: 1.8; margin: 0; white-space: pre-wrap;">${inquiry.message}</p>
                     </div>
 
-                    <!-- Actions -->
+                    <!-- Action Buttons -->
                     <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                        <a href="mailto:${inquiry.email}?subject=Re: Rock One Wild Tea Inquiry [${inquiry.id}]" style="background: #d4af37; color: #040a06; text-decoration: none; padding: 12px 26px; border-radius: 25px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 4px 15px rgba(212,175,55,0.4);">Reply to Patron</a>
+                        <a href="mailto:${inquiry.email}?subject=Re: Rock One Wild Tea Inquiry [${inquiry.id}]" style="background: #d4af37; color: #040a06; text-decoration: none; padding: 12px 24px; border-radius: 25px; font-weight: bold; font-size: 13px; display: inline-block; margin-right: 10px; box-shadow: 0 4px 15px rgba(212,175,55,0.35);">Reply via Email</a>
+                        ${cleanPhone ? `<a href="${waLink}" style="background: #25D366; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 25px; font-weight: bold; font-size: 13px; display: inline-block;">Reply on WhatsApp</a>` : ''}
                     </div>
 
                     <!-- Footer -->
                     <div style="text-align: center; margin-top: 30px; color: #888; font-size: 11px; line-height: 1.5;">
-                        <p>No: 54 Gannilawattha, Wallawela, Ettampitiya, Badulla District, Sri Lanka<br>Direct WhatsApp: +94 77 175 7556</p>
+                        <p>Rock One Wild Tea Estate &bull; No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka<br>Direct WhatsApp Desk: +94 77 175 7556</p>
                     </div>
                 </div>
             `
