@@ -5374,68 +5374,68 @@ Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
         const modal = document.createElement('div');
         modal.id = 'inquiry-success-modal';
         modal.className = 'modal-backdrop active';
-        modal.style.cssText = 'position:fixed; inset:0; background:rgba(4,14,8,0.92); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); z-index:99999; display:flex; align-items:center; justify-content:center; padding:1.5rem; animation:fadeIn 0.3s ease;';
+        modal.style.cssText = 'position:fixed; inset:0; background:rgba(4,14,8,0.92); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); z-index:99999; display:flex; align-items:center; justify-content:center; padding:1.25rem; overflow-y:auto; -webkit-overflow-scrolling:touch; animation:fadeIn 0.3s ease;';
 
         modal.innerHTML = `
-            <div class="modal-card" style="background:linear-gradient(135deg, rgba(6, 18, 12, 0.98) 0%, rgba(12, 32, 22, 0.98) 100%); border:1px solid rgba(212,175,55,0.45); border-radius:20px; max-width:600px; width:100%; padding:2.5rem 2rem; box-shadow:0 24px 60px rgba(0,0,0,0.85), 0 0 35px rgba(212,175,55,0.1); position:relative; text-align:center;">
-                <button type="button" id="close-inq-modal-btn" style="position:absolute; top:1.25rem; right:1.25rem; background:transparent; border:none; color:var(--color-gold); font-size:1.5rem; cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:all 0.2s;" title="Close">&times;</button>
+            <div class="modal-card" style="background:linear-gradient(135deg, rgba(6, 18, 12, 0.98) 0%, rgba(12, 32, 22, 0.98) 100%); border:1px solid rgba(212,175,55,0.45); border-radius:20px; max-width:580px; width:100%; max-height:88vh; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:2.25rem 1.75rem; box-shadow:0 24px 60px rgba(0,0,0,0.85), 0 0 35px rgba(212,175,55,0.1); position:relative; text-align:center; margin:auto;">
+                <button type="button" id="close-inq-modal-btn" style="position:sticky; top:0; float:right; background:rgba(0,0,0,0.5); border:1px solid rgba(212,175,55,0.3); color:var(--color-gold); font-size:1.5rem; cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:all 0.2s; z-index:10;" title="Close Receipt">&times;</button>
                 
-                <div style="width:62px; height:62px; border-radius:50%; background:rgba(212,175,55,0.15); border:1px solid var(--color-gold); display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem auto; color:var(--color-gold);">
+                <div style="width:58px; height:58px; border-radius:50%; background:rgba(212,175,55,0.15); border:1px solid var(--color-gold); display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem auto; color:var(--color-gold); clear:both;">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                     </svg>
                 </div>
 
-                <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:2px; color:var(--color-gold); font-weight:700; display:block; margin-bottom:0.4rem;">OFFICIAL CONCIERGE DELIVERY RECEIPT</span>
-                <h3 style="font-family:var(--font-serif); font-size:1.75rem; color:#ffffff; margin-bottom:0.75rem; line-height:1.2;">Message & Dossier Delivered</h3>
+                <span style="font-size:0.72rem; text-transform:uppercase; letter-spacing:2px; color:var(--color-gold); font-weight:700; display:block; margin-bottom:0.4rem;">OFFICIAL CONCIERGE DELIVERY RECEIPT</span>
+                <h3 style="font-family:var(--font-serif); font-size:1.6rem; color:#ffffff; margin-bottom:0.75rem; line-height:1.2;">Message & Dossier Delivered</h3>
                 
-                <div style="display:inline-block; background:rgba(212,175,55,0.15); border:1px solid var(--color-gold); border-radius:20px; padding:0.35rem 1.25rem; font-family:monospace; font-weight:700; font-size:0.92rem; color:var(--color-gold); margin-bottom:1.25rem;">
+                <div style="display:inline-block; background:rgba(212,175,55,0.15); border:1px solid var(--color-gold); border-radius:20px; padding:0.35rem 1.25rem; font-family:monospace; font-weight:700; font-size:0.9rem; color:var(--color-gold); margin-bottom:1.25rem;">
                     DOSSIER REF: ${inquiry.id}
                 </div>
 
-                <p style="color:var(--color-text-muted); font-size:0.9rem; line-height:1.65; margin-bottom:1.5rem;">
+                <p style="color:var(--color-text-muted); font-size:0.88rem; line-height:1.65; margin-bottom:1.5rem;">
                     Thank you, <strong style="color:#fff;">${inquiry.fullName}</strong>. Your inquiry has been registered in our estate ledger and dispatched to our Master Tea Sommelier. A delivery confirmation note has been issued.
                 </p>
 
                 <!-- Complete Structured Delivery Note -->
-                <div style="background:rgba(4,14,8,0.85); border:1px solid rgba(212,175,55,0.25); border-radius:12px; padding:1.25rem 1.35rem; text-align:left; margin-bottom:1.75rem; font-size:0.85rem; line-height:1.6;">
-                    <div style="color:var(--color-gold); font-size:0.75rem; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:0.75rem; border-bottom:1px solid rgba(212,175,55,0.2); padding-bottom:0.4rem;">
+                <div style="background:rgba(4,14,8,0.85); border:1px solid rgba(212,175,55,0.25); border-radius:12px; padding:1.15rem 1.25rem; text-align:left; margin-bottom:1.5rem; font-size:0.83rem; line-height:1.6;">
+                    <div style="color:var(--color-gold); font-size:0.72rem; text-transform:uppercase; letter-spacing:1.5px; font-weight:700; margin-bottom:0.6rem; border-bottom:1px solid rgba(212,175,55,0.2); padding-bottom:0.35rem;">
                         Delivery Note Summary
                     </div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.4rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.35rem;">
                         <span style="color:var(--color-text-muted);">Client Name:</span>
                         <strong style="color:#fff;">${inquiry.fullName}</strong>
                     </div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.4rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.35rem;">
                         <span style="color:var(--color-text-muted);">Client Email:</span>
                         <strong style="color:#86efac;">${inquiry.email}</strong>
                     </div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.4rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.35rem;">
                         <span style="color:var(--color-text-muted);">Phone / WhatsApp:</span>
                         <strong style="color:#fff;">${inquiry.phone || 'Not provided'}</strong>
                     </div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.4rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.35rem;">
                         <span style="color:var(--color-text-muted);">Requested Harvest / Service:</span>
                         <strong style="color:var(--color-gold);">${inquiry.service || 'Artisanal Pure Single-Estate Teas'}</strong>
                     </div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.4rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:0.35rem;">
                         <span style="color:var(--color-text-muted);">Budget Tier:</span>
                         <strong style="color:#fff;">${inquiry.budget || 'Not specified'}</strong>
                     </div>
-                    <div style="margin-top:0.6rem;">
+                    <div style="margin-top:0.5rem;">
                         <span style="color:var(--color-text-muted); display:block; margin-bottom:0.25rem;">Project Details Entered:</span>
-                        <p style="color:#e5e5e5; font-style:italic; margin:0; background:rgba(255,255,255,0.03); padding:0.5rem 0.75rem; border-radius:6px;">"${inquiry.details || inquiry.notes || 'General Inquiry'}"</p>
+                        <p style="color:#e5e5e5; font-style:italic; margin:0; background:rgba(255,255,255,0.03); padding:0.5rem 0.75rem; border-radius:6px; font-size:0.8rem; line-height:1.5;">"${inquiry.details || inquiry.notes || 'General Inquiry'}"</p>
                     </div>
                 </div>
 
                 <!-- Actions -->
                 <div style="display:flex; flex-direction:column; gap:0.75rem;">
-                    <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="padding:0.9rem 1.5rem; font-size:0.9rem; font-weight:700; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:0.5rem; background:linear-gradient(135deg, #25d366, #128c7e); color:#ffffff; border-radius:30px; border:none; box-shadow:0 6px 20px rgba(37,211,102,0.3); transition:all 0.3s ease;">
+                    <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="padding:0.85rem 1.35rem; font-size:0.88rem; font-weight:700; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:0.5rem; background:linear-gradient(135deg, #25d366, #128c7e); color:#ffffff; border-radius:30px; border:none; box-shadow:0 6px 20px rgba(37,211,102,0.3); transition:all 0.3s ease;">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.247 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.992-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.443-4.436-9.884-9.888-9.884-5.447 0-9.885 4.437-9.889 9.885-.001 2.016.52 3.49 1.37 4.975l-.997 3.641 3.731-.978z"/></svg>
                         <span>Open WhatsApp Priority Concierge</span>
                     </a>
                     
-                    <button type="button" id="close-inq-modal-btn2" class="btn btn-outline" style="font-size:0.82rem; padding:0.75rem; border-color:rgba(212,175,55,0.3); color:var(--color-gold); border-radius:30px;">
+                    <button type="button" id="close-inq-modal-btn2" class="btn btn-outline" style="font-size:0.82rem; padding:0.75rem; border-color:rgba(212,175,55,0.3); color:var(--color-gold); border-radius:30px; cursor:pointer;">
                         Close Receipt
                     </button>
                 </div>
@@ -5447,9 +5447,20 @@ Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
         const closeModal = () => modal.remove();
         document.getElementById('close-inq-modal-btn')?.addEventListener('click', closeModal);
         document.getElementById('close-inq-modal-btn2')?.addEventListener('click', closeModal);
+        
+        // Click backdrop to close
         modal.addEventListener('click', (e) => {
             if (e.target === modal) closeModal();
         });
+
+        // Escape key to close
+        const escHandler = (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                document.removeEventListener('keydown', escHandler);
+            }
+        };
+        document.addEventListener('keydown', escHandler);
     }
 
     // ── Connoisseur Web Audio Harmonic Bell Chime ──
