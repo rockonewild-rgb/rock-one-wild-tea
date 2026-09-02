@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../db/database');
+const { sendInquiryEmails } = require('../services/email');
 
 /**
  * POST /api/inquiries
  * Submit concierge inquiry or B2B request
  */
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const {
             full_name, email, phone = '',
@@ -31,6 +32,12 @@ router.post('/', (req, res) => {
         insert.run(id, full_name, email, phone, service_interested, budget_range, message, 'new');
 
         const created = db.prepare('SELECT * FROM inquiries WHERE id = ?').get(id);
+
+        // Dispatch Resend email notification in the background
+        sendInquiryEmails(created).catch(err => {
+            console.error('Email dispatch error:', err.message);
+        });
+
         res.status(201).json({
             success: true,
             message: 'Inquiry received successfully. Our concierge will contact you promptly.',

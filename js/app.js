@@ -5352,10 +5352,21 @@ Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
                 contactMethod: 'Direct Email & WhatsApp'
             };
 
-            // Save in Store ledger
+            // Save in Store ledger & Backend Database (which triggers Resend Email)
             const registeredInquiry = window.TeaFactoryStore.addInquiry(inquiryData);
 
-            // Dispatch Email
+            if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.submitInquiry === 'function') {
+                window.TeaFactoryAPI.submitInquiry({
+                    full_name: fullName,
+                    email: email,
+                    phone: phone,
+                    service_interested: service || 'General Inquiry',
+                    budget_range: budget || 'Not Specified',
+                    message: details || 'No specific notes provided'
+                }).catch(err => console.warn('API inquiry submit notice:', err.message));
+            }
+
+            // Client-side fallback dispatch
             await EmailService.sendInquiryEmail(registeredInquiry);
 
             setTimeout(() => {
