@@ -5,7 +5,7 @@ const resendApiKey = process.env.RESEND_API_KEY;
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 const SENDER_EMAIL = process.env.RESEND_FROM_EMAIL || 'Rock One Wild Tea <onboarding@resend.dev>';
-const CONCIERGE_INBOX = process.env.CONCIERGE_EMAIL || 'axentrat@gmail.com';
+const CONCIERGE_INBOX = process.env.CONCIERGE_EMAIL || 'rockonewild@gmail.com';
 
 /**
  * Send Concierge Inquiry Email Notification to Estate Owner & Customer
@@ -68,7 +68,7 @@ async function sendInquiryEmails(inquiry) {
         console.error('❌ [Email Service] Admin notification failed:', err.message);
     }
 
-    // 2. Automated Luxury Confirmation Email to Customer
+    // 2. Automated Luxury Confirmation Email to Customer (or fallback in Sandbox mode)
     try {
         const customerEmail = await resend.emails.send({
             from: SENDER_EMAIL,
@@ -111,7 +111,7 @@ async function sendInquiryEmails(inquiry) {
         results.customerEmail = customerEmail;
         console.log('🌿 [Email Service] Customer confirmation email sent to:', inquiry.email);
     } catch (err) {
-        console.error('❌ [Email Service] Customer confirmation failed:', err.message);
+        console.warn('Notice on customer confirmation in sandbox mode:', err.message);
     }
 
     return { success: true, results };

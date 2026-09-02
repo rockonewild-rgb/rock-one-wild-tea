@@ -2,13 +2,29 @@ const fs = require('fs');
 const path = require('path');
 const { DatabaseSync } = require('node:sqlite');
 
-// Ensure data directory exists
-const dataDir = path.join(__dirname, '../../data');
-if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+// Detect writable directory for local vs Vercel / AWS Lambda
+let dbPath;
+if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.NODE_ENV === 'production') {
+    const tmpDir = '/tmp';
+    dbPath = path.join(tmpDir, 'teafactory.db');
+    
+    // Copy bundled seed database to /tmp if it doesn't exist yet in /tmp
+    const bundledDb = path.join(__dirname, '../../data/teafactory.db');
+    if (fs.existsSync(bundledDb) && !fs.existsSync(dbPath)) {
+        try {
+            fs.copyFileSync(bundledDb, dbPath);
+        } catch (e) {
+            console.warn('Notice copying db to /tmp:', e.message);
+        }
+    }
+} else {
+    const dataDir = path.join(__dirname, '../../data');
+    if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+    }
+    dbPath = path.join(dataDir, 'teafactory.db');
 }
 
-const dbPath = path.join(dataDir, 'teafactory.db');
 const db = new DatabaseSync(dbPath);
 
 // Enable foreign keys
