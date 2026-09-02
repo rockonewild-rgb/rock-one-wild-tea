@@ -5255,33 +5255,20 @@ Direct Inbox: rockonewild@gmail.com | WhatsApp: +94 77 175 7556
 Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
             `.trim();
 
-            // 1. Dual delivery via FormSubmit with auto-responder delivery note to patron
+            // 1. Direct Estate API & Resend Email Delivery
             try {
-                const response = await fetch("https://formsubmit.co/ajax/15cfd400738ddd5d2940cea392c50e0a", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json"
-                    },
-                    body: JSON.stringify({
-                        "Dossier Reference": inquiry.id,
-                        "Full Name": inquiry.fullName,
-                        "Email Address": inquiry.email,
-                        "Phone Number": inquiry.phone || 'Not specified',
-                        "Service Requested": inquiry.service || 'Artisanal Pure Single-Estate Teas',
-                        "Project Budget": inquiry.budget || 'Not specified',
-                        "Project Requirements": inquiry.details || inquiry.notes || 'General Inquiry',
-                        "_replyto": inquiry.email,
-                        "_subject": `[New Enquiry ${inquiry.id}] ${inquiry.fullName} - ${inquiry.service || 'Estate Concierge'}`,
-                        "_autoresponse": `Thank you ${inquiry.fullName} for contacting Rock One Wild Tea Estate. We have received your inquiry [Ref: ${inquiry.id}] for ${inquiry.service || 'our single-estate teas'}. Our Master Tea Sommelier will review your dossier and contact you promptly. For urgent assistance, message our WhatsApp at +94 77 175 7556.`
-                    })
-                });
-
-                if (response.ok) {
-                    console.log("Inquiry delivered to concierge desk and autoresponder sent.");
+                if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.submitInquiry === 'function') {
+                    await window.TeaFactoryAPI.submitInquiry({
+                        full_name: inquiry.fullName,
+                        email: inquiry.email,
+                        phone: inquiry.phone,
+                        service_interested: inquiry.service || 'Artisanal Pure Single-Estate Teas',
+                        budget_range: inquiry.budget || 'Not Specified',
+                        message: inquiry.details || inquiry.notes || 'General Inquiry'
+                    });
                 }
             } catch (err) {
-                console.warn("Direct form post notice:", err.message);
+                console.warn("API inquiry dispatch notice:", err.message);
             }
 
             return {
@@ -5333,18 +5320,7 @@ Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
             // Save in Store ledger & Backend Database (which triggers Resend Email)
             const registeredInquiry = window.TeaFactoryStore.addInquiry(inquiryData);
 
-            if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.submitInquiry === 'function') {
-                window.TeaFactoryAPI.submitInquiry({
-                    full_name: fullName,
-                    email: email,
-                    phone: phone,
-                    service_interested: service || 'General Inquiry',
-                    budget_range: budget || 'Not Specified',
-                    message: details || 'No specific notes provided'
-                }).catch(err => console.warn('API inquiry submit notice:', err.message));
-            }
-
-            // Client-side fallback dispatch
+            // Dispatch via Backend API and Resend Email
             await EmailService.sendInquiryEmail(registeredInquiry);
 
             setTimeout(() => {
