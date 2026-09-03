@@ -1177,6 +1177,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function closeDrawer() {
         drawerOverlay.classList.remove('active');
+        drawerOverlay.classList.remove('open');
         currentDrawerContext = null;
     }
 
@@ -1185,6 +1186,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Close on overlay backdrop click
     drawerOverlay.addEventListener('click', (e) => {
         if (e.target === drawerOverlay) closeDrawer();
+    });
+
+    // Close on Escape key press
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if (drawerOverlay && drawerOverlay.classList.contains('active')) closeDrawer();
+        }
     });
 
     // 6. Box Enquiry Submission handler
