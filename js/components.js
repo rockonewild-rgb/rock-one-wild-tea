@@ -529,7 +529,9 @@ const UIComponents = {
         `;
 
         html += slots.map((slot, idx) => {
-            const isBooked = slot.status === 'Booked';
+            const timeStr = slot.timeSlot || slot.time_slot || slot.time || '09:00 AM - 10:00 AM';
+            const pkgName = (slot.booking && slot.booking.package) || slot.package || slot.name || 'Silver Leaf Tour';
+            const isBooked = slot.status === 'Booked' || (slot.booked_seats >= (slot.max_capacity || 12));
             const alignClass = idx % 2 === 0 ? 'left-aligned' : 'right-aligned';
             const statusBadge = isBooked 
                 ? `<span class="slot-status-badge booked">${_t('status_reserved', 'Reserved')}</span>` 
@@ -540,7 +542,7 @@ const UIComponents = {
                     <div class="timeline-dot"></div>
                     <div class="timeline-card">
                         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.75rem;">
-                            <span class="slot-time" style="font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600; color: var(--color-white);">${slot.timeSlot}</span>
+                            <span class="slot-time" style="font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600; color: var(--color-white);">${timeStr}</span>
                             ${statusBadge}
                         </div>
                         <div style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.5; margin-top: 0.75rem;">
@@ -550,11 +552,11 @@ const UIComponents = {
                                 </div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 0.6rem;">
                                     <span style="font-size: 0.75rem; color: var(--color-text-muted);">Estate Sommelier Tour</span>
-                                    <span class="slot-pkg-badge" style="color: var(--color-gold); font-size: 0.7rem; text-transform: uppercase; font-weight: 600;">${(slot.booking && slot.booking.package) || slot.package || 'Private Tasting'}</span>
+                                    <span class="slot-pkg-badge" style="color: var(--color-gold); font-size: 0.7rem; text-transform: uppercase; font-weight: 600;">${pkgName}</span>
                                 </div>
                             ` : `
                                 <div style="margin-bottom: 1rem;">Available for heritage factory tour &amp; organic gardens tasting.</div>
-                                <button class="btn btn-outline btn-book-slot" data-id="${slot.id}" data-timeslot="${slot.timeSlot}" style="width: 100%; text-align: center;">${_t('btn_book_slot', 'Book Slot')}</button>
+                                <button class="btn btn-outline btn-book-slot" data-id="${slot.id}" data-timeslot="${timeStr}" style="width: 100%; text-align: center;">${_t('btn_book_slot', 'Book Slot')}</button>
                             `}
                         </div>
                     </div>
@@ -1112,35 +1114,41 @@ const UIComponents = {
                                 <tbody>
                                     ${tourSlots.length === 0 ? `
                                         <tr><td colspan="6" class="text-center" style="padding: 2.5rem; color: #888;">No tour time slots configured. Add your first time slot below.</td></tr>
-                                    ` : tourSlots.map(slot => `
+                                    ` : tourSlots.map(slot => {
+                                        const timeStr = slot.timeSlot || slot.time_slot || slot.time || '09:00 AM - 10:00 AM';
+                                        const pkgName = slot.package || slot.name || 'Silver Leaf Tour';
+                                        const isBooked = slot.status === 'Booked' || (slot.booked_seats >= (slot.max_capacity || 12));
+                                        const statusStr = isBooked ? 'Booked' : 'Available';
+
+                                        return `
                                         <tr>
                                             <td class="font-mono text-gold font-bold">#${String(slot.id).padStart(2, '0')}</td>
-                                            <td><strong style="color:var(--color-white); font-family:var(--font-serif);">${slot.timeSlot}</strong></td>
-                                            <td><span style="font-size:0.8rem; color:var(--color-gold); font-weight:600;">${slot.package || 'Silver Leaf Tour'}</span></td>
+                                            <td><strong style="color:var(--color-white); font-family:var(--font-serif);">${timeStr}</strong></td>
+                                            <td><span style="font-size:0.8rem; color:var(--color-gold); font-weight:600;">${pkgName}</span></td>
                                             <td>
-                                                <span class="box-badge ${slot.status === 'Available' ? 'status-available' : 'status-booked'}" style="font-size: 0.65rem;">
-                                                    ${slot.status}
+                                                <span class="box-badge ${statusStr === 'Available' ? 'status-available' : 'status-booked'}" style="font-size: 0.65rem;">
+                                                    ${statusStr}
                                                 </span>
                                             </td>
                                             <td>
                                                 ${slot.booking ? `
                                                     <div style="font-size: 0.8rem; color: var(--color-gold); font-weight: 600;">${slot.booking.customerName || slot.booking.name || 'Guest'}</div>
-                                                    <small style="color: var(--color-text-muted);">${slot.booking.guests || 1} Guests &bull; ${slot.booking.package || slot.package}</small>
+                                                    <small style="color: var(--color-text-muted);">${slot.booking.guests || 1} Guests &bull; ${slot.booking.package || pkgName}</small>
                                                 ` : `<span style="font-size: 0.75rem; color: var(--color-text-muted);">No Bookings</span>`}
                                             </td>
                                             <td>
                                                 <div style="display: flex; gap: 0.4rem; align-items: center;">
                                                     <button class="btn-edit-slot" 
                                                             data-id="${slot.id}" 
-                                                            data-timeslot="${slot.timeSlot}" 
-                                                            data-package="${slot.package || 'Silver Leaf Tour'}" 
-                                                            data-status="${slot.status}" 
+                                                            data-timeslot="${timeStr}" 
+                                                            data-package="${pkgName}" 
+                                                            data-status="${statusStr}" 
                                                             style="background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); color: var(--color-gold); padding: 0.35rem 0.65rem; font-size: 0.7rem; border-radius: 3px; cursor: pointer; transition: var(--transition-smooth); display: inline-flex; align-items: center; gap: 0.25rem;" 
                                                             title="Edit Time Slot">
                                                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                                         Edit
                                                     </button>
-                                                    ${slot.status === 'Booked' ? `
+                                                    ${statusStr === 'Booked' ? `
                                                         <button class="btn-reset-slot" data-id="${slot.id}" style="background: rgba(46,125,50,0.15); border: 1px solid rgba(46,125,50,0.3); color: #81c784; padding: 0.35rem 0.65rem; font-size: 0.7rem; border-radius: 3px; cursor: pointer; transition: var(--transition-smooth); display: inline-flex; align-items: center; gap: 0.25rem;" title="Free slot for new bookings">
                                                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
                                                             Free Slot
@@ -1153,7 +1161,8 @@ const UIComponents = {
                                                 </div>
                                             </td>
                                         </tr>
-                                    `).join('')}
+                                        `;
+                                    }).join('')}
                                 </tbody>
                             </table>
                         </div>

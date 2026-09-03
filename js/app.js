@@ -4616,7 +4616,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const status = document.getElementById('slot-status-input').value;
 
                 if (editId) {
-                    window.TeaFactoryStore.updateTourSlot(parseInt(editId), {
+                    window.TeaFactoryStore.updateTourSlot(editId, {
                         timeSlot,
                         package: packageType,
                         status
@@ -4691,7 +4691,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const resetSlotBtns = document.querySelectorAll('.btn-reset-slot');
         resetSlotBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                const slotId = parseInt(btn.getAttribute('data-id'));
+                const slotId = btn.getAttribute('data-id');
                 if (confirm(`Free Slot #${slotId} back to Available for new guest bookings?`)) {
                     window.TeaFactoryStore.resetSingleTourSlot(slotId);
                     showToast("Slot Freed", `Slot #${slotId} is now available for new bookings.`, "success");
@@ -4704,7 +4704,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const deleteSlotBtns = document.querySelectorAll('.btn-delete-slot');
         deleteSlotBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                const slotId = parseInt(btn.getAttribute('data-id'));
+                const slotId = btn.getAttribute('data-id');
                 if (confirm(`Are you sure you want to remove Slot #${slotId} from the daily timeline?`)) {
                     window.TeaFactoryStore.deleteTourSlot(slotId);
                     showToast("Slot Removed", `Slot #${slotId} was removed from the schedule.`, "success");

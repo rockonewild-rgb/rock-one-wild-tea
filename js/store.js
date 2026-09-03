@@ -1247,10 +1247,13 @@ class TeaFactoryStore {
         const maxId = this.state.tourSlots.reduce((max, s) => Math.max(max, typeof s.id === 'number' ? s.id : 0), 0);
         const newSlot = {
             id: maxId + 1,
-            timeSlot: slotData.timeSlot || "09:00 AM - 10:00 AM",
-            package: slotData.package || "Silver Leaf Tour",
+            timeSlot: slotData.timeSlot || slotData.time_slot || "09:00 AM - 10:00 AM",
+            time_slot: slotData.timeSlot || slotData.time_slot || "09:00 AM - 10:00 AM",
+            package: slotData.package || slotData.name || "Silver Leaf Tour",
+            name: slotData.package || slotData.name || "Silver Leaf Tour",
             status: slotData.status || "Available",
-            booking: null
+            booking: null,
+            price: slotData.price || 75.00
         };
         this.state.tourSlots.push(newSlot);
         this.saveState();
@@ -1259,15 +1262,22 @@ class TeaFactoryStore {
 
     updateTourSlot(slotId, updatedData) {
         if (!this.state.tourSlots) return null;
-        const idx = this.state.tourSlots.findIndex(s => s.id === slotId);
+        const idx = this.state.tourSlots.findIndex(s => String(s.id) === String(slotId));
         if (idx === -1) return null;
 
         const current = this.state.tourSlots[idx];
+        const updatedTime = updatedData.timeSlot !== undefined ? updatedData.timeSlot : (current.timeSlot || current.time_slot);
+        const updatedPkg = updatedData.package !== undefined ? updatedData.package : (current.package || current.name);
+        const updatedStatus = updatedData.status !== undefined ? updatedData.status : current.status;
+
         this.state.tourSlots[idx] = {
             ...current,
-            timeSlot: updatedData.timeSlot !== undefined ? updatedData.timeSlot : current.timeSlot,
-            package: updatedData.package !== undefined ? updatedData.package : current.package,
-            status: updatedData.status !== undefined ? updatedData.status : current.status
+            timeSlot: updatedTime,
+            time_slot: updatedTime,
+            package: updatedPkg,
+            name: updatedPkg,
+            status: updatedStatus,
+            booking: updatedStatus === 'Available' ? null : current.booking
         };
 
         this.saveState();
@@ -1276,7 +1286,7 @@ class TeaFactoryStore {
 
     resetSingleTourSlot(slotId) {
         if (!this.state.tourSlots) return false;
-        const idx = this.state.tourSlots.findIndex(s => s.id === slotId);
+        const idx = this.state.tourSlots.findIndex(s => String(s.id) === String(slotId));
         if (idx === -1) return false;
         this.state.tourSlots[idx].status = 'Available';
         this.state.tourSlots[idx].booking = null;
@@ -1286,7 +1296,7 @@ class TeaFactoryStore {
 
     deleteTourSlot(slotId) {
         if (!this.state.tourSlots) return false;
-        this.state.tourSlots = this.state.tourSlots.filter(s => s.id !== slotId);
+        this.state.tourSlots = this.state.tourSlots.filter(s => String(s.id) !== String(slotId));
         this.saveState();
         return true;
     }
@@ -1781,7 +1791,24 @@ Rock One Wild Tea Sanctuary Concierge Team
 
             // 3. Sync Tour Slots
             if (tourRes.status === 'fulfilled' && Array.isArray(tourRes.value) && tourRes.value.length > 0) {
-                this.state.tourSlots = tourRes.value;
+                this.state.tourSlots = tourRes.value.map(s => {
+                    const isBooked = (s.booked_seats >= (s.max_capacity || 12)) || s.status === 'Booked' || s.status === 'reserved';
+                    const time = s.time_slot || s.timeSlot || s.time || "09:00 AM - 10:00 AM";
+                    const pkg = s.name || s.package || "Silver Leaf Tour";
+                    return {
+                        id: s.id,
+                        timeSlot: time,
+                        time_slot: time,
+                        package: pkg,
+                        name: pkg,
+                        status: isBooked ? 'Booked' : 'Available',
+                        booking: s.booked_seats > 0 ? { customerName: 'Reserved Session', guests: s.booked_seats, package: pkg } : (s.booking || null),
+                        tour_date: s.tour_date || 'Daily',
+                        price: s.price_usd || s.price || 75.00,
+                        max_capacity: s.max_capacity || 12,
+                        booked_seats: s.booked_seats || 0
+                    };
+                });
             }
 
             // 4. Sync Reviews
