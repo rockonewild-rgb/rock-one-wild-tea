@@ -1403,6 +1403,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (result.success) {
             const booking = result.booking;
+
+            // Trigger backend API and Resend Email Dispatch to Customer & Owner
+            if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.createOrder === 'function') {
+                window.TeaFactoryAPI.createOrder({
+                    id: booking.id,
+                    customer_name: booking.customerName,
+                    customer_email: booking.email,
+                    customer_phone: booking.phone,
+                    shipping_address: 'Standard International Delivery',
+                    subtotal_usd: booking.price,
+                    total_usd: booking.price,
+                    currency_code: booking.currency || 'USD',
+                    total_in_currency: booking.price,
+                    payment_method: 'bank',
+                    bespoke_notes: `Direct Product Reservation: ${booking.productName} (${booking.weight || ''})`,
+                    items: [{
+                        id: productId,
+                        name: booking.productName,
+                        quantity: 1,
+                        price: booking.price,
+                        giftOptions: {
+                            waxSeal: booking.waxSealColor,
+                            monogram: booking.monogramInitials,
+                            message: booking.giftMessage
+                        }
+                    }]
+                }).catch(err => console.warn('API product order dispatch notice:', err.message));
+            }
+
             showToast(
                 "Order Confirmed",
                 `${booking.productName} (${booking.weight}) reserved. Delivery: ${booking.deliveryRange}`,
@@ -6500,6 +6529,24 @@ Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
 
                         // Persist this order ID to device memory for "My Order" quick lookup
                         window.TeaFactoryStore.saveRecentOrderId(order.id);
+
+                        // Trigger backend API and Resend Email Dispatch to Customer & Owner
+                        if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.createOrder === 'function') {
+                            window.TeaFactoryAPI.createOrder({
+                                id: order.id,
+                                customer_name: order.customerName,
+                                customer_email: order.email,
+                                customer_phone: order.phone,
+                                shipping_address: `${order.address || 'Standard Delivery'}, ${order.country || 'International'}`,
+                                subtotal_usd: order.price,
+                                total_usd: order.price,
+                                currency_code: order.currency || 'USD',
+                                total_in_currency: order.price,
+                                payment_method: order.paymentMethod || 'credit_card',
+                                bespoke_notes: order.ownerNote || '',
+                                items: order.items || []
+                            }).catch(err => console.warn('API order email dispatch notice:', err.message));
+                        }
 
                         // Display luxury order confirmation view in drawer
                         body.innerHTML = `

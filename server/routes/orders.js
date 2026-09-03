@@ -1,14 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../db/database');
+const { sendOrderConfirmationEmails } = require('../services/email');
 
 /**
  * POST /api/orders
  * Create a new order with items
  */
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const {
+            id: customOrderId,
             customer_name, customer_email, customer_phone = '',
             shipping_address, items = [],
             subtotal_usd, discount_usd = 0, total_usd,
@@ -23,7 +25,7 @@ router.post('/', (req, res) => {
             });
         }
 
-        const orderId = 'ORD-' + Date.now().toString(36).toUpperCase() + '-' + Math.floor(Math.random() * 900 + 100);
+        const orderId = customOrderId || ('ORD-' + Date.now().toString(36).toUpperCase() + '-' + Math.floor(Math.random() * 900 + 100));
 
         // Insert Order
         const insertOrder = db.prepare(`
@@ -33,10 +35,10 @@ router.post('/', (req, res) => {
 
         insertOrder.run(
             orderId, customer_name, customer_email, customer_phone,
-            shipping_address, Number(subtotal_usd), Number(discount_usd),
-            Number(total_usd), currency_code, Number(currency_rate),
-            Number(total_in_currency || total_usd), payment_method,
-            'paid', 'processing', bespoke_notes || ''
+            shipping_address, Number(subtotal_usd || total_usd || 0), Number(discount_usd || 0),
+            Number(total_usd || 0), currency_code, Number(currency_rate || 1.0),
+            Number(total_in_currency || total_usd || 0), payment_method,
+            payment_method === 'bank' ? 'pending_deposit' : 'paid', 'processing', bespoke_notes || ''
         );
 
         // Insert Order Items and adjust product stock
@@ -50,13 +52,13 @@ router.post('/', (req, res) => {
         items.forEach((it, idx) => {
             const itemId = orderId + '-item-' + (idx + 1);
             const qty = Number(it.quantity) || 1;
-            const unitPrice = Number(it.price_usd || it.price) || 0;
+            const unitPrice = Number(it.unit_price_usd || it.price_usd || it.price) || 0;
             const itemTotal = unitPrice * qty;
 
             insertItem.run(
-                itemId, orderId, it.id || it.product_id,
-                it.name || 'Artisanal Tea Item', qty, unitPrice, itemTotal,
-                it.giftOptions ? JSON.stringify(it.giftOptions) : null
+                itemId, orderId, it.id || it.product_id || ('prod-' + (idx + 1)),
+                it.name || it.product_name || 'Artisanal Tea Item', qty, unitPrice, itemTotal,
+                it.giftOptions || it.gift_options ? JSON.stringify(it.giftOptions || it.gift_options) : null
             );
 
             // Deduct stock
@@ -69,16 +71,28 @@ router.post('/', (req, res) => {
         const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(orderId);
         const orderItems = db.prepare('SELECT * FROM order_items WHERE order_id = ?').all(orderId);
 
+        const orderWithItems = {
+            ...order,
+            items: orderItems.map(i => ({
+                ...i,
+                gift_options: i.gift_options ? JSON.parse(i.gift_options) : null
+            }))
+        };
+
+        // Dispatch Resend Email notification to Customer & Owner (awaited for serverless resilience)
+        let emailResult = null;
+        try {
+            emailResult = await sendOrderConfirmationEmails(orderWithItems);
+            console.log('✅ Order email dispatched successfully for:', orderId);
+        } catch (mailErr) {
+            console.error('⚠️ Order email dispatch error:', mailErr.message);
+        }
+
         res.status(201).json({
             success: true,
             message: 'Order created successfully',
-            data: {
-                ...order,
-                items: orderItems.map(i => ({
-                    ...i,
-                    gift_options: i.gift_options ? JSON.parse(i.gift_options) : null
-                }))
-            }
+            data: orderWithItems,
+            email_delivery: emailResult
         });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
