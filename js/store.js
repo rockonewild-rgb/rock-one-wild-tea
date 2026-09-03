@@ -1772,7 +1772,24 @@ Rock One Wild Tea Sanctuary Concierge Team
 
             // 1. Sync Products
             if (prodRes.status === 'fulfilled' && Array.isArray(prodRes.value) && prodRes.value.length > 0) {
-                this.state.products = prodRes.value;
+                this.state.products = prodRes.value.map(p => {
+                    const priceNum = Number(p.price !== undefined ? p.price : (p.price_usd !== undefined ? p.price_usd : 0)) || 0;
+                    return {
+                        id: p.id,
+                        name: p.name || 'Single-Estate Ceylon Tea',
+                        category: p.category || 'Imperial Reserve',
+                        price: priceNum,
+                        price_usd: priceNum,
+                        weight: p.weight || '100g Vintage Tin',
+                        stock: p.stock || (p.stock_quantity > 0 ? 'In Stock' : 'In Stock'),
+                        image: p.image || p.image_url || 'images/Product.jpeg',
+                        desc: p.desc || p.description || '',
+                        leafGrade: p.leafGrade || p.leaf_grade || 'Finest Broken Orange Pekoe',
+                        steepTemp: p.steepTemp || p.steep_temp || '95°C',
+                        steepTime: p.steepTime || p.steep_time || '3-4 mins',
+                        symbol: p.symbol || ''
+                    };
+                });
             }
 
             // 2. Sync Collector Boxes

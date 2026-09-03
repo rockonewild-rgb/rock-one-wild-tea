@@ -1517,18 +1517,25 @@ const UIComponents = {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${products.map(prod => `
+                                    ${products.map(prod => {
+                                        const priceVal = Number(prod.price !== undefined ? prod.price : (prod.price_usd !== undefined ? prod.price_usd : 0)) || 0;
+                                        const leafGradeStr = prod.leafGrade || prod.leaf_grade || 'Finest Harvest';
+                                        const categoryStr = prod.category || 'Imperial Reserve';
+                                        const weightStr = prod.weight || '100g Vintage Tin';
+                                        const stockStr = prod.stock || (prod.stock_quantity > 0 ? 'In Stock' : 'In Stock');
+
+                                        return `
                                         <tr>
                                             <td>
-                                                <img src="${prod.image || 'images/Product.jpeg'}" alt="${prod.name}" style="width: 44px; height: 44px; object-fit: contain; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); background: rgba(0,0,0,0.4); display: block;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
+                                                <img src="${prod.image || prod.image_url || 'images/Product.jpeg'}" alt="${prod.name}" style="width: 44px; height: 44px; object-fit: contain; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); background: rgba(0,0,0,0.4); display: block;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
                                             </td>
-                                            <td><strong>${prod.name}</strong><br><small style="color:var(--color-text-muted);">${prod.leafGrade}</small></td>
-                                            <td>${prod.category}</td>
-                                            <td>${prod.weight}</td>
-                                            <td style="color:var(--color-gold); font-weight: 600;">$${prod.price.toFixed(2)}</td>
+                                            <td><strong>${prod.name}</strong><br><small style="color:var(--color-text-muted);">${leafGradeStr}</small></td>
+                                            <td>${categoryStr}</td>
+                                            <td>${weightStr}</td>
+                                            <td style="color:var(--color-gold); font-weight: 600;">$${priceVal.toFixed(2)}</td>
                                             <td>
-                                                <span class="box-badge ${prod.stock === 'In Stock' ? 'status-available' : 'status-pending'}" style="font-size: 0.65rem;">
-                                                    ${prod.stock}
+                                                <span class="box-badge ${stockStr === 'In Stock' ? 'status-available' : 'status-pending'}" style="font-size: 0.65rem;">
+                                                    ${stockStr}
                                                 </span>
                                             </td>
                                             <td style="white-space: nowrap;">
@@ -1536,16 +1543,16 @@ const UIComponents = {
                                                     <button class="btn-edit-prod" 
                                                             data-id="${prod.id}" 
                                                             data-name="${prod.name}" 
-                                                            data-category="${prod.category}" 
-                                                            data-price="${prod.price}" 
-                                                            data-weight="${prod.weight}" 
+                                                            data-category="${categoryStr}" 
+                                                            data-price="${priceVal}" 
+                                                            data-weight="${weightStr}" 
                                                             data-symbol="${prod.symbol || ''}" 
-                                                            data-stock="${prod.stock}" 
-                                                            data-desc="${prod.desc || ''}" 
-                                                            data-grade="${prod.leafGrade || ''}" 
-                                                            data-temp="${prod.steepTemp || ''}" 
-                                                            data-time="${prod.steepTime || ''}" 
-                                                            data-image="${prod.image || 'images/Product.jpeg'}" 
+                                                            data-stock="${stockStr}" 
+                                                            data-desc="${prod.desc || prod.description || ''}" 
+                                                            data-grade="${leafGradeStr}" 
+                                                            data-temp="${prod.steepTemp || prod.steep_temp || ''}" 
+                                                            data-time="${prod.steepTime || prod.steep_time || ''}" 
+                                                            data-image="${prod.image || prod.image_url || 'images/Product.jpeg'}" 
                                                             style="background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); color: var(--color-gold); padding: 0.35rem 0.65rem; font-size: 0.7rem; border-radius: 3px; cursor: pointer; transition: var(--transition-smooth); display: inline-flex; align-items: center; gap: 0.25rem;" 
                                                             title="Edit Product">
                                                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -1558,7 +1565,8 @@ const UIComponents = {
                                                 </div>
                                             </td>
                                         </tr>
-                                    `).join('')}
+                                        `;
+                                    }).join('')}
                                 </tbody>
                             </table>
                         </div>
@@ -3420,7 +3428,7 @@ const UIComponents = {
                     </div>
                     <div>
                         <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-muted); margin-bottom: 0.3rem;">Amount Due</div>
-                        <div style="font-weight: 700; font-size: 1.3rem; color: var(--color-gold);">$${order.price.toFixed(2)}</div>
+                        <div style="font-weight: 700; font-size: 1.3rem; color: var(--color-gold);">${order.formattedPrice || `$${(Number(order.price) || 0).toFixed(2)}`}</div>
                     </div>
                     ${order.ownerNote ? `
                     <div>
@@ -3461,7 +3469,7 @@ const UIComponents = {
                             <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 1rem;">Click the button below to pay securely via our payment gateway. Your order will be confirmed automatically.</div>
                             <a href="${order.paymentLink}" target="_blank" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; font-size: 0.9rem;">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                Pay ${order.formattedPrice || '$' + order.price.toFixed(2)} Online →
+                                Pay ${order.formattedPrice || `$${(Number(order.price) || 0).toFixed(2)}`} Online →
                             </a>
                         ` : `
                             <div style="font-size: 0.8rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 0.45rem;">
@@ -3481,7 +3489,7 @@ const UIComponents = {
                             <div class="bank-detail-row"><span>Account No:</span><strong>${order.accountNo || '8002345678'}</strong></div>
                             ${order.referenceNote ? `<div class="bank-detail-row"><span>Reference:</span><strong>${order.referenceNote}</strong></div>` : `<div class="bank-detail-row"><span>Reference:</span><strong>${order.id}</strong></div>`}
                             <div class="bank-detail-row" style="border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 0.5rem; margin-top: 0.5rem;">
-                                <span>Amount:</span><strong style="color: var(--color-gold);">${order.formattedPrice || '$' + order.price.toFixed(2)}</strong>
+                                <span>Amount:</span><strong style="color: var(--color-gold);">${order.formattedPrice || `$${(Number(order.price) || 0).toFixed(2)}`}</strong>
                             </div>
                         </div>
 
