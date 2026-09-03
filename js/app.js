@@ -257,34 +257,22 @@
         setProgress(100);
         clearInterval(progressTimer);
 
+        preloader.classList.add('fade-out');
         setTimeout(() => {
-            preloader.classList.add('fade-out');
-            setTimeout(() => {
-                if (preloader.parentNode) {
-                    preloader.style.display = 'none';
-                }
-            }, 800);
-        }, 300);
+            if (preloader.parentNode) {
+                preloader.style.display = 'none';
+            }
+        }, 500);
     }
 
-    // Minimum display duration threshold for luxury feel (~600ms), maximum safety cutoff 2200ms
-    const minTimePassed = new Promise(resolve => setTimeout(resolve, 600));
-    const domReady = new Promise(resolve => {
-        if (document.readyState === 'complete' || document.readyState === 'interactive') {
-            resolve();
-        } else {
-            window.addEventListener('DOMContentLoaded', resolve, { once: true });
-        }
-    });
-
-    Promise.all([minTimePassed, domReady]).then(() => {
-        if (document.readyState === 'complete') {
-            dismissPreloader();
-        } else {
-            window.addEventListener('load', dismissPreloader, { once: true });
-            setTimeout(dismissPreloader, 1800);
-        }
-    });
+    // Dismiss immediately when DOM is interactive/ready for instant page render
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(dismissPreloader, 200);
+    } else {
+        document.addEventListener('DOMContentLoaded', () => setTimeout(dismissPreloader, 200), { once: true });
+    }
+    window.addEventListener('load', () => setTimeout(dismissPreloader, 100), { once: true });
+    setTimeout(dismissPreloader, 1200); // Safety fallback
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
