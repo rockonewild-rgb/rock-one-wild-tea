@@ -2313,25 +2313,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const approveSlipBtn = modal.querySelector('#modal-act-approve-slip');
         if (approveSlipBtn) {
             approveSlipBtn.addEventListener('click', () => {
-                if (confirm(`Approve deposit slip for ${booking.customerName} (${booking.id}) and confirm payment?`)) {
-                    window.TeaFactoryStore.validateDepositSlip(booking.id, true);
-                    closeModal();
-                    showToast("Deposit Slip Approved", `Payment verified and reservation ${booking.id} confirmed.`, "success");
+                closeModal();
+                showPaymentApprovalModal(booking.id, () => {
                     renderTabContent('admin');
-                }
+                });
             });
         }
 
         const rejectSlipBtn = modal.querySelector('#modal-act-reject-slip');
         if (rejectSlipBtn) {
             rejectSlipBtn.addEventListener('click', () => {
-                const reason = prompt("Enter rejection reason for customer (e.g. 'Amount mismatch' or 'Illegible receipt'):", "Amount mismatch or invalid receipt");
-                if (reason !== null) {
-                    window.TeaFactoryStore.validateDepositSlip(booking.id, false, reason);
-                    closeModal();
-                    showToast("Deposit Slip Rejected", `Slip marked as rejected. Status updated for ${booking.id}.`, "error");
+                closeModal();
+                showPaymentRejectionModal(booking.id, () => {
                     renderTabContent('admin');
-                }
+                });
             });
         }
 
@@ -2342,6 +2337,269 @@ document.addEventListener('DOMContentLoaded', () => {
                 showConvertToOrderModal(booking.id, booking);
             });
         }
+    }
+
+    // ─── Luxury Payment Approval Confirmation Modal ──────────────────────────
+    function showPaymentApprovalModal(transactionId, callback) {
+        const existing = document.getElementById('payment-approval-modal');
+        if (existing) existing.remove();
+
+        const orders = window.TeaFactoryStore.getOrders() || [];
+        const bookings = window.TeaFactoryStore.getBookings() || [];
+        const order = orders.find(o => o.id === transactionId || o.bookingId === transactionId);
+        const booking = bookings.find(b => b.id === transactionId);
+        const target = order || booking || { id: transactionId };
+
+        const custName = target.customerName || target.customer_name || 'Valued Patron';
+        const custEmail = target.email || target.customer_email || 'Not provided';
+        const custPhone = target.phone || target.customer_phone || '';
+        const itemName = target.productName || target.itemName || target.boxName || 'Artisanal Single-Estate Tea';
+        const amountFormatted = target.formattedPrice || (target.price ? `$${Number(target.price).toFixed(2)} USD` : (target.amount ? `$${Number(target.amount).toFixed(2)} USD` : '$150.00 USD'));
+        const slipImg = target.slipImage || '';
+        const paymentMethod = target.paymentMethod || 'Bank Deposit / Cash Slip';
+
+        const modal = document.createElement('div');
+        modal.id = 'payment-approval-modal';
+        modal.className = 'payment-approval-modal-overlay';
+        modal.style.cssText = `
+            position: fixed; inset: 0; z-index: 10000;
+            background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+        `;
+
+        modal.innerHTML = `
+            <div class="payment-approval-dialog" style="
+                background: linear-gradient(135deg, rgba(6, 22, 14, 0.98) 0%, rgba(3, 12, 7, 0.98) 100%);
+                border: 1px solid rgba(76, 175, 80, 0.6);
+                box-shadow: 0 25px 80px rgba(0,0,0,0.95), 0 0 35px rgba(76, 175, 80, 0.25);
+                border-radius: 22px; max-width: 580px; width: 100%; max-height: 90vh; overflow-y: auto;
+                padding: 2.25rem; color: #ffffff; position: relative;
+            ">
+                <!-- Close Button -->
+                <button type="button" class="btn-modal-close" style="
+                    position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.06);
+                    border: 1px solid rgba(255,255,255,0.15); color: #ffffff; width: 34px; height: 34px; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;
+                ">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+
+                <!-- Header Icon & Titles -->
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="
+                        width: 68px; height: 68px; border-radius: 50%; background: rgba(46, 125, 50, 0.18);
+                        border: 2px solid #4caf50; display: inline-flex; align-items: center; justify-content: center;
+                        color: #81c784; margin-bottom: 1rem; box-shadow: 0 0 24px rgba(76, 175, 80, 0.35);
+                    ">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    </div>
+                    <span style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; color: var(--color-gold); font-weight: 700; margin-bottom: 0.35rem;">
+                        Concierge Operations Desk
+                    </span>
+                    <h3 style="font-family: var(--font-serif); font-size: 1.55rem; margin: 0; color: #ffffff;">Approve &amp; Confirm Payment</h3>
+                    <p style="font-size: 0.82rem; color: var(--color-text-muted); margin: 0.35rem 0 0 0;">Verify transaction funds &amp; authorize harvest allocation.</p>
+                </div>
+
+                <!-- Transaction Particulars Card -->
+                <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(212,175,55,0.25); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.55rem; margin-bottom: 0.55rem;">
+                        <span style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px;">Transaction Ref</span>
+                        <strong style="font-family: monospace; color: var(--color-gold); font-size: 0.95rem;">${transactionId}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.55rem; margin-bottom: 0.55rem;">
+                        <span style="font-size: 0.75rem; color: var(--color-text-muted);">Customer</span>
+                        <span style="font-weight: 600; color: #ffffff; font-size: 0.88rem;">${custName}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.55rem; margin-bottom: 0.55rem;">
+                        <span style="font-size: 0.75rem; color: var(--color-text-muted);">Allocation / Item</span>
+                        <span style="color: #e0e0e0; font-size: 0.85rem;">${itemName}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.55rem; margin-bottom: 0.55rem;">
+                        <span style="font-size: 0.75rem; color: var(--color-text-muted);">Payment Mode</span>
+                        <span style="color: var(--color-gold); font-size: 0.85rem; font-weight: 600;">${paymentMethod === 'slip' || paymentMethod === 'bank' ? 'Bank Cash Deposit / Wire Slip' : 'Online Payment Gateway'}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.8rem; color: #ffffff; font-weight: 700;">Verified Amount</span>
+                        <span style="font-size: 1.25rem; font-weight: 800; color: #4ade80;">${amountFormatted}</span>
+                    </div>
+                </div>
+
+                <!-- Attached Bank Slip Preview (if present) -->
+                ${slipImg ? `
+                    <div style="background: rgba(212,175,55,0.05); border: 1px solid rgba(212,175,55,0.3); border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+                        <img src="${slipImg}" alt="Deposit Slip" style="width: 80px; height: 80px; object-fit: contain; background: #000; border-radius: 6px; border: 1px solid rgba(212,175,55,0.4); cursor: pointer;" onclick="window.open('${slipImg}')" title="Click to view full size">
+                        <div style="flex: 1;">
+                            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--color-gold); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 0.25rem;">Attached Bank Slip</div>
+                            <div style="font-size: 0.75rem; color: var(--color-text-muted); line-height: 1.4;">Teller stamp and transfer particulars verified against bank records.</div>
+                            <button type="button" class="btn btn-outline" style="font-size: 0.68rem; padding: 0.25rem 0.6rem; margin-top: 0.4rem; color: var(--color-gold); border-color: rgba(212,175,55,0.4);" onclick="window.open('${slipImg}')">View Full Slip &rarr;</button>
+                        </div>
+                    </div>
+                ` : ''}
+
+                <!-- Optional Concierge Audit Note -->
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-muted); margin-bottom: 0.4rem;">
+                        Concierge Approval Note (Optional)
+                    </label>
+                    <input type="text" id="modal-approval-note" placeholder="e.g. Bank slip verified on Commercial Bank portal by Manager" style="
+                        width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px;
+                        padding: 0.65rem 0.9rem; color: #ffffff; font-size: 0.82rem; outline: none;
+                    ">
+                </div>
+
+                <!-- Confirmation Action Buttons -->
+                <div style="display: flex; gap: 0.85rem; justify-content: flex-end; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-outline btn-modal-cancel" style="padding: 0.75rem 1.4rem; font-size: 0.85rem; border-color: rgba(255,255,255,0.25); color: #fff;">
+                        Cancel
+                    </button>
+                    <button type="button" id="btn-modal-confirm-approval" class="btn btn-primary" style="
+                        padding: 0.75rem 1.75rem; font-size: 0.88rem; font-weight: 700; background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+                        border-color: #4caf50; color: #ffffff; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 20px rgba(46,125,50,0.45);
+                    ">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Confirm &amp; Authorize Payment
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        function closeModal() { modal.remove(); }
+        modal.querySelector('.btn-modal-close').addEventListener('click', closeModal);
+        modal.querySelector('.btn-modal-cancel').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        const confirmBtn = modal.querySelector('#btn-modal-confirm-approval');
+        confirmBtn.addEventListener('click', () => {
+            const noteInput = modal.querySelector('#modal-approval-note');
+            const note = noteInput ? noteInput.value.trim() : '';
+            const res = window.TeaFactoryStore.validateDepositSlip(transactionId, true, note);
+            closeModal();
+            if (res.success) {
+                showToast("Payment Approved & Confirmed", `Transaction ${transactionId} has been verified and marked as Paid.`, "success");
+                if (typeof callback === 'function') callback();
+                else renderTabContent('admin');
+            } else {
+                showToast("Validation Error", res.message || "Could not validate slip.", "error");
+            }
+        });
+    }
+
+    // ─── Luxury Payment Rejection Confirmation Modal ─────────────────────────
+    function showPaymentRejectionModal(transactionId, callback) {
+        const existing = document.getElementById('payment-rejection-modal');
+        if (existing) existing.remove();
+
+        const orders = window.TeaFactoryStore.getOrders() || [];
+        const bookings = window.TeaFactoryStore.getBookings() || [];
+        const order = orders.find(o => o.id === transactionId || o.bookingId === transactionId);
+        const booking = bookings.find(b => b.id === transactionId);
+        const target = order || booking || { id: transactionId };
+        const custName = target.customerName || target.customer_name || 'Valued Patron';
+
+        const modal = document.createElement('div');
+        modal.id = 'payment-rejection-modal';
+        modal.className = 'payment-rejection-modal-overlay';
+        modal.style.cssText = `
+            position: fixed; inset: 0; z-index: 10000;
+            background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+        `;
+
+        modal.innerHTML = `
+            <div class="payment-rejection-dialog" style="
+                background: linear-gradient(135deg, rgba(26, 8, 8, 0.98) 0%, rgba(14, 4, 4, 0.98) 100%);
+                border: 1px solid rgba(239, 68, 68, 0.6);
+                box-shadow: 0 25px 80px rgba(0,0,0,0.95), 0 0 35px rgba(239, 68, 68, 0.25);
+                border-radius: 22px; max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto;
+                padding: 2.25rem; color: #ffffff; position: relative;
+            ">
+                <!-- Close Button -->
+                <button type="button" class="btn-modal-close" style="
+                    position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.06);
+                    border: 1px solid rgba(255,255,255,0.15); color: #ffffff; width: 34px; height: 34px; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center; cursor: pointer;
+                ">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+
+                <!-- Header Icon & Titles -->
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="
+                        width: 68px; height: 68px; border-radius: 50%; background: rgba(198, 40, 40, 0.18);
+                        border: 2px solid #ef5350; display: inline-flex; align-items: center; justify-content: center;
+                        color: #ef5350; margin-bottom: 1rem; box-shadow: 0 0 24px rgba(239, 68, 68, 0.35);
+                    ">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                    </div>
+                    <span style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; color: #ef5350; font-weight: 700; margin-bottom: 0.35rem;">
+                        Deposit Slip Rejection
+                    </span>
+                    <h3 style="font-family: var(--font-serif); font-size: 1.55rem; margin: 0; color: #ffffff;">Reject Deposit Slip</h3>
+                    <p style="font-size: 0.82rem; color: var(--color-text-muted); margin: 0.35rem 0 0 0;">Transaction: <strong style="color:var(--color-gold); font-family:monospace;">${transactionId}</strong> (${custName})</p>
+                </div>
+
+                <!-- Reason Quick Chips -->
+                <div style="margin-bottom: 1.25rem;">
+                    <label style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-muted); margin-bottom: 0.5rem;">
+                        Select Common Rejection Reason:
+                    </label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem;">
+                        <button type="button" class="btn-reason-chip" data-reason="Deposit amount mismatch" style="font-size: 0.72rem; padding: 0.3rem 0.65rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #e0e0e0; border-radius: 14px; cursor: pointer;">Amount Mismatch</button>
+                        <button type="button" class="btn-reason-chip" data-reason="Illegible / blurred slip screenshot" style="font-size: 0.72rem; padding: 0.3rem 0.65rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #e0e0e0; border-radius: 14px; cursor: pointer;">Illegible Image</button>
+                        <button type="button" class="btn-reason-chip" data-reason="Funds not credited to bank account" style="font-size: 0.72rem; padding: 0.3rem 0.65rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #e0e0e0; border-radius: 14px; cursor: pointer;">Funds Uncredited</button>
+                        <button type="button" class="btn-reason-chip" data-reason="Incorrect reference number" style="font-size: 0.72rem; padding: 0.3rem 0.65rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #e0e0e0; border-radius: 14px; cursor: pointer;">Invalid Reference</button>
+                    </div>
+                    <textarea id="modal-rejection-reason" rows="3" placeholder="Enter custom rejection reason for customer..." style="
+                        width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px;
+                        padding: 0.65rem 0.9rem; color: #ffffff; font-size: 0.82rem; outline: none; resize: vertical;
+                    ">Deposit amount mismatch or invalid receipt</textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 0.85rem; justify-content: flex-end; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-outline btn-modal-cancel" style="padding: 0.75rem 1.4rem; font-size: 0.85rem; border-color: rgba(255,255,255,0.25); color: #fff;">
+                        Cancel
+                    </button>
+                    <button type="button" id="btn-modal-confirm-rejection" class="btn btn-primary" style="
+                        padding: 0.75rem 1.75rem; font-size: 0.88rem; font-weight: 700; background: linear-gradient(135deg, #c62828 0%, #8e0000 100%);
+                        border-color: #ef5350; color: #ffffff; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 20px rgba(198,40,40,0.45);
+                    ">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        Confirm Rejection
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        function closeModal() { modal.remove(); }
+        modal.querySelector('.btn-modal-close').addEventListener('click', closeModal);
+        modal.querySelector('.btn-modal-cancel').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        const reasonArea = modal.querySelector('#modal-rejection-reason');
+        modal.querySelectorAll('.btn-reason-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                reasonArea.value = chip.getAttribute('data-reason');
+            });
+        });
+
+        const confirmBtn = modal.querySelector('#btn-modal-confirm-rejection');
+        confirmBtn.addEventListener('click', () => {
+            const reason = reasonArea.value.trim() || 'Amount mismatch or invalid receipt';
+            const res = window.TeaFactoryStore.validateDepositSlip(transactionId, false, reason);
+            closeModal();
+            if (res.success) {
+                showToast("Deposit Slip Rejected", `Slip marked as rejected for ${transactionId}.`, "error");
+                if (typeof callback === 'function') callback();
+                else renderTabContent('admin');
+            } else {
+                showToast("Rejection Error", res.message || "Could not reject slip.", "error");
+            }
+        });
     }
 
     // ─── Audit Log Live Filter & Search Logic ─────────────────────────────────
@@ -4542,15 +4800,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.btn-approve-slip').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-id');
-                if (confirm(`Approve deposit slip for transaction ${id} and confirm payment?`)) {
-                    const res = window.TeaFactoryStore.validateDepositSlip(id, true);
-                    if (res.success) {
-                        showToast("Deposit Slip Approved", `Payment verified & confirmed for ${id}.`, "success");
-                        renderTabContent('admin');
-                    } else {
-                        showToast("Validation Error", res.message || "Could not validate slip.", "error");
-                    }
-                }
+                showPaymentApprovalModal(id, () => {
+                    renderTabContent('admin');
+                });
             });
         });
 
@@ -4558,16 +4810,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.btn-reject-slip').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-id');
-                const reason = prompt("Please enter reason for rejecting this deposit slip (e.g. 'Amount mismatch', 'Illegible screenshot'):", "Amount mismatch or invalid receipt");
-                if (reason !== null) {
-                    const res = window.TeaFactoryStore.validateDepositSlip(id, false, reason);
-                    if (res.success) {
-                        showToast("Deposit Slip Rejected", `Deposit slip for ${id} was rejected. Customer status updated.`, "error");
-                        renderTabContent('admin');
-                    } else {
-                        showToast("Rejection Error", res.message || "Could not reject slip.", "error");
-                    }
-                }
+                showPaymentRejectionModal(id, () => {
+                    renderTabContent('admin');
+                });
             });
         });
 
@@ -4575,13 +4820,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.btn-mark-order-paid').forEach(btn => {
             btn.addEventListener('click', () => {
                 const orderId = btn.getAttribute('data-order-id');
-                if (confirm(`Confirm payment for Order ${orderId}? This will mark the gift box as Reserved.`)) {
-                    const ok = window.TeaFactoryStore.updateOrderStatus(orderId, 'Paid & Confirmed');
-                    if (ok) {
-                        showToast("Payment Confirmed", `Order ${orderId} marked as Paid & Confirmed. Gift box reserved.`, "success");
-                        renderTabContent('admin');
-                    }
-                }
+                showPaymentApprovalModal(orderId, () => {
+                    renderTabContent('admin');
+                });
             });
         });
 
