@@ -33,15 +33,20 @@ router.post('/', async (req, res) => {
 
         const created = db.prepare('SELECT * FROM inquiries WHERE id = ?').get(id);
 
-        // Dispatch Resend email notification in the background
-        sendInquiryEmails(created).catch(err => {
-            console.error('Email dispatch error:', err.message);
-        });
+        // Dispatch Resend email notification (awaited so Vercel serverless does not terminate before completion)
+        let emailStatus = null;
+        try {
+            emailStatus = await sendInquiryEmails(created);
+            console.log('✅ Resend email dispatch completed for:', id, emailStatus);
+        } catch (mailErr) {
+            console.error('⚠️ Email dispatch warning:', mailErr.message);
+        }
 
         res.status(201).json({
             success: true,
             message: 'Inquiry received successfully. Our concierge will contact you promptly.',
-            data: created
+            data: created,
+            email_delivery: emailStatus
         });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
