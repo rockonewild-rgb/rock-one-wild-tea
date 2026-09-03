@@ -31,13 +31,18 @@ router.get('/', (req, res) => {
         query += ' ORDER BY price_usd DESC';
         const rows = db.prepare(query).all(...params);
 
-        // Parse JSON fields
-        const products = rows.map(r => ({
-            ...r,
-            flavor_notes: r.flavor_notes ? JSON.parse(r.flavor_notes) : [],
-            brewing_guide: r.brewing_guide ? JSON.parse(r.brewing_guide) : null,
-            is_reserve: Boolean(r.is_reserve)
-        }));
+        // Parse JSON fields and guarantee numeric prices
+        const products = rows.map(r => {
+            const priceVal = Number(r.price_usd !== undefined ? r.price_usd : (r.price !== undefined ? r.price : 0)) || 0;
+            return {
+                ...r,
+                price: priceVal,
+                price_usd: priceVal,
+                flavor_notes: r.flavor_notes ? JSON.parse(r.flavor_notes) : [],
+                brewing_guide: r.brewing_guide ? JSON.parse(r.brewing_guide) : null,
+                is_reserve: Boolean(r.is_reserve)
+            };
+        });
 
         res.json({ success: true, count: products.length, data: products });
     } catch (err) {

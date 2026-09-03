@@ -681,7 +681,25 @@ class TeaFactoryStore {
             this.state.products = this.getDefaultProducts();
             this.saveState();
         }
-        return this.state.products;
+        return this.state.products.map(p => {
+            if (!p) return p;
+            const priceNum = Number(p.price !== undefined ? p.price : (p.price_usd !== undefined ? p.price_usd : 0)) || 0;
+            p.price = priceNum;
+            p.price_usd = priceNum;
+            if (!p.leafGrade && p.leaf_grade) p.leafGrade = p.leaf_grade;
+            if (!p.desc && p.description) p.desc = p.description;
+            if (!p.image && p.image_url) p.image = p.image_url;
+            return p;
+        });
+    }
+    getProductById(id) {
+        const prod = (this.getProducts() || []).find(p => p && (p.id == id || String(p.id) === String(id)));
+        if (prod) {
+            const priceNum = Number(prod.price !== undefined ? prod.price : (prod.price_usd !== undefined ? prod.price_usd : 0)) || 0;
+            prod.price = priceNum;
+            prod.price_usd = priceNum;
+        }
+        return prod || null;
     }
     getBookings() { return this.state.bookings || []; }
     getTourSlots() { return this.state.tourSlots || []; }
