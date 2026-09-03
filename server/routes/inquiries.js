@@ -10,6 +10,7 @@ const { sendInquiryEmails } = require('../services/email');
 router.post('/', async (req, res) => {
     try {
         const {
+            id: customId,
             full_name, email, phone = '',
             service_interested = 'General Inquiry',
             budget_range = 'Not Specified',
@@ -23,7 +24,7 @@ router.post('/', async (req, res) => {
             });
         }
 
-        const id = 'INQ-' + Date.now().toString(36).toUpperCase();
+        const id = customId || ('INQ-' + Date.now().toString(36).toUpperCase());
         const insert = db.prepare(`
             INSERT INTO inquiries (id, full_name, email, phone, service_interested, budget_range, message, status)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)

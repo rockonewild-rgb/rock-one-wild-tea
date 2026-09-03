@@ -5267,6 +5267,7 @@ Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
             try {
                 if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.submitInquiry === 'function') {
                     await window.TeaFactoryAPI.submitInquiry({
+                        id: inquiry.id,
                         full_name: inquiry.fullName,
                         email: inquiry.email,
                         phone: inquiry.phone,
@@ -5308,7 +5309,7 @@ Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = `
                     <span class="btn-spinner" style="display:inline-block; width:16px; height:16px; border:2px solid rgba(0,0,0,0.3); border-top-color:#000; border-radius:50%; animation:spin 0.8s linear infinite; margin-right:8px; vertical-align:middle;"></span>
-                    <span>Sending Message to axentrat@gmail.com...</span>
+                    <span>Delivering Concierge Dossier...</span>
                 `;
             }
 
