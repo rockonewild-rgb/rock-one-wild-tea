@@ -4820,7 +4820,7 @@ img.zoomable:hover {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     padding: 0;
-    overflow: hidden;
+    overflow: visible !important;
 }
 
 .floating-cart-btn:hover {
@@ -4852,6 +4852,19 @@ img.zoomable:hover {
 /* Diagonal Shining Light Sheen Sweep Effect */
 .cart-shine-sheen {
     position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.cart-shine-sheen::after {
+    content: '';
+    position: absolute;
     top: -50%;
     left: -130%;
     width: 70%;
@@ -4864,8 +4877,6 @@ img.zoomable:hover {
     );
     transform: rotate(25deg);
     animation: cartShineSweep 3.2s infinite ease-in-out;
-    pointer-events: none;
-    z-index: 2;
 }
 
 @keyframes cartShineSweep {
@@ -4890,6 +4901,7 @@ img.zoomable:hover {
     width: 100%;
     height: 100%;
     z-index: 3;
+    overflow: visible;
 }
 
 .cart-floating-svg {
@@ -4904,22 +4916,25 @@ img.zoomable:hover {
 
 .floating-cart-badge {
     position: absolute;
-    top: -4px;
-    right: -4px;
-    background: linear-gradient(135deg, #d4af37 0%, #f6e27a 100%);
-    color: #040e08;
-    font-size: 0.7rem;
-    font-weight: 800;
-    min-width: 20px;
-    height: 20px;
-    border-radius: 10px;
+    top: -6px;
+    right: -6px;
+    z-index: 50;
+    background: linear-gradient(135deg, #ffd700 0%, #d4af37 100%) !important;
+    color: #040e08 !important;
+    font-size: 0.78rem !important;
+    font-weight: 900 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 0.3rem;
-    border: 2px solid #7f1d1d;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 10px rgba(212, 175, 55, 0.8);
+    padding: 0 0.35rem;
+    border: 2px solid #5a0c0c !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.9), 0 0 12px rgba(255, 215, 0, 0.85) !important;
     line-height: 1;
+    pointer-events: none;
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
