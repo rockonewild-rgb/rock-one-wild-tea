@@ -332,7 +332,7 @@ class TeaFactoryStore {
     addInquiry(inquiryData) {
         if (!this.state.inquiries) this.state.inquiries = [];
         const newInquiry = {
-            id: "INQ-" + Math.floor(10000 + Math.random() * 90000),
+            id: inquiryData.id || ("INQ-" + Math.floor(10000 + Math.random() * 90000)),
             fullName: inquiryData.fullName || "Anonymous Patron",
             email: inquiryData.email || "",
             phone: inquiryData.phone || "",

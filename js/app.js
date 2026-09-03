@@ -5313,7 +5313,10 @@ Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
                 `;
             }
 
+            const dossierId = 'INQ-' + Math.floor(10000 + Math.random() * 90000);
+
             const inquiryData = {
+                id: dossierId,
                 fullName,
                 email,
                 phone,
@@ -5328,6 +5331,7 @@ Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
 
             // Save in Store ledger & Backend Database (which triggers Resend Email)
             const registeredInquiry = window.TeaFactoryStore.addInquiry(inquiryData);
+            registeredInquiry.id = dossierId;
 
             // Dispatch via Backend API and Resend Email
             await EmailService.sendInquiryEmail(registeredInquiry);
