@@ -534,11 +534,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const form = document.getElementById('admin-login-form');
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            const passcode = (document.getElementById('admin-passcode').value || '').trim().toLowerCase();
-            const storedPasscode = (window.TeaFactoryStore.getAdminPasscode() || 'admin').trim().toLowerCase();
-            const validCodes = [storedPasscode, 'admin', '1890', 'rockone', 'rock1890', 'concierge', 'tea1890'];
+            const passcode = (document.getElementById('admin-passcode').value || '').trim();
+            const storedPasscode = (window.TeaFactoryStore.getAdminPasscode() || 'admin').trim();
             
-            if (validCodes.includes(passcode)) {
+            if (passcode.toLowerCase() === storedPasscode.toLowerCase()) {
                 isAdminAuthenticated = true;
                 showToast("Access Granted", "Welcome back, Estate Concierge.", "success");
                 renderTabContent('admin');
@@ -644,14 +643,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const form = modal.querySelector('#change-passcode-form');
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            const currInput = (modal.querySelector('#modal-curr-passcode').value || '').trim().toLowerCase();
+            const currInput = (modal.querySelector('#modal-curr-passcode').value || '').trim();
             const newInput = (modal.querySelector('#modal-new-passcode').value || '').trim();
             const confirmInput = (modal.querySelector('#modal-confirm-passcode').value || '').trim();
 
-            const storedPasscode = (window.TeaFactoryStore.getAdminPasscode() || 'admin').trim().toLowerCase();
-            const validCurrentCodes = [storedPasscode, 'admin', '1890', 'rockone', 'rock1890', 'concierge'];
+            const storedPasscode = (window.TeaFactoryStore.getAdminPasscode() || 'admin').trim();
 
-            if (!validCurrentCodes.includes(currInput)) {
+            if (currInput.toLowerCase() !== storedPasscode.toLowerCase()) {
                 showToast("Verification Error", "Current passcode is incorrect.", "error");
                 modal.querySelector('#modal-curr-passcode').value = '';
                 modal.querySelector('#modal-curr-passcode').focus();
