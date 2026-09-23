@@ -479,28 +479,30 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!container) return;
 
         container.innerHTML = `
-            <div class="panel-card" style="max-width: 440px; margin: 4rem auto; text-align: center; border: var(--border-gold); background: rgba(10, 24, 14, 0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 3.5rem 2.5rem; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.85), 0 0 30px rgba(212,175,55,0.15);">
-                <div style="width: 80px; height: 80px; margin: 0 auto 1.5rem auto; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));">
-                    <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" style="width: 100%; height: 100%; object-fit: contain;" onerror="window.handleImageError && window.handleImageError(this, 'logo')">
-                </div>
-                <h2 style="font-family: var(--font-serif); font-size: 1.6rem; color: var(--color-white); margin-bottom: 0.5rem; letter-spacing: 0.5px;">Concierge Authentication</h2>
-                <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 2.25rem; font-weight: 300;">Access restricted to authorized estate operators.</p>
-                
-                <form id="admin-login-form" class="admin-form" style="display: flex; flex-direction: column; gap: 1.5rem;">
-                    <div class="form-group" style="text-align: left;">
-                        <label for="admin-passcode" style="margin-bottom: 0.5rem; display: block; font-size: 0.72rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--color-gold); font-weight: 600;">Estate Passcode</label>
-                        <div style="position: relative; width: 100%;">
-                            <input type="password" id="admin-passcode" placeholder="Enter staff passcode" autocomplete="current-password" style="width: 100%; box-sizing: border-box; font-size: 1rem; color: #ffffff !important; background: rgba(2, 8, 4, 0.75) !important; border: 1.5px solid rgba(212, 175, 55, 0.45); border-radius: 8px; padding: 0.85rem 3rem 0.85rem 1rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s;" required>
-                            <button type="button" id="toggle-admin-passcode-btn" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--color-gold); cursor: pointer; padding: 0.25rem; display: flex; align-items: center; justify-content: center; opacity: 0.8; transition: opacity 0.2s;" title="Show/Hide Passcode">
-                                <svg id="passcode-eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
-                        </div>
+            <div class="admin-login-viewport">
+                <div class="admin-login-card">
+                    <div class="admin-login-logo-box">
+                        <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" class="admin-login-logo" onerror="window.handleImageError && window.handleImageError(this, 'logo')">
                     </div>
-                    <button type="submit" class="btn btn-primary w-full" style="padding: 0.9rem; font-size: 0.88rem; letter-spacing: 1.5px; font-weight: 700; box-shadow: 0 4px 20px rgba(212,175,55,0.35);">Unlock Console</button>
-                </form>
+                    <h2 class="admin-login-title">Concierge Authentication</h2>
+                    <p class="admin-login-subtitle">Access restricted to authorized estate operators.</p>
+                    
+                    <form id="admin-login-form" class="admin-form" style="display: flex; flex-direction: column; gap: 1.35rem;">
+                        <div class="form-group" style="text-align: left;">
+                            <label for="admin-passcode" class="admin-login-label">Estate Passcode</label>
+                            <div class="admin-login-input-wrapper">
+                                <input type="password" id="admin-passcode" placeholder="Enter staff passcode" autocomplete="current-password" class="admin-login-input" required>
+                                <button type="button" id="toggle-admin-passcode-btn" class="admin-login-eye-btn" title="Show/Hide Passcode">
+                                    <svg id="passcode-eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-full admin-login-btn">Unlock Console</button>
+                    </form>
+                </div>
             </div>
         `;
 
@@ -559,8 +561,8 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.style.cssText = `
             position: fixed; inset: 0; z-index: 10000;
             background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            display: flex; align-items: center; justify-content: center; padding: 1.5rem;
-            animation: fadeInModal 0.25s ease-out;
+            display: flex; align-items: center; justify-content: center; padding: 1rem;
+            animation: fadeInModal 0.25s ease-out; box-sizing: border-box;
         `;
 
         modal.innerHTML = `
@@ -568,7 +570,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 background: linear-gradient(135deg, rgba(8, 22, 14, 0.98) 0%, rgba(4, 12, 7, 0.99) 100%);
                 border: 1.5px solid rgba(212, 175, 55, 0.55);
                 box-shadow: 0 25px 80px rgba(0,0,0,0.95), 0 0 35px rgba(212, 175, 55, 0.2);
-                border-radius: 20px; max-width: 460px; width: 100%; padding: 2.25rem; color: #ffffff; position: relative;
+                border-radius: 20px; max-width: 460px; width: 100%; max-height: 90vh; overflow-y: auto;
+                padding: clamp(1.5rem, 3vh, 2.25rem); color: #ffffff; position: relative; box-sizing: border-box;
             ">
                 <!-- Close Button -->
                 <button type="button" class="btn-modal-close" style="
@@ -698,7 +701,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 background: linear-gradient(135deg, rgba(26, 8, 8, 0.98) 0%, rgba(14, 4, 4, 0.99) 100%);
                 border: 1.5px solid rgba(239, 68, 68, 0.6);
                 box-shadow: 0 25px 80px rgba(0,0,0,0.95), 0 0 35px rgba(239, 68, 68, 0.25);
-                border-radius: 22px; max-width: 500px; width: 100%; padding: 2.25rem; color: #ffffff; position: relative;
+                border-radius: 22px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;
+                padding: clamp(1.5rem, 3vh, 2.25rem); color: #ffffff; position: relative; box-sizing: border-box;
             ">
                 <!-- Close Button -->
                 <button type="button" class="btn-modal-close" style="
