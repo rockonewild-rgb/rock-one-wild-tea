@@ -92,6 +92,63 @@ router.get('/', async (req, res) => {
 });
 
 /**
+ * PATCH /api/inquiries/:id
+ * Update inquiry status or fields
+ */
+router.patch('/:id', async (req, res) => {
+    try {
+        const inqId = req.params.id;
+        const { status, message, notes } = req.body;
+
+        if (!status && !message && !notes) {
+            return res.status(400).json({ success: false, error: 'No update fields provided' });
+        }
+
+        const updatePayload = {};
+        if (status) updatePayload.status = status;
+        if (message || notes) updatePayload.message = message || notes;
+
+        if (isSupabaseAvailable()) {
+            const { error } = await supabase.from('inquiries').update(updatePayload).eq('id', inqId);
+            if (error) console.warn('⚠️ Supabase inquiry update error:', error.message);
+        }
+
+        try {
+            if (status) {
+                db.prepare('UPDATE inquiries SET status = ? WHERE id = ?').run(status, inqId);
+            }
+        } catch (e) {}
+
+        res.json({ success: true, message: 'Inquiry updated successfully', id: inqId, data: updatePayload });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+/**
+ * PUT /api/inquiries/:id
+ */
+router.put('/:id', async (req, res) => {
+    try {
+        const inqId = req.params.id;
+        const { status } = req.body;
+
+        if (isSupabaseAvailable()) {
+            const { error } = await supabase.from('inquiries').update({ status }).eq('id', inqId);
+            if (error) console.warn('⚠️ Supabase inquiry update error:', error.message);
+        }
+
+        try {
+            db.prepare('UPDATE inquiries SET status = ? WHERE id = ?').run(status || 'new', inqId);
+        } catch (e) {}
+
+        res.json({ success: true, message: 'Inquiry updated successfully', id: inqId, status });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+/**
  * DELETE /api/inquiries/:id
  */
 router.delete('/:id', async (req, res) => {

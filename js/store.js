@@ -351,22 +351,51 @@ class TeaFactoryStore {
         this.state.inquiries.unshift(newInquiry);
         this.logMockInquiryEmail(newInquiry);
         this.saveState();
+
+        if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.submitInquiry === 'function') {
+            TeaFactoryAPI.submitInquiry({
+                id: newInquiry.id,
+                full_name: newInquiry.fullName,
+                email: newInquiry.email,
+                phone: newInquiry.phone,
+                service_interested: Array.isArray(newInquiry.interests) ? newInquiry.interests.join(', ') : (newInquiry.interests || 'Private Reserve'),
+                budget_range: newInquiry.volumeTier || 'VIP Tier',
+                message: newInquiry.notes || ''
+            }).catch(e => console.warn('Supabase inquiry submit error:', e));
+        }
+
         return newInquiry;
     }
 
     updateInquiryStatus(inquiryId, newStatus) {
         if (!this.state.inquiries) return;
-        const inq = this.state.inquiries.find(i => i.id === inquiryId);
+        const inq = this.state.inquiries.find(i => String(i.id) === String(inquiryId));
         if (inq) {
             inq.status = newStatus;
             this.saveState();
+
+            if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.updateInquiryStatus === 'function') {
+                TeaFactoryAPI.updateInquiryStatus(inquiryId, newStatus).catch(e => console.warn('Supabase inquiry status update error:', e));
+            } else {
+                fetch(`/api/inquiries/${encodeURIComponent(inquiryId)}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                }).catch(e => console.warn('Inquiry status update error:', e));
+            }
         }
     }
 
     deleteInquiry(inquiryId) {
         if (!this.state.inquiries) return;
-        this.state.inquiries = this.state.inquiries.filter(i => i.id !== inquiryId);
+        this.state.inquiries = this.state.inquiries.filter(i => String(i.id) !== String(inquiryId));
         this.saveState();
+
+        if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.deleteInquiry === 'function') {
+            TeaFactoryAPI.deleteInquiry(inquiryId).catch(e => console.warn('Supabase inquiry delete error:', e));
+        } else {
+            fetch(`/api/inquiries/${encodeURIComponent(inquiryId)}`, { method: 'DELETE' }).catch(e => console.warn('Inquiry delete error:', e));
+        }
     }
 
     getDefaultProducts() {
@@ -1898,12 +1927,13 @@ Rock One Wild Tea Sanctuary Concierge Team
             if (!isOnline) return;
 
             // Fetch all resources concurrently in 1 parallel batch
-            const [prodRes, boxRes, tourRes, revRes, annRes] = await Promise.allSettled([
+            const [prodRes, boxRes, tourRes, revRes, annRes, inqRes] = await Promise.allSettled([
                 TeaFactoryAPI.fetchProducts(),
                 TeaFactoryAPI.fetchBoxes(),
                 TeaFactoryAPI.fetchTourSlots(),
                 TeaFactoryAPI.fetchReviews(),
-                TeaFactoryAPI.fetchAnnouncements()
+                TeaFactoryAPI.fetchAnnouncements(),
+                TeaFactoryAPI.fetchInquiries()
             ]);
 
             // 1. Sync Products
@@ -1988,6 +2018,28 @@ Rock One Wild Tea Sanctuary Concierge Team
                     content: a.content,
                     image: a.image,
                     link: a.link
+                }));
+            }
+
+            // 6. Sync Inquiries
+            if (inqRes.status === 'fulfilled' && Array.isArray(inqRes.value) && inqRes.value.length > 0) {
+                this.state.inquiries = inqRes.value.map(inq => ({
+                    id: inq.id,
+                    fullName: inq.full_name || inq.fullName || inq.name || 'Anonymous Patron',
+                    email: inq.email || '',
+                    phone: inq.phone || '',
+                    country: inq.country || (inq.budget_range ? inq.budget_range : 'Global Connoisseur'),
+                    organization: inq.organization || inq.service_interested || 'Private Reserve Member',
+                    service_interested: inq.service_interested || '',
+                    budget_range: inq.budget_range || '',
+                    volumeTier: inq.volumeTier || inq.service_interested || inq.budget_range || 'VIP Reserve Tier',
+                    interests: Array.isArray(inq.interests) ? inq.interests : (inq.service_interested ? [inq.service_interested] : ['VIP Allocation']),
+                    contactMethod: inq.contactMethod || (inq.phone ? 'WhatsApp Priority Desk' : 'Email Concierge'),
+                    notes: inq.notes || inq.message || '',
+                    message: inq.message || inq.notes || '',
+                    date: inq.created_at ? new Date(inq.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : (inq.date || 'Recent'),
+                    status: inq.status || 'Pending Concierge Review',
+                    created_at: inq.created_at || new Date().toISOString()
                 }));
             }
 
@@ -2096,12 +2148,46 @@ const TeaFactoryAPI = {
         }
     },
 
+    async fetchInquiries() {
+        try {
+            const res = await fetch(`${this.baseUrl}/inquiries`);
+            const json = await res.json();
+            return json.success ? json.data : null;
+        } catch (e) {
+            return null;
+        }
+    },
+
     async submitInquiry(inquiryPayload) {
         try {
             const res = await fetch(`${this.baseUrl}/inquiries`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(inquiryPayload)
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async updateInquiryStatus(id, status) {
+        try {
+            const res = await fetch(`${this.baseUrl}/inquiries/${encodeURIComponent(id)}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async deleteInquiry(id) {
+        try {
+            const res = await fetch(`${this.baseUrl}/inquiries/${encodeURIComponent(id)}`, {
+                method: 'DELETE'
             });
             return await res.json();
         } catch (e) {

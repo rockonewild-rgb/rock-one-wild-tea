@@ -5615,9 +5615,56 @@ document.addEventListener('DOMContentLoaded', () => {
                 const inqId = select.getAttribute('data-id');
                 const newStatus = select.value;
                 window.TeaFactoryStore.updateInquiryStatus(inqId, newStatus);
+                
+                // Update parent card data-status attribute for instant filtering
+                const card = select.closest('.inq-dossier-card');
+                if (card) {
+                    card.setAttribute('data-status', newStatus);
+                }
+
+                // Dynamic color adjust for select element
+                if (newStatus === 'Allocated') {
+                    select.style.cssText = 'font-size: 0.75rem; padding: 0.3rem 0.55rem; border-radius: 6px; cursor: pointer; font-weight: 600; background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4);';
+                } else if (newStatus === 'Contacted') {
+                    select.style.cssText = 'font-size: 0.75rem; padding: 0.3rem 0.55rem; border-radius: 6px; cursor: pointer; font-weight: 600; background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4);';
+                } else if (newStatus === 'Archived') {
+                    select.style.cssText = 'font-size: 0.75rem; padding: 0.3rem 0.55rem; border-radius: 6px; cursor: pointer; font-weight: 600; background: rgba(148, 163, 184, 0.12); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3);';
+                } else {
+                    select.style.cssText = 'font-size: 0.75rem; padding: 0.3rem 0.55rem; border-radius: 6px; cursor: pointer; font-weight: 600; background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4);';
+                }
+
                 showToast("Inquiry Updated", `Status for Dossier ${inqId} changed to "${newStatus}".`, "success");
             });
         });
+
+        // Private Reserve Inquiries Search & Filter Listeners
+        const inqSearchBox = document.getElementById('inq-search-box');
+        const inqFilterStatus = document.getElementById('inq-filter-status-select');
+        const filterInquiries = () => {
+            const query = (inqSearchBox ? inqSearchBox.value : '').toLowerCase().trim();
+            const statusFilter = inqFilterStatus ? inqFilterStatus.value : 'ALL';
+            
+            document.querySelectorAll('.inq-dossier-card').forEach(card => {
+                const searchText = card.getAttribute('data-search-text') || '';
+                const cardStatus = card.getAttribute('data-status') || '';
+                
+                const matchesQuery = !query || searchText.includes(query);
+                const matchesStatus = statusFilter === 'ALL' || cardStatus === statusFilter;
+
+                if (matchesQuery && matchesStatus) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        };
+
+        if (inqSearchBox) {
+            inqSearchBox.addEventListener('input', filterInquiries);
+        }
+        if (inqFilterStatus) {
+            inqFilterStatus.addEventListener('change', filterInquiries);
+        }
 
         // Private Reserve Inquiries Delete Buttons
         document.querySelectorAll('.btn-delete-inquiry').forEach(btn => {
@@ -5625,7 +5672,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const inqId = btn.getAttribute('data-id');
                 const inquiries = window.TeaFactoryStore.getInquiries ? window.TeaFactoryStore.getInquiries() : [];
                 const inq = inquiries.find(i => String(i.id) === String(inqId));
-                const inqName = inq ? `${inq.clientName || inq.name || 'Private Inquiry'} (${inq.id})` : `Dossier ${inqId}`;
+                const inqName = inq ? `${inq.fullName || inq.full_name || inq.clientName || inq.name || 'Private Patron'} (${inq.id})` : `Dossier ${inqId}`;
                 showDeleteConfirmModal({
                     title: 'Delete Private Inquiry Dossier',
                     subtitle: 'Private Reserve Concierge',

@@ -1754,98 +1754,286 @@ const UIComponents = {
         }
 
         if (activeSubTab === 'inquiries') {
-            const inquiries = window.TeaFactoryStore ? window.TeaFactoryStore.getInquiries() : [];
+            const rawInquiries = window.TeaFactoryStore ? window.TeaFactoryStore.getInquiries() : [];
+            
+            // Normalize all inquiry items across Supabase and local storage
+            const inquiries = rawInquiries.map(inq => {
+                const id = inq.id || ('INQ-' + Math.floor(10000 + Math.random() * 90000));
+                const fullName = inq.fullName || inq.full_name || inq.name || inq.clientName || 'Anonymous Patron';
+                const email = inq.email || 'N/A';
+                const phone = inq.phone || '';
+                const organization = inq.organization || (inq.service_interested && inq.service_interested !== 'General Inquiry' ? inq.service_interested : '') || 'Private Reserve Patron';
+                const country = inq.country || (inq.budget_range && inq.budget_range !== 'Not Specified' ? inq.budget_range : 'Global Connoisseur');
+                const volumeTier = inq.volumeTier || inq.budget_range || inq.service_interested || 'Collector Reserve Tier';
+                
+                let interestsList = [];
+                if (Array.isArray(inq.interests)) {
+                    interestsList = inq.interests;
+                } else if (typeof inq.interests === 'string' && inq.interests.trim()) {
+                    interestsList = [inq.interests];
+                } else if (inq.service_interested && inq.service_interested !== 'General Inquiry') {
+                    interestsList = [inq.service_interested];
+                } else {
+                    interestsList = ['Numbered Collector Teak Wood Chests (Series 01–10)'];
+                }
+
+                const contactMethod = inq.contactMethod || (phone ? 'WhatsApp Priority Desk' : 'Email Concierge');
+                const notes = inq.notes || inq.message || '';
+                const dateStr = inq.created_at 
+                    ? new Date(inq.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+                    : (inq.date || 'Recent');
+                
+                // Normalized status
+                let normStatus = inq.status || 'Pending Concierge Review';
+                if (normStatus === 'new') normStatus = 'Pending Concierge Review';
+                if (normStatus === 'contacted') normStatus = 'Contacted';
+                if (normStatus === 'allocated') normStatus = 'Allocated';
+                if (normStatus === 'archived') normStatus = 'Archived';
+
+                return {
+                    id,
+                    fullName,
+                    email,
+                    phone,
+                    organization,
+                    country,
+                    volumeTier,
+                    interests: interestsList,
+                    contactMethod,
+                    notes,
+                    date: dateStr,
+                    status: normStatus,
+                    raw: inq
+                };
+            });
+
+            // Calculate KPI statistics
+            const totalCount = inquiries.length;
+            const pendingCount = inquiries.filter(i => i.status === 'Pending Concierge Review' || i.status === 'new').length;
+            const contactedCount = inquiries.filter(i => i.status === 'Contacted').length;
+            const allocatedCount = inquiries.filter(i => i.status === 'Allocated').length;
+            const archivedCount = inquiries.filter(i => i.status === 'Archived').length;
 
             html += `
-                <div class="panel-card" style="margin-bottom: 0;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                <div class="panel-card inq-ledger-wrapper" style="margin-bottom: 0; background: linear-gradient(145deg, rgba(8, 22, 14, 0.95), rgba(4, 12, 8, 0.98)); border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 16px 40px rgba(0,0,0,0.6); border-radius: 12px; padding: 1.75rem;">
+                    
+                    <!-- Header Section -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1.25rem; border-bottom: 1px solid rgba(212,175,55,0.18); padding-bottom: 1.25rem;">
                         <div>
-                            <h3 class="panel-title" style="margin-bottom: 0.25rem;">Private Reserve Allocation Inquiries Ledger</h3>
-                            <p class="panel-desc" style="margin-bottom: 0;">Review incoming VIP patron applications, volume allocation requests, and dispatch email/WhatsApp responses.</p>
+                            <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.35rem;">
+                                <span style="font-size: 1.3rem;">📜</span>
+                                <h3 class="panel-title" style="margin-bottom: 0; font-family: var(--font-serif, 'Playfair Display', serif); font-size: 1.4rem; color: var(--color-gold); letter-spacing: 0.5px;">
+                                    Private Reserve Allocation Inquiries Ledger
+                                </h3>
+                            </div>
+                            <p class="panel-desc" style="margin-bottom: 0; color: #cbd5e1; font-size: 0.88rem; max-width: 650px; line-height: 1.5;">
+                                VIP patron applications, bespoke cellar allocation requests, and direct concierge response registry synced live with Supabase.
+                            </p>
                         </div>
-                        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-                            <span class="box-badge status-available" style="font-size: 0.75rem;">
-                                ${inquiries.length} Total Applications
+                        <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+                            <span style="font-size: 0.78rem; font-weight: 700; color: #fff; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.4); padding: 0.4rem 0.9rem; border-radius: 30px; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 0.4rem;">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--color-gold); box-shadow: 0 0 8px var(--color-gold);"></span>
+                                ${totalCount} VIP Registrations
                             </span>
                         </div>
                     </div>
 
-                    <div class="admin-table-container">
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Dossier Ref</th>
-                                    <th>Patron &amp; Organization</th>
-                                    <th>Contact Desk</th>
-                                    <th>Allocation Tier</th>
-                                    <th>Harvest Interests</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${inquiries.length === 0 ? `
-                                    <tr>
-                                        <td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 2.5rem;">
-                                            No inquiries recorded yet. Applications submitted from the website will appear here in real-time.
-                                        </td>
-                                    </tr>
-                                ` : inquiries.map(inq => {
-                                    const waNumber = (inq.phone || '').replace(/[^0-9]/g, '');
-                                    const waLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(`Hello ${inq.fullName}, this is the Master Tea Concierge from Rock One Wild Tea Estate regarding your Private Reserve Inquiry dossier [${inq.id}].`)}`;
-                                    const mailtoLink = `mailto:${inq.email}?subject=${encodeURIComponent(`Private Reserve Allocation Inquiry [${inq.id}] - Rock One Wild Tea`)}&body=${encodeURIComponent(`Dear ${inq.fullName},\n\nThank you for applying to the Rock One Wild Tea Private Reserve Club [Dossier ${inq.id}].\n\n`)}`;
+                    <!-- KPI Statistics Ribbon -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 1.75rem;">
+                        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 600;">Total Inquiries</div>
+                                <div style="font-size: 1.4rem; font-weight: 700; color: #ffffff; font-family: monospace;">${totalCount}</div>
+                            </div>
+                            <span style="font-size: 1.5rem; opacity: 0.8;">🗂️</span>
+                        </div>
+                        <div style="background: rgba(234, 179, 8, 0.08); border: 1px solid rgba(234, 179, 8, 0.35); border-radius: 8px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: #facc15; font-weight: 600;">Pending Review</div>
+                                <div style="font-size: 1.4rem; font-weight: 700; color: #facc15; font-family: monospace;">${pendingCount}</div>
+                            </div>
+                            <span style="font-size: 1.5rem; opacity: 0.9;">⏳</span>
+                        </div>
+                        <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: #60a5fa; font-weight: 600;">Contacted</div>
+                                <div style="font-size: 1.4rem; font-weight: 700; color: #60a5fa; font-family: monospace;">${contactedCount}</div>
+                            </div>
+                            <span style="font-size: 1.5rem; opacity: 0.9;">💬</span>
+                        </div>
+                        <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.35); border-radius: 8px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: #4ade80; font-weight: 600;">Allocated</div>
+                                <div style="font-size: 1.4rem; font-weight: 700; color: #4ade80; font-family: monospace;">${allocatedCount}</div>
+                            </div>
+                            <span style="font-size: 1.5rem; opacity: 0.9;">🏆</span>
+                        </div>
+                    </div>
 
-                                    return `
-                                        <tr data-inq-id="${inq.id}">
-                                            <td>
-                                                <strong style="color: var(--color-gold); font-family: monospace; font-size: 0.88rem;">${inq.id}</strong><br>
-                                                <small style="color: var(--color-text-muted);">${inq.date}</small>
-                                            </td>
-                                            <td>
-                                                <strong style="color: var(--color-white); font-size: 0.9rem;">${inq.fullName}</strong><br>
-                                                <small style="color: var(--color-gold);">${inq.organization ? inq.organization + ' • ' : ''}${inq.country}</small>
-                                            </td>
-                                            <td>
-                                                <div style="font-size: 0.8rem; line-height: 1.45;">
-                                                    <div><a href="${mailtoLink}" style="color: var(--color-white); text-decoration: underline;">${inq.email}</a></div>
-                                                    <div><a href="${waLink}" target="_blank" rel="noopener noreferrer" style="color: #25d366; text-decoration: none; font-weight: 500;">${inq.phone}</a></div>
-                                                    <small style="color: var(--color-text-muted); font-size: 0.72rem;">Pref: ${inq.contactMethod}</small>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span style="font-size: 0.76rem; font-weight: 600; color: #fff; background: rgba(255,255,255,0.06); padding: 0.25rem 0.55rem; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); display: inline-block;">
-                                                    ${inq.volumeTier}
+                    <!-- Search & Filter Controls -->
+                    <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.3); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                        <div style="position: relative; flex: 1; min-width: 240px;">
+                            <input type="text" id="inq-search-box" placeholder="Search patron, dossier ref, email, country..." style="width: 100%; padding: 0.55rem 1rem 0.55rem 2.2rem; background: rgba(10, 24, 16, 0.7); border: 1px solid rgba(212,175,55,0.3); border-radius: 6px; color: #fff; font-size: 0.84rem; outline: none;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(212,175,55,0.7)" stroke-width="2" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); pointer-events: none;">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <span style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Filter:</span>
+                            <select id="inq-filter-status-select" style="padding: 0.5rem 0.85rem; background: rgba(10, 24, 16, 0.85); border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; color: var(--color-gold); font-size: 0.82rem; cursor: pointer;">
+                                <option value="ALL">All Dossiers (${totalCount})</option>
+                                <option value="Pending Concierge Review">Pending Review (${pendingCount})</option>
+                                <option value="Contacted">Contacted (${contactedCount})</option>
+                                <option value="Allocated">Allocated (${allocatedCount})</option>
+                                <option value="Archived">Archived (${archivedCount})</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Dossier Cards Grid (Responsive Luxury Cards) -->
+                    <div id="inq-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.25rem;">
+                        ${inquiries.length === 0 ? `
+                            <div style="grid-column: 1 / -1; text-align: center; color: var(--color-text-muted); padding: 3.5rem 1.5rem; background: rgba(0,0,0,0.25); border-radius: 8px; border: 1px dashed rgba(212,175,55,0.25);">
+                                <div style="font-size: 2.2rem; margin-bottom: 0.75rem; color: var(--color-gold);">📜</div>
+                                <h4 style="color: var(--color-gold); font-family: var(--font-serif, serif); font-size: 1.15rem; margin-bottom: 0.4rem;">No Allocation Dossiers Recorded Yet</h4>
+                                <p style="font-size: 0.85rem; color: #94a3b8; max-width: 480px; margin: 0 auto;">
+                                    When VIP connoisseurs submit reserve inquiries via the Private Reserve Allocation portal, their dossiers will appear here in real time.
+                                </p>
+                            </div>
+                        ` : inquiries.map(inq => {
+                            const waNumber = (inq.phone || '').replace(/[^0-9]/g, '');
+                            const waLink = waNumber ? `https://wa.me/${waNumber}?text=${encodeURIComponent(`Hello ${inq.fullName}, this is the Master Tea Concierge from Rock One Wild Tea Estate regarding your Private Reserve Inquiry dossier [${inq.id}].`)}` : '#';
+                            const mailtoLink = inq.email !== 'N/A' ? `mailto:${inq.email}?subject=${encodeURIComponent(`Private Reserve Allocation Dossier [${inq.id}] - Rock One Wild Tea`)}&body=${encodeURIComponent(`Dear ${inq.fullName},\n\nThank you for registering your allocation request with Rock One Wild Tea Estate (Dossier Reference: ${inq.id}).\n\nWe have received your interest in: ${inq.volumeTier}.\n\nOur Estate Sommelier is preparing your personalized allocation certificate.\n\nWarm regards,\nMaster Tea Concierge\nRock One Wild Tea Estate`)}` : '#';
+                            
+                            // Initials
+                            const initials = (inq.fullName || 'P').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+                            // Status badge colors
+                            let statusBadgeStyle = 'background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4);';
+                            if (inq.status === 'Allocated') {
+                                statusBadgeStyle = 'background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4);';
+                            } else if (inq.status === 'Contacted') {
+                                statusBadgeStyle = 'background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4);';
+                            } else if (inq.status === 'Archived') {
+                                statusBadgeStyle = 'background: rgba(148, 163, 184, 0.12); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3);';
+                            }
+
+                            return `
+                                <div class="inq-dossier-card" data-inq-id="${inq.id}" data-status="${inq.status}" data-search-text="${(inq.fullName + ' ' + inq.id + ' ' + inq.email + ' ' + inq.country + ' ' + inq.organization + ' ' + inq.volumeTier).toLowerCase()}" style="background: rgba(7, 20, 13, 0.75); border: 1px solid rgba(212, 175, 55, 0.22); border-radius: 10px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.25s ease; box-shadow: 0 6px 20px rgba(0,0,0,0.35);">
+                                    
+                                    <div>
+                                        <!-- Top Row: ID, Date & Status -->
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.75rem;">
+                                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                <span style="font-family: monospace; font-size: 0.88rem; font-weight: 700; color: var(--color-gold); background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3); padding: 0.2rem 0.55rem; border-radius: 4px;">
+                                                    ${inq.id}
                                                 </span>
-                                            </td>
-                                            <td>
-                                                <div style="font-size: 0.75rem; color: #e2ede5; max-width: 220px; line-height: 1.35;">
-                                                    ${Array.isArray(inq.interests) ? inq.interests.map(i => `<span style="display: block; margin-bottom: 2px;">• ${i}</span>`).join('') : inq.interests}
-                                                </div>
-                                                ${inq.notes ? `<div style="font-size: 0.72rem; color: var(--color-text-muted); margin-top: 4px; font-style: italic;">"${inq.notes.length > 50 ? inq.notes.substring(0, 50) + '...' : inq.notes}"</div>` : ''}
-                                            </td>
-                                            <td>
-                                                <select class="form-input inq-status-select" data-id="${inq.id}" style="font-size: 0.75rem; padding: 0.35rem 0.55rem; background: rgba(0,0,0,0.6); border-radius: 4px; color: var(--color-gold); border-color: rgba(212,175,55,0.4); cursor: pointer;">
-                                                    <option value="Pending Concierge Review" ${inq.status === 'Pending Concierge Review' ? 'selected' : ''}>Pending Review</option>
-                                                    <option value="Allocated" ${inq.status === 'Allocated' ? 'selected' : ''}>Allocated</option>
-                                                    <option value="Contacted" ${inq.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
-                                                    <option value="Archived" ${inq.status === 'Archived' ? 'selected' : ''}>Archived</option>
+                                                <span style="font-size: 0.75rem; color: var(--color-text-muted);">
+                                                    ${inq.date}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <select class="form-input inq-status-select" data-id="${inq.id}" style="font-size: 0.75rem; padding: 0.3rem 0.55rem; border-radius: 6px; cursor: pointer; font-weight: 600; ${statusBadgeStyle}">
+                                                    <option value="Pending Concierge Review" ${inq.status === 'Pending Concierge Review' ? 'selected' : ''}>⏳ Pending Review</option>
+                                                    <option value="Contacted" ${inq.status === 'Contacted' ? 'selected' : ''}>💬 Contacted</option>
+                                                    <option value="Allocated" ${inq.status === 'Allocated' ? 'selected' : ''}>🏆 Allocated</option>
+                                                    <option value="Archived" ${inq.status === 'Archived' ? 'selected' : ''}>📁 Archived</option>
                                                 </select>
-                                            </td>
-                                            <td>
-                                                <div style="display: flex; gap: 0.4rem; align-items: center;">
-                                                    <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; color: #25d366; border-color: rgba(37,211,102,0.4); text-decoration: none;" title="Open WhatsApp Chat">
-                                                        WhatsApp
-                                                    </a>
-                                                    <button class="btn btn-outline btn-delete-inquiry" data-id="${inq.id}" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; color: #ff5e5e; border-color: rgba(255,94,94,0.3); cursor: pointer;" title="Delete Inquiry">
-                                                        Delete
-                                                    </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Patron Identity Block -->
+                                        <div style="display: flex; gap: 0.85rem; align-items: flex-start; margin-bottom: 1rem;">
+                                            <div style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, rgba(212,175,55,0.25), rgba(7,20,13,0.9)); border: 1.5px solid var(--color-gold); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; color: var(--color-gold); flex-shrink: 0; box-shadow: 0 0 10px rgba(212,175,55,0.2);">
+                                                ${initials}
+                                            </div>
+                                            <div style="flex: 1; min-width: 0;">
+                                                <h4 style="color: #ffffff; font-size: 1.05rem; margin: 0 0 0.2rem 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                    ${inq.fullName}
+                                                </h4>
+                                                <div style="font-size: 0.78rem; color: var(--color-gold); display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+                                                    <span>🏛️ ${inq.organization}</span>
+                                                    ${inq.country ? `<span style="color: rgba(255,255,255,0.4);">•</span><span>🌍 ${inq.country}</span>` : ''}
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    `;
-                                }).join('')}
-                            </tbody>
-                        </table>
+                                            </div>
+                                        </div>
+
+                                        <!-- Contact Desks -->
+                                        <div style="background: rgba(0,0,0,0.35); border-radius: 6px; padding: 0.65rem 0.85rem; margin-bottom: 0.9rem; font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.35rem; border: 1px solid rgba(255,255,255,0.04);">
+                                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                                <span style="color: var(--color-text-muted); font-size: 0.72rem;">Email:</span>
+                                                <a href="${mailtoLink}" style="color: #ffffff; text-decoration: underline; font-weight: 500; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                                                    ${inq.email}
+                                                </a>
+                                            </div>
+                                            ${inq.phone ? `
+                                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                                    <span style="color: var(--color-text-muted); font-size: 0.72rem;">WhatsApp:</span>
+                                                    <a href="${waLink}" target="_blank" rel="noopener noreferrer" style="color: #25d366; text-decoration: none; font-weight: 600; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.3rem;">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="#25d366"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                                                        ${inq.phone}
+                                                    </a>
+                                                </div>
+                                            ` : ''}
+                                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                                <span style="color: var(--color-text-muted); font-size: 0.72rem;">Desk Channel:</span>
+                                                <span style="color: #cbd5e1; font-size: 0.74rem;">${inq.contactMethod}</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Allocation Tier & Harvest Request -->
+                                        <div style="margin-bottom: 0.85rem;">
+                                            <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--color-gold); font-weight: 600; margin-bottom: 0.35rem;">
+                                                Allocation Request:
+                                            </div>
+                                            <div style="background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.25); border-radius: 6px; padding: 0.45rem 0.75rem; color: #fff; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.45rem;">
+                                                🏷️ ${inq.volumeTier}
+                                            </div>
+                                            ${inq.interests.length > 0 ? `
+                                                <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.45rem;">
+                                                    ${inq.interests.map(i => `
+                                                        <span style="font-size: 0.72rem; color: #e2ede5; background: rgba(255,255,255,0.06); padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);">
+                                                            • ${i}
+                                                        </span>
+                                                    `).join('')}
+                                                </div>
+                                            ` : ''}
+                                        </div>
+
+                                        <!-- Message / Patron Notes -->
+                                        ${inq.notes ? `
+                                            <div style="background: rgba(0,0,0,0.4); border-left: 3px solid var(--color-gold); border-radius: 0 6px 6px 0; padding: 0.6rem 0.85rem; margin-bottom: 1rem;">
+                                                <div style="font-size: 0.7rem; color: var(--color-gold); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.2rem; font-weight: 600;">Patron Notes:</div>
+                                                <div style="font-size: 0.8rem; color: #f1f5f9; line-height: 1.45; font-style: italic;">
+                                                    "${inq.notes}"
+                                                </div>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+
+                                    <!-- Bottom Action Bar -->
+                                    <div style="display: flex; gap: 0.5rem; align-items: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.85rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                                        ${inq.phone ? `
+                                            <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="flex: 1; padding: 0.45rem 0.75rem; font-size: 0.75rem; color: #25d366; border-color: rgba(37,211,102,0.4); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.35rem; background: rgba(37,211,102,0.08); border-radius: 6px;" title="Open WhatsApp Chat">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="#25d366"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                                                <span>WhatsApp</span>
+                                            </a>
+                                        ` : ''}
+                                        ${inq.email !== 'N/A' ? `
+                                            <a href="${mailtoLink}" class="btn btn-outline" style="flex: 1; padding: 0.45rem 0.75rem; font-size: 0.75rem; color: var(--color-gold); border-color: rgba(212,175,55,0.4); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.35rem; background: rgba(212,175,55,0.08); border-radius: 6px;" title="Send Official Email">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                                <span>Email</span>
+                                            </a>
+                                        ` : ''}
+                                        <button class="btn btn-outline btn-delete-inquiry" data-id="${inq.id}" style="padding: 0.45rem 0.75rem; font-size: 0.75rem; color: #ff5e5e; border-color: rgba(255,94,94,0.3); cursor: pointer; background: rgba(255,94,94,0.06); border-radius: 6px; display: flex; align-items: center; gap: 0.3rem;" title="Delete Inquiry Dossier">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                            <span>Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 </div>
             `;
