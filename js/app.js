@@ -678,6 +678,98 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ─── Luxury Universal Deletion & Removal Confirmation Modal ───────────────
+    function showDeleteConfirmModal({ title = 'Confirm Deletion', subtitle = 'Estate Concierge Operations', itemName = '', message = 'Are you sure you want to delete this record? This action cannot be undone.', confirmText = 'Delete & Remove', onConfirm }) {
+        const existing = document.getElementById('universal-delete-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'universal-delete-modal';
+        modal.className = 'delete-confirm-modal-overlay';
+        modal.style.cssText = `
+            position: fixed; inset: 0; z-index: 10000;
+            background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+            animation: fadeInModal 0.25s ease-out;
+        `;
+
+        modal.innerHTML = `
+            <div class="delete-confirm-dialog" style="
+                background: linear-gradient(135deg, rgba(26, 8, 8, 0.98) 0%, rgba(14, 4, 4, 0.99) 100%);
+                border: 1.5px solid rgba(239, 68, 68, 0.6);
+                box-shadow: 0 25px 80px rgba(0,0,0,0.95), 0 0 35px rgba(239, 68, 68, 0.25);
+                border-radius: 22px; max-width: 500px; width: 100%; padding: 2.25rem; color: #ffffff; position: relative;
+            ">
+                <!-- Close Button -->
+                <button type="button" class="btn-modal-close" style="
+                    position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.06);
+                    border: 1px solid rgba(255,255,255,0.15); color: #ffffff; width: 34px; height: 34px; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;
+                ">&times;</button>
+
+                <!-- Header Icon & Titles -->
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="
+                        width: 64px; height: 64px; border-radius: 50%; background: rgba(198, 40, 40, 0.18);
+                        border: 2px solid #ef5350; display: inline-flex; align-items: center; justify-content: center;
+                        color: #ef5350; margin-bottom: 1rem; box-shadow: 0 0 24px rgba(239, 68, 68, 0.35);
+                    ">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                    </div>
+                    <span style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; color: #ef5350; font-weight: 700; margin-bottom: 0.35rem;">
+                        ${subtitle}
+                    </span>
+                    <h3 style="font-family: var(--font-serif); font-size: 1.5rem; margin: 0; color: #ffffff;">${title}</h3>
+                </div>
+
+                <!-- Item Particular Card if provided -->
+                ${itemName ? `
+                    <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 0.95rem 1.15rem; margin-bottom: 1.25rem; text-align: center;">
+                        <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.25rem;">Target Item / Record</span>
+                        <strong style="color: var(--color-gold); font-size: 0.95rem; font-family: var(--font-serif);">${itemName}</strong>
+                    </div>
+                ` : ''}
+
+                <!-- Warning Message Text -->
+                <p style="font-size: 0.85rem; color: #e0e0e0; line-height: 1.6; margin: 0 0 1.75rem 0; text-align: center;">
+                    ${message}
+                </p>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 0.85rem; justify-content: flex-end; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-outline btn-modal-cancel" style="padding: 0.75rem 1.4rem; font-size: 0.85rem; border-color: rgba(255,255,255,0.25); color: #fff;">
+                        Cancel &amp; Keep
+                    </button>
+                    <button type="button" id="btn-modal-confirm-delete" class="btn btn-primary" style="
+                        padding: 0.75rem 1.75rem; font-size: 0.88rem; font-weight: 700; background: linear-gradient(135deg, #c62828 0%, #8e0000 100%);
+                        border-color: #ef5350; color: #ffffff; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 20px rgba(198,40,40,0.45);
+                    ">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        ${confirmText}
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        function closeModal() { modal.remove(); }
+        modal.querySelector('.btn-modal-close').addEventListener('click', closeModal);
+        modal.querySelector('.btn-modal-cancel').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        const confirmBtn = modal.querySelector('#btn-modal-confirm-delete');
+        confirmBtn.addEventListener('click', () => {
+            closeModal();
+            if (typeof onConfirm === 'function') onConfirm();
+        });
+    }
+
     // 4. Toast Notification System
     function showToast(title, message, type = 'success') {
         const toast = document.createElement('div');
@@ -4354,11 +4446,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const resetToursBtn = document.getElementById('admin-reset-tours-btn');
         if (resetToursBtn) {
             resetToursBtn.addEventListener('click', () => {
-                if (confirm('Are you sure you want to release all estate tour slots for the day? This will clear active bookings.')) {
-                    window.TeaFactoryStore.resetTourSlots();
-                    showToast("Tour Slots Released", "All hourly factory tour slots have been reset to Available.", "success");
-                    renderTabContent('admin');
-                }
+                showDeleteConfirmModal({
+                    title: 'Release Estate Tour Slots',
+                    subtitle: 'Factory Tour Operations',
+                    itemName: 'All Daily Tour Slots',
+                    message: 'Are you sure you want to release all estate tour slots for the day? This will clear active bookings and reset availability.',
+                    confirmText: 'Release All Slots',
+                    onConfirm: () => {
+                        window.TeaFactoryStore.resetTourSlots();
+                        showToast("Tour Slots Released", "All hourly factory tour slots have been reset to Available.", "success");
+                        renderTabContent('admin');
+                    }
+                });
             });
         }
 
@@ -4366,11 +4465,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const forceResetBtn = document.getElementById('admin-force-reset-btn');
         if (forceResetBtn) {
             forceResetBtn.addEventListener('click', () => {
-                if (confirm('WARNING: Are you sure you want to reset all portal data to factory defaults? This will clear all bookings, products, and custom settings.')) {
-                    window.TeaFactoryStore.forceResetState();
-                    showToast("System Reset Complete", "All local database registries have been restored to defaults.", "success");
-                    renderTabContent('admin');
-                }
+                showDeleteConfirmModal({
+                    title: 'Factory System Reset',
+                    subtitle: 'System & Registry Control',
+                    itemName: 'Complete Portal Database',
+                    message: 'WARNING: Are you sure you want to reset all portal data to factory defaults? This will clear all bookings, products, and custom settings.',
+                    confirmText: 'Reset to Factory Defaults',
+                    onConfirm: () => {
+                        window.TeaFactoryStore.forceResetState();
+                        showToast("System Reset Complete", "All local database registries have been restored to defaults.", "success");
+                        renderTabContent('admin');
+                    }
+                });
             });
         }
 
@@ -4421,19 +4527,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const content = event.target.result;
-                    if (confirm(`Are you sure you want to restore the estate database from "${file.name}"?\n\nThis will replace the current catalog, products, orders, and reservations with the backup snapshot.`)) {
-                        const result = window.TeaFactoryStore.restoreDatabaseJson(content);
-                        if (result.success) {
-                            showToast(
-                                "Database Restored Successfully",
-                                `Restored ${result.summary.boxesCount} gift boxes, ${result.summary.productsCount} products, ${result.summary.bookingsCount} reservations (${result.summary.seasonName}).`,
-                                "success"
-                            );
-                            renderTabContent('admin');
-                        } else {
-                            showToast("Database Restore Failed", result.message || "Could not parse backup file.", "error");
+                    showDeleteConfirmModal({
+                        title: 'Restore Estate Database',
+                        subtitle: 'Database Backup & Recovery',
+                        itemName: file.name,
+                        message: `Are you sure you want to restore the estate database from "${file.name}"? This will replace the current catalog, products, orders, and reservations with the backup snapshot.`,
+                        confirmText: 'Restore Database',
+                        onConfirm: () => {
+                            const result = window.TeaFactoryStore.restoreDatabaseJson(content);
+                            if (result.success) {
+                                showToast(
+                                    "Database Restored Successfully",
+                                    `Restored ${result.summary.boxesCount} gift boxes, ${result.summary.productsCount} products, ${result.summary.bookingsCount} reservations (${result.summary.seasonName}).`,
+                                    "success"
+                                );
+                                renderTabContent('admin');
+                            } else {
+                                showToast("Database Restore Failed", result.message || "Could not parse backup file.", "error");
+                            }
                         }
-                    }
+                    });
                     restoreFileInput.value = '';
                 };
                 reader.onerror = () => {
@@ -4559,12 +4672,19 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteGalleryBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const imgId = btn.getAttribute('data-id');
-                const caption = btn.getAttribute('data-caption');
-                if (confirm(`Are you sure you want to remove "${caption}" from the live gallery?`)) {
-                    window.TeaFactoryStore.deleteGalleryImage(imgId);
-                    showToast("Photo Removed", "The photograph was removed from the gallery.", "success");
-                    renderTabContent('admin');
-                }
+                const caption = btn.getAttribute('data-caption') || 'Artisanal Photograph';
+                showDeleteConfirmModal({
+                    title: 'Remove Gallery Photo',
+                    subtitle: 'Estate Gallery Desk',
+                    itemName: caption,
+                    message: `Are you sure you want to remove this photograph from the public estate gallery?`,
+                    confirmText: 'Remove Photo',
+                    onConfirm: () => {
+                        window.TeaFactoryStore.deleteGalleryImage(imgId);
+                        showToast("Photo Removed", "The photograph was removed from the gallery.", "success");
+                        renderTabContent('admin');
+                    }
+                });
             });
         });
 
@@ -4715,12 +4835,19 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteBoxBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const boxId = parseInt(btn.getAttribute('data-id'));
-                const boxName = btn.getAttribute('data-name');
-                if (confirm(`Are you sure you want to remove ${boxName} (#${boxId}) from this series?`)) {
-                    window.TeaFactoryStore.deleteBox(boxId);
-                    showToast("Gift Box Removed", `"${boxName}" was removed from the active series.`, "success");
-                    renderTabContent('admin');
-                }
+                const boxName = btn.getAttribute('data-name') || `Gift Box #${boxId}`;
+                showDeleteConfirmModal({
+                    title: 'Remove Collector Gift Box',
+                    subtitle: 'Gift Boxes Desk',
+                    itemName: `${boxName} (#${boxId})`,
+                    message: `Are you sure you want to remove ${boxName} from the current active series?`,
+                    confirmText: 'Remove Box',
+                    onConfirm: () => {
+                        window.TeaFactoryStore.deleteBox(boxId);
+                        showToast("Gift Box Removed", `"${boxName}" was removed from the active series.`, "success");
+                        renderTabContent('admin');
+                    }
+                });
             });
         });
 
@@ -4884,11 +5011,20 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteProdBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const prodId = btn.getAttribute('data-id');
-                if (confirm('Are you sure you want to delete this product from the catalog?')) {
-                    window.TeaFactoryStore.deleteProduct(prodId);
-                    showToast("Product Removed", "The product was removed from the active catalog.", "success");
-                    renderTabContent('admin');
-                }
+                const prod = (window.TeaFactoryStore.getProducts() || []).find(p => String(p.id) === String(prodId));
+                const prodName = prod ? prod.name : `Product #${prodId}`;
+                showDeleteConfirmModal({
+                    title: 'Remove Product from Catalog',
+                    subtitle: 'Products & Inventory Desk',
+                    itemName: prodName,
+                    message: 'Are you sure you want to delete this product? It will be permanently removed from the active catalog and customer shopping bag.',
+                    confirmText: 'Delete Product',
+                    onConfirm: () => {
+                        window.TeaFactoryStore.deleteProduct(prodId);
+                        showToast("Product Removed", "The product was removed from the active catalog.", "success");
+                        renderTabContent('admin');
+                    }
+                });
             });
         });
 
@@ -4916,31 +5052,41 @@ document.addEventListener('DOMContentLoaded', () => {
             adminTableBody.addEventListener('click', (e) => {
                 if (e.target.classList.contains('btn-verify-booking')) {
                     const bookingId = e.target.getAttribute('data-id');
-                    if (confirm(`Verify payment for reservation ${bookingId}?`)) {
-                        const ok = window.TeaFactoryStore.updateBookingStatus(bookingId, 'Paid & Confirmed');
-                        if (ok) {
-                            showToast("Reservation Verified", `Payment verified for booking ${bookingId}.`, "success");
-                            renderTabContent('admin');
-                        }
-                    }
+                    showPaymentApprovalModal(bookingId, () => {
+                        renderTabContent('admin');
+                    });
                 } else if (e.target.classList.contains('btn-complete-booking')) {
                     const bookingId = e.target.getAttribute('data-id');
-                    if (confirm(`Mark reservation ${bookingId} as Completed & Fulfilled? This confirms tour execution.`)) {
-                        const ok = window.TeaFactoryStore.updateBookingStatus(bookingId, 'Completed');
-                        if (ok) {
-                            showToast("Tour / Reservation Completed", `Booking ${bookingId} marked as completed and fulfilled.`, "success");
-                            renderTabContent('admin');
+                    showDeleteConfirmModal({
+                        title: 'Complete Tour Reservation',
+                        subtitle: 'Concierge Operations',
+                        itemName: `Reservation ${bookingId}`,
+                        message: `Mark reservation ${bookingId} as Completed & Fulfilled? This confirms tour execution and archival.`,
+                        confirmText: 'Mark Completed',
+                        onConfirm: () => {
+                            const ok = window.TeaFactoryStore.updateBookingStatus(bookingId, 'Completed');
+                            if (ok) {
+                                showToast("Tour / Reservation Completed", `Booking ${bookingId} marked as completed and fulfilled.`, "success");
+                                renderTabContent('admin');
+                            }
                         }
-                    }
+                    });
                 } else if (e.target.classList.contains('btn-cancel-booking')) {
                     const bookingId = e.target.getAttribute('data-id');
-                    if (confirm(`Are you sure you want to cancel booking ${bookingId}? This will release the slot back to stock.`)) {
-                        const ok = window.TeaFactoryStore.updateBookingStatus(bookingId, 'Cancelled');
-                        if (ok) {
-                            showToast("Reservation Cancelled", `Booking ${bookingId} cancelled and slot released.`, "success");
-                            renderTabContent('admin');
+                    showDeleteConfirmModal({
+                        title: 'Cancel Booking Reservation',
+                        subtitle: 'Active Reservations Registry',
+                        itemName: `Booking ${bookingId}`,
+                        message: `Are you sure you want to cancel booking ${bookingId}? This will mark it as Cancelled and release the slot back to stock.`,
+                        confirmText: 'Cancel Booking',
+                        onConfirm: () => {
+                            const ok = window.TeaFactoryStore.updateBookingStatus(bookingId, 'Cancelled');
+                            if (ok) {
+                                showToast("Reservation Cancelled", `Booking ${bookingId} cancelled and slot released.`, "success");
+                                renderTabContent('admin');
+                            }
                         }
-                    }
+                    });
                 } else if (e.target.classList.contains('btn-convert-to-order')) {
                     const bookingId = e.target.getAttribute('data-id');
                     const booking = window.TeaFactoryStore.getBookings().find(b => b.id === bookingId);
@@ -5002,13 +5148,20 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.btn-cancel-order').forEach(btn => {
             btn.addEventListener('click', () => {
                 const orderId = btn.getAttribute('data-order-id');
-                if (confirm(`Cancel order ${orderId}? This will notify the customer the order is cancelled.`)) {
-                    const ok = window.TeaFactoryStore.updateOrderStatus(orderId, 'Cancelled');
-                    if (ok) {
-                        showToast("Order Cancelled", `Order ${orderId} has been cancelled.`, "success");
-                        renderTabContent('admin');
+                showDeleteConfirmModal({
+                    title: 'Cancel Customer Order',
+                    subtitle: 'Orders & Fulfillment Desk',
+                    itemName: `Order ${orderId}`,
+                    message: `Are you sure you want to cancel order ${orderId}? This will mark the order as Cancelled in estate records.`,
+                    confirmText: 'Cancel Order',
+                    onConfirm: () => {
+                        const ok = window.TeaFactoryStore.updateOrderStatus(orderId, 'Cancelled');
+                        if (ok) {
+                            showToast("Order Cancelled", `Order ${orderId} has been cancelled.`, "success");
+                            renderTabContent('admin');
+                        }
                     }
-                }
+                });
             });
         });
 
@@ -5122,11 +5275,18 @@ document.addEventListener('DOMContentLoaded', () => {
         resetSlotBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const slotId = btn.getAttribute('data-id');
-                if (confirm(`Free Slot #${slotId} back to Available for new guest bookings?`)) {
-                    window.TeaFactoryStore.resetSingleTourSlot(slotId);
-                    showToast("Slot Freed", `Slot #${slotId} is now available for new bookings.`, "success");
-                    renderTabContent('admin');
-                }
+                showDeleteConfirmModal({
+                    title: 'Release Tour Time Slot',
+                    subtitle: 'Daily Tour Operations',
+                    itemName: `Tour Slot #${slotId}`,
+                    message: `Free Slot #${slotId} back to Available for new guest bookings? Current reservation will be cleared.`,
+                    confirmText: 'Free Slot',
+                    onConfirm: () => {
+                        window.TeaFactoryStore.resetSingleTourSlot(slotId);
+                        showToast("Slot Freed", `Slot #${slotId} is now available for new bookings.`, "success");
+                        renderTabContent('admin');
+                    }
+                });
             });
         });
 
@@ -5135,11 +5295,18 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteSlotBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const slotId = btn.getAttribute('data-id');
-                if (confirm(`Are you sure you want to remove Slot #${slotId} from the daily timeline?`)) {
-                    window.TeaFactoryStore.deleteTourSlot(slotId);
-                    showToast("Slot Removed", `Slot #${slotId} was removed from the schedule.`, "success");
-                    renderTabContent('admin');
-                }
+                showDeleteConfirmModal({
+                    title: 'Remove Tour Slot from Schedule',
+                    subtitle: 'Daily Tour Operations',
+                    itemName: `Tour Slot #${slotId}`,
+                    message: `Are you sure you want to remove Slot #${slotId} from the daily timeline?`,
+                    confirmText: 'Delete Slot',
+                    onConfirm: () => {
+                        window.TeaFactoryStore.deleteTourSlot(slotId);
+                        showToast("Slot Removed", `Slot #${slotId} was removed from the schedule.`, "success");
+                        renderTabContent('admin');
+                    }
+                });
             });
         });
 
@@ -5148,11 +5315,20 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteAnnBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const annId = parseInt(btn.getAttribute('data-id'));
-                if (confirm('Are you sure you want to delete this bulletin?')) {
-                    window.TeaFactoryStore.deleteAnnouncement(annId);
-                    showToast("Announcement Deleted", "The bulletin has been removed from the public logs.", "success");
-                    renderTabContent('admin');
-                }
+                const ann = (window.TeaFactoryStore.getAnnouncements() || []).find(a => a.id === annId);
+                const annTitle = ann ? ann.title : `Bulletin #${annId}`;
+                showDeleteConfirmModal({
+                    title: 'Delete Bulletin Notice',
+                    subtitle: 'Estate Bulletin Log',
+                    itemName: annTitle,
+                    message: 'Are you sure you want to delete this bulletin notice? It will be permanently removed from public view and estate logs.',
+                    confirmText: 'Delete Bulletin',
+                    onConfirm: () => {
+                        window.TeaFactoryStore.deleteAnnouncement(annId);
+                        showToast("Announcement Deleted", "The bulletin has been removed from the public logs.", "success");
+                        renderTabContent('admin');
+                    }
+                });
             });
         });
 
@@ -5392,11 +5568,20 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.btn-delete-review').forEach(btn => {
             btn.addEventListener('click', () => {
                 const revId = btn.getAttribute('data-id');
-                if (confirm("Are you sure you want to delete this customer review?")) {
-                    window.TeaFactoryStore.deleteReview(revId);
-                    showToast("Review Deleted", "Customer review has been removed.", "success");
-                    renderTabContent('admin');
-                }
+                const rev = (window.TeaFactoryStore.getReviews() || []).find(r => String(r.id) === String(revId));
+                const revAuthor = rev ? `${rev.author} (${rev.rating}★)` : `Review #${revId}`;
+                showDeleteConfirmModal({
+                    title: 'Delete Customer Review',
+                    subtitle: 'Customer Experience Desk',
+                    itemName: revAuthor,
+                    message: 'Are you sure you want to delete this customer review? It will be permanently removed from guest testimonials.',
+                    confirmText: 'Delete Review',
+                    onConfirm: () => {
+                        window.TeaFactoryStore.deleteReview(revId);
+                        showToast("Review Deleted", "Customer review has been removed.", "success");
+                        renderTabContent('admin');
+                    }
+                });
             });
         });
 
@@ -5414,11 +5599,21 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.btn-delete-inquiry').forEach(btn => {
             btn.addEventListener('click', () => {
                 const inqId = btn.getAttribute('data-id');
-                if (confirm(`Are you sure you want to delete inquiry dossier ${inqId}?`)) {
-                    window.TeaFactoryStore.deleteInquiry(inqId);
-                    showToast("Inquiry Deleted", `Dossier ${inqId} was removed from the registry.`, "info");
-                    renderTabContent('admin');
-                }
+                const inquiries = window.TeaFactoryStore.getInquiries ? window.TeaFactoryStore.getInquiries() : [];
+                const inq = inquiries.find(i => String(i.id) === String(inqId));
+                const inqName = inq ? `${inq.clientName || inq.name || 'Private Inquiry'} (${inq.id})` : `Dossier ${inqId}`;
+                showDeleteConfirmModal({
+                    title: 'Delete Private Inquiry Dossier',
+                    subtitle: 'Private Reserve Concierge',
+                    itemName: inqName,
+                    message: `Are you sure you want to delete inquiry dossier ${inqId}? This will remove it from the concierge registry.`,
+                    confirmText: 'Delete Inquiry',
+                    onConfirm: () => {
+                        window.TeaFactoryStore.deleteInquiry(inqId);
+                        showToast("Inquiry Deleted", `Dossier ${inqId} was removed from the registry.`, "info");
+                        renderTabContent('admin');
+                    }
+                });
             });
         });
     }
@@ -6885,12 +7080,19 @@ Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
             const clearBtn = document.getElementById('btn-clear-cart');
             if (clearBtn) {
                 clearBtn.onclick = () => {
-                    if (confirm("Are you sure you want to empty your entire reserve bag?")) {
-                        window.TeaFactoryStore.clearCart();
-                        updateCartBadges();
-                        showToast("Reserve bag emptied.", "info");
-                        window.UIComponents.renderCartDrawer('cart-drawer-body');
-                    }
+                    showDeleteConfirmModal({
+                        title: 'Empty Reserve Bag',
+                        subtitle: 'Shopping Bag',
+                        itemName: 'All Selected Teas & Gift Boxes',
+                        message: 'Are you sure you want to empty your entire reserve bag? All added products will be cleared.',
+                        confirmText: 'Empty Bag',
+                        onConfirm: () => {
+                            window.TeaFactoryStore.clearCart();
+                            updateCartBadges();
+                            showToast("Reserve bag emptied.", "info");
+                            window.UIComponents.renderCartDrawer('cart-drawer-body');
+                        }
+                    });
                 };
             }
 
