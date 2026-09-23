@@ -1331,13 +1331,16 @@ class TeaFactoryStore {
         if (!this.state.tourSlots) return false;
         this.state.tourSlots = this.state.tourSlots.filter(s => String(s.id) !== String(slotId));
         this.saveState();
+        try {
+            fetch(`/api/tours/bookings/${encodeURIComponent(slotId)}`, { method: 'DELETE' }).catch(() => {});
+        } catch (e) {}
         return true;
     }
 
 
     // Add new Announcement
     addAnnouncement(announcement) {
-        const id = this.state.announcements.length ? Math.max(...this.state.announcements.map(a => a.id)) + 1 : 1;
+        const id = 'ann-' + Date.now().toString(36);
         const newAnn = {
             id,
             title: announcement.title,
@@ -1349,6 +1352,19 @@ class TeaFactoryStore {
         };
         this.state.announcements.unshift(newAnn);
         this.saveState();
+
+        if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.createAnnouncement === 'function') {
+            TeaFactoryAPI.createAnnouncement({
+                id,
+                tag: newAnn.tag,
+                title: newAnn.title,
+                heading: newAnn.title,
+                content: newAnn.content,
+                image: newAnn.image,
+                premium: newAnn.premium
+            }).catch(e => console.warn('Supabase sync notice:', e));
+        }
+
         return newAnn;
     }
 
@@ -1356,6 +1372,10 @@ class TeaFactoryStore {
     deleteAnnouncement(id) {
         this.state.announcements = this.state.announcements.filter(a => String(a.id) !== String(id));
         this.saveState();
+
+        if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.deleteAnnouncement === 'function') {
+            TeaFactoryAPI.deleteAnnouncement(id).catch(e => console.warn('Supabase sync notice:', e));
+        }
     }
 
     // Logging simulated emails
@@ -2012,6 +2032,67 @@ const TeaFactoryAPI = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(reviewPayload)
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async createAnnouncement(announcement) {
+        try {
+            const res = await fetch(`${this.baseUrl}/announcements`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(announcement)
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async deleteAnnouncement(id) {
+        try {
+            const res = await fetch(`${this.baseUrl}/announcements/${encodeURIComponent(id)}`, {
+                method: 'DELETE'
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async createProduct(product) {
+        try {
+            const res = await fetch(`${this.baseUrl}/products`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(product)
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async deleteProduct(id) {
+        try {
+            const res = await fetch(`${this.baseUrl}/products/${encodeURIComponent(id)}`, {
+                method: 'DELETE'
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async updateBox(number, payload) {
+        try {
+            const res = await fetch(`${this.baseUrl}/boxes/${encodeURIComponent(number)}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
             });
             return await res.json();
         } catch (e) {

@@ -1,14 +1,35 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../db/database');
+const { supabase, isSupabaseAvailable } = require('../db/supabase');
 
 /**
  * GET /api/tours/slots
- * Fetch all tour slots
  */
-router.get('/slots', (req, res) => {
+router.get('/slots', async (req, res) => {
     try {
         const { date } = req.query;
+
+        if (isSupabaseAvailable()) {
+            let query = supabase.from('tour_slots').select('*').eq('is_active', true);
+            if (date) {
+                query = query.eq('tour_date', date);
+            }
+            query = query.order('tour_date', { ascending: true }).order('time_slot', { ascending: true });
+
+            const { data, error } = await query;
+            if (!error && data) {
+                return res.json({
+                    success: true,
+                    count: data.length,
+                    data: data.map(s => ({
+                        ...s,
+                        available_seats: (s.max_capacity || 12) - (s.booked_seats || 0)
+                    }))
+                });
+            }
+        }
+
         let query = 'SELECT * FROM tour_slots WHERE is_active = 1';
         const params = [];
 
@@ -35,14 +56,14 @@ router.get('/slots', (req, res) => {
 
 /**
  * POST /api/tours/book
- * Book a tour slot
  */
-router.post('/book', (req, res) => {
+router.post('/book', async (req, res) => {
     try {
         const {
+            id: customId,
             tour_slot_id, tour_date, time_slot,
             guest_name, guest_email, guest_phone,
-            guest_count = 1, notes = ''
+            guest_count = 1, notes = '', slip_image = ''
         } = req.body;
 
         if (!tour_date || !time_slot || !guest_name || !guest_email) {
@@ -53,46 +74,53 @@ router.post('/book', (req, res) => {
         }
 
         const count = Number(guest_count) || 1;
+        const bookingId = customId || ('TB-' + Date.now().toString(36).toUpperCase());
 
-        // Find matching tour slot if slot_id given or search by date/time
-        let slot = null;
-        if (tour_slot_id) {
-            slot = db.prepare('SELECT * FROM tour_slots WHERE id = ?').get(tour_slot_id);
-        } else {
-            slot = db.prepare('SELECT * FROM tour_slots WHERE tour_date = ? AND time_slot = ?').get(tour_date, time_slot);
-        }
+        const bookingRecord = {
+            id: bookingId,
+            tour_slot_id: tour_slot_id || null,
+            tour_date,
+            time_slot,
+            guest_name,
+            guest_email,
+            guest_phone: guest_phone || '',
+            guest_count: count,
+            notes: notes || '',
+            slip_image: slip_image || '',
+            status: 'confirmed'
+        };
 
-        // If slot exists, check seat availability
-        if (slot) {
-            const available = slot.max_capacity - slot.booked_seats;
-            if (available < count) {
-                return res.status(400).json({
-                    success: false,
-                    error: `Only ${available} seat(s) available for this session.`
-                });
+        if (isSupabaseAvailable()) {
+            const { error: bookErr } = await supabase.from('tour_bookings').insert([bookingRecord]);
+            if (bookErr) console.warn('⚠️ Supabase tour booking error:', bookErr.message);
+
+            if (tour_slot_id) {
+                const { data: currentSlot } = await supabase.from('tour_slots').select('booked_seats').eq('id', tour_slot_id).single();
+                if (currentSlot) {
+                    await supabase.from('tour_slots').update({
+                        booked_seats: (currentSlot.booked_seats || 0) + count
+                    }).eq('id', tour_slot_id);
+                }
             }
-
-            // Update booked seats
-            db.prepare('UPDATE tour_slots SET booked_seats = booked_seats + ? WHERE id = ?').run(count, slot.id);
         }
 
-        const bookingId = 'TB-' + Date.now().toString(36).toUpperCase();
-        const insertBooking = db.prepare(`
-            INSERT INTO tour_bookings (id, tour_slot_id, tour_date, time_slot, guest_name, guest_email, guest_phone, guest_count, notes, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `);
+        // SQLite sync
+        try {
+            db.prepare(`
+                INSERT OR REPLACE INTO tour_bookings (id, tour_slot_id, tour_date, time_slot, guest_name, guest_email, guest_phone, guest_count, notes, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'confirmed')
+            `).run(bookingId, tour_slot_id, tour_date, time_slot, guest_name, guest_email, guest_phone, count, notes);
 
-        insertBooking.run(
-            bookingId, slot ? slot.id : null, tour_date, time_slot,
-            guest_name, guest_email, guest_phone || '', count,
-            notes || '', 'confirmed'
-        );
+            if (tour_slot_id) {
+                db.prepare('UPDATE tour_slots SET booked_seats = booked_seats + ? WHERE id = ?').run(count, tour_slot_id);
+            }
+        } catch (e) {}
 
-        const booking = db.prepare('SELECT * FROM tour_bookings WHERE id = ?').get(bookingId);
         res.status(201).json({
             success: true,
-            message: 'Tour booking confirmed successfully',
-            data: booking
+            message: 'Tour booking confirmed successfully.',
+            booking_id: bookingId,
+            data: bookingRecord
         });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
@@ -101,12 +129,39 @@ router.post('/book', (req, res) => {
 
 /**
  * GET /api/tours/bookings
- * List all bookings
  */
-router.get('/bookings', (req, res) => {
+router.get('/bookings', async (req, res) => {
     try {
-        const bookings = db.prepare('SELECT * FROM tour_bookings ORDER BY created_at DESC').all();
-        res.json({ success: true, count: bookings.length, data: bookings });
+        if (isSupabaseAvailable()) {
+            const { data, error } = await supabase.from('tour_bookings').select('*').order('created_at', { ascending: false });
+            if (!error && data) {
+                return res.json({ success: true, count: data.length, data });
+            }
+        }
+
+        const rows = db.prepare('SELECT * FROM tour_bookings ORDER BY created_at DESC').all();
+        res.json({ success: true, count: rows.length, data: rows });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+/**
+ * DELETE /api/tours/bookings/:id
+ */
+router.delete('/bookings/:id', async (req, res) => {
+    try {
+        const bookId = req.params.id;
+        if (isSupabaseAvailable()) {
+            const { error } = await supabase.from('tour_bookings').delete().eq('id', bookId);
+            if (error) console.warn('⚠️ Supabase tour booking delete error:', error.message);
+        }
+
+        try {
+            db.prepare('DELETE FROM tour_bookings WHERE id = ?').run(bookId);
+        } catch (e) {}
+
+        res.json({ success: true, message: 'Booking deleted successfully', id: bookId });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }

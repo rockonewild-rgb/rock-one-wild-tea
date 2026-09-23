@@ -9,6 +9,7 @@
     "start": "node server/server.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.117.0",
     "compression": "^1.8.2",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",

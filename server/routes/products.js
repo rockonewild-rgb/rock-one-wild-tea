@@ -1,14 +1,44 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../db/database');
+const { supabase, isSupabaseAvailable } = require('../db/supabase');
 
 /**
  * GET /api/products
- * Fetch all products with optional filtering
+ * Fetch all products
  */
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const { category, search, reserve } = req.query;
+
+        if (isSupabaseAvailable()) {
+            let query = supabase.from('products').select('*');
+            if (category && category !== 'all') {
+                query = query.eq('category', category);
+            }
+            if (reserve !== undefined) {
+                query = query.eq('is_reserve', reserve === 'true' || reserve === '1');
+            }
+            if (search) {
+                query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
+            }
+            query = query.order('price_usd', { ascending: false });
+
+            const { data, error } = await query;
+            if (!error && data) {
+                const formatted = data.map(r => ({
+                    ...r,
+                    price: Number(r.price_usd || 0),
+                    price_usd: Number(r.price_usd || 0),
+                    flavor_notes: Array.isArray(r.flavor_notes) ? r.flavor_notes : (typeof r.flavor_notes === 'string' ? JSON.parse(r.flavor_notes) : []),
+                    brewing_guide: typeof r.brewing_guide === 'string' ? JSON.parse(r.brewing_guide) : r.brewing_guide,
+                    is_reserve: Boolean(r.is_reserve)
+                }));
+                return res.json({ success: true, count: formatted.length, data: formatted });
+            }
+        }
+
+        // SQLite fallback
         let query = 'SELECT * FROM products WHERE 1=1';
         const params = [];
 
@@ -31,7 +61,6 @@ router.get('/', (req, res) => {
         query += ' ORDER BY price_usd DESC';
         const rows = db.prepare(query).all(...params);
 
-        // Parse JSON fields and guarantee numeric prices
         const products = rows.map(r => {
             const priceVal = Number(r.price_usd !== undefined ? r.price_usd : (r.price !== undefined ? r.price : 0)) || 0;
             return {
@@ -52,10 +81,25 @@ router.get('/', (req, res) => {
 
 /**
  * GET /api/products/:id
- * Fetch a single product by ID
  */
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
+        if (isSupabaseAvailable()) {
+            const { data, error } = await supabase.from('products').select('*').eq('id', req.params.id).single();
+            if (!error && data) {
+                return res.json({
+                    success: true,
+                    data: {
+                        ...data,
+                        price: Number(data.price_usd || 0),
+                        flavor_notes: Array.isArray(data.flavor_notes) ? data.flavor_notes : (typeof data.flavor_notes === 'string' ? JSON.parse(data.flavor_notes) : []),
+                        brewing_guide: typeof data.brewing_guide === 'string' ? JSON.parse(data.brewing_guide) : data.brewing_guide,
+                        is_reserve: Boolean(data.is_reserve)
+                    }
+                });
+            }
+        }
+
         const row = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
         if (!row) {
             return res.status(404).json({ success: false, error: 'Product not found' });
@@ -76,23 +120,56 @@ router.get('/:id', (req, res) => {
 
 /**
  * POST /api/products
- * Create a new product
  */
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const {
             name, category = 'artisan', type = 'Specialty Tea',
             season = '2026 Flush', grade = 'OP1', elevation = '1,200m Wallawela',
-            price_usd, stock = 10, image = 'images/tea_box.png',
+            price_usd, price, stock = 10, image = 'images/Product.jpeg',
             description = '', flavor_notes = [], brewing_guide = null,
             is_reserve = false
         } = req.body;
 
-        if (!name || !price_usd) {
-            return res.status(400).json({ success: false, error: 'Name and price_usd are required.' });
+        const finalPrice = Number(price_usd || price || 0);
+        if (!name || !finalPrice) {
+            return res.status(400).json({ success: false, error: 'Name and price are required.' });
         }
 
         const id = 'prod-' + Date.now().toString(36);
+        const record = {
+            id,
+            name,
+            category,
+            type,
+            season,
+            grade,
+            elevation,
+            price_usd: finalPrice,
+            stock: Number(stock),
+            image,
+            description,
+            flavor_notes: Array.isArray(flavor_notes) ? flavor_notes : [],
+            brewing_guide: brewing_guide || {},
+            is_reserve: Boolean(is_reserve)
+        };
+
+        if (isSupabaseAvailable()) {
+            const { data, error } = await supabase.from('products').insert([record]).select().single();
+            if (!error && data) {
+                // SQLite sync
+                try {
+                    db.prepare(`
+                        INSERT OR REPLACE INTO products (id, name, category, type, season, grade, elevation, price_usd, stock, image, description, flavor_notes, brewing_guide, is_reserve)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    `).run(id, name, category, type, season, grade, elevation, finalPrice, Number(stock), image, description, JSON.stringify(flavor_notes), JSON.stringify(brewing_guide), is_reserve ? 1 : 0);
+                } catch (e) {}
+
+                return res.status(201).json({ success: true, data });
+            }
+        }
+
+        // SQLite fallback
         const insert = db.prepare(`
             INSERT INTO products (id, name, category, type, season, grade, elevation, price_usd, stock, image, description, flavor_notes, brewing_guide, is_reserve)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -100,7 +177,7 @@ router.post('/', (req, res) => {
 
         insert.run(
             id, name, category, type, season, grade, elevation,
-            Number(price_usd), Number(stock), image, description,
+            finalPrice, Number(stock), image, description,
             JSON.stringify(flavor_notes), brewing_guide ? JSON.stringify(brewing_guide) : null,
             is_reserve ? 1 : 0
         );
@@ -121,75 +198,22 @@ router.post('/', (req, res) => {
 });
 
 /**
- * PUT /api/products/:id
- * Update product
- */
-router.put('/:id', (req, res) => {
-    try {
-        const existing = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
-        if (!existing) {
-            return res.status(404).json({ success: false, error: 'Product not found' });
-        }
-
-        const {
-            name = existing.name,
-            category = existing.category,
-            type = existing.type,
-            season = existing.season,
-            grade = existing.grade,
-            elevation = existing.elevation,
-            price_usd = existing.price_usd,
-            stock = existing.stock,
-            image = existing.image,
-            description = existing.description,
-            flavor_notes = existing.flavor_notes ? JSON.parse(existing.flavor_notes) : [],
-            brewing_guide = existing.brewing_guide ? JSON.parse(existing.brewing_guide) : null,
-            is_reserve = existing.is_reserve
-        } = req.body;
-
-        const update = db.prepare(`
-            UPDATE products
-            SET name = ?, category = ?, type = ?, season = ?, grade = ?,
-                elevation = ?, price_usd = ?, stock = ?, image = ?,
-                description = ?, flavor_notes = ?, brewing_guide = ?, is_reserve = ?
-            WHERE id = ?
-        `);
-
-        update.run(
-            name, category, type, season, grade, elevation,
-            Number(price_usd), Number(stock), image, description,
-            JSON.stringify(flavor_notes), brewing_guide ? JSON.stringify(brewing_guide) : null,
-            is_reserve ? 1 : 0,
-            req.params.id
-        );
-
-        const updated = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
-        res.json({
-            success: true,
-            data: {
-                ...updated,
-                flavor_notes: JSON.parse(updated.flavor_notes || '[]'),
-                brewing_guide: updated.brewing_guide ? JSON.parse(updated.brewing_guide) : null,
-                is_reserve: Boolean(updated.is_reserve)
-            }
-        });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
-
-/**
  * DELETE /api/products/:id
  */
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
-        const existing = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
-        if (!existing) {
-            return res.status(404).json({ success: false, error: 'Product not found' });
+        const prodId = req.params.id;
+
+        if (isSupabaseAvailable()) {
+            const { error } = await supabase.from('products').delete().eq('id', prodId);
+            if (error) console.warn('⚠️ Supabase delete error:', error.message);
         }
 
-        db.prepare('DELETE FROM products WHERE id = ?').run(req.params.id);
-        res.json({ success: true, message: 'Product deleted successfully' });
+        try {
+            db.prepare('DELETE FROM products WHERE id = ?').run(prodId);
+        } catch (e) {}
+
+        res.json({ success: true, message: 'Product deleted successfully', id: prodId });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../db/database');
+const { supabase, isSupabaseAvailable } = require('../db/supabase');
 const { sendInquiryEmails } = require('../services/email');
 
 /**
@@ -25,20 +26,37 @@ router.post('/', async (req, res) => {
         }
 
         const id = customId || ('INQ-' + Date.now().toString(36).toUpperCase());
-        const insert = db.prepare(`
-            INSERT INTO inquiries (id, full_name, email, phone, service_interested, budget_range, message, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `);
+        const record = {
+            id,
+            full_name,
+            email,
+            phone,
+            service_interested,
+            budget_range,
+            message,
+            status: 'new'
+        };
 
-        insert.run(id, full_name, email, phone, service_interested, budget_range, message, 'new');
+        let created = record;
 
-        const created = db.prepare('SELECT * FROM inquiries WHERE id = ?').get(id);
+        if (isSupabaseAvailable()) {
+            const { data, error } = await supabase.from('inquiries').insert([record]).select().single();
+            if (!error && data) {
+                created = data;
+            }
+        }
 
-        // Dispatch Resend email notification (awaited so Vercel serverless does not terminate before completion)
+        try {
+            db.prepare(`
+                INSERT OR REPLACE INTO inquiries (id, full_name, email, phone, service_interested, budget_range, message, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 'new')
+            `).run(id, full_name, email, phone, service_interested, budget_range, message);
+        } catch (e) {}
+
+        // Dispatch Resend email notification
         let emailStatus = null;
         try {
             emailStatus = await sendInquiryEmails(created);
-            console.log('✅ Resend email dispatch completed for:', id, emailStatus);
         } catch (mailErr) {
             console.error('⚠️ Email dispatch warning:', mailErr.message);
         }
@@ -56,12 +74,39 @@ router.post('/', async (req, res) => {
 
 /**
  * GET /api/inquiries
- * List all inquiries
  */
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     try {
+        if (isSupabaseAvailable()) {
+            const { data, error } = await supabase.from('inquiries').select('*').order('created_at', { ascending: false });
+            if (!error && data) {
+                return res.json({ success: true, count: data.length, data });
+            }
+        }
+
         const rows = db.prepare('SELECT * FROM inquiries ORDER BY created_at DESC').all();
         res.json({ success: true, count: rows.length, data: rows });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+/**
+ * DELETE /api/inquiries/:id
+ */
+router.delete('/:id', async (req, res) => {
+    try {
+        const inqId = req.params.id;
+        if (isSupabaseAvailable()) {
+            const { error } = await supabase.from('inquiries').delete().eq('id', inqId);
+            if (error) console.warn('⚠️ Supabase delete error:', error.message);
+        }
+
+        try {
+            db.prepare('DELETE FROM inquiries WHERE id = ?').run(inqId);
+        } catch (e) {}
+
+        res.json({ success: true, message: 'Inquiry deleted successfully', id: inqId });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
