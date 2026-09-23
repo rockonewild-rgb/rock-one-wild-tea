@@ -901,7 +901,7 @@ const UIComponents = {
                                                 <div style="font-weight: 700; font-size: 0.9rem; color: var(--color-white);">${item.customerName}</div>
                                                 <div style="font-size: 0.75rem; color: var(--color-text-muted);"><a href="mailto:${item.email}" style="color:var(--color-text-muted); text-decoration:underline;">${item.email}</a></div>
                                                 <div style="font-size: 0.75rem; color: var(--color-text-muted);"><a href="https://api.whatsapp.com/send?phone=${encodeURIComponent(phoneClean)}" target="_blank" style="color:#81c784; text-decoration:none; display:inline-flex; align-items:center; gap:0.25rem;"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.247 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.992-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.443-4.436-9.884-9.888-9.884-5.447 0-9.885 4.437-9.889 9.885-.001 2.016.52 3.49 1.37 4.975l-.997 3.641 3.731-.978z"/></svg> ${item.phone}</a></div>
-                                                ${item.address ? `<div style="font-size: 0.72rem; color: #b0bec5; margin-top: 0.25rem;">📍 ${item.address}${item.country ? `, ${item.country}` : ''}</div>` : ''}
+                                                ${item.address ? `<div style="font-size: 0.72rem; color: #b0bec5; margin-top: 0.25rem; display: flex; align-items: center; gap: 0.3rem;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg><span>${item.address}${item.country ? `, ${item.country}` : ''}</span></div>` : ''}
                                             </div>
 
                                             <div>
@@ -1330,7 +1330,12 @@ const UIComponents = {
                             <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
                                 <label class="form-label" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Attach Gift Box Image</label>
                                 <div class="file-upload-zone" id="box-image-zone" style="padding: 1.25rem 1rem; border-radius: 10px;">
-                                    <div class="file-upload-icon" style="font-size: 1.4rem; margin-bottom: 0.35rem;">📷</div>
+                                    <div class="file-upload-icon" style="margin-bottom: 0.35rem; color: var(--color-gold);">
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                            <circle cx="12" cy="13" r="4"></circle>
+                                        </svg>
+                                    </div>
                                     <div class="file-upload-text" style="font-size: 0.8rem;">Drag &amp; drop or <span class="file-upload-link">browse image</span></div>
                                     <div class="file-upload-hint" style="font-size: 0.7rem; margin-top: 0.25rem; color: var(--color-text-muted);">JPG or PNG &mdash; Max 5MB (Defaults to luxury cedar chest)</div>
                                     <input type="file" id="box-image-file" accept="image/*" style="display:none;">
@@ -1642,7 +1647,12 @@ const UIComponents = {
                             <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
                                 <label class="form-label" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Attach Product Image</label>
                                 <div class="file-upload-zone" id="prod-image-zone" style="padding: 1.25rem 1rem; border-radius: 10px;">
-                                    <div class="file-upload-icon" style="font-size: 1.4rem; margin-bottom: 0.35rem;">📷</div>
+                                    <div class="file-upload-icon" style="margin-bottom: 0.35rem; color: var(--color-gold);">
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                            <circle cx="12" cy="13" r="4"></circle>
+                                        </svg>
+                                    </div>
                                     <div class="file-upload-text" style="font-size: 0.8rem;">Drag &amp; drop or <span class="file-upload-link">browse image</span></div>
                                     <div class="file-upload-hint" style="font-size: 0.7rem; margin-top: 0.25rem; color: var(--color-text-muted);">JPG or PNG &mdash; Max 5MB (Defaults to standard luxury tin)</div>
                                     <input type="file" id="prod-image-file" accept="image/*" style="display:none;">
@@ -1821,7 +1831,15 @@ const UIComponents = {
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1.25rem; border-bottom: 1px solid rgba(212,175,55,0.18); padding-bottom: 1.25rem;">
                         <div>
                             <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.35rem;">
-                                <span style="font-size: 1.3rem;">📜</span>
+                                <span style="color: var(--color-gold); display: flex; align-items: center;">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
+                                </span>
                                 <h3 class="panel-title" style="margin-bottom: 0; font-family: var(--font-serif, 'Playfair Display', serif); font-size: 1.4rem; color: var(--color-gold); letter-spacing: 0.5px;">
                                     Private Reserve Allocation Inquiries Ledger
                                 </h3>
@@ -1845,28 +1863,48 @@ const UIComponents = {
                                 <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 600;">Total Inquiries</div>
                                 <div style="font-size: 1.4rem; font-weight: 700; color: #ffffff; font-family: monospace;">${totalCount}</div>
                             </div>
-                            <span style="font-size: 1.5rem; opacity: 0.8;">🗂️</span>
+                            <span style="color: var(--color-gold); display: flex; align-items: center; opacity: 0.9;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                            </span>
                         </div>
                         <div style="background: rgba(234, 179, 8, 0.08); border: 1px solid rgba(234, 179, 8, 0.35); border-radius: 8px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: #facc15; font-weight: 600;">Pending Review</div>
                                 <div style="font-size: 1.4rem; font-weight: 700; color: #facc15; font-family: monospace;">${pendingCount}</div>
                             </div>
-                            <span style="font-size: 1.5rem; opacity: 0.9;">⏳</span>
+                            <span style="color: #facc15; display: flex; align-items: center; opacity: 0.9;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </span>
                         </div>
                         <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: #60a5fa; font-weight: 600;">Contacted</div>
                                 <div style="font-size: 1.4rem; font-weight: 700; color: #60a5fa; font-family: monospace;">${contactedCount}</div>
                             </div>
-                            <span style="font-size: 1.5rem; opacity: 0.9;">💬</span>
+                            <span style="color: #60a5fa; display: flex; align-items: center; opacity: 0.9;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                                </svg>
+                            </span>
                         </div>
                         <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.35); border-radius: 8px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: #4ade80; font-weight: 600;">Allocated</div>
                                 <div style="font-size: 1.4rem; font-weight: 700; color: #4ade80; font-family: monospace;">${allocatedCount}</div>
                             </div>
-                            <span style="font-size: 1.5rem; opacity: 0.9;">🏆</span>
+                            <span style="color: #4ade80; display: flex; align-items: center; opacity: 0.9;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                                    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                                    <path d="M4 22h16"></path>
+                                    <path d="M10 14.66V17c0 .55-.45 1-1 1H7v2h10v-2h-2c-.55 0-1-.45-1-1v-2.34c3.48-.68 6.1-3.69 6.1-7.32V4H4v5.34c0 3.63 2.62 6.64 6.1 7.32z"></path>
+                                </svg>
+                            </span>
                         </div>
                     </div>
 
@@ -1895,7 +1933,14 @@ const UIComponents = {
                     <div id="inq-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.25rem;">
                         ${inquiries.length === 0 ? `
                             <div style="grid-column: 1 / -1; text-align: center; color: var(--color-text-muted); padding: 3.5rem 1.5rem; background: rgba(0,0,0,0.25); border-radius: 8px; border: 1px dashed rgba(212,175,55,0.25);">
-                                <div style="font-size: 2.2rem; margin-bottom: 0.75rem; color: var(--color-gold);">📜</div>
+                                <div style="margin-bottom: 0.75rem; color: var(--color-gold); display: flex; justify-content: center;">
+                                    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    </svg>
+                                </div>
                                 <h4 style="color: var(--color-gold); font-family: var(--font-serif, serif); font-size: 1.15rem; margin-bottom: 0.4rem;">No Allocation Dossiers Recorded Yet</h4>
                                 <p style="font-size: 0.85rem; color: #94a3b8; max-width: 480px; margin: 0 auto;">
                                     When VIP connoisseurs submit reserve inquiries via the Private Reserve Allocation portal, their dossiers will appear here in real time.
@@ -1935,10 +1980,10 @@ const UIComponents = {
                                             </div>
                                             <div>
                                                 <select class="form-input inq-status-select" data-id="${inq.id}" style="font-size: 0.75rem; padding: 0.3rem 0.55rem; border-radius: 6px; cursor: pointer; font-weight: 600; ${statusBadgeStyle}">
-                                                    <option value="Pending Concierge Review" ${inq.status === 'Pending Concierge Review' ? 'selected' : ''}>⏳ Pending Review</option>
-                                                    <option value="Contacted" ${inq.status === 'Contacted' ? 'selected' : ''}>💬 Contacted</option>
-                                                    <option value="Allocated" ${inq.status === 'Allocated' ? 'selected' : ''}>🏆 Allocated</option>
-                                                    <option value="Archived" ${inq.status === 'Archived' ? 'selected' : ''}>📁 Archived</option>
+                                                    <option value="Pending Concierge Review" ${inq.status === 'Pending Concierge Review' ? 'selected' : ''}>Pending Review</option>
+                                                    <option value="Contacted" ${inq.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
+                                                    <option value="Allocated" ${inq.status === 'Allocated' ? 'selected' : ''}>Allocated</option>
+                                                    <option value="Archived" ${inq.status === 'Archived' ? 'selected' : ''}>Archived</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -1952,9 +1997,18 @@ const UIComponents = {
                                                 <h4 style="color: #ffffff; font-size: 1.05rem; margin: 0 0 0.2rem 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                                     ${inq.fullName}
                                                 </h4>
-                                                <div style="font-size: 0.78rem; color: var(--color-gold); display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
-                                                    <span>🏛️ ${inq.organization}</span>
-                                                    ${inq.country ? `<span style="color: rgba(255,255,255,0.4);">•</span><span>🌍 ${inq.country}</span>` : ''}
+                                                <div style="font-size: 0.78rem; color: var(--color-gold); display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                                    <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M5 21V7l8-4v18"></path><path d="M19 21V11l-6-3"></path></svg>
+                                                        ${inq.organization}
+                                                    </span>
+                                                    ${inq.country ? `
+                                                        <span style="color: rgba(255,255,255,0.4);">•</span>
+                                                        <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                                            ${inq.country}
+                                                        </span>
+                                                    ` : ''}
                                                 </div>
                                             </div>
                                         </div>
@@ -1987,8 +2041,9 @@ const UIComponents = {
                                             <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--color-gold); font-weight: 600; margin-bottom: 0.35rem;">
                                                 Allocation Request:
                                             </div>
-                                            <div style="background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.25); border-radius: 6px; padding: 0.45rem 0.75rem; color: #fff; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.45rem;">
-                                                🏷️ ${inq.volumeTier}
+                                            <div style="background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.25); border-radius: 6px; padding: 0.45rem 0.75rem; color: #fff; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.45rem; display: flex; align-items: center; gap: 0.4rem;">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                                                <span>${inq.volumeTier}</span>
                                             </div>
                                             ${inq.interests.length > 0 ? `
                                                 <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.45rem;">
@@ -2736,7 +2791,7 @@ const UIComponents = {
                 ytStart: 0,
                 title: "Montane Mist & Wild Terroir",
                 sub: "1,200m+ Cloud Rainforest Sanctuary",
-                icon: "🌿",
+                iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.8"><path d="M2 22s5-11 18-18c0 0-3 15-14 18l-4 0z"></path><path d="M6 18c3-3 7-7 12-12"></path></svg>`,
                 desc: "Dawn breaks over Wallawela ridges where wild, uncultivated tea trees thrive in mineral mountain soil."
             },
             {
@@ -2745,7 +2800,7 @@ const UIComponents = {
                 ytStart: 45,
                 title: "Hand-Harvesting & Withering Troughs",
                 sub: "Tender Leaf Plucking & Aeration",
-                icon: "🍃",
+                iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.8"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`,
                 desc: "Artisan pickers hand-select pristine young buds at peak sunrise dew before oxidation begins."
             },
             {
@@ -2754,7 +2809,7 @@ const UIComponents = {
                 ytStart: 95,
                 title: "Orthodox Rolling & Fermentation",
                 sub: "Slow Table Crafting & Leaf Oxidation",
-                icon: "🪵",
+                iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M12 3v18"></path><path d="M3 12h18"></path></svg>`,
                 desc: "Gentle table rolling preserves essential oils, followed by natural cool-room enzymatic oxidation."
             },
             {
@@ -2763,7 +2818,7 @@ const UIComponents = {
                 ytStart: 180,
                 title: "Wood-Fired Curing & Cupping Flights",
                 sub: "Master Connoisseur Tasting Ritual",
-                icon: "🫖",
+                iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.8"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>`,
                 desc: "Evaluating liquor clarity, golden amber hues, and exquisite natural floral honey aromatic notes."
             }
         ];
@@ -2820,11 +2875,13 @@ const UIComponents = {
 
                     <!-- Top Bar Stream Engine Selector -->
                     <div style="position: absolute; top: 12px; right: 12px; z-index: 10; display: flex; gap: 0.5rem;">
-                        <button id="btn-cinema-mode-yt" class="cinema-mode-btn active" style="background: rgba(4, 14, 8, 0.88); backdrop-filter: blur(8px); border: 1px solid rgba(212,175,55,0.55); color: #ffd875; font-size: 0.72rem; font-weight: 700; padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
-                            🎬 4K Documentary
+                        <button id="btn-cinema-mode-yt" class="cinema-mode-btn active" style="background: rgba(4, 14, 8, 0.88); backdrop-filter: blur(8px); border: 1px solid rgba(212,175,55,0.55); color: #ffd875; font-size: 0.72rem; font-weight: 700; padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.35rem;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                            <span>4K Documentary</span>
                         </button>
-                        <button id="btn-cinema-mode-html5" class="cinema-mode-btn" style="background: rgba(4, 14, 8, 0.88); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.18); color: var(--color-text-muted); font-size: 0.72rem; font-weight: 600; padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
-                            🌿 Ambient Stream
+                        <button id="btn-cinema-mode-html5" class="cinema-mode-btn" style="background: rgba(4, 14, 8, 0.88); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.18); color: var(--color-text-muted); font-size: 0.72rem; font-weight: 600; padding: 0.35rem 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.35rem;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 22s5-11 18-18c0 0-3 15-14 18l-4 0z"></path></svg>
+                            <span>Ambient Stream</span>
                         </button>
                     </div>
                 </div>
@@ -2833,7 +2890,7 @@ const UIComponents = {
                 <div>
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
                         <h4 style="font-size: 1.05rem; font-family: var(--font-serif); color: var(--color-white); letter-spacing: 0.5px; margin: 0;">
-                            Documentary Chapters & Ritual Timeline
+                            Documentary Chapters &amp; Ritual Timeline
                         </h4>
                         <span style="font-size: 0.7rem; color: var(--color-gold); text-transform: uppercase; letter-spacing: 1px;">
                             Click to Jump to Scene
@@ -2844,7 +2901,7 @@ const UIComponents = {
                         ${chapters.map(ch => `
                             <div class="cinema-chapter-card ${ch.id === 1 ? 'active' : ''}" data-yt-start="${ch.ytStart}" data-time="${ch.time}" style="background: rgba(4, 14, 8, 0.7); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 12px; padding: 1.15rem; cursor: pointer; transition: all 0.25s ease;">
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
-                                    <span style="font-size: 1.2rem;">${ch.icon}</span>
+                                    <span style="display: flex; align-items: center;">${ch.iconSvg}</span>
                                     <span style="font-size: 0.68rem; font-weight: 700; color: var(--color-gold); background: rgba(212, 175, 55, 0.15); border: 1px solid rgba(212, 175, 55, 0.3); padding: 0.15rem 0.45rem; border-radius: 4px;">
                                         Chapter 0${ch.id}
                                     </span>
@@ -3010,8 +3067,9 @@ const UIComponents = {
                             <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; color: var(--color-gold); font-weight: 700; display: block; margin-bottom: 0.35rem;">Scenic Montane Circuits</span>
                             <h4 style="font-size: 1.35rem; font-family: var(--font-serif); color: var(--color-white); letter-spacing: 0.5px; margin: 0;">Top Visited Landmarks with Actual Terroir Photos</h4>
                         </div>
-                        <span style="font-size: 0.75rem; color: var(--color-text-muted); background: rgba(255,255,255,0.05); padding: 0.35rem 0.85rem; border-radius: 20px; border: 1px solid rgba(212,175,55,0.25);">
-                            📍 Wallawela Sanctuary Proximity
+                        <span style="font-size: 0.75rem; color: var(--color-text-muted); background: rgba(255,255,255,0.05); padding: 0.35rem 0.85rem; border-radius: 20px; border: 1px solid rgba(212,175,55,0.25); display: inline-flex; align-items: center; gap: 0.35rem;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span>Wallawela Sanctuary Proximity</span>
                         </span>
                     </div>
 

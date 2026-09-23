@@ -6516,7 +6516,7 @@ Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
                     updateDisplay();
                 } else {
                     stopTimer();
-                    statusEl.innerText = `${_t('timer_ready', 'INFUSION PERFECT')} 🫖`;
+                    statusEl.innerText = _t('timer_ready', 'INFUSION PERFECT');
                     statusEl.style.color = "#00e5c9";
                     startBtn.innerHTML = `↺ ${_t('btn_steep_again', 'Steep Again')}`;
                     ringEl.style.strokeDashoffset = 0;
@@ -6637,7 +6637,7 @@ Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
                     updateHomeDisplay();
                 } else {
                     stopHomeTimer();
-                    statusEl.innerText = `${_t('timer_ready', 'READY')} 🫖`;
+                    statusEl.innerText = _t('timer_ready', 'READY');
                     statusEl.style.color = "#00e5c9";
                     startBtn.innerHTML = `↺ ${_t('btn_steep_again', 'Steep Again')}`;
                     ringEl.style.strokeDashoffset = 0;
@@ -7209,8 +7209,8 @@ Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
             // Check Lookbook / Wholesale Technical Dossier
             if (/lookbook|brochure|pdf|dossier|wholesale|b2b|export|නාමාවලිය|පොත|விவரக்குறிப்பு|カタログ|白皮书|画册|كتالوج/.test(lower)) {
                 addBotMessage(cfg.lookbookResponse || "You can view and download our complete **2026 Estate Lookbook & Wholesale Technical Dossier (PDF)** right now.", [
-                    { label: cfg.btnOpenLookbook || "📖 Open Estate Lookbook (PDF)", onclick: "if(window.appOpenLookbook){window.appOpenLookbook()}" },
-                    { label: cfg.btnTradeDesk || "💬 WhatsApp Trade Desk", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%2C%20I%20would%20like%20to%20receive%20the%202026%20B2B%20Wholesale%20Lookbook%20and%20Price%20List." }
+                    { label: cfg.btnOpenLookbook || "Open Estate Lookbook (PDF)", onclick: "if(window.appOpenLookbook){window.appOpenLookbook()}" },
+                    { label: cfg.btnTradeDesk || "WhatsApp Trade Desk", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%2C%20I%20would%20like%20to%20receive%20the%202026%20B2B%20Wholesale%20Lookbook%20and%20Price%20List." }
                 ]);
                 return;
             }

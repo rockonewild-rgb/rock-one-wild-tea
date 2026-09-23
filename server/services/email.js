@@ -330,7 +330,7 @@ async function sendOrderConfirmationEmails(order) {
                         ${isBank ? `
                             <div style="background: rgba(212, 175, 55, 0.08); border: 1px solid #d4af37; border-radius: 8px; padding: 20px; margin: 25px 0;">
                                 <h4 style="color: #ffd875; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 6px;">
-                                    🏦 Bank Cash Deposit &amp; Wire Transfer Details
+                                    Bank Cash Deposit &amp; Wire Transfer Details
                                 </h4>
                                 <p style="font-size: 13px; color: #d1d5db; margin: 0 0 12px 0;">Please transfer the total amount using the banking instructions below:</p>
                                 <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #ffffff;">
@@ -341,19 +341,19 @@ async function sendOrderConfirmationEmails(order) {
                                     <tr><td style="padding: 4px 0; color: #9ca3af;"><strong>Payment Reference:</strong></td><td style="font-family: monospace; color: #86efac; font-weight: bold;">${order.id}</td></tr>
                                 </table>
                                 <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed rgba(212,175,55,0.3); font-size: 12px; color: #d1d5db;">
-                                    📱 <strong>Slip Verification:</strong> Please WhatsApp a photo or screenshot of your deposit slip to <strong style="color:#ffffff;">+94 77 175 7556</strong> for instant priority dispatch approval.
+                                    <strong>Slip Verification:</strong> Please WhatsApp a photo or screenshot of your deposit slip to <strong style="color:#ffffff;">+94 77 175 7556</strong> for instant priority dispatch approval.
                                 </div>
                             </div>
                         ` : `
                             <div style="background: rgba(37, 211, 102, 0.08); border: 1px solid rgba(37, 211, 102, 0.3); border-radius: 8px; padding: 16px; margin: 20px 0; text-align: center;">
-                                <p style="margin: 0; font-size: 13px; color: #86efac; font-weight: bold;">💳 Payment Gateway Processed</p>
+                                <p style="margin: 0; font-size: 13px; color: #86efac; font-weight: bold;">Payment Gateway Processed</p>
                                 <p style="margin: 4px 0 0 0; font-size: 12px; color: #d1d5db;">Your payment is confirmed. Your artisanal tea batch has entered our climate-controlled vault for packing.</p>
                             </div>
                         `}
 
                         <!-- Dispatch & Shipping Info -->
                         <div style="background: rgba(255, 255, 255, 0.03); border-radius: 8px; padding: 16px; margin: 20px 0; border: 1px solid rgba(255,255,255,0.08); font-size: 13px;">
-                            <div style="color: #d4af37; font-weight: bold; margin-bottom: 6px;">📦 Dispatch &amp; Delivery Notice</div>
+                            <div style="color: #d4af37; font-weight: bold; margin-bottom: 6px;">Dispatch &amp; Delivery Notice</div>
                             <div style="color: #d1d5db; line-height: 1.6;">
                                 Destination: <strong style="color:#ffffff;">${order.shipping_address || order.address || 'Standard International Delivery'}</strong><br>
                                 Estimated Dispatch: <strong style="color:#ffffff;">3–7 business days via Express Priority Courier</strong> with live tracking.

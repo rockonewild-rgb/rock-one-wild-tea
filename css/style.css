@@ -8724,6 +8724,30 @@ mark.search-match-highlight {
     }
 }
 
+/* ─── Lookbook Certification Seals ────────────────────────────────────────── */
+.cert-icon-seal {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.75rem auto;
+    color: var(--color-gold);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.12);
+    transition: all 0.3s ease;
+}
+
+.cert-card:hover .cert-icon-seal {
+    transform: scale(1.08);
+    border-color: var(--color-gold);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    background: rgba(212, 175, 55, 0.18);
+}
+
+
 
 
 
