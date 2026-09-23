@@ -1337,6 +1337,89 @@ class TeaFactoryStore {
         return true;
     }
 
+    // ── Product Management Methods ──
+    addProduct(productData) {
+        if (!this.state.products) this.state.products = [];
+        const id = productData.id || ('prod-' + Date.now().toString(36));
+        const priceVal = Number(productData.price || productData.price_usd || 0);
+        const newProduct = {
+            id,
+            name: productData.name || 'Artisanal Tea Item',
+            category: productData.category || 'artisan',
+            type: productData.type || 'Specialty Tea',
+            season: productData.season || '2026 Flush',
+            grade: productData.leafGrade || productData.grade || 'OP1',
+            elevation: productData.elevation || '1,200m Wallawela',
+            price: priceVal,
+            price_usd: priceVal,
+            weight: productData.weight || '100g Vintage Tin',
+            stock: productData.stock !== undefined ? productData.stock : 10,
+            stock_quantity: typeof productData.stock === 'number' ? productData.stock : 10,
+            image: productData.image || 'images/Product.jpeg',
+            desc: productData.desc || productData.description || '',
+            description: productData.desc || productData.description || '',
+            leafGrade: productData.leafGrade || productData.grade || 'Premium Grade',
+            steepTemp: productData.steepTemp || '85°C (185°F)',
+            steepTime: productData.steepTime || '3-4 Minutes',
+            flavor_notes: Array.isArray(productData.flavor_notes) ? productData.flavor_notes : [],
+            brewing_guide: productData.brewing_guide || { temp: productData.steepTemp || '85°C', time: productData.steepTime || '3-4 mins' },
+            is_reserve: Boolean(productData.is_reserve)
+        };
+
+        this.state.products.unshift(newProduct);
+        this.saveState();
+
+        if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.createProduct === 'function') {
+            TeaFactoryAPI.createProduct(newProduct).catch(e => console.warn('Supabase product sync error:', e));
+        }
+
+        return newProduct;
+    }
+
+    updateProduct(productId, updatedData) {
+        if (!this.state.products) return null;
+        const idx = this.state.products.findIndex(p => String(p.id) === String(productId));
+        if (idx === -1) return null;
+
+        const current = this.state.products[idx];
+        const priceVal = updatedData.price !== undefined ? Number(updatedData.price) : Number(current.price || current.price_usd || 0);
+        const updated = {
+            ...current,
+            ...updatedData,
+            price: priceVal,
+            price_usd: priceVal,
+            description: updatedData.desc !== undefined ? updatedData.desc : (updatedData.description !== undefined ? updatedData.description : current.description)
+        };
+
+        this.state.products[idx] = updated;
+        this.saveState();
+
+        if (typeof TeaFactoryAPI !== 'undefined') {
+            fetch(`/api/products/${encodeURIComponent(productId)}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updated)
+            }).catch(e => console.warn('Supabase product update error:', e));
+        }
+
+        return updated;
+    }
+
+    deleteProduct(productId) {
+        if (!this.state.products) return false;
+        this.state.products = this.state.products.filter(p => String(p.id) !== String(productId));
+        this.saveState();
+
+        if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.deleteProduct === 'function') {
+            TeaFactoryAPI.deleteProduct(productId).catch(e => console.warn('Supabase product delete error:', e));
+        } else {
+            fetch(`/api/products/${encodeURIComponent(productId)}`, { method: 'DELETE' }).catch(e => console.warn('Product delete error:', e));
+        }
+
+        return true;
+    }
+
+
 
     // Add new Announcement
     addAnnouncement(announcement) {

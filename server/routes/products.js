@@ -209,6 +209,55 @@ router.post('/', async (req, res) => {
 });
 
 /**
+ * PUT /api/products/:id
+ */
+router.put('/:id', async (req, res) => {
+    try {
+        const prodId = req.params.id;
+        const {
+            name, category, type, season, grade, leafGrade, elevation,
+            price_usd, price, stock, image, description, desc,
+            flavor_notes, brewing_guide, is_reserve
+        } = req.body;
+
+        const updates = {};
+        if (name !== undefined) updates.name = name;
+        if (category !== undefined) updates.category = category;
+        if (type !== undefined) updates.type = type;
+        if (season !== undefined) updates.season = season;
+        if (grade !== undefined || leafGrade !== undefined) updates.grade = grade || leafGrade;
+        if (elevation !== undefined) updates.elevation = elevation;
+        if (price_usd !== undefined || price !== undefined) updates.price_usd = Number(price_usd || price);
+        if (stock !== undefined) updates.stock = Number(stock);
+        if (image !== undefined) updates.image = image;
+        if (description !== undefined || desc !== undefined) updates.description = description || desc;
+        if (flavor_notes !== undefined) updates.flavor_notes = Array.isArray(flavor_notes) ? flavor_notes : [];
+        if (brewing_guide !== undefined) updates.brewing_guide = brewing_guide;
+        if (is_reserve !== undefined) updates.is_reserve = Boolean(is_reserve);
+
+        if (isSupabaseAvailable()) {
+            const { data, error } = await supabase.from('products').update(updates).eq('id', prodId).select().single();
+            if (!error && data) {
+                return res.json({ success: true, data });
+            }
+        }
+
+        // SQLite update
+        try {
+            db.prepare(`
+                UPDATE products
+                SET name = COALESCE(?, name), price_usd = COALESCE(?, price_usd), stock = COALESCE(?, stock)
+                WHERE id = ?
+            `).run(name, Number(price_usd || price), Number(stock), prodId);
+        } catch (e) {}
+
+        res.json({ success: true, message: 'Product updated successfully' });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+/**
  * DELETE /api/products/:id
  */
 router.delete('/:id', async (req, res) => {
