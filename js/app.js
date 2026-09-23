@@ -1012,7 +1012,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p style="font-size: 0.82rem; color: var(--color-text-muted); line-height: 1.5; margin: 0 0 1rem 0;">
                                 Direct credit &amp; debit card processing (Visa, Mastercard, AMEX) is currently being integrated. To book your tour slots immediately, please use the live <strong>Bank Transfer</strong> or <strong>Cash Deposit Slip</strong> options.
                             </p>
-                            <button type="button" class="btn btn-outline" onclick="const bTab=document.querySelector('#tour-booking-form .pay-tab[data-method=\'bank\']');if(bTab)bTab.click();" style="font-size: 0.78rem; padding: 0.45rem 0.9rem; color: var(--color-gold); border-color: rgba(212,175,55,0.4);">
+                            <button type="button" class="btn btn-outline" onclick="window.switchDrawerPayTab('tour-booking-form', 'bank')" style="font-size: 0.78rem; padding: 0.45rem 0.9rem; color: var(--color-gold); border-color: rgba(212,175,55,0.4);">
                                 &larr; Switch to Bank Transfer &amp; Slip Upload (Live)
                             </button>
                         </div>
@@ -1192,7 +1192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p style="font-size: 0.82rem; color: var(--color-text-muted); line-height: 1.5; margin: 0 0 1rem 0;">
                                 Direct online card checkout is currently being integrated. To place your order immediately, please use <strong>Bank Transfer</strong> or <strong>Cash Deposit Slip</strong> upload.
                             </p>
-                            <button type="button" class="btn btn-outline" onclick="const bTab=document.querySelector('#prod-booking-form .pay-tab[data-method=\'bank\']');if(bTab)bTab.click();" style="font-size: 0.78rem; padding: 0.45rem 0.9rem; color: var(--color-gold); border-color: rgba(212,175,55,0.4);">
+                            <button type="button" class="btn btn-outline" onclick="window.switchDrawerPayTab('prod-booking-form', 'bank')" style="font-size: 0.78rem; padding: 0.45rem 0.9rem; color: var(--color-gold); border-color: rgba(212,175,55,0.4);">
                                 &larr; Switch to Bank Transfer &amp; Slip Upload (Live)
                             </button>
                         </div>
@@ -1748,6 +1748,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // Global helper for switching payment tabs programmatically
+    window.switchDrawerPayTab = function(formId, method) {
+        const form = document.getElementById(formId);
+        if (!form) return;
+        const tab = form.querySelector(`.pay-tab[data-method="${method}"]`);
+        if (tab) tab.click();
+    };
 
     // 7c-2. Bespoke Gift Options Interactivity Binder
     function bindBespokeGiftEvents(prefix) {
