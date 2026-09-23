@@ -229,10 +229,10 @@
             cart_phone_label: "WhatsApp / Contact Phone *",
             cart_country_label: "Destination Country",
             cart_address_label: "Courier Delivery Address",
-            cart_pay_mode_label: "Preferred Payment Mode",
-            cart_pay_both: "Both Options Available (Online + Bank Slip)",
-            cart_pay_online: "Online Payment (Cards / Gateway)",
-            cart_pay_bank: "Bank Cash Deposit (Slip Upload)",
+            cart_pay_mode_label: "Payment Settlement Mode",
+            cart_pay_both: "Direct Bank Cash Deposit & Slip Upload (Live)",
+            cart_pay_online: "Online Card Payment (Gateway - Coming Soon)",
+            cart_pay_bank: "Direct Bank Cash Deposit & Slip Upload (Live)",
             cart_notes_label: "Special Courier Instructions",
             cart_notes_placeholder: "Optional delivery instructions or notes for concierge...",
             btn_place_order: "Place Reserve Order"
@@ -452,9 +452,9 @@
             cart_country_label: "රට",
             cart_address_label: "බෙදාහැරීමේ ලිපිනය",
             cart_pay_mode_label: "ගෙවීම් ක්‍රමය",
-            cart_pay_both: "ක්‍රම දෙකම (Online + බැංකු තැන්පතු)",
-            cart_pay_online: "Online ගෙවීම් (Cards / Gateway)",
-            cart_pay_bank: "බැංකු තැන්පතු (Slip Upload)",
+            cart_pay_both: "සෘජු බැංකු තැන්පතු සහ Slip Upload (ක්‍රියාකාරී)",
+            cart_pay_online: "Online Card Payment (Gateway - ළඟදීම)",
+            cart_pay_bank: "සෘජු බැංකු තැන්පතු සහ Slip Upload (ක්‍රියාකාරී)",
             cart_notes_label: "විශේෂ උපදෙස්",
             cart_notes_placeholder: "බෙදාහැරීම පිළිබඳ විශේෂ සටහන්...",
             btn_place_order: "ඇණවුම තහවුරු කරන්න"
@@ -674,9 +674,9 @@
             cart_country_label: "நாடு",
             cart_address_label: "விநியோக முகவரி",
             cart_pay_mode_label: "பணம் செலுத்தும் முறை",
-            cart_pay_both: "இரண்டு முறைகளும் (Online + வங்கி வைப்பு)",
-            cart_pay_online: "ஆன்லைன் கட்டணம் (Cards / Gateway)",
-            cart_pay_bank: "வங்கி வைப்பு (சீட்டு பதிவேற்றம்)",
+            cart_pay_both: "நேரடி வங்கி வைப்பு மற்றும் ரசீது பதிவேற்றம் (செயலில்)",
+            cart_pay_online: "ஆன்லைன் கார்டு கட்டணம் (விரைவில்)",
+            cart_pay_bank: "நேரடி வங்கி வைப்பு மற்றும் ரசீது பதிவேற்றம் (செயலில்)",
             cart_notes_label: "சிறப்பு குறிப்புகள்",
             cart_notes_placeholder: "விநியோகம் தொடர்பான குறிப்புகள்...",
             btn_place_order: "பதிவை உறுதி செய்"
@@ -896,9 +896,9 @@
             cart_country_label: "お届け先の国",
             cart_address_label: "配送先ご住所",
             cart_pay_mode_label: "お支払い方法",
-            cart_pay_both: "両方利用可能（オンライン決済＋銀行振込）",
-            cart_pay_online: "オンライン決済（カード / ゲートウェイ）",
-            cart_pay_bank: "銀行振込（振込明細アップロード）",
+            cart_pay_both: "銀行直接振込＆明細アップロード（利用可能）",
+            cart_pay_online: "オンラインカード決済（近日対応予定）",
+            cart_pay_bank: "銀行直接振込＆明細アップロード（利用可能）",
             cart_notes_label: "配送に関するご要望",
             cart_notes_placeholder: "コンシェルジュへのメッセージや配送希望日時など...",
             btn_place_order: "注文を確定する"
@@ -1117,10 +1117,10 @@
             cart_phone_label: "联系电话 / WhatsApp *",
             cart_country_label: "目的国家/地区",
             cart_address_label: "配送详细地址",
-            cart_pay_mode_label: "首选支付方式",
-            cart_pay_both: "支持双通道（在线网关 + 银行转账）",
-            cart_pay_online: "在线安全支付（信用卡 / 网关）",
-            cart_pay_bank: "银行现金转账（上传回执单）",
+            cart_pay_mode_label: "结算支付方式",
+            cart_pay_both: "银行现金转账与回执单上传（当前可用）",
+            cart_pay_online: "在线信用卡安全网关（即将上线）",
+            cart_pay_bank: "银行现金转账与回执单上传（当前可用）",
             cart_notes_label: "配送特殊要求",
             cart_notes_placeholder: "如指定配送时间或给礼宾团队的备注...",
             btn_place_order: "确认提交订单"
@@ -1339,10 +1339,10 @@
             cart_phone_label: "رقم الهاتف / واتساب *",
             cart_country_label: "دولة الشحن",
             cart_address_label: "عنوان التوصيل بالتفصيل",
-            cart_pay_mode_label: "طريقة الدفع المفضلة",
-            cart_pay_both: "الخياران متاحان (دفع إلكتروني + تحويل بنكي)",
-            cart_pay_online: "دفع إلكتروني فوري (بطاقات / بوابة دفع)",
-            cart_pay_bank: "إيداع بنكي نقدي (رفع إيصال التحويل)",
+            cart_pay_mode_label: "طريقة التسوية والدفع",
+            cart_pay_both: "إيداع بنكي مباشر مع رفع الإيصال (مفعل حالياً)",
+            cart_pay_online: "دفع بالبطاقات الائتمانية (قريباً)",
+            cart_pay_bank: "إيداع بنكي مباشر مع رفع الإيصال (مفعل حالياً)",
             cart_notes_label: "تعليمات خاصة للشحن",
             cart_notes_placeholder: "ملاحظات للتوصيل أو للكونسيرج...",
             btn_place_order: "تأكيد وإرسال الطلب"
@@ -1408,7 +1408,7 @@
                     category: "PAYMENT",
                     iconKey: "card",
                     question: "What payment methods & bank transfer options are accepted?",
-                    answer: "We accept **Direct Bank Transfers** with deposit slip verification (Commercial Bank, Sampath Bank, Bank of Ceylon), credit/debit cards, and cash on estate arrival. Deposit slips can be uploaded directly during booking checkout.",
+                    answer: "For live orders and reservations, we accept **Direct Bank Transfers & Cash Deposits** (Bank of Ceylon) with instant deposit slip upload verification. Online Credit/Debit Card payments (Visa, Mastercard, AMEX) are currently **coming soon**.",
                     actions: [
                         { label: "Order Online", tab: "catalog" }
                     ],
@@ -1541,7 +1541,7 @@
                     category: "ගෙවීම්",
                     iconKey: "card",
                     question: "පිළිගන්නා ගෙවීම් ක්‍රම සහ බැංකු තැන්පතු විකල්ප මොනවාද?",
-                    answer: "අපි **සෘජු බැංකු තැන්පතු** (කොමර්ෂල් බැංකුව, සම්පත් බැංකුව, ලංකා බැංකුව), ක්‍රෙඩිට්/ඩෙබිට් කාඩ්පත් පිළිගන්නෙමු. ඇණවුම් කිරීමේදී තැන්පතු රිසිට්පත කෙලින්ම අප්ලෝඩ් කළ හැක.",
+                    answer: "සජීවී ඇණවුම් සහ චාරිකා සඳහා, අපගේ ලංකා බැංකු (Bank of Ceylon) ගිණුමට **සෘජු බැංකු තැන්පතු** සිදුකර තැන්පතු රිසිට්පත (Slip Upload) කෙලින්ම යොමු කළ හැක. Online ක්‍රෙඩිට්/ඩෙබිට් කාඩ්පත් ගෙවීම් **ළඟදීම** සක්‍රීය වේ.",
                     actions: [
                         { label: "තේ ඇණවුම් කරන්න", tab: "catalog" }
                     ],
@@ -1674,7 +1674,7 @@
                     category: "கட்டணம்",
                     iconKey: "card",
                     question: "ஏற்றுக்கொள்ளப்படும் கட்டண முறைகள் மற்றும் வங்கி பரிமாற்றங்கள் எவை?",
-                    answer: "நாங்கள் **வங்கி வைப்புத்தொகை** (கொமர்ஷல் வங்கி, சம்பத் வங்கி, லங்கா வங்கி), கிரெடிட்/டெபிட் கார்டுகளை ஏற்றுக்கொள்கிறோம். பதிவு செய்யும் போது ரசீதை பதிவேற்றலாம்.",
+                    answer: "நேரடி முன்பதிவுகளுக்கு, எங்கள் லங்கா வங்கி (Bank of Ceylon) கணக்கிற்கு **நேரடி வங்கி வைப்பு** செய்து ரசீதை பதிவேற்றலாம். ஆன்லைன் கிரெடிட்/டெபிட் கார்டு கட்டணங்கள் **விரைவில்** அறிமுகப்படுத்தப்படும்.",
                     actions: [
                         { label: "தேயிலை பதிவு செய்க", tab: "catalog" }
                     ],
@@ -1807,7 +1807,7 @@
                     category: "決済方法",
                     iconKey: "card",
                     question: "利用可能な支払い方法と銀行振込について教えてください。",
-                    answer: "クレジットカード決済、**銀行直接振込**（振込明細スリップのオンライン提出に対応）、および現地決済に対応しております。ご注文時に受領証スリップを簡単にアップロードいただけます。",
+                    answer: "現在のご注文およびご予約では、スリランカ銀行（Bank of Ceylon）口座への**銀行直接振込＆振込明細スリップのオンライン提出**に対応しております。オンラインクレジットカード決済（Visa、Mastercard等）は**近日対応予定**です。",
                     actions: [
                         { label: "オンラインで注文", tab: "catalog" }
                     ],
@@ -1940,7 +1940,7 @@
                     category: "支付方式",
                     iconKey: "card",
                     question: "庄园支持哪些支付方式与银行转账选项？",
-                    answer: "我们支持**主流信用卡/借记卡**、**银行直接转账汇款**（支持在线上传银行水单/回执凭证）。您在下单或预订结算时可直接上传付款水单。",
+                    answer: "对于当前线上订单与庄园探秘预约，我们支持通过锡兰银行（Bank of Ceylon）进行**直接银行转账汇款与回执单水单在线上传**。在线信用卡与借记卡快速支付网关**即将上线**。",
                     actions: [
                         { label: "在线选购茶品", tab: "catalog" }
                     ],
@@ -2073,7 +2073,7 @@
                     category: "طرق الدفع",
                     iconKey: "card",
                     question: "ما هي طرق الدفع والتحويل المصرفي المقبولة؟",
-                    answer: "نقبل **التحويلات المصرفية المباشرة** مع إمكانية رفع إيصال الإيداع، وكذلك البطاقات الائتمانية والدفع عند الوصول إلى المزرعة.",
+                    answer: "للطلبات والحجوزات المباشرة، نقبل **التحويلات والإيداعات المصرفية المباشرة (Bank of Ceylon)** مع رفع إيصال الإيداع للتحقق الفوري. خدمة الدفع الإلكتروني المباشر بالبطاقات الائتمانية **ستتوفر قريباً**.",
                     actions: [
                         { label: "الطلب أونلاين", tab: "catalog" }
                     ],

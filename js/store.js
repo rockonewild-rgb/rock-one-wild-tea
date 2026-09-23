@@ -1077,7 +1077,7 @@ class TeaFactoryStore {
             bookingDate: dateNow.toLocaleDateString('en-US', options),
             depositPaid: parseFloat(customerData.deposit) || 50.00,
             totalPrice: parseFloat(customerData.totalPrice) || (parseFloat(customerData.deposit) || 50.00),
-            paymentMethod: customerData.paymentMethod || 'card',
+            paymentMethod: customerData.paymentMethod || 'bank',
             slipImage: customerData.slipImage || '',
             status: customerData.paymentMethod === 'card' ? 'Paid & Confirmed' : 'Pending Verification',
             tourDate: customerData.tourDate || "",
@@ -1631,7 +1631,7 @@ Direct Desk: +94 77 175 7556 | axentrat@gmail.com
         return this.state.cart.reduce((count, item) => count + item.quantity, 0);
     }
 
-    checkoutCart(customerData, paymentMethod = 'online') {
+    checkoutCart(customerData, paymentMethod = 'bank') {
         const cart = this.getCart();
         if (cart.length === 0) return { success: false, message: "Your reserve cart is empty." };
 
@@ -1662,8 +1662,8 @@ Direct Desk: +94 77 175 7556 | axentrat@gmail.com
             giftOptions: item.giftOptions
         }));
 
-        const isBank = paymentMethod === 'bank' || paymentMethod === 'both';
-        const isOnline = paymentMethod === 'online' || paymentMethod === 'both';
+        const isBank = true;
+        const isOnline = paymentMethod === 'online';
 
         // 1. Create order record in state.orders
         const newOrder = {
@@ -1682,9 +1682,9 @@ Direct Desk: +94 77 175 7556 | axentrat@gmail.com
             deliveryRange: deliveryRange,
             paymentMethod: paymentMethod,
             paymentLink: isOnline ? `https://checkout.stripe.com/pay/mock_rockonewildtea_${orderId.toLowerCase()}` : '',
-            bankName: "Commercial Bank of Ceylon (Ettampitiya / Bandarawela)",
+            bankName: "Bank of Ceylon (Kandy Main Branch)",
             accountName: "Rock One Wild Tea (Pvt) Ltd",
-            accountNo: "8002345678",
+            accountNo: "0083-1001-5271-8843",
             referenceNote: orderId,
             ownerNote: customerData.notes || "Order placed via Multi-Item Connoisseur Reserve Basket.",
             status: "Order Created"

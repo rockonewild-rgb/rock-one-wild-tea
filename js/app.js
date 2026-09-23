@@ -931,36 +931,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <!-- Deposit Payment Method Switcher -->
                     <div class="form-group">
-                        <label>Deposit Payment Method</label>
+                        <label>Deposit Payment Method (Live: Bank Deposit &amp; Slip Upload)</label>
                         <div class="payment-method-tabs">
-                            <button type="button" class="pay-tab active" data-method="card" style="display:inline-flex; align-items:center; gap:0.35rem;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                Card / Gateway
-                            </button>
-                            <button type="button" class="pay-tab" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                            <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
-                                Bank Transfer
+                                Bank Transfer (Live)
                             </button>
                             <button type="button" class="pay-tab" data-method="slip" style="display:inline-flex; align-items:center; gap:0.35rem;">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                Cash Deposit Slip
+                                Cash Deposit Slip (Live)
+                            </button>
+                            <button type="button" class="pay-tab" data-method="card" style="display:inline-flex; align-items:center; gap:0.35rem; opacity: 0.85;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                Card / Gateway <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(212,175,55,0.25); color:var(--color-gold); font-weight:700;">SOON</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Method A: Card / Gateway Payment -->
-                    <div id="pay-panel-card" class="pay-panel active">
-                        <div class="mock-card-notice">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.8" style="flex-shrink:0;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                            <div>
-                                <div style="font-weight:600;color:var(--color-gold);margin-bottom:0.3rem;">Instant Card &amp; Online Gateway</div>
-                                <div style="font-size:0.8rem;color:var(--color-text-muted);">Pay your seat deposit online. Your tour time slot is verified and locked immediately upon submission.</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Method B: Direct Bank Transfer with Slip Attachment -->
-                    <div id="pay-panel-bank" class="pay-panel">
+                    <!-- Method A: Direct Bank Transfer with Slip Attachment (Active Default) -->
+                    <div id="pay-panel-bank" class="pay-panel active">
                         <div class="bank-details-block">
                             <div class="bank-detail-row"><span>Bank Name:</span><strong>Bank of Ceylon</strong></div>
                             <div class="bank-detail-row"><span>Account Name:</span><strong>Rock One Wild Tea (Pvt) Ltd</strong></div>
@@ -970,9 +959,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <span>Deposit Required:</span><strong id="bank-deposit-display" style="color:var(--color-gold);">$${pkgDeposit.toFixed(2)} USD</strong>
                             </div>
                         </div>
-                        <span class="field-hint" style="margin-top:0.75rem;display:block;">Transfer the deposit and attach your payment receipt below.</span>
+                        <span class="field-hint" style="margin-top:0.75rem;display:block;">Transfer the deposit and attach your payment receipt / transfer screenshot below.</span>
                         <div class="form-group" style="margin-top:1rem;">
-                            <label>Upload Bank Transfer Slip / Screenshot</label>
+                            <label>Upload Bank Transfer Slip / Screenshot *</label>
                             <div class="file-upload-zone" id="tour-bank-slip-zone">
                                 <div class="file-upload-icon">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
@@ -985,7 +974,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
 
-                    <!-- Method C: Cash Deposit at Bank with Slip Attachment -->
+                    <!-- Method B: Cash Deposit at Bank with Slip Attachment -->
                     <div id="pay-panel-slip" class="pay-panel">
                         <div class="mock-card-notice" style="background:rgba(212,175,55,0.07);border-color:rgba(212,175,55,0.2);">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.8" style="flex-shrink:0;"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
@@ -1000,7 +989,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="bank-detail-row"><span>Deposit Amount:</span><strong id="cash-deposit-display" style="color:var(--color-gold);">${window.TeaFactoryStore.formatCurrency(pkgDeposit)}</strong></div>
                         </div>
                         <div class="form-group" style="margin-top:1rem;">
-                            <label>Upload Cash Deposit Slip</label>
+                            <label>Upload Cash Deposit Slip *</label>
                             <div class="file-upload-zone" id="tour-cash-slip-zone">
                                 <div class="file-upload-icon">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
@@ -1010,6 +999,22 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <input type="file" id="tour-cash-slip" accept="image/*,.pdf" style="display:none;">
                             </div>
                             <div id="tour-cash-slip-preview" class="slip-preview" style="display:none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Method C: Card / Online Gateway (Coming Soon Notice) -->
+                    <div id="pay-panel-card" class="pay-panel">
+                        <div class="mock-card-notice" style="background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.35); border-radius: 8px; padding: 1.25rem;">
+                            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                                <span style="background: rgba(212,175,55,0.2); color: var(--color-gold); font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;">Coming Soon</span>
+                                <strong style="color: var(--color-white); font-size: 0.92rem;">Online Card Gateway in Preparation</strong>
+                            </div>
+                            <p style="font-size: 0.82rem; color: var(--color-text-muted); line-height: 1.5; margin: 0 0 1rem 0;">
+                                Direct credit &amp; debit card processing (Visa, Mastercard, AMEX) is currently being integrated. To book your tour slots immediately, please use the live <strong>Bank Transfer</strong> or <strong>Cash Deposit Slip</strong> options.
+                            </p>
+                            <button type="button" class="btn btn-outline" onclick="const bTab=document.querySelector('#tour-booking-form .pay-tab[data-method=\'bank\']');if(bTab)bTab.click();" style="font-size: 0.78rem; padding: 0.45rem 0.9rem; color: var(--color-gold); border-color: rgba(212,175,55,0.4);">
+                                &larr; Switch to Bank Transfer &amp; Slip Upload (Live)
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -1108,39 +1113,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${window.UIComponents.renderBespokeGiftOptions('prod')}
 
                     <div class="form-group" style="margin-top:1.25rem;">
-                        <label>Payment Method</label>
+                        <label>Payment Method (Live: Bank Deposit &amp; Slip Upload)</label>
                         <div class="payment-method-tabs">
-                            <button type="button" class="pay-tab active" data-method="card" style="display:inline-flex; align-items:center; gap:0.35rem;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                Card Payment
-                            </button>
-                            <button type="button" class="pay-tab" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                            <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
-                                Bank Transfer
+                                Bank Transfer (Live)
                             </button>
                             <button type="button" class="pay-tab" data-method="slip" style="display:inline-flex; align-items:center; gap:0.35rem;">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                Cash Deposit Slip
+                                Cash Deposit Slip (Live)
+                            </button>
+                            <button type="button" class="pay-tab" data-method="card" style="display:inline-flex; align-items:center; gap:0.35rem; opacity: 0.85;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                Card Payment <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(212,175,55,0.25); color:var(--color-gold); font-weight:700;">SOON</span>
                             </button>
                         </div>
                     </div>
-                    <div id="pay-panel-card" class="pay-panel active">
-                        <div class="mock-card-notice">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.8" style="flex-shrink:0;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                            <div>
-                                <div style="font-weight:600;color:var(--color-gold);margin-bottom:0.3rem;">Secure Card Payment</div>
-                                <div style="font-size:0.8rem;color:var(--color-text-muted);">Card gateway coming soon. You will be redirected to our concierge via WhatsApp or Instagram to finalize.</div>
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top:1rem;">
-                            <label for="prod-social-channel">Redirect to Concierge via</label>
-                            <select id="prod-social-channel">
-                                <option value="WhatsApp">WhatsApp Concierge Direct</option>
-                                <option value="Instagram">Instagram Direct Message</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div id="pay-panel-bank" class="pay-panel">
+
+                    <!-- Method A: Direct Bank Transfer with Slip Attachment (Active Default) -->
+                    <div id="pay-panel-bank" class="pay-panel active">
                         <div class="bank-details-block">
                             <div class="bank-detail-row"><span>Bank Name:</span><strong>Bank of Ceylon</strong></div>
                             <div class="bank-detail-row"><span>Account Name:</span><strong>Rock One Wild Tea (Pvt) Ltd</strong></div>
@@ -1150,23 +1141,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <span class="field-hint" style="margin-top:0.75rem;display:block;">After transferring, upload your payment slip below to confirm.</span>
                         <div class="form-group" style="margin-top:1rem;">
-                            <label>Upload Bank Transfer Slip</label>
+                            <label>Upload Bank Transfer Slip *</label>
                             <div class="file-upload-zone" id="prod-bank-slip-zone">
                                 <div class="file-upload-icon">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
                                 </div>
-                                <div class="file-upload-text">Drag & drop or <span class="file-upload-link">browse file</span></div>
+                                <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse file</span></div>
                                 <div class="file-upload-hint">JPG, PNG or PDF — Max 5MB</div>
                                 <input type="file" id="prod-bank-slip" accept="image/*,.pdf" style="display:none;">
                             </div>
                             <div id="prod-slip-preview" class="slip-preview" style="display:none;"></div>
                         </div>
                     </div>
+
+                    <!-- Method B: Cash Deposit at Bank with Slip Attachment -->
                     <div id="pay-panel-slip" class="pay-panel">
                         <div class="mock-card-notice" style="background:rgba(212,175,55,0.07);border-color:rgba(212,175,55,0.2);">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.8" style="flex-shrink:0;"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
                             <div>
-                                <div style="font-weight:600;color:var(--color-gold);margin-bottom:0.3rem;">Cash Deposit at Bank</div>
+                                <div style="font-weight:600;color:var(--color-gold);margin-bottom:0.3rem;">Cash Deposit at Bank of Ceylon</div>
                                 <div style="font-size:0.8rem;color:var(--color-text-muted);">Deposit the amount at any Bank of Ceylon branch and upload your cash deposit slip for verification.</div>
                             </div>
                         </div>
@@ -1176,16 +1169,32 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="bank-detail-row"><span>Amount:</span><strong>${window.TeaFactoryStore.formatCurrency(product.price)}</strong></div>
                         </div>
                         <div class="form-group" style="margin-top:1rem;">
-                            <label>Upload Cash Deposit Slip</label>
+                            <label>Upload Cash Deposit Slip *</label>
                             <div class="file-upload-zone" id="prod-cash-slip-zone">
                                 <div class="file-upload-icon">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
                                 </div>
-                                <div class="file-upload-text">Drag & drop or <span class="file-upload-link">browse file</span></div>
+                                <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse file</span></div>
                                 <div class="file-upload-hint">JPG, PNG or PDF — Max 5MB</div>
                                 <input type="file" id="prod-cash-slip" accept="image/*,.pdf" style="display:none;">
                             </div>
                             <div id="prod-cash-slip-preview" class="slip-preview" style="display:none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Method C: Card / Online Gateway (Coming Soon Notice) -->
+                    <div id="pay-panel-card" class="pay-panel">
+                        <div class="mock-card-notice" style="background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.35); border-radius: 8px; padding: 1.25rem;">
+                            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                                <span style="background: rgba(212,175,55,0.2); color: var(--color-gold); font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;">Coming Soon</span>
+                                <strong style="color: var(--color-white); font-size: 0.92rem;">Online Card Gateway in Preparation</strong>
+                            </div>
+                            <p style="font-size: 0.82rem; color: var(--color-text-muted); line-height: 1.5; margin: 0 0 1rem 0;">
+                                Direct online card checkout is currently being integrated. To place your order immediately, please use <strong>Bank Transfer</strong> or <strong>Cash Deposit Slip</strong> upload.
+                            </p>
+                            <button type="button" class="btn btn-outline" onclick="const bTab=document.querySelector('#prod-booking-form .pay-tab[data-method=\'bank\']');if(bTab)bTab.click();" style="font-size: 0.78rem; padding: 0.45rem 0.9rem; color: var(--color-gold); border-color: rgba(212,175,55,0.4);">
+                                &larr; Switch to Bank Transfer &amp; Slip Upload (Live)
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -1537,8 +1546,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Active payment method
         const activeTabBtn = form.querySelector('.pay-tab.active');
-        const paymentMethod = activeTabBtn ? activeTabBtn.getAttribute('data-method') : 'card';
+        const paymentMethod = activeTabBtn ? activeTabBtn.getAttribute('data-method') : 'bank';
         const socialChannel = document.getElementById('tour-social-channel')?.value || 'WhatsApp';
+
+        if (paymentMethod === 'card') {
+            showToast("Card Gateway Coming Soon", "Please select Bank Transfer or Cash Deposit Slip and attach your receipt to confirm your booking.", "info");
+            const bankTab = form.querySelector('.pay-tab[data-method="bank"]');
+            if (bankTab) bankTab.click();
+            return;
+        }
 
         // Check slip requirement for bank/slip methods
         if ((paymentMethod === 'bank' || paymentMethod === 'slip') && !selectedTourSlipBase64) {
@@ -2319,11 +2335,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="field-hint">Pre-filled from the box price. Adjust if needed after negotiation.</span>
                     </div>
                     <div class="form-group">
-                        <label>Payment Method to Offer Customer</label>
+                        <label>Payment Settlement Mode (Live)</label>
                         <select id="co-method">
-                            <option value="both">Online Payment + Bank Deposit (Both Options)</option>
-                            <option value="online">Online Payment Link Only</option>
-                            <option value="bank">Bank Deposit Only</option>
+                            <option value="bank" selected>Direct Bank Deposit (Active Live Channel)</option>
+                            <option value="online">Online Payment Link (Gateway Coming Soon)</option>
+                            <option value="both">Both Options (Bank Live + Gateway Coming Soon)</option>
                         </select>
                     </div>
                     <div class="form-group" id="co-link-group">

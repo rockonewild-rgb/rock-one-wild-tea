@@ -3459,37 +3459,46 @@ const UIComponents = {
                         <div style="font-size: 0.8rem; color: var(--color-text-muted);">We received your deposit slip. Our team will verify and confirm your order within 24 hours.</div>
                     </div>
                 ` : `
-                    <!-- Payment Options — both always shown -->
+                    <!-- Payment Options -->
                     <h4 style="font-family: var(--font-serif); color: var(--color-white); margin-bottom: 1.25rem; font-size: 1.1rem; display: flex; align-items: center; gap: 0.45rem;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                        Complete Your Payment
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        Payment Methods &amp; Settlement
                     </h4>
 
-                    <!-- Option A: Online Payment -->
-                    <div style="margin-bottom: 1.25rem; padding: 1.25rem; background: rgba(46,125,50,0.1); border: 1px solid rgba(46,125,50,0.25); border-radius: 8px;">
-                        <div style="font-weight: 700; color: #81c784; margin-bottom: 0.5rem; font-size: 0.9rem;">Option A — Pay Online (Instant)</div>
-                        ${order.paymentLink ? `
-                            <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 1rem;">Click the button below to pay securely via our payment gateway. Your order will be confirmed automatically.</div>
-                            <a href="${order.paymentLink}" target="_blank" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; font-size: 0.9rem;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                Pay ${order.formattedPrice || `$${(Number(order.price) || 0).toFixed(2)}`} Online →
-                            </a>
-                        ` : `
-                            <div style="font-size: 0.8rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 0.45rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                                Our concierge team will share a personal payment link via WhatsApp or Email shortly.
+                    <!-- Option A: Online Card Gateway (Coming Soon Notice) -->
+                    <div style="margin-bottom: 1.25rem; padding: 1.25rem; background: rgba(255,255,255,0.02); border: 1px dashed rgba(212,175,55,0.35); border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+                            <div style="font-weight: 700; color: #ffffff; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                Online Card Gateway (Visa / Mastercard / AMEX)
                             </div>
-                        `}
+                            <span style="background: rgba(212,175,55,0.18); color: var(--color-gold); font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(212,175,55,0.35);">
+                                Coming Soon
+                            </span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--color-text-muted); line-height: 1.5;">
+                            Direct online credit &amp; debit card processing is currently in preparation. To settle and confirm your order immediately, please use the live <strong>Direct Bank Deposit &amp; Slip Upload</strong> option below.
+                        </div>
                     </div>
 
-                    <!-- Option B: Bank Cash Deposit + Slip Upload -->
-                    <div style="margin-bottom: 1.5rem; padding: 1.25rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.2); border-radius: 8px;">
-                        <div style="font-weight: 700; color: var(--color-gold); margin-bottom: 0.75rem; font-size: 0.9rem;">Option B — Bank Cash Deposit &amp; Slip Upload</div>
-                        <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 1rem;">Deposit the exact amount at any branch, then attach and submit your deposit slip image below for instant verification.</div>
+                    <!-- Option B: Direct Bank Cash Deposit + Slip Upload (Active Live Channel) -->
+                    <div style="margin-bottom: 1.5rem; padding: 1.25rem; background: rgba(212,175,55,0.03); border: 1.5px solid rgba(212,175,55,0.4); border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
+                            <div style="font-weight: 700; color: var(--color-gold); font-size: 0.95rem; display: flex; align-items: center; gap: 0.45rem;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
+                                Direct Bank Deposit &amp; Slip Upload
+                            </div>
+                            <span style="background: rgba(46,125,50,0.2); color: #81c784; font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(46,125,50,0.4);">
+                                &#x2714; Active Live Method
+                            </span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 1rem;">
+                            Transfer or deposit the exact invoice amount into our Bank of Ceylon account, then upload your deposit receipt or mobile transfer screenshot below for rapid concierge validation.
+                        </div>
                         <div class="bank-details-block" style="margin-bottom: 1.25rem;">
-                            <div class="bank-detail-row"><span>Bank:</span><strong>${order.bankName || 'Commercial Bank of Ceylon (Ettampitiya / Bandarawela)'}</strong></div>
+                            <div class="bank-detail-row"><span>Bank:</span><strong>${order.bankName || 'Bank of Ceylon (Kandy Main Branch)'}</strong></div>
                             <div class="bank-detail-row"><span>Account Name:</span><strong>${order.accountName || 'Rock One Wild Tea (Pvt) Ltd'}</strong></div>
-                            <div class="bank-detail-row"><span>Account No:</span><strong>${order.accountNo || '8002345678'}</strong></div>
+                            <div class="bank-detail-row"><span>Account No:</span><strong>${order.accountNo || '0083-1001-5271-8843'}</strong></div>
                             ${order.referenceNote ? `<div class="bank-detail-row"><span>Reference:</span><strong>${order.referenceNote}</strong></div>` : `<div class="bank-detail-row"><span>Reference:</span><strong>${order.id}</strong></div>`}
                             <div class="bank-detail-row" style="border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 0.5rem; margin-top: 0.5rem;">
                                 <span>Amount:</span><strong style="color: var(--color-gold);">${order.formattedPrice || `$${(Number(order.price) || 0).toFixed(2)}`}</strong>
@@ -3499,7 +3508,7 @@ const UIComponents = {
                         <!-- Slip Upload Form -->
                         <form id="order-slip-form" class="admin-form" style="gap: 1rem;">
                             <div class="form-group">
-                                <label>Attach Your Deposit Slip (Image)</label>
+                                <label>Attach Your Bank Deposit Slip (Image / PDF) *</label>
                                 <div class="file-upload-zone" id="order-slip-zone">
                                     <div class="file-upload-icon">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
@@ -3510,7 +3519,7 @@ const UIComponents = {
                                 </div>
                                 <div id="order-slip-preview" class="slip-preview" style="display:none;"></div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-full" data-order-id="${order.id}" style="display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;">
+                            <button type="submit" class="btn btn-primary w-full" data-order-id="${order.id}" style="display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; box-shadow: 0 4px 18px rgba(212,175,55,0.25);">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                                 Submit Deposit Slip for Verification
                             </button>
@@ -3978,12 +3987,14 @@ const UIComponents = {
                                 </select>
                             </div>
                             <div class="form-group" style="margin-bottom: 0;">
-                                <label class="form-label" for="cart-payment-method" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">${_t('cart_pay_mode_label', 'Preferred Payment Mode')}</label>
+                                <label class="form-label" for="cart-payment-method" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">${_t('cart_pay_mode_label', 'Payment Settlement Mode')}</label>
                                 <select class="form-input" id="cart-payment-method" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                    <option value="both" selected>${_t('cart_pay_both', 'Both Options Available (Online + Bank Slip)')}</option>
-                                    <option value="online">${_t('cart_pay_online', 'Online Payment (Cards / Gateway)')}</option>
-                                    <option value="bank">${_t('cart_pay_bank', 'Bank Cash Deposit (Slip Upload)')}</option>
+                                    <option value="bank" selected>${_t('cart_pay_bank', 'Direct Bank Cash Deposit & Slip Upload (Live)')}</option>
+                                    <option value="online" disabled>${_t('cart_pay_online', 'Online Card Payment (Cards / Gateway - Coming Soon)')}</option>
                                 </select>
+                                <span style="font-size: 0.7rem; color: var(--color-gold); margin-top: 0.35rem; display: block; line-height: 1.35;">
+                                    &#9432; Online card gateway coming soon. Live method: Direct Bank Deposit &amp; Slip Upload.
+                                </span>
                             </div>
                         </div>
 
