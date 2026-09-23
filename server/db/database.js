@@ -27,8 +27,18 @@ if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.NO
 
 const db = new DatabaseSync(dbPath);
 
-// Enable foreign keys
-db.exec('PRAGMA foreign_keys = ON;');
+// SQLite Performance Pragmas
+try {
+    db.exec(`
+        PRAGMA foreign_keys = ON;
+        PRAGMA journal_mode = WAL;
+        PRAGMA synchronous = NORMAL;
+        PRAGMA cache_size = 10000;
+        PRAGMA temp_store = MEMORY;
+    `);
+} catch (e) {
+    db.exec('PRAGMA foreign_keys = ON;');
+}
 
 /**
  * Initialize all database tables

@@ -2,6 +2,7 @@ const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const compression = require('compression');
 require('dotenv').config();
 
 // Initialize database
@@ -9,6 +10,17 @@ require('./db/database');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Enable Gzip/Brotli Compression for all text, JSON, JS, CSS, and HTML responses
+app.use(compression({
+    threshold: 1024, // only compress responses above 1KB
+    filter: (req, res) => {
+        if (req.headers['x-no-compression']) {
+            return false;
+        }
+        return compression.filter(req, res);
+    }
+}));
 
 // Middleware
 app.use(cors({
@@ -20,8 +32,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
-// Static files (serves root project files so index.html is accessible directly)
-app.use(express.static(path.join(__dirname, '..')));
+// Static files with optimized HTTP caching headers
+app.use(express.static(path.join(__dirname, '..'), {
+    maxAge: '1h',
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.html')) {
+            res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+        } else if (filePath.match(/\.(jpg|jpeg|png|webp|svg|gif|ico|mp3|wav|ogg)$/i)) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        } else if (filePath.match(/\.(css|js)$/i)) {
+            res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+        }
+    }
+}));
 
 // API Healthcheck
 app.get('/api/health', (req, res) => {
