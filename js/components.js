@@ -1526,11 +1526,16 @@ const UIComponents = {
                                         const categoryStr = prod.category || 'Imperial Reserve';
                                         const weightStr = prod.weight || '100g Vintage Tin';
                                         const stockStr = prod.stock || (prod.stock_quantity > 0 ? 'In Stock' : 'In Stock');
+                                        let prodImg = prod.image || prod.image_url || 'images/Product.jpeg';
+                                        if (prodImg.includes('silver_tips')) prodImg = 'images/Product.jpeg';
+                                        else if (prodImg.includes('black_tea')) prodImg = 'images/luxury_tea_tin.jpg';
+                                        else if (prodImg.includes('green_tea')) prodImg = 'images/luxury_tea_chest.jpg';
+                                        else if (prodImg.includes('tea_box')) prodImg = 'images/Gift Box.jpeg';
 
                                         return `
                                         <tr>
                                             <td>
-                                                <img src="${prod.image || prod.image_url || 'images/Product.jpeg'}" alt="${prod.name}" style="width: 44px; height: 44px; object-fit: contain; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); background: rgba(0,0,0,0.4); display: block;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
+                                                <img src="${prodImg}" alt="${prod.name}" style="width: 44px; height: 44px; object-fit: contain; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); background: rgba(0,0,0,0.4); display: block;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
                                             </td>
                                             <td><strong>${prod.name}</strong><br><small style="color:var(--color-text-muted);">${leafGradeStr}</small></td>
                                             <td>${categoryStr}</td>

@@ -3,6 +3,15 @@ const router = express.Router();
 const { db } = require('../db/database');
 const { supabase, isSupabaseAvailable } = require('../db/supabase');
 
+function normalizeProductImage(img) {
+    if (!img) return 'images/Product.jpeg';
+    if (img.includes('silver_tips')) return 'images/Product.jpeg';
+    if (img.includes('black_tea')) return 'images/luxury_tea_tin.jpg';
+    if (img.includes('green_tea')) return 'images/luxury_tea_chest.jpg';
+    if (img.includes('tea_box')) return 'images/Gift Box.jpeg';
+    return img;
+}
+
 /**
  * GET /api/products
  * Fetch all products
@@ -30,6 +39,7 @@ router.get('/', async (req, res) => {
                     ...r,
                     price: Number(r.price_usd || 0),
                     price_usd: Number(r.price_usd || 0),
+                    image: normalizeProductImage(r.image),
                     flavor_notes: Array.isArray(r.flavor_notes) ? r.flavor_notes : (typeof r.flavor_notes === 'string' ? JSON.parse(r.flavor_notes) : []),
                     brewing_guide: typeof r.brewing_guide === 'string' ? JSON.parse(r.brewing_guide) : r.brewing_guide,
                     is_reserve: Boolean(r.is_reserve)
@@ -67,6 +77,7 @@ router.get('/', async (req, res) => {
                 ...r,
                 price: priceVal,
                 price_usd: priceVal,
+                image: normalizeProductImage(r.image),
                 flavor_notes: r.flavor_notes ? JSON.parse(r.flavor_notes) : [],
                 brewing_guide: r.brewing_guide ? JSON.parse(r.brewing_guide) : null,
                 is_reserve: Boolean(r.is_reserve)
