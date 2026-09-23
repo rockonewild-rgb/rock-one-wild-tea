@@ -535,7 +535,8 @@ document.addEventListener('DOMContentLoaded', () => {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const passcode = (document.getElementById('admin-passcode').value || '').trim().toLowerCase();
-            const validCodes = ['admin', '1890', 'rockone', 'rock1890', 'concierge', 'tea1890'];
+            const storedPasscode = (window.TeaFactoryStore.getAdminPasscode() || 'admin').trim().toLowerCase();
+            const validCodes = [storedPasscode, 'admin', '1890', 'rockone', 'rock1890', 'concierge', 'tea1890'];
             
             if (validCodes.includes(passcode)) {
                 isAdminAuthenticated = true;
@@ -545,6 +546,136 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast("Access Denied", "Invalid staff credentials passcode.", "error");
                 document.getElementById('admin-passcode').value = '';
                 document.getElementById('admin-passcode').focus();
+            }
+        });
+    }
+
+    // ─── Change Concierge Passcode Modal ──────────────────────────────────────
+    function showChangePasscodeModal() {
+        const existing = document.getElementById('change-passcode-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'change-passcode-modal';
+        modal.style.cssText = `
+            position: fixed; inset: 0; z-index: 10000;
+            background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+            animation: fadeInModal 0.25s ease-out;
+        `;
+
+        modal.innerHTML = `
+            <div style="
+                background: linear-gradient(135deg, rgba(8, 22, 14, 0.98) 0%, rgba(4, 12, 7, 0.99) 100%);
+                border: 1.5px solid rgba(212, 175, 55, 0.55);
+                box-shadow: 0 25px 80px rgba(0,0,0,0.95), 0 0 35px rgba(212, 175, 55, 0.2);
+                border-radius: 20px; max-width: 460px; width: 100%; padding: 2.25rem; color: #ffffff; position: relative;
+            ">
+                <!-- Close Button -->
+                <button type="button" class="btn-modal-close" style="
+                    position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.06);
+                    border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 34px; height: 34px; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center; cursor: pointer;
+                ">&times;</button>
+
+                <!-- Header -->
+                <div style="text-align: center; margin-bottom: 1.75rem;">
+                    <div style="
+                        width: 60px; height: 60px; border-radius: 50%; background: rgba(212, 175, 55, 0.15);
+                        border: 1.5px solid var(--color-gold); display: inline-flex; align-items: center; justify-content: center;
+                        color: var(--color-gold); margin-bottom: 0.85rem; box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+                    ">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </div>
+                    <h3 style="font-family: var(--font-serif); font-size: 1.45rem; margin: 0; color: #ffffff;">Update Passcode</h3>
+                    <p style="font-size: 0.78rem; color: var(--color-text-muted); margin: 0.35rem 0 0 0;">Set a new access passcode for Concierge Operations.</p>
+                </div>
+
+                <!-- Form -->
+                <form id="change-passcode-form" style="display: flex; flex-direction: column; gap: 1.15rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 600; margin-bottom: 0.35rem;">
+                            Current Passcode
+                        </label>
+                        <input type="password" id="modal-curr-passcode" placeholder="Enter current passcode" required style="
+                            width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1.5px solid rgba(255,255,255,0.15);
+                            border-radius: 8px; padding: 0.75rem 1rem; color: #ffffff; font-size: 0.95rem; outline: none;
+                        ">
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 600; margin-bottom: 0.35rem;">
+                            New Passcode
+                        </label>
+                        <input type="password" id="modal-new-passcode" placeholder="Enter new passcode (min. 3 chars)" minlength="3" required style="
+                            width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1.5px solid rgba(255,255,255,0.15);
+                            border-radius: 8px; padding: 0.75rem 1rem; color: #ffffff; font-size: 0.95rem; outline: none;
+                        ">
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 600; margin-bottom: 0.35rem;">
+                            Confirm New Passcode
+                        </label>
+                        <input type="password" id="modal-confirm-passcode" placeholder="Re-enter new passcode" minlength="3" required style="
+                            width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1.5px solid rgba(255,255,255,0.15);
+                            border-radius: 8px; padding: 0.75rem 1rem; color: #ffffff; font-size: 0.95rem; outline: none;
+                        ">
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 0.75rem;">
+                        <button type="button" class="btn btn-outline btn-modal-cancel" style="padding: 0.65rem 1.25rem; font-size: 0.82rem;">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.5rem; font-size: 0.85rem; font-weight: 700;">Save New Passcode</button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        function closeModal() { modal.remove(); }
+        modal.querySelector('.btn-modal-close').addEventListener('click', closeModal);
+        modal.querySelector('.btn-modal-cancel').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        const form = modal.querySelector('#change-passcode-form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const currInput = (modal.querySelector('#modal-curr-passcode').value || '').trim().toLowerCase();
+            const newInput = (modal.querySelector('#modal-new-passcode').value || '').trim();
+            const confirmInput = (modal.querySelector('#modal-confirm-passcode').value || '').trim();
+
+            const storedPasscode = (window.TeaFactoryStore.getAdminPasscode() || 'admin').trim().toLowerCase();
+            const validCurrentCodes = [storedPasscode, 'admin', '1890', 'rockone', 'rock1890', 'concierge'];
+
+            if (!validCurrentCodes.includes(currInput)) {
+                showToast("Verification Error", "Current passcode is incorrect.", "error");
+                modal.querySelector('#modal-curr-passcode').value = '';
+                modal.querySelector('#modal-curr-passcode').focus();
+                return;
+            }
+
+            if (newInput.length < 3) {
+                showToast("Validation Error", "New passcode must be at least 3 characters.", "error");
+                return;
+            }
+
+            if (newInput !== confirmInput) {
+                showToast("Mismatch Error", "New passcode and confirmation do not match.", "error");
+                modal.querySelector('#modal-confirm-passcode').value = '';
+                modal.querySelector('#modal-confirm-passcode').focus();
+                return;
+            }
+
+            const ok = window.TeaFactoryStore.setAdminPasscode(newInput);
+            if (ok) {
+                closeModal();
+                showToast("Passcode Updated", "Your new Concierge Operations passcode has been saved.", "success");
+            } else {
+                showToast("Save Error", "Could not update passcode. Please try again.", "error");
             }
         });
     }
@@ -4762,6 +4893,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
+
+        // Change Passcode Button
+        const changePasscodeBtn = document.getElementById('admin-change-passcode-btn');
+        if (changePasscodeBtn) {
+            changePasscodeBtn.addEventListener('click', () => {
+                showChangePasscodeModal();
+            });
+        }
 
         // Logout/Lock Button
         const logoutBtn = document.getElementById('admin-logout-btn');

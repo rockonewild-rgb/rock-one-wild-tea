@@ -1013,6 +1013,21 @@ class TeaFactoryStore {
         return true;
     }
 
+    // Admin Passcode Management
+    getAdminPasscode() {
+        return this.state.adminPasscode || localStorage.getItem('tea_factory_admin_passcode') || 'admin';
+    }
+
+    setAdminPasscode(newPasscode) {
+        if (!newPasscode || typeof newPasscode !== 'string') return false;
+        const clean = newPasscode.trim();
+        if (clean.length < 3) return false;
+        this.state.adminPasscode = clean;
+        localStorage.setItem('tea_factory_admin_passcode', clean);
+        this.saveState();
+        return true;
+    }
+
     // Reset Season & Series
     resetSeason(newSeasonName, newPrice = 150.00) {
         const nextSeriesNum = this.state.currentSeason.seriesNumber + 1;
