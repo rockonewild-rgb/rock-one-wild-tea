@@ -8676,6 +8676,55 @@ mark.search-match-highlight {
     color: var(--color-gold) !important;
 }
 
+/* ─── Email Service Provider Chooser Modal ───────────────────────────────── */
+.email-provider-btn {
+    position: relative;
+    cursor: pointer;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #fff;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.email-provider-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.email-provider-btn.email-btn-gmail:hover {
+    border-color: rgba(234, 67, 53, 0.7);
+    background: rgba(234, 67, 53, 0.14);
+}
+
+.email-provider-btn.email-btn-outlook:hover {
+    border-color: rgba(0, 120, 212, 0.7);
+    background: rgba(0, 120, 212, 0.14);
+}
+
+.email-provider-btn.email-btn-yahoo:hover {
+    border-color: rgba(126, 31, 255, 0.7);
+    background: rgba(126, 31, 255, 0.14);
+}
+
+.email-provider-btn.email-btn-default:hover {
+    border-color: var(--color-gold);
+    background: rgba(212, 175, 55, 0.14);
+}
+
+@media (max-width: 540px) {
+    .email-provider-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+
 
 
 

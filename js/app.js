@@ -774,6 +774,203 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // 3b. Interactive Email Service Provider Chooser Modal
+    function showEmailServiceChooserModal({
+        to = 'axentrat@gmail.com',
+        subject = 'Enquiry: Ceylon Artisanal Tea Allocation',
+        body = '',
+        title = 'Select Preferred Email Service',
+        subtitle = 'Concierge Dispatch Desk',
+        itemSummary = ''
+    } = {}) {
+        const existing = document.getElementById('email-service-chooser-modal');
+        if (existing) existing.remove();
+
+        const encodedTo = encodeURIComponent(to);
+        const encodedSubject = encodeURIComponent(subject);
+        const encodedBody = encodeURIComponent(body);
+
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodedTo}&su=${encodedSubject}&body=${encodedBody}`;
+        const outlookUrl = `https://outlook.live.com/mail/0/deeplink/compose?to=${encodedTo}&subject=${encodedSubject}&body=${encodedBody}`;
+        const yahooUrl = `https://compose.mail.yahoo.com/?to=${encodedTo}&subj=${encodedSubject}&body=${encodedBody}`;
+        const mailtoUrl = `mailto:${to}?subject=${encodedSubject}&body=${encodedBody}`;
+
+        const modal = document.createElement('div');
+        modal.id = 'email-service-chooser-modal';
+        modal.className = 'admin-modal-overlay';
+        modal.style.cssText = `
+            position: fixed; inset: 0; background: rgba(5, 7, 6, 0.88);
+            backdrop-filter: blur(10px); z-index: 99999;
+            display: flex; align-items: center; justify-content: center;
+            padding: 1.25rem; animation: fadeInModal 0.25s ease-out;
+        `;
+
+        modal.innerHTML = `
+            <div class="admin-modal" style="
+                background: linear-gradient(145deg, #131714 0%, #0d100e 100%);
+                border: 1px solid rgba(212, 175, 55, 0.35);
+                border-radius: 16px; width: 100%; max-width: 540px;
+                box-shadow: 0 25px 60px rgba(0,0,0,0.85), 0 0 35px rgba(212,175,55,0.15);
+                color: #fff; overflow: hidden; position: relative; animation: scaleUpModal 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            ">
+                <!-- Modal Header -->
+                <div style="padding: 1.35rem 1.75rem 1.15rem; border-bottom: 1px solid rgba(212,175,55,0.18); display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.9rem;">
+                        <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); display: flex; align-items: center; justify-content: center; color: var(--color-gold); flex-shrink: 0;">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold); font-weight: 700; display: block; margin-bottom: 0.2rem;">
+                                ${subtitle}
+                            </span>
+                            <h3 style="font-family: var(--font-serif); font-size: 1.25rem; margin: 0; color: #fff; font-weight: 600;">
+                                ${title}
+                            </h3>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-modal-close" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-size: 1.5rem; line-height: 1; cursor: pointer; padding: 0.25rem; transition: color 0.2s;" title="Close">
+                        &times;
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div style="padding: 1.35rem 1.75rem; max-height: calc(85vh - 120px); overflow-y: auto;">
+                    ${itemSummary ? `
+                        <div style="background: rgba(212,175,55,0.06); border: 1px solid rgba(212,175,55,0.22); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.15rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem;">
+                            <span style="color: var(--color-text-muted);">Inquiry Target:</span>
+                            <strong style="color: var(--color-gold); font-family: var(--font-serif);">${itemSummary}</strong>
+                        </div>
+                    ` : ''}
+
+                    <p style="font-size: 0.84rem; color: #b8c2bc; line-height: 1.5; margin: 0 0 1.15rem 0;">
+                        Choose your email provider below. Your inquiry dossier will be automatically prepared and dispatched to <span style="color: var(--color-gold); font-weight: 600;">${to}</span>.
+                    </p>
+
+                    <!-- Provider List -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;" class="email-provider-grid">
+                        <!-- Gmail -->
+                        <a href="${gmailUrl}" target="_blank" rel="noopener noreferrer" class="email-provider-btn email-btn-gmail">
+                            <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(234,67,53,0.18); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="18" height="18" viewBox="0 0 24 24">
+                                    <path fill="#EA4335" d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/>
+                                </svg>
+                            </div>
+                            <div style="text-align: left;">
+                                <strong style="display: block; font-size: 0.88rem; color: #fff;">Google Gmail</strong>
+                                <span style="font-size: 0.72rem; color: #a0aab0;">Webmail Compose</span>
+                            </div>
+                        </a>
+
+                        <!-- Outlook / Office 365 -->
+                        <a href="${outlookUrl}" target="_blank" rel="noopener noreferrer" class="email-provider-btn email-btn-outlook">
+                            <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(0,120,212,0.18); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="18" height="18" viewBox="0 0 24 24">
+                                    <path fill="#0078D4" d="M24 7.2v9.6c0 1.32-.88 2.4-2.16 2.4H13.2V4.8h8.64c1.28 0 2.16 1.08 2.16 2.4zM10.8 4.8H2.16C.88 4.8 0 5.88 0 7.2v9.6C0 18.12.88 19.2 2.16 19.2h8.64V4.8z"/>
+                                </svg>
+                            </div>
+                            <div style="text-align: left;">
+                                <strong style="display: block; font-size: 0.88rem; color: #fff;">MS Outlook</strong>
+                                <span style="font-size: 0.72rem; color: #a0aab0;">Office 365 / Live</span>
+                            </div>
+                        </a>
+
+                        <!-- Yahoo Mail -->
+                        <a href="${yahooUrl}" target="_blank" rel="noopener noreferrer" class="email-provider-btn email-btn-yahoo">
+                            <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(126,31,255,0.18); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="#7E1FFF">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5h-2v-4.5L8 6h2.2l1.8 4 1.8-4H16l-3 6v4.5z"/>
+                                </svg>
+                            </div>
+                            <div style="text-align: left;">
+                                <strong style="display: block; font-size: 0.88rem; color: #fff;">Yahoo! Mail</strong>
+                                <span style="font-size: 0.72rem; color: #a0aab0;">Webmail Compose</span>
+                            </div>
+                        </a>
+
+                        <!-- Default / System App -->
+                        <a href="${mailtoUrl}" class="email-provider-btn email-btn-default">
+                            <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(212,175,55,0.18); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-gold);">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                                    <path d="M22 7l-10 7L2 7"></path>
+                                </svg>
+                            </div>
+                            <div style="text-align: left;">
+                                <strong style="display: block; font-size: 0.88rem; color: #fff;">Default Mail App</strong>
+                                <span style="font-size: 0.72rem; color: #a0aab0;">Apple / Windows Mail</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- 1-Click Clipboard Copy Section -->
+                    <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.85rem 1rem;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-muted); font-weight: 600;">Inquiry Dossier Copy</span>
+                            <button type="button" id="btn-copy-email-body" class="btn btn-outline" style="padding: 0.3rem 0.65rem; font-size: 0.72rem; color: var(--color-gold); border-color: rgba(212,175,55,0.4); display: flex; align-items: center; gap: 0.35rem;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                <span id="copy-btn-label">Copy Inquiry Text</span>
+                            </button>
+                        </div>
+                        <pre style="margin: 0; font-family: monospace; font-size: 0.75rem; color: #cfd8dc; max-height: 90px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; background: rgba(0,0,0,0.35); padding: 0.5rem 0.65rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);">${body}</pre>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div style="padding: 0.85rem 1.75rem; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: flex-end;">
+                    <button type="button" class="btn btn-outline btn-modal-close-footer" style="padding: 0.45rem 1.15rem; font-size: 0.8rem; border-color: rgba(255,255,255,0.25); color: #fff;">
+                        Close
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        function closeModal() {
+            modal.style.opacity = '0';
+            modal.style.transition = 'opacity 0.2s ease-out';
+            setTimeout(() => modal.remove(), 200);
+        }
+
+        modal.querySelectorAll('.btn-modal-close, .btn-modal-close-footer').forEach(btn => {
+            btn.addEventListener('click', closeModal);
+        });
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        const copyBtn = modal.querySelector('#btn-copy-email-body');
+        const copyLabel = modal.querySelector('#copy-btn-label');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(body).then(() => {
+                    copyLabel.innerText = '✓ Copied!';
+                    copyBtn.style.borderColor = '#4caf50';
+                    copyBtn.style.color = '#4caf50';
+                    showToast("Dossier Copied", "Inquiry details copied to clipboard.", "success");
+                    setTimeout(() => {
+                        copyLabel.innerText = 'Copy Inquiry Text';
+                        copyBtn.style.borderColor = 'rgba(212,175,55,0.4)';
+                        copyBtn.style.color = 'var(--color-gold)';
+                    }, 2500);
+                }).catch(() => {
+                    showToast("Clipboard Notice", "Could not copy automatically. Please select text manually.", "error");
+                });
+            });
+        }
+
+        modal.querySelectorAll('.email-provider-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const providerName = btn.querySelector('strong')?.innerText || 'Email Provider';
+                showToast("Opening Email", `Dispatching inquiry via ${providerName}...`, "success");
+            });
+        });
+    }
+    window.showEmailServiceChooserModal = showEmailServiceChooserModal;
+
     // 4. Toast Notification System
     function showToast(title, message, type = 'success') {
         const toast = document.createElement('div');
@@ -1552,16 +1749,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(() => {
                         const encodedMsg = encodeURIComponent(baseText);
                         window.open(`https://api.whatsapp.com/send?phone=94771757556&text=${encodedMsg}`, '_blank');
-                    }, 1200);
+                    }, 1000);
                 } else {
-                    showToast("Creating Email Envelope", "Opening email application...", "success");
+                    showToast("Loading Email Dispatcher", "Opening email service selector...", "success");
                     setTimeout(() => {
-                        const subject = encodeURIComponent(`Enquiry: ${booking.boxName} (${booking.seasonName})`);
-                        const body = encodeURIComponent(baseText);
-                        window.open(`mailto:axentrat@gmail.com?subject=${subject}&body=${body}`, '_self');
-                    }, 1200);
+                        showEmailServiceChooserModal({
+                            to: 'axentrat@gmail.com',
+                            subject: `Enquiry: ${booking.boxName} (${booking.seasonName})`,
+                            body: baseText,
+                            title: 'Select Preferred Email Service',
+                            subtitle: 'Collector Reserve Concierge Dispatch',
+                            itemSummary: `${booking.boxName} (${booking.seasonName})`
+                        });
+                    }, 600);
                 }
-            }, 1000);
+            }, 800);
 
         } else {
             showToast("Enquiry Failed", result.message, 'error');
@@ -1655,15 +1857,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         showToast("Connecting to Concierge", "Opening WhatsApp chat support...", "success");
                         setTimeout(() => {
                             window.open(`https://api.whatsapp.com/send?phone=94771757556&text=${encodedMsg}`, '_blank');
-                        }, 1200);
+                        }, 1000);
                     } else {
-                        showToast("Creating Email Envelope", "Opening email application...", "success");
+                        showToast("Loading Email Dispatcher", "Opening email service selector...", "success");
                         setTimeout(() => {
-                            const subject = encodeURIComponent(`Tour Reservation Gate Pass: ${booking.id}`);
-                            window.open(`mailto:axentrat@gmail.com?subject=${subject}&body=${encodedMsg}`, '_self');
-                        }, 1200);
+                            showEmailServiceChooserModal({
+                                to: 'axentrat@gmail.com',
+                                subject: `Tour Reservation Gate Pass: ${booking.id}`,
+                                body: message,
+                                title: 'Select Preferred Email Service',
+                                subtitle: 'Estate Tour Gate Pass Dispatch',
+                                itemSummary: `${packageName} (${guests} Guests)`
+                            });
+                        }, 600);
                     }
-                }, 1000);
+                }, 800);
             }
         } else {
             showToast("Tour Booking Failed", result.message, 'error');
