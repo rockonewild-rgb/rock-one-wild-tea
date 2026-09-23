@@ -437,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         container.innerHTML = announcements.map(ann => `
-            <div class="announcement-card ${ann.premium ? 'premium-ann' : ''}" data-id="${ann.id}" style="cursor: pointer;">
+            <div class="announcement-card ${ann.premium ? 'premium-ann' : ''}" data-id="${ann.id}" onclick="window.openAnnModal && window.openAnnModal('${ann.id}')" style="cursor: pointer;">
                 <div class="ann-header">
                     <span class="ann-tag">
                         ${window.SVG_ICONS ? window.SVG_ICONS.tag : ''} ${ann.tag}
@@ -451,14 +451,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p class="ann-content">${ann.content.substring(0, 130)}${ann.content.length > 130 ? '...' : ''}</p>
                 </div>
                 <div class="ann-footer">
-                    ${ann.premium ? '<span class="premium-badge">Collector Exclusives</span>' : '<span class="ann-read-more">Read Bulletin &rarr;</span>'}
+                    ${ann.premium ? '<span class="premium-badge">Collector Exclusives</span>' : `<button type="button" class="ann-read-more" onclick="event.stopPropagation(); window.openAnnModal && window.openAnnModal('${ann.id}')" style="background:none; border:none; padding:0; cursor:pointer; font:inherit; color:inherit;">Read Bulletin &rarr;</button>`}
                 </div>
             </div>
         `).join('');
 
         container.querySelectorAll('.announcement-card').forEach(card => {
             card.addEventListener('click', () => {
-                const annId = parseInt(card.getAttribute('data-id'), 10);
+                const annId = card.getAttribute('data-id');
                 openAnnModal(annId);
             });
         });
@@ -5338,8 +5338,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const deleteAnnBtns = document.querySelectorAll('.btn-delete-ann');
         deleteAnnBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                const annId = parseInt(btn.getAttribute('data-id'));
-                const ann = (window.TeaFactoryStore.getAnnouncements() || []).find(a => a.id === annId);
+                const annId = btn.getAttribute('data-id');
+                const ann = (window.TeaFactoryStore.getAnnouncements() || []).find(a => String(a.id) === String(annId));
                 const annTitle = ann ? ann.title : `Bulletin #${annId}`;
                 showDeleteConfirmModal({
                     title: 'Delete Bulletin Notice',
@@ -5728,9 +5728,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!container) return;
 
         container.querySelectorAll('.announcement-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const annId = parseInt(card.getAttribute('data-id'));
-                openAnnModal(annId);
+            card.addEventListener('click', (e) => {
+                const annId = card.getAttribute('data-id');
+                if (annId) {
+                    openAnnModal(annId);
+                }
             });
         });
     }
@@ -5741,8 +5743,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function openAnnModal(annIdOrObj) {
         const announcements = window.TeaFactoryStore ? window.TeaFactoryStore.getAnnouncements() : [];
-        const annId = typeof annIdOrObj === 'object' && annIdOrObj !== null ? annIdOrObj.id : parseInt(annIdOrObj, 10);
-        const ann = typeof annIdOrObj === 'object' && annIdOrObj !== null ? annIdOrObj : announcements.find(a => a.id === annId);
+        let ann = null;
+        if (typeof annIdOrObj === 'object' && annIdOrObj !== null) {
+            ann = annIdOrObj;
+        } else if (annIdOrObj !== undefined && annIdOrObj !== null && annIdOrObj !== '') {
+            const sId = String(annIdOrObj);
+            ann = announcements.find(a => String(a.id) === sId || String(a.id) === String(parseInt(sId, 10)));
+        }
+        if (!ann && announcements.length > 0) {
+            ann = announcements[0];
+        }
         if (!ann) return;
 
         const titleEl = document.getElementById('ann-modal-title');
@@ -5753,27 +5763,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const imgEl = document.getElementById('ann-modal-image');
 
         if (titleEl) titleEl.innerText = ann.premium ? 'Collector Exclusive Bulletin' : 'Estate Bulletin Details';
-        if (headingEl) headingEl.innerText = ann.title;
-        if (contentEl) contentEl.innerText = ann.content;
+        if (headingEl) headingEl.innerText = ann.title || ann.heading || 'Estate Bulletin';
+        if (contentEl) contentEl.innerText = ann.content || '';
         if (tagEl) {
-            tagEl.innerText = ann.tag;
+            tagEl.innerText = ann.tag || 'Bulletin';
             tagEl.className = ann.premium ? 'box-badge status-booked' : 'box-badge status-available';
         }
-        if (dateEl) dateEl.innerText = ann.date;
+        if (dateEl) dateEl.innerText = ann.date || ann.date_str || '';
         if (imgEl) imgEl.src = ann.image || 'images/luxury_tea_announcement.jpg';
 
-        if (annModal) {
-            annModal.classList.add('active');
+        const modal = document.getElementById('announcement-modal');
+        if (modal) {
+            modal.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
     }
 
     function closeAnnModal() {
-        if (annModal) {
-            annModal.classList.remove('active');
+        const modal = document.getElementById('announcement-modal');
+        if (modal) {
+            modal.classList.remove('active');
             document.body.style.overflow = '';
         }
     }
+
+    // Expose openAnnModal and closeAnnModal globally
+    window.openAnnModal = openAnnModal;
+    window.closeAnnModal = closeAnnModal;
 
     if (annModalCloseBtn) {
         annModalCloseBtn.addEventListener('click', closeAnnModal);
@@ -5786,8 +5802,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Close on Escape key
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && annModal && annModal.classList.contains('active')) {
-            closeAnnModal();
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('announcement-modal');
+            if (modal && modal.classList.contains('active')) {
+                closeAnnModal();
+            }
+        }
+    });
+
+    // Delegated click listener for any announcement card or read bulletin trigger
+    document.addEventListener('click', (e) => {
+        const readBtn = e.target.closest('.ann-read-more');
+        if (readBtn) {
+            const card = readBtn.closest('.announcement-card, [data-id]');
+            if (card) {
+                const id = card.getAttribute('data-id');
+                if (id) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openAnnModal(id);
+                }
+            }
         }
     });
 

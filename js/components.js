@@ -31,7 +31,7 @@ const UIComponents = {
         }
 
         container.innerHTML = announcements.map(ann => `
-            <div class="announcement-card ${ann.premium ? 'premium-ann' : ''}" data-id="${ann.id}" style="cursor: pointer;">
+            <div class="announcement-card ${ann.premium ? 'premium-ann' : ''}" data-id="${ann.id}" onclick="window.openAnnModal && window.openAnnModal('${ann.id}')" style="cursor: pointer;">
                 <div class="ann-header">
                     <span class="ann-tag">
                         ${SVG_ICONS.tag} ${ann.tag}
@@ -45,7 +45,7 @@ const UIComponents = {
                     <p class="ann-content">${ann.content}</p>
                 </div>
                 <div class="ann-footer">
-                    ${ann.premium ? '<span class="premium-badge">Collector Exclusives</span>' : '<span class="ann-read-more">Read Bulletin &rarr;</span>'}
+                    ${ann.premium ? '<span class="premium-badge">Collector Exclusives</span>' : `<button type="button" class="ann-read-more" onclick="event.stopPropagation(); window.openAnnModal && window.openAnnModal('${ann.id}')" style="background:none; border:none; padding:0; cursor:pointer; font:inherit; color:inherit;">Read Bulletin &rarr;</button>`}
                 </div>
             </div>
         `).join('');
@@ -81,7 +81,7 @@ const UIComponents = {
             html += `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 4rem;">No active bulletins at this time. Check back soon.</div>`;
         } else {
             html += announcements.map(ann => `
-                <div class="box-card announcement-card ${ann.premium ? 'premium-ann' : ''}" data-id="${ann.id}" style="cursor: pointer;">
+                <div class="box-card announcement-card ${ann.premium ? 'premium-ann' : ''}" data-id="${ann.id}" onclick="window.openAnnModal && window.openAnnModal('${ann.id}')" style="cursor: pointer;">
                     <div class="card-image-wrapper">
                         <img src="${ann.image || 'images/luxury_tea_announcement.jpg'}" class="card-image" alt="${ann.title}" onerror="window.handleImageError && window.handleImageError(this, 'announcement')" loading="lazy" decoding="async">
                         <div class="card-image-overlay"></div>
@@ -98,7 +98,7 @@ const UIComponents = {
                             <p class="box-details" style="line-height: 1.6; font-size: 0.8rem; height: 50px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 0;">${ann.content}</p>
                         </div>
                         <div class="box-footer" style="margin-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 0.75rem; text-align: right;">
-                            <span style="color: var(--color-gold); font-size: 0.75rem; font-weight: 600;">Read Bulletin &rarr;</span>
+                            <button type="button" class="ann-read-more" onclick="event.stopPropagation(); window.openAnnModal && window.openAnnModal('${ann.id}')" style="background:none; border:none; padding:0; cursor:pointer; font:inherit; color: var(--color-gold); font-size: 0.75rem; font-weight: 600;">Read Bulletin &rarr;</button>
                         </div>
                     </div>
                 </div>

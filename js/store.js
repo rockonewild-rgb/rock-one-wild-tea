@@ -1354,7 +1354,7 @@ class TeaFactoryStore {
 
     // Delete Announcement
     deleteAnnouncement(id) {
-        this.state.announcements = this.state.announcements.filter(a => a.id !== id);
+        this.state.announcements = this.state.announcements.filter(a => String(a.id) !== String(id));
         this.saveState();
     }
 
