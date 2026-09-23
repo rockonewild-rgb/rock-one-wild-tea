@@ -91,7 +91,20 @@ router.post('/book', async (req, res) => {
         };
 
         if (isSupabaseAvailable()) {
-            const { error: bookErr } = await supabase.from('tour_bookings').insert([bookingRecord]);
+            let { error: bookErr } = await supabase.from('tour_bookings').insert([bookingRecord]);
+
+            // If slip_image column is missing in the Supabase schema, retry gracefully without it
+            if (bookErr && bookErr.message && (bookErr.message.includes('slip_image') || bookErr.message.includes('schema cache'))) {
+                console.warn('⚠️ slip_image column missing in Supabase tour_bookings table. Retrying insert without slip_image...');
+                const fallbackBooking = { ...bookingRecord };
+                delete fallbackBooking.slip_image;
+                if (bookingRecord.slip_image) {
+                    fallbackBooking.notes = (fallbackBooking.notes ? fallbackBooking.notes + ' | ' : '') + '[Deposit Slip Attached]';
+                }
+                const retryRes = await supabase.from('tour_bookings').insert([fallbackBooking]);
+                bookErr = retryRes.error;
+            }
+
             if (bookErr) console.warn('⚠️ Supabase tour booking error:', bookErr.message);
 
             if (tour_slot_id) {

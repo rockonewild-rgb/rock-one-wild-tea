@@ -64,10 +64,23 @@ router.post('/', async (req, res) => {
         }));
 
         if (isSupabaseAvailable()) {
-            const { error: ordErr } = await supabase.from('orders').insert([orderRecord]);
-            if (ordErr) console.warn('⚠️ Supabase order insert error:', ordErr.message);
+            let { error: ordErr } = await supabase.from('orders').insert([orderRecord]);
 
-            if (itemRecords.length > 0) {
+            // If slip_image column is missing in the Supabase schema, retry gracefully without it
+            if (ordErr && ordErr.message && (ordErr.message.includes('slip_image') || ordErr.message.includes('schema cache'))) {
+                console.warn('⚠️ slip_image column missing in Supabase orders table. Retrying insert without slip_image...');
+                const fallbackRecord = { ...orderRecord };
+                delete fallbackRecord.slip_image;
+                if (orderRecord.slip_image) {
+                    fallbackRecord.bespoke_notes = (fallbackRecord.bespoke_notes ? fallbackRecord.bespoke_notes + ' | ' : '') + '[Deposit Slip Attached]';
+                }
+                const retryRes = await supabase.from('orders').insert([fallbackRecord]);
+                ordErr = retryRes.error;
+            }
+
+            if (ordErr) {
+                console.warn('⚠️ Supabase order insert error:', ordErr.message);
+            } else if (itemRecords.length > 0) {
                 const { error: itmErr } = await supabase.from('order_items').insert(itemRecords);
                 if (itmErr) console.warn('⚠️ Supabase items insert error:', itmErr.message);
             }
