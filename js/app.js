@@ -810,6 +810,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const box = boxes.find(b => b.id === id);
             const season = window.TeaFactoryStore.getCurrentSeason();
 
+            const boxMinDate = new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0];
+
             drawerTitle.innerText = `Inquire: ${box.name}`;
 
             drawerFormContainer.innerHTML = `
@@ -839,7 +841,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="form-group">
                         <label for="cust-pref-date">Preferred Delivery Date</label>
-                        <input type="date" id="cust-pref-date" required>
+                        <div class="date-input-wrapper">
+                            <input type="date" id="cust-pref-date" min="${boxMinDate}" value="${boxMinDate}" required>
+                            <span class="date-calendar-icon" aria-hidden="true">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </span>
+                        </div>
                         <span class="field-hint">Specify your preferred date of arrival (minimum 3 days from today).</span>
                     </div>
                     <div class="form-group">
@@ -881,6 +893,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const timeSlot = data.timeSlot;
             selectedTourSlipBase64 = '';
 
+            const tourMinDate = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+
             // Get selected package details
             const selectedPkgCard = document.querySelector('.package-card.selected');
             const pkgName = selectedPkgCard ? selectedPkgCard.getAttribute('data-package') : 'Golden Sommelier Tour';
@@ -913,7 +927,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="form-group">
                         <label for="tour-date-input">Tour Date</label>
-                        <input type="date" id="tour-date-input" required>
+                        <div class="date-input-wrapper">
+                            <input type="date" id="tour-date-input" min="${tourMinDate}" value="${tourMinDate}" required>
+                            <span class="date-calendar-icon" aria-hidden="true">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </span>
+                        </div>
+                        <span class="field-hint">Select your preferred date for the guided estate &amp; factory tour.</span>
                     </div>
                     <div class="form-group">
                         <label for="tour-guests">Number of Guests</label>
@@ -1074,6 +1099,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (type === 'product') {
             const products = window.TeaFactoryStore.getProducts();
             const product = products.find(p => p.id === id);
+            const prodMinDate = new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0];
 
             drawerTitle.innerText = `Order: ${product.name}`;
 
@@ -1109,7 +1135,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="form-group">
                         <label for="prod-pref-date">Preferred Delivery Date</label>
-                        <input type="date" id="prod-pref-date" required>
+                        <div class="date-input-wrapper">
+                            <input type="date" id="prod-pref-date" min="${prodMinDate}" value="${prodMinDate}" required>
+                            <span class="date-calendar-icon" aria-hidden="true">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </span>
+                        </div>
                         <span class="field-hint">Specify your preferred delivery dispatch date.</span>
                     </div>
 

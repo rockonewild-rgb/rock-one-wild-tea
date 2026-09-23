@@ -2759,22 +2759,25 @@ html[lang="ar"] .nav-btn {
 .form-group input[type="email"],
 .form-group input[type="tel"],
 .form-group input[type="number"],
+.form-group input[type="date"],
+.form-group input[type="password"],
 .form-group select,
 .form-group textarea {
     width: 100%;
     box-sizing: border-box;
-    background: rgba(4, 12, 7, 0.75);
+    background: rgba(4, 12, 7, 0.82);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(212, 175, 55, 0.25);
-    color: var(--color-white);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: var(--color-white, #ffffff);
     padding: 0.75rem 0.95rem;
     border-radius: 8px;
-    font-family: var(--font-sans);
-    font-size: 0.85rem;
+    font-family: var(--font-sans, inherit);
+    font-size: 0.88rem;
     line-height: 1.4;
     transition: var(--transition-smooth);
     outline: none;
+    color-scheme: dark;
 }
 
 .form-input:focus,
@@ -2786,9 +2789,98 @@ html[lang="ar"] .nav-btn {
     background: rgba(4, 14, 8, 0.95);
 }
 
+/* Universal Luxury Date Input & Calendar Icon Engine */
+.date-input-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.date-input-wrapper input[type="date"],
+.form-group input[type="date"] {
+    width: 100%;
+    color-scheme: dark;
+    background: rgba(4, 12, 7, 0.85) !important;
+    color: #ffffff !important;
+    border: 1.5px solid rgba(212, 175, 55, 0.35);
+    border-radius: 8px;
+    padding: 0.75rem 2.75rem 0.75rem 1rem;
+    font-size: 0.9rem;
+    font-family: var(--font-sans, inherit);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-sizing: border-box;
+    min-height: 44px;
+}
+
+.date-input-wrapper input[type="date"]:hover,
+.form-group input[type="date"]:hover {
+    border-color: rgba(212, 175, 55, 0.65);
+    background: rgba(6, 18, 11, 0.95) !important;
+}
+
+.date-input-wrapper input[type="date"]:focus,
+.form-group input[type="date"]:focus {
+    border-color: var(--color-gold, #d4af37);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
+    background: rgba(4, 14, 8, 0.98) !important;
+}
+
+/* Gold Calendar Indicator for Webkit Browsers */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    font-size: 1.25rem;
+    padding: 0.25rem;
+    filter: invert(75%) sepia(60%) saturate(500%) hue-rotate(5deg) brightness(1.1) contrast(95%);
+    opacity: 0.95;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    transform: scale(1.15);
+    filter: invert(85%) sepia(70%) saturate(600%) hue-rotate(5deg) brightness(1.2) contrast(100%);
+}
+
+/* Decorative Gold Calendar Icon Overlay */
+.date-calendar-icon {
+    position: absolute;
+    right: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-gold, #d4af37);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.45));
+    transition: all 0.2s ease;
+    z-index: 1;
+}
+
+.date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 0.65rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.date-input-wrapper:hover .date-calendar-icon {
+    color: #ffffff;
+    filter: drop-shadow(0 0 10px var(--color-gold, #d4af37));
+    transform: translateY(-50%) scale(1.1);
+}
+
 .field-hint {
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     color: var(--color-text-muted);
+    line-height: 1.35;
+    margin-top: 0.15rem;
 }
 
 .form-group.inline-checkbox {
