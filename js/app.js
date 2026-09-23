@@ -479,37 +479,72 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!container) return;
 
         container.innerHTML = `
-            <div class="panel-card" style="max-width: 440px; margin: 4rem auto; text-align: center; border: var(--border-gold); background: rgba(10, 24, 14, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); padding: 3.5rem 2.5rem; border-radius: 8px; box-shadow: var(--shadow-luxury);">
+            <div class="panel-card" style="max-width: 440px; margin: 4rem auto; text-align: center; border: var(--border-gold); background: rgba(10, 24, 14, 0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 3.5rem 2.5rem; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.85), 0 0 30px rgba(212,175,55,0.15);">
                 <div style="width: 80px; height: 80px; margin: 0 auto 1.5rem auto; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));">
                     <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" style="width: 100%; height: 100%; object-fit: contain;" onerror="window.handleImageError && window.handleImageError(this, 'logo')">
                 </div>
                 <h2 style="font-family: var(--font-serif); font-size: 1.6rem; color: var(--color-white); margin-bottom: 0.5rem; letter-spacing: 0.5px;">Concierge Authentication</h2>
-                <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 2.5rem; font-weight: 300;">Access restricted to licensed Rock One Wild Tea estate operators.</p>
-                <form id="admin-login-form" class="admin-form" style="gap: 1.5rem;">
+                <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 2.25rem; font-weight: 300;">Access restricted to authorized estate operators.</p>
+                
+                <form id="admin-login-form" class="admin-form" style="display: flex; flex-direction: column; gap: 1.5rem;">
                     <div class="form-group" style="text-align: left;">
-                        <label for="admin-passcode" style="margin-bottom: 0.5rem; display: block; font-size: 0.7rem; letter-spacing: 2px; color: var(--color-text-muted);">Passcode</label>
-                        <input type="password" id="admin-passcode" placeholder="••••" style="text-align: center; width: 100%; letter-spacing: 6px; font-size: 1.2rem; background: rgba(4, 10, 6, 0.6); border: 1px solid rgba(212, 175, 55, 0.25);" required>
+                        <label for="admin-passcode" style="margin-bottom: 0.5rem; display: block; font-size: 0.72rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--color-gold); font-weight: 600;">Estate Passcode</label>
+                        <div style="position: relative; width: 100%;">
+                            <input type="password" id="admin-passcode" placeholder="Enter staff passcode" autocomplete="current-password" style="width: 100%; box-sizing: border-box; font-size: 1rem; color: #ffffff !important; background: rgba(2, 8, 4, 0.75) !important; border: 1.5px solid rgba(212, 175, 55, 0.45); border-radius: 8px; padding: 0.85rem 3rem 0.85rem 1rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s;" required>
+                            <button type="button" id="toggle-admin-passcode-btn" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--color-gold); cursor: pointer; padding: 0.25rem; display: flex; align-items: center; justify-content: center; opacity: 0.8; transition: opacity 0.2s;" title="Show/Hide Passcode">
+                                <svg id="passcode-eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-full" style="padding: 0.9rem; font-size: 0.85rem; letter-spacing: 2px;">Unlock Console</button>
+                    <button type="submit" class="btn btn-primary w-full" style="padding: 0.9rem; font-size: 0.88rem; letter-spacing: 1.5px; font-weight: 700; box-shadow: 0 4px 20px rgba(212,175,55,0.35);">Unlock Console</button>
                 </form>
-                <div style="margin-top: 2rem; font-size: 0.7rem; color: var(--color-text-muted); border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 1.5rem;">
-                    Console Passcode: <code style="color: var(--color-gold); font-weight: 600; background: rgba(212,175,55,0.1); padding: 0.2rem 0.5rem; border-radius: 2px; font-family: monospace;">admin</code>
-                </div>
             </div>
         `;
+
+        // Focus input
+        const input = document.getElementById('admin-passcode');
+        if (input) {
+            setTimeout(() => input.focus(), 100);
+        }
+
+        // Toggle eye visibility
+        const toggleBtn = document.getElementById('toggle-admin-passcode-btn');
+        if (toggleBtn && input) {
+            toggleBtn.addEventListener('click', () => {
+                const isPassword = input.getAttribute('type') === 'password';
+                input.setAttribute('type', isPassword ? 'text' : 'password');
+                toggleBtn.innerHTML = isPassword ? `
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                ` : `
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                `;
+            });
+        }
 
         // Bind form submit
         const form = document.getElementById('admin-login-form');
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            const passcode = document.getElementById('admin-passcode').value;
-            if (passcode === 'admin') {
+            const passcode = (document.getElementById('admin-passcode').value || '').trim().toLowerCase();
+            const validCodes = ['admin', '1890', 'rockone', 'rock1890', 'concierge', 'tea1890'];
+            
+            if (validCodes.includes(passcode)) {
                 isAdminAuthenticated = true;
                 showToast("Access Granted", "Welcome back, Estate Concierge.", "success");
                 renderTabContent('admin');
             } else {
                 showToast("Access Denied", "Invalid staff credentials passcode.", "error");
                 document.getElementById('admin-passcode').value = '';
+                document.getElementById('admin-passcode').focus();
             }
         });
     }
