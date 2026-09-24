@@ -742,7 +742,62 @@ class TeaFactoryStore {
     }
     getEmailLogs() { return this.state.emailLogs || []; }
     getOrders() { return this.state.orders || []; }
-    getOrderById(orderId) { return (this.state.orders || []).find(o => o.id === orderId) || null; }
+    getOrderById(orderId) {
+        if (!orderId) return null;
+        const cleanId = String(orderId).trim().toUpperCase();
+
+        // 1. Check in state.orders
+        const foundOrder = (this.state.orders || []).find(o => 
+            String(o.id).toUpperCase() === cleanId || 
+            (o.bookingId && String(o.bookingId).toUpperCase() === cleanId)
+        );
+        if (foundOrder) return foundOrder;
+
+        // 2. Check in state.bookings (Tour Bookings & Experience Bookings)
+        const foundBooking = (this.state.bookings || []).find(b => 
+            String(b.id).toUpperCase() === cleanId
+        );
+        if (foundBooking) {
+            const isTour = foundBooking.type === 'tour' || cleanId.startsWith('TB-') || cleanId.startsWith('TR-');
+            let status = foundBooking.status || 'Pending Verification';
+            if (status === 'confirmed' || status === 'Paid & Confirmed') {
+                status = 'Paid & Confirmed';
+            } else if (foundBooking.slipImage && status !== 'Slip Rejected') {
+                status = 'Slip Submitted';
+            }
+
+            return {
+                id: foundBooking.id,
+                bookingId: foundBooking.id,
+                type: isTour ? 'tour' : (foundBooking.type || 'product'),
+                isTour: isTour,
+                boxName: isTour ? (foundBooking.packageName || 'Highland Estate Factory Tour') : (foundBooking.productName || foundBooking.boxName || 'Single-Estate Order'),
+                seasonName: isTour ? `${foundBooking.tourDate || 'Scheduled Date'} @ ${foundBooking.timeSlot || ''} (${foundBooking.guests || 1} Guest${(foundBooking.guests || 1) > 1 ? 's' : ''})` : (foundBooking.seasonName || 'Artisanal Reserve'),
+                customerName: foundBooking.customerName || foundBooking.name || 'Estate Guest',
+                email: foundBooking.email || '',
+                phone: foundBooking.phone || '',
+                price: parseFloat(foundBooking.depositPaid || foundBooking.deposit || foundBooking.totalPrice || 50.00),
+                formattedPrice: isTour ? `$${Number(foundBooking.depositPaid || foundBooking.deposit || 50.00).toFixed(2)} USD (Deposit)` : `$${Number(foundBooking.totalPrice || foundBooking.price || 0).toFixed(2)} USD`,
+                status: status,
+                slipImage: foundBooking.slipImage || '',
+                tourDate: foundBooking.tourDate || '',
+                timeSlot: foundBooking.timeSlot || '',
+                guests: parseInt(foundBooking.guests) || 1,
+                packageName: foundBooking.packageName || 'Highland Estate Factory Tour',
+                dietaryNotes: foundBooking.dietaryNotes || '',
+                transportRequired: foundBooking.transportRequired || '',
+                createdAt: foundBooking.bookingDate || new Date().toLocaleDateString('en-US'),
+                validatedAt: foundBooking.validatedAt || null,
+                validationNote: foundBooking.validationNote || '',
+                bankName: 'Bank of Ceylon (Kandy / Badulla Branch)',
+                accountName: 'Rock One Wild Tea (Pvt) Ltd',
+                accountNo: '0083-1001-5271-8843',
+                referenceNote: foundBooking.id
+            };
+        }
+
+        return null;
+    }
 
     // ─── Recent Order Memory (device-local, separate key) ─────────────────────
     static get RECENT_ORDERS_KEY() { return 'tf_recent_order_ids'; }
@@ -813,35 +868,56 @@ class TeaFactoryStore {
         const bIdx = this.state.bookings.findIndex(b => b.id === bookingId);
         if (bIdx !== -1) this.state.bookings[bIdx].status = 'Order Created';
 
+        this.saveRecentOrderId(orderId);
         this.saveState();
         return { success: true, order: newOrder };
     }
 
     // Updates order status; optionally attaches deposit slip image
     updateOrderStatus(orderId, status, slipImage) {
-        if (!this.state.orders) return false;
-        const idx = this.state.orders.findIndex(o => o.id === orderId);
-        if (idx === -1) return false;
-        this.state.orders[idx].status = status;
-        if (slipImage) this.state.orders[idx].slipImage = slipImage;
+        let updated = false;
 
-        // Sync the linked booking status too
-        const linkedBookingId = this.state.orders[idx].bookingId;
-        const bIdx = this.state.bookings.findIndex(b => b.id === linkedBookingId);
-        if (bIdx !== -1) {
-            if (status === 'Paid & Confirmed') {
-                this.state.bookings[bIdx].status = 'Paid & Confirmed';
-                // Mark box as fully booked
-                const boxIdx = this.state.boxes.findIndex(b => b.id === this.state.orders[idx].boxId);
-                if (boxIdx !== -1) this.state.boxes[boxIdx].status = 'Booked';
-            } else if (status === 'Cancelled') {
-                this.state.bookings[bIdx].status = 'Cancelled';
-            } else if (status === 'Slip Submitted') {
-                this.state.bookings[bIdx].status = 'Slip Submitted';
+        if (this.state.orders) {
+            const idx = this.state.orders.findIndex(o => o.id === orderId);
+            if (idx !== -1) {
+                this.state.orders[idx].status = status;
+                if (slipImage) this.state.orders[idx].slipImage = slipImage;
+                updated = true;
+
+                // Sync the linked booking status too
+                const linkedBookingId = this.state.orders[idx].bookingId;
+                const bIdx = this.state.bookings.findIndex(b => b.id === linkedBookingId);
+                if (bIdx !== -1) {
+                    if (status === 'Paid & Confirmed') {
+                        this.state.bookings[bIdx].status = 'Paid & Confirmed';
+                        const boxIdx = this.state.boxes.findIndex(b => b.id === this.state.orders[idx].boxId);
+                        if (boxIdx !== -1) this.state.boxes[boxIdx].status = 'Booked';
+                    } else if (status === 'Cancelled') {
+                        this.state.bookings[bIdx].status = 'Cancelled';
+                    } else if (status === 'Slip Submitted') {
+                        this.state.bookings[bIdx].status = 'Slip Submitted';
+                        if (slipImage) this.state.bookings[bIdx].slipImage = slipImage;
+                    }
+                }
             }
         }
-        this.saveState();
-        return true;
+
+        // Also check if orderId is a direct booking in state.bookings (e.g. tour booking)
+        if (this.state.bookings) {
+            const bIdx = this.state.bookings.findIndex(b => b.id === orderId);
+            if (bIdx !== -1) {
+                this.state.bookings[bIdx].status = status;
+                if (slipImage) this.state.bookings[bIdx].slipImage = slipImage;
+                updated = true;
+            }
+        }
+
+        if (updated) {
+            this.saveRecentOrderId(orderId);
+            this.saveState();
+            return true;
+        }
+        return false;
     }
 
     // Universal Bank Slip Validation for all transactions (Orders & Bookings)
@@ -1111,6 +1187,10 @@ class TeaFactoryStore {
         const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         
         const bookingId = `TR-${slot.id}-${Date.now().toString().slice(-4)}`;
+        const initialStatus = customerData.paymentMethod === 'card' 
+            ? 'Paid & Confirmed' 
+            : (customerData.slipImage ? 'Slip Submitted' : 'Pending Verification');
+
         const tourBooking = {
             id: bookingId,
             type: 'tour',
@@ -1126,7 +1206,7 @@ class TeaFactoryStore {
             totalPrice: parseFloat(customerData.totalPrice) || (parseFloat(customerData.deposit) || 50.00),
             paymentMethod: customerData.paymentMethod || 'bank',
             slipImage: customerData.slipImage || '',
-            status: customerData.paymentMethod === 'card' ? 'Paid & Confirmed' : 'Pending Verification',
+            status: initialStatus,
             tourDate: customerData.tourDate || "",
             dietaryNotes: customerData.dietaryNotes || "None",
             transportRequired: customerData.transportRequired || "No"
@@ -1147,6 +1227,9 @@ class TeaFactoryStore {
 
         // Generate Tour Booking Email Log
         this.logMockTourEmail(tourBooking);
+
+        // Save to device recent orders memory
+        this.saveRecentOrderId(bookingId);
 
         this.saveState();
         return { success: true, booking: tourBooking };

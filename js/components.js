@@ -3538,15 +3538,20 @@ const UIComponents = {
             const recentCards = recentIds.map(id => {
                 const order = window.TeaFactoryStore.getOrderById(id);
                 if (!order) return '';
-                const isPaid      = order.status === 'Paid & Confirmed';
+                const isPaid      = order.status === 'Paid & Confirmed' || order.status === 'confirmed';
                 const isCancelled = order.status === 'Cancelled';
-                const isSlip      = order.status === 'Slip Submitted';
+                const isSlip      = order.status === 'Slip Submitted' || order.status === 'Pending Verification';
                 const isAwaiting  = order.status === 'Awaiting Payment' || order.status === 'Order Created';
 
                 const statusDot = isPaid      ? '#81c784'
                                 : isCancelled ? '#ef5350'
                                 : isSlip      ? '#d4af37'
                                 : '#90caf9';
+
+                const statusLabel = isPaid ? (order.isTour ? 'Slip Authorized & Confirmed' : 'Paid & Confirmed')
+                                  : isSlip ? (order.isTour ? 'Tour Pending — Slip Uploaded' : 'Slip Submitted')
+                                  : isCancelled ? 'Cancelled'
+                                  : order.status;
 
                 const statusIcon = isPaid ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>`
                                  : isSlip ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`
@@ -3557,11 +3562,11 @@ const UIComponents = {
                 const shortBox = (order.boxName || 'Order').length > 36 ? order.boxName.slice(0, 36) + '…' : (order.boxName || 'Order');
 
                 return `
-                    <div class="recent-order-card" data-recent-order-id="${order.id}" role="button" tabindex="0" title="Click to load order ${order.id}">
+                    <div class="recent-order-card" data-recent-order-id="${order.id}" role="button" tabindex="0" title="Click to load ${order.isTour ? 'tour booking' : 'order'} ${order.id}">
                         <div class="recent-order-card-header">
                             <span class="recent-order-id-pill">${order.id}</span>
                             <span class="recent-order-status-badge" style="color: ${statusDot}; border-color: ${statusDot}30; background: ${statusDot}15;">
-                                ${statusIcon} ${order.status}
+                                ${statusIcon} ${statusLabel}
                             </span>
                         </div>
                         <div class="recent-order-card-body">
@@ -3578,7 +3583,7 @@ const UIComponents = {
                         <div class="recent-order-card-footer">
                             <span class="recent-order-load-cta">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                Open Order
+                                ${order.isTour ? 'View Tour Pass' : 'Open Order'}
                             </span>
                         </div>
                     </div>
@@ -3595,10 +3600,10 @@ const UIComponents = {
                                 </div>
                                 <div>
                                     <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); font-weight: 700;">Recently Viewed on This Device</div>
-                                    <div class="recent-orders-panel-subtitle">${recentIds.length} recent order${recentIds.length !== 1 ? 's' : ''} — click a card to load instantly</div>
+                                    <div class="recent-orders-panel-subtitle">${recentIds.length} recent transaction${recentIds.length !== 1 ? 's' : ''} (Orders &amp; Tour Passes) — click to load</div>
                                 </div>
                             </div>
-                            <button class="recent-orders-clear-btn" id="recent-orders-clear-btn" title="Clear order history from this device">
+                            <button class="recent-orders-clear-btn" id="recent-orders-clear-btn" title="Clear history from this device">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>
                                 Clear History
                             </button>
@@ -3614,9 +3619,9 @@ const UIComponents = {
         container.innerHTML = `
             <div style="max-width: 700px; margin: 0 auto; padding: 2rem 0;">
                 <div class="tour-header-block" style="margin-bottom: 2.5rem; text-align: center;">
-                    <span class="section-tag">Gift Box Purchase</span>
-                    <h2 class="view-title">My Order Payment</h2>
-                    <p class="view-subtitle">Enter your Order ID shared by the Rock One Wild Tea concierge team to view your order details and complete payment.</p>
+                    <span class="section-tag">Order &amp; Tour Booking Tracking</span>
+                    <h2 class="view-title">My Orders &amp; Tour Reservations</h2>
+                    <p class="view-subtitle">Enter your Order Reference or Tour Booking Pass ID (e.g. <span style="font-family: monospace; color: var(--color-gold);">ORD-12345678</span> or <span style="font-family: monospace; color: var(--color-gold);">TB-XXXXX</span> / <span style="font-family: monospace; color: var(--color-gold);">TR-XXXXX</span>) to view status, check slip authorization, or upload payment verification.</p>
                 </div>
 
                 ${recentOrdersHtml}
@@ -3625,15 +3630,15 @@ const UIComponents = {
                 <div class="panel-card" style="margin-bottom: 2rem;" id="order-lookup-card">
                     <h3 class="panel-title" style="margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        Look Up Your Order
+                        Look Up Order or Tour Booking Pass
                     </h3>
-                    <p class="panel-desc" style="margin-bottom: 1.5rem;">Your Order ID was shared by our concierge team via WhatsApp or Email (e.g. <span style="font-family: monospace; color: var(--color-gold);">ORD-12345678</span>).</p>
+                    <p class="panel-desc" style="margin-bottom: 1.5rem;">Enter the Reference ID provided upon checkout or in your confirmation email (e.g. <span style="font-family: monospace; color: var(--color-gold);">ORD-88231001</span> or <span style="font-family: monospace; color: var(--color-gold);">TB-MUFD26QL</span>).</p>
                     <form id="order-lookup-form" class="admin-form" style="flex-direction: row; gap: 0.75rem; align-items: flex-end; flex-wrap: wrap;">
                         <div class="form-group" style="flex: 1; min-width: 220px; margin-bottom: 0;">
-                            <label for="order-id-input">Order ID</label>
-                            <input type="text" id="order-id-input" placeholder="ORD-12345678" style="font-family: monospace; text-transform: uppercase; font-size: 1rem;" required>
+                            <label for="order-id-input">Reference / Booking ID</label>
+                            <input type="text" id="order-id-input" placeholder="ORD-12345678 or TB-XXXXX" style="font-family: monospace; text-transform: uppercase; font-size: 1rem;" required>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem; white-space: nowrap;">View Order →</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem; white-space: nowrap;">Look Up Status →</button>
                     </form>
                 </div>
 
@@ -3648,16 +3653,165 @@ const UIComponents = {
         const panel = document.getElementById('order-details-panel');
         if (!panel) return;
 
-        // Always show BOTH payment options — clients may prefer online OR bank regardless
-        // of what was selected at checkout. Gateway link only renders when paymentLink is set.
-        const showOnline = true;
-        const showBank   = true;
-
-        const isPaid      = order.status === 'Paid & Confirmed';
+        const isTour      = order.isTour || order.type === 'tour' || String(order.id).startsWith('TR-') || String(order.id).startsWith('TB-');
+        const isPaid      = order.status === 'Paid & Confirmed' || order.status === 'confirmed';
         const isCancelled = order.status === 'Cancelled';
-        const isSlipSent  = order.status === 'Slip Submitted';
+        const isSlipSent  = order.status === 'Slip Submitted' || order.status === 'Pending Verification';
 
         panel.style.display = 'block';
+
+        // ────────────────── A. SPECIALIZED TOUR BOOKING TRACKING ──────────────────
+        if (isTour) {
+            const guestCount = order.guests || 1;
+            const tourDate = order.tourDate || 'Scheduled Date';
+            const timeSlot = order.timeSlot || '10:00 AM - 11:30 AM';
+            const guestName = order.customerName || 'Valued Guest';
+            const statusLabel = isPaid 
+                ? 'Slip Authorized & Tour Confirmed' 
+                : isSlipSent 
+                    ? 'Tour Pending — Slip Under Verification' 
+                    : isCancelled 
+                        ? 'Reservation Cancelled' 
+                        : 'Deposit Slip Required';
+
+            panel.innerHTML = `
+                <!-- Tour Booking Pass Card -->
+                <div class="panel-card" style="margin-bottom: 1.5rem; border: 1.5px solid ${isPaid ? '#22c55e' : isCancelled ? 'rgba(198,40,40,0.4)' : 'var(--color-gold)'};">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1.25rem;">
+                        <div>
+                            <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold); font-weight: 700; display: block; margin-bottom: 0.25rem;">
+                                Highland Estate &bull; Tour Gate Pass
+                            </span>
+                            <div style="font-family: monospace; font-size: 1.25rem; color: #ffffff; font-weight: 700; letter-spacing: 0.5px;">${order.id}</div>
+                            <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.2rem;">Booked: ${order.createdAt}</div>
+                        </div>
+                        <span style="padding: 0.45rem 1rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem;
+                            background: ${isPaid ? 'rgba(34,197,94,0.18)' : isCancelled ? 'rgba(198,40,40,0.2)' : 'rgba(212,175,55,0.18)'};
+                            color: ${isPaid ? '#86efac' : isCancelled ? '#e57373' : 'var(--color-gold)'};
+                            border: 1px solid ${isPaid ? 'rgba(34,197,94,0.4)' : isCancelled ? 'rgba(198,40,40,0.4)' : 'rgba(212,175,55,0.4)'};">
+                            ${isPaid ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>` : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`}
+                            ${statusLabel}
+                        </span>
+                    </div>
+
+                    <!-- Tour Details Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                        <div>
+                            <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-muted); margin-bottom: 0.3rem;">Experience</div>
+                            <div style="font-weight: 600; color: #ffffff;">${order.boxName || 'Highland Estate Factory Tour'}</div>
+                            <div style="font-size: 0.75rem; color: var(--color-text-muted);">Orthodox Factory &amp; Sommelier Cupping</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-muted); margin-bottom: 0.3rem;">Date &amp; Time Slot</div>
+                            <div style="font-weight: 700; color: var(--color-gold); font-size: 0.95rem;">${tourDate}</div>
+                            <div style="font-size: 0.8rem; color: #86efac; font-weight: 600;">${timeSlot}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-muted); margin-bottom: 0.3rem;">Guests Allocated</div>
+                            <div style="font-weight: 700; font-size: 1.1rem; color: #ffffff;">${guestCount} ${guestCount === 1 ? 'Guest' : 'Guests'}</div>
+                            <div style="font-size: 0.75rem; color: var(--color-text-muted);">Lead: ${guestName}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-muted); margin-bottom: 0.3rem;">Deposit Paid / Due</div>
+                            <div style="font-weight: 700; font-size: 1.1rem; color: var(--color-gold);">${order.formattedPrice || `$${(Number(order.price) || 50).toFixed(2)} USD`}</div>
+                        </div>
+                    </div>
+
+                    ${isPaid ? `
+                        <!-- 🟢 STATE: SLIP AUTHORIZED & TOUR CONFIRMED -->
+                        <div style="background: linear-gradient(135deg, rgba(34,197,94,0.12) 0%, rgba(4,28,14,0.85) 100%); border: 1.5px solid #22c55e; border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(34,197,94,0.25); display: flex; align-items: center; justify-content: center; color: #86efac; flex-shrink: 0;">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; color: #86efac; font-size: 1.05rem;">Deposit Slip Authorized &amp; Active Gate Pass</div>
+                                    <div style="font-size: 0.8rem; color: #d1d5db;">${order.validatedAt ? `Authorized on ${order.validatedAt} by Estate Manager` : 'Verified &amp; Authorized by Estate Concierge Desk'}</div>
+                                </div>
+                            </div>
+                            <p style="font-size: 0.85rem; color: #f3f4f6; line-height: 1.6; margin: 0 0 1rem 0;">
+                                Your factory tour reservation is officially authorized. Please present this screen or your email boarding pass upon arrival at the estate security gate.
+                            </p>
+                            <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; font-size: 0.8rem; color: #d1d5db; line-height: 1.6;">
+                                <strong style="color: var(--color-gold);">Estate Location:</strong> No: 54 Gannilawattha, Wallawela in Ettampitiya, Badulla District (Elevation 1,240m)<br>
+                                <strong style="color: var(--color-gold);">Arrival Recommendation:</strong> Please arrive 10–15 minutes prior to ${timeSlot}.
+                            </div>
+                            <div style="text-align: center; margin-top: 1.25rem;">
+                                <a href="https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20Authorized%20Tour%20Pass%20${order.id}%20for%20${tourDate}.%20Please%20guide%20our%20chauffeur." target="_blank" style="background: #25D366; color: #ffffff; text-decoration: none; padding: 10px 22px; border-radius: 25px; font-weight: bold; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                    Message Concierge on WhatsApp (+94 77 175 7556)
+                                </a>
+                            </div>
+                        </div>
+                    ` : isSlipSent ? `
+                        <!-- 🟡 STATE: TOUR PENDING & SLIP SUBMITTED / UNDER REVIEW -->
+                        <div style="background: rgba(212,175,55,0.08); border: 1.5px dashed rgba(212,175,55,0.5); border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(212,175,55,0.2); display: flex; align-items: center; justify-content: center; color: var(--color-gold); flex-shrink: 0;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; color: var(--color-gold); font-size: 1.05rem;">Tour Booking Pending — Deposit Slip Under Verification</div>
+                                    <div style="font-size: 0.8rem; color: var(--color-text-muted);">Slip uploaded and pending authorization by Estate Concierge</div>
+                                </div>
+                            </div>
+                            <p style="font-size: 0.85rem; color: #f3f4f6; line-height: 1.6; margin: 0 0 1rem 0;">
+                                We have received your bank deposit / transfer slip for <strong>${guestCount} Guests</strong> on <strong>${tourDate} (${timeSlot})</strong>. Our estate manager is reviewing the transaction ledger and will authorize your gate pass within 24 hours.
+                            </p>
+                            ${order.slipImage ? `
+                                <div style="margin: 1rem 0; padding: 0.75rem; background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 0.75rem;">
+                                    <img src="${order.slipImage}" alt="Uploaded Slip" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(212,175,55,0.3);">
+                                    <div style="font-size: 0.8rem; color: #d1d5db;">
+                                        <div style="font-weight: 600; color: #ffffff;">Deposit Slip Attached</div>
+                                        <div style="font-size: 0.72rem; color: var(--color-text-muted);">Status: Awaiting Concierge Desk Clearance</div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            <div style="text-align: center; margin-top: 1.25rem;">
+                                <a href="https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20submitted%20slip%20for%20Tour%20Booking%20${order.id}%20(${tourDate}).%20Please%20authorize%20my%20pass." target="_blank" style="background: #25D366; color: #ffffff; text-decoration: none; padding: 10px 22px; border-radius: 25px; font-weight: bold; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                    Inquire with Concierge on WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    ` : `
+                        <!-- ⚪ STATE: SLIP REQUIRED FOR TOUR -->
+                        <div style="margin-bottom: 1.5rem; padding: 1.25rem; background: rgba(212,175,55,0.03); border: 1.5px solid rgba(212,175,55,0.4); border-radius: 8px;">
+                            <div style="font-weight: 700; color: var(--color-gold); font-size: 0.95rem; margin-bottom: 0.5rem;">
+                                Direct Bank Deposit &amp; Slip Upload Required
+                            </div>
+                            <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 1rem;">
+                                Please deposit the deposit amount of <strong>${order.formattedPrice || '$50.00 USD'}</strong> to reserve your slots, then upload your slip below for immediate concierge authorization:
+                            </p>
+                            <div class="bank-details-block" style="margin-bottom: 1.25rem;">
+                                <div class="bank-detail-row"><span>Bank:</span><strong>Bank of Ceylon (Kandy / Badulla Branch)</strong></div>
+                                <div class="bank-detail-row"><span>Account Name:</span><strong>Rock One Wild Tea (Pvt) Ltd</strong></div>
+                                <div class="bank-detail-row"><span>Account No:</span><strong>0083-1001-5271-8843</strong></div>
+                                <div class="bank-detail-row"><span>Reference:</span><strong>${order.id}</strong></div>
+                            </div>
+                            <form id="order-slip-form" class="admin-form" style="gap: 1rem;">
+                                <div class="form-group">
+                                    <label>Attach Your Bank Deposit Slip (Image / PDF) *</label>
+                                    <div class="file-upload-zone" id="order-slip-zone">
+                                        <div class="file-upload-icon">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                                        </div>
+                                        <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse file</span></div>
+                                        <div class="file-upload-hint">JPG, PNG or PDF — Max 5MB</div>
+                                        <input type="file" id="order-slip-file" accept="image/*,.pdf" style="display:none;">
+                                    </div>
+                                    <div id="order-slip-preview" class="slip-preview" style="display:none;"></div>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-full" data-order-id="${order.id}">
+                                    Submit Deposit Slip for Tour Authorization
+                                </button>
+                            </form>
+                        </div>
+                    `}
+                </div>
+            `;
+            return;
+        }
+
+        // ────────────────── B. PRODUCT / GIFT BOX ORDER VIEW ──────────────────
         panel.innerHTML = `
             <!-- Order Summary Card -->
             <div class="panel-card" style="margin-bottom: 1.5rem; border: 1px solid ${isPaid ? 'rgba(46,125,50,0.4)' : isCancelled ? 'rgba(198,40,40,0.3)' : 'rgba(212,175,55,0.25)'};">
@@ -3676,7 +3830,7 @@ const UIComponents = {
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.06);">
                     <div>
-                        <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-muted); margin-bottom: 0.3rem;">Gift Box</div>
+                        <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-muted); margin-bottom: 0.3rem;">Tea Reserve</div>
                         <div style="font-weight: 600;">${order.boxName}</div>
                         <div style="font-size: 0.75rem; color: var(--color-text-muted);">${order.seasonName}</div>
                     </div>
@@ -3695,7 +3849,7 @@ const UIComponents = {
                     <div style="text-align: center; padding: 1.5rem; background: rgba(46,125,50,0.12); border-radius: 8px; border: 1px solid rgba(46,125,50,0.3);">
                         <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#81c784" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 0.5rem;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                         <div style="font-weight: 700; color: #81c784; font-size: 1rem; margin-bottom: 0.25rem;">Payment Confirmed!</div>
-                        <div style="font-size: 0.8rem; color: var(--color-text-muted);">Your gift box has been reserved. Our concierge team will contact you shortly regarding delivery.</div>
+                        <div style="font-size: 0.8rem; color: var(--color-text-muted);">Your tea allocation has been reserved. Our concierge team will contact you shortly regarding delivery.</div>
                     </div>
                 ` : isCancelled ? `
                     <div style="text-align: center; padding: 1.5rem; background: rgba(198,40,40,0.1); border-radius: 8px; border: 1px solid rgba(198,40,40,0.3);">
