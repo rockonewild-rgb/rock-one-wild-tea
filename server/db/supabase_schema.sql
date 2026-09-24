@@ -73,7 +73,10 @@ CREATE TABLE tour_bookings (
     guest_phone TEXT,
     guest_count INTEGER NOT NULL DEFAULT 1,
     notes TEXT,
+    slip_image TEXT,
     status TEXT DEFAULT 'confirmed',
+    validated_at TIMESTAMPTZ,
+    validation_note TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -94,6 +97,9 @@ CREATE TABLE orders (
     payment_status TEXT DEFAULT 'paid',
     fulfillment_status TEXT DEFAULT 'processing',
     bespoke_notes TEXT,
+    slip_image TEXT,
+    validated_at TIMESTAMPTZ,
+    validation_note TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

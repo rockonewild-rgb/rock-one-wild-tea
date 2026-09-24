@@ -185,6 +185,21 @@ function initSchema() {
             subscribed_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
     `);
+
+    // Safe migration checks for new columns
+    try {
+        const orderCols = db.prepare("PRAGMA table_info(orders)").all().map(c => c.name);
+        if (!orderCols.includes('slip_image')) db.prepare("ALTER TABLE orders ADD COLUMN slip_image TEXT").run();
+        if (!orderCols.includes('validated_at')) db.prepare("ALTER TABLE orders ADD COLUMN validated_at TEXT").run();
+        if (!orderCols.includes('validation_note')) db.prepare("ALTER TABLE orders ADD COLUMN validation_note TEXT").run();
+
+        const tourCols = db.prepare("PRAGMA table_info(tour_bookings)").all().map(c => c.name);
+        if (!tourCols.includes('slip_image')) db.prepare("ALTER TABLE tour_bookings ADD COLUMN slip_image TEXT").run();
+        if (!tourCols.includes('validated_at')) db.prepare("ALTER TABLE tour_bookings ADD COLUMN validated_at TEXT").run();
+        if (!tourCols.includes('validation_note')) db.prepare("ALTER TABLE tour_bookings ADD COLUMN validation_note TEXT").run();
+    } catch (e) {
+        console.warn('SQLite schema column check notice:', e.message);
+    }
 }
 
 /**
