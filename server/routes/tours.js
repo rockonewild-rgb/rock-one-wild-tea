@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../db/database');
 const { supabase, isSupabaseAvailable } = require('../db/supabase');
+const { sendTourConfirmationEmails } = require('../services/email');
 
 /**
  * GET /api/tours/slots
@@ -129,11 +130,20 @@ router.post('/book', async (req, res) => {
             }
         } catch (e) {}
 
+        // Dispatch Tour Booking Confirmation Emails (Guest Boarding Pass + Concierge Alert)
+        let emailStatus = null;
+        try {
+            emailStatus = await sendTourConfirmationEmails(bookingRecord);
+        } catch (mailErr) {
+            console.error('⚠️ Tour email dispatch error:', mailErr.message);
+        }
+
         res.status(201).json({
             success: true,
             message: 'Tour booking confirmed successfully.',
             booking_id: bookingId,
-            data: bookingRecord
+            data: bookingRecord,
+            email_delivery: emailStatus
         });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });

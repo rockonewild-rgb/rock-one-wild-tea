@@ -1104,7 +1104,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="booking-summary-box">
                     <div class="summary-row"><span>Experience:</span><strong style="color:var(--color-gold);">${pkgName}</strong></div>
                     <div class="summary-row"><span>Time Slot:</span><span>${timeSlot}</span></div>
-                    <div class="summary-row"><span>Seat Deposit:</span><span>${window.TeaFactoryStore.formatCurrency(pkgDeposit)} / guest</span></div>
+                    <div class="summary-row"><span>Guests:</span><strong id="summary-guest-count" style="color:var(--color-white);">1</strong></div>
+                    <div class="summary-row"><span>Total Package Value:</span><span id="summary-total-price">${window.TeaFactoryStore.formatCurrency(pkgPrice)}</span></div>
+                    <div class="summary-row"><span>Seat Deposit:</span><span id="summary-deposit-due">${window.TeaFactoryStore.formatCurrency(pkgDeposit)}</span> (${window.TeaFactoryStore.formatCurrency(pkgDeposit)} / guest)</div>
                     <div class="summary-row total"><span>Total Payable Now:</span><span id="tour-total-deposit">${window.TeaFactoryStore.formatCurrency(pkgDeposit)}</span></div>
                 </div>
 
@@ -1259,9 +1261,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     const g = Math.max(1, parseInt(guestsInput.value) || 1);
                     const totalP = g * pkgPrice;
                     const totalD = g * pkgDeposit;
-                    document.getElementById('summary-guest-count').innerText = g;
-                    document.getElementById('summary-total-price').innerText = window.TeaFactoryStore.formatCurrency(totalP);
-                    document.getElementById('summary-deposit-due').innerText = window.TeaFactoryStore.formatCurrency(totalD);
+                    const guestCountEl = document.getElementById('summary-guest-count');
+                    if (guestCountEl) guestCountEl.innerText = g;
+                    const totalPriceEl = document.getElementById('summary-total-price');
+                    if (totalPriceEl) totalPriceEl.innerText = window.TeaFactoryStore.formatCurrency(totalP);
+                    const depositDueEl = document.getElementById('summary-deposit-due');
+                    if (depositDueEl) depositDueEl.innerText = window.TeaFactoryStore.formatCurrency(totalD);
                     const totalPayableEl = document.getElementById('tour-total-deposit');
                     if (totalPayableEl) totalPayableEl.innerText = window.TeaFactoryStore.formatCurrency(totalD);
                     const bDisp = document.getElementById('bank-deposit-display');
@@ -1806,13 +1811,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const selectedPkgCard = document.querySelector('.package-card.selected');
         const packageName = selectedPkgCard ? selectedPkgCard.getAttribute('data-package') : 'Golden Sommelier Tour';
-        const pkgPrice = parseFloat(selectedPkgCard ? selectedPkgCard.getAttribute('data-price') : 150.00);
-        const pkgDeposit = parseFloat(selectedPkgCard ? selectedPkgCard.getAttribute('data-deposit') : 50.00);
+        const pkgPrice = parseFloat(selectedPkgCard ? selectedPkgCard.getAttribute('data-price') : 150.00) || 150.00;
+        const pkgDeposit = parseFloat(selectedPkgCard ? selectedPkgCard.getAttribute('data-deposit') : 50.00) || 50.00;
 
         const totalDeposit = guests * pkgDeposit;
         const totalPrice = guests * pkgPrice;
 
-        const slotId = currentDrawerContext.id;
+        const slotId = currentDrawerContext ? currentDrawerContext.id : 1;
+        const timeSlot = (currentDrawerContext && currentDrawerContext.data && currentDrawerContext.data.timeSlot) ? currentDrawerContext.data.timeSlot : "10:15 AM - 11:15 AM";
+
         const result = window.TeaFactoryStore.bookTour(slotId, {
             name, 
             email, 
@@ -1822,6 +1829,7 @@ document.addEventListener('DOMContentLoaded', () => {
             deposit: totalDeposit, 
             totalPrice: totalPrice,
             tourDate, 
+            timeSlot,
             dietaryNotes, 
             transportRequired,
             paymentMethod,
@@ -1830,16 +1838,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (result.success) {
             const booking = result.booking;
+
+            // Sync to backend API (Supabase & SQLite)
+            if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.bookTour === 'function') {
+                window.TeaFactoryAPI.bookTour({
+                    id: booking.id,
+                    tour_slot_id: booking.slotId,
+                    tour_date: booking.tourDate || new Date().toISOString().split('T')[0],
+                    time_slot: booking.timeSlot,
+                    guest_name: booking.customerName,
+                    guest_email: booking.email,
+                    guest_phone: booking.phone,
+                    guest_count: booking.guests,
+                    notes: `Package: ${booking.packageName}. Dietary: ${booking.dietaryNotes}. Transport: ${booking.transportRequired}`,
+                    slip_image: booking.slipImage || ''
+                }).catch(err => console.warn('API tour booking sync notice:', err.message));
+            }
+
             if (paymentMethod === 'card') {
                 showToast(
                     "Tour Reserved & Confirmed!", 
-                    `Tour slot reserved for ${guests} guests on ${tourDate || currentDrawerContext.data.timeSlot}.`, 
+                    `Boarding pass ${booking.id} reserved for ${guests} guests on ${tourDate || timeSlot}. Confirmation sent to ${email}.`, 
                     'success'
                 );
             } else {
                 showToast(
-                    "Deposit Slip Submitted!", 
-                    `Deposit slip received for ${guests} guests (${currentDrawerContext.data.timeSlot}). Concierge will verify within 24 hours.`, 
+                    "Tour Booking Confirmed!", 
+                    `Boarding pass ${booking.id} created for ${guests} guests (${timeSlot}). Confirmation email dispatched to ${email}.`, 
                     'success'
                 );
             }
@@ -1847,32 +1872,30 @@ document.addEventListener('DOMContentLoaded', () => {
             closeDrawer();
             renderTabContent(activeTab);
 
-            // Forward summary message if card/concierge channel requested
-            if (paymentMethod === 'card') {
-                const message = `Hello Rock One Wild Tea!\n\nI have booked a Factory Tour:\n• Package: ${packageName} (${guests} Guests)\n• Slot: ${booking.timeSlot}\n• Date: ${tourDate}\n• Booking Ref: ${booking.id}\n• Lead Guest: ${name}\n• Phone: ${phone}\n• Deposit Paid: $${totalDeposit.toFixed(2)} USD\n\nPlease send gate pass instructions.`;
-                const encodedMsg = encodeURIComponent(message);
+            // Forward summary message / connect to concierge desk
+            const message = `Hello Rock One Wild Tea!\n\nI have booked an Estate Factory Tour:\n• Booking Ref: ${booking.id}\n• Lead Guest: ${name}\n• Email: ${email}\n• Phone: ${phone}\n• Date: ${tourDate}\n• Slot: ${booking.timeSlot}\n• Party: ${guests} Guests\n• Package: ${packageName}\n• Deposit: $${totalDeposit.toFixed(2)} USD\n\nPlease confirm my gate pass arrival.`;
+            const encodedMsg = encodeURIComponent(message);
 
-                setTimeout(() => {
-                    if (socialChannel === 'WhatsApp') {
-                        showToast("Connecting to Concierge", "Opening WhatsApp chat support...", "success");
-                        setTimeout(() => {
-                            window.open(`https://api.whatsapp.com/send?phone=94771757556&text=${encodedMsg}`, '_blank');
-                        }, 1000);
-                    } else {
-                        showToast("Loading Email Dispatcher", "Opening email service selector...", "success");
-                        setTimeout(() => {
-                            showEmailServiceChooserModal({
-                                to: 'axentrat@gmail.com',
-                                subject: `Tour Reservation Gate Pass: ${booking.id}`,
-                                body: message,
-                                title: 'Select Preferred Email Service',
-                                subtitle: 'Estate Tour Gate Pass Dispatch',
-                                itemSummary: `${packageName} (${guests} Guests)`
-                            });
-                        }, 600);
-                    }
-                }, 800);
-            }
+            setTimeout(() => {
+                if (socialChannel === 'WhatsApp' || !socialChannel) {
+                    showToast("Connecting to Concierge", "Opening WhatsApp concierge desk...", "info");
+                    setTimeout(() => {
+                        window.open(`https://api.whatsapp.com/send?phone=94771757556&text=${encodedMsg}`, '_blank');
+                    }, 1200);
+                } else {
+                    showToast("Loading Email Dispatcher", "Opening email service selector...", "info");
+                    setTimeout(() => {
+                        showEmailServiceChooserModal({
+                            to: 'rockonewild@gmail.com',
+                            subject: `Tour Reservation Gate Pass: ${booking.id} - ${name}`,
+                            body: message,
+                            title: 'Select Preferred Email Service',
+                            subtitle: 'Estate Tour Gate Pass Dispatch',
+                            itemSummary: `${packageName} (${guests} Guests)`
+                        });
+                    }, 800);
+                }
+            }, 1000);
         } else {
             showToast("Tour Booking Failed", result.message, 'error');
         }

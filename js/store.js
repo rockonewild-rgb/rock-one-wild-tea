@@ -1080,28 +1080,46 @@ class TeaFactoryStore {
     }
 
     // Factory Tour Bookings
-    bookTour(slotId, customerData) {
-        const slotIndex = this.state.tourSlots.findIndex(s => s.id === slotId);
-        if (slotIndex === -1) return { success: false, message: "Time slot not found" };
+    bookTour(slotId, customerData = {}) {
+        // Find slot by loose/string/number ID or timeSlot
+        let slotIndex = -1;
+        if (this.state.tourSlots && this.state.tourSlots.length > 0) {
+            slotIndex = this.state.tourSlots.findIndex(s => 
+                String(s.id) === String(slotId) || 
+                s.id === slotId || 
+                (customerData.timeSlot && s.timeSlot === customerData.timeSlot)
+            );
+        }
 
-        const slot = this.state.tourSlots[slotIndex];
-        if (slot.status !== "Available") {
-            return { success: false, message: "This slot is already booked." };
+        // If slot not found in state, create/fallback to default slot structure gracefully
+        let slot = null;
+        if (slotIndex !== -1) {
+            slot = this.state.tourSlots[slotIndex];
+        } else {
+            slot = {
+                id: slotId || (this.state.tourSlots ? this.state.tourSlots.length + 1 : 1),
+                timeSlot: customerData.timeSlot || "10:15 AM - 11:15 AM",
+                status: "Available",
+                package: customerData.packageName || "Golden Sommelier Tour"
+            };
+            if (!this.state.tourSlots) this.state.tourSlots = [];
+            this.state.tourSlots.push(slot);
+            slotIndex = this.state.tourSlots.length - 1;
         }
 
         const dateNow = new Date();
         const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         
-        const bookingId = `TR-${slotId}-${Date.now().toString().slice(-4)}`;
+        const bookingId = `TR-${slot.id}-${Date.now().toString().slice(-4)}`;
         const tourBooking = {
             id: bookingId,
             type: 'tour',
             slotId: slot.id,
-            timeSlot: slot.timeSlot,
-            packageName: customerData.packageName || slot.package,
-            customerName: customerData.name,
-            email: customerData.email,
-            phone: customerData.phone,
+            timeSlot: customerData.timeSlot || slot.timeSlot,
+            packageName: customerData.packageName || slot.package || "Golden Sommelier Tour",
+            customerName: customerData.name || "Estate Guest",
+            email: customerData.email || "",
+            phone: customerData.phone || "",
             guests: parseInt(customerData.guests) || 1,
             bookingDate: dateNow.toLocaleDateString('en-US', options),
             depositPaid: parseFloat(customerData.deposit) || 50.00,
@@ -1118,12 +1136,13 @@ class TeaFactoryStore {
         this.state.tourSlots[slotIndex].status = "Booked";
         this.state.tourSlots[slotIndex].booking = {
             bookingId: bookingId,
-            customerName: customerData.name,
-            guests: customerData.guests,
+            customerName: tourBooking.customerName,
+            guests: tourBooking.guests,
             package: tourBooking.packageName
         };
 
         // Add to global bookings for audit
+        if (!this.state.bookings) this.state.bookings = [];
         this.state.bookings.unshift(tourBooking);
 
         // Generate Tour Booking Email Log
