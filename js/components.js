@@ -899,6 +899,9 @@ const UIComponents = {
                 <button class="admin-tab-btn ${activeSubTab === 'gallery' ? 'active' : ''}" data-subtab="gallery" style="display: flex; align-items: center; gap: 0.5rem;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> Gallery Desk
                 </button>
+                <button class="admin-tab-btn ${activeSubTab === 'slides' ? 'active' : ''}" data-subtab="slides" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg> Hero Slideshow Desk
+                </button>
                 <button class="admin-tab-btn ${activeSubTab === 'tours' ? 'active' : ''}" data-subtab="tours" style="display: flex; align-items: center; gap: 0.5rem;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg> Tour Slots Desk
                 </button>
@@ -1329,6 +1332,135 @@ const UIComponents = {
                             
                             <button type="submit" id="btn-save-gallery-img" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">
                                 Publish to Gallery
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        } else if (activeSubTab === 'slides') {
+            const heroSlides = window.TeaFactoryStore.getHeroSlides();
+            const galleryImages = window.TeaFactoryStore.getGalleryImages();
+            const activeCount = heroSlides.filter(s => s.enabled !== false).length;
+
+            html += `
+                <div class="admin-columns">
+                    <!-- Left: Active Slides in Home Landing Slideshow -->
+                    <div class="panel-card" style="margin-bottom: 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                            <div>
+                                <h3 class="panel-title" style="margin-bottom: 0.25rem;">Landing Screen Hero Slides</h3>
+                                <p class="panel-desc" style="margin-bottom: 0;">Configure, reorder, toggle, and manage the rotating slideshow on the Home landing page.</p>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <span class="box-badge status-available" style="font-size: 0.75rem;">${activeCount} Active / ${heroSlides.length} Total</span>
+                                <button id="btn-reset-hero-slides" class="btn btn-outline" style="font-size: 0.7rem; padding: 0.35rem 0.75rem; border-color: rgba(255,255,255,0.25); color: #cbd5e1; display: inline-flex; align-items: center; gap: 0.3rem;" title="Reset slideshow to factory curated set">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                    Reset Curated
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Slides List -->
+                        <div style="display: flex; flex-direction: column; gap: 0.85rem; max-height: 600px; overflow-y: auto; padding-right: 0.5rem;">
+                            ${heroSlides.length === 0 ? `
+                                <div style="text-align: center; padding: 3rem; color: #888;">No slides configured. Add a slide using the form on the right or reset to curated defaults.</div>
+                            ` : heroSlides.map((slide, idx) => `
+                                <div style="display: flex; gap: 0.85rem; align-items: center; background: rgba(3, 12, 7, 0.85); border: 1px solid ${slide.enabled !== false ? 'rgba(212,175,55,0.35)' : 'rgba(255,255,255,0.1)'}; border-radius: 8px; padding: 0.75rem 0.9rem; position: relative; opacity: ${slide.enabled !== false ? '1' : '0.6'}; transition: all 0.25s ease;">
+                                    <!-- Slide Number & Reorder Handle -->
+                                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 28px;">
+                                        <span style="font-family: monospace; font-size: 0.85rem; font-weight: 700; color: var(--color-gold);">${String(idx + 1).padStart(2, '0')}</span>
+                                        <div style="display: flex; flex-direction: column; gap: 1px; margin-top: 2px;">
+                                            <button class="btn-move-slide-up" data-id="${slide.id}" ${idx === 0 ? 'disabled style="opacity:0.25; cursor:not-allowed;"' : 'style="cursor:pointer;"'} style="background: none; border: none; color: #94a3b8; font-size: 0.7rem; padding: 1px;" title="Move Up">▲</button>
+                                            <button class="btn-move-slide-down" data-id="${slide.id}" ${idx === heroSlides.length - 1 ? 'disabled style="opacity:0.25; cursor:not-allowed;"' : 'style="cursor:pointer;"'} style="background: none; border: none; color: #94a3b8; font-size: 0.7rem; padding: 1px;" title="Move Down">▼</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Thumbnail -->
+                                    <div style="width: 75px; height: 55px; border-radius: 6px; overflow: hidden; border: 1px solid rgba(212,175,55,0.3); flex-shrink: 0; background: #000;">
+                                        <img src="${slide.image}" alt="${(slide.title || '').replace(/<[^>]*>?/gm, '')}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="window.handleImageError && window.handleImageError(this, 'gallery')">
+                                    </div>
+
+                                    <!-- Slide Info -->
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem;">
+                                            <span style="font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--color-gold); letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">
+                                                ${slide.subtitle || 'Estate Story'}
+                                            </span>
+                                            <span class="box-badge ${slide.enabled !== false ? 'status-available' : 'status-booked'}" style="font-size: 0.58rem; padding: 0.05rem 0.35rem;">
+                                                ${slide.enabled !== false ? 'Active' : 'Hidden'}
+                                            </span>
+                                        </div>
+                                        <div style="font-size: 0.82rem; font-weight: 600; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                            ${(slide.title || 'Slide Headline').replace(/<[^>]*>?/gm, '')}
+                                        </div>
+                                        <div style="font-size: 0.7rem; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.1rem;">
+                                            ${slide.description || ''}
+                                        </div>
+                                    </div>
+
+                                    <!-- Slide Actions -->
+                                    <div style="display: flex; gap: 0.35rem; align-items: center; flex-shrink: 0;">
+                                        <button class="btn-toggle-hero-slide" data-id="${slide.id}" style="background: ${slide.enabled !== false ? 'rgba(5, 150, 105, 0.2)' : 'rgba(100, 116, 139, 0.2)'}; border: 1px solid ${slide.enabled !== false ? 'rgba(5, 150, 105, 0.5)' : 'rgba(100, 116, 139, 0.4)'}; color: ${slide.enabled !== false ? '#34d399' : '#94a3b8'}; padding: 0.3rem 0.55rem; font-size: 0.68rem; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.2rem;" title="${slide.enabled !== false ? 'Click to hide from home landing screen' : 'Click to show on home landing screen'}">
+                                            ${slide.enabled !== false ? '👁️ On' : '🚫 Off'}
+                                        </button>
+                                        <button class="btn-delete-hero-slide" data-id="${slide.id}" data-title="${(slide.title || 'Slide').replace(/<[^>]*>?/gm, '')}" style="background: rgba(255,94,94,0.15); border: 1px solid rgba(255,94,94,0.4); color: #ff5e5e; padding: 0.3rem 0.5rem; font-size: 0.68rem; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.2rem;" title="Remove this slide">
+                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Right: Add New Slide Form -->
+                    <div class="panel-card" style="margin-bottom: 0;">
+                        <h3 class="panel-title">Add Slide to Hero Slideshow</h3>
+                        <p class="panel-desc">Select an image from the Gallery or upload a photo, and customize the headline and narrative story.</p>
+
+                        <form id="admin-add-slide-form" class="admin-form" style="gap: 1.15rem;">
+                            <!-- Image Selection Mode: Pick from Gallery or File -->
+                            <div class="form-group">
+                                <label class="form-label" for="slide-gallery-picker">1. Select Image from Gallery *</label>
+                                <select class="form-input" id="slide-gallery-picker" style="font-size: 0.85rem;">
+                                    <option value="">-- Choose a photo from Gallery --</option>
+                                    ${galleryImages.map(img => `
+                                        <option value="${img.src}" data-caption="${img.caption || ''}" data-tag="${img.tag || ''}">${img.caption || img.src}</option>
+                                    `).join('')}
+                                </select>
+                            </div>
+
+                            <!-- Live Selected Image Preview -->
+                            <div class="form-group">
+                                <label class="form-label">2. Selected Slide Image Preview</label>
+                                <div id="slide-selected-image-preview" style="width: 100%; aspect-ratio: 16/9; max-height: 150px; border-radius: 6px; overflow: hidden; border: 1px dashed rgba(212,175,55,0.4); background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; position: relative;">
+                                    <img id="slide-preview-img" src="images/1 (1).jpeg" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="window.handleImageError && window.handleImageError(this, 'gallery')">
+                                    <input type="hidden" id="slide-image-src-hidden" value="images/1 (1).jpeg">
+                                </div>
+                                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                    <button type="button" id="btn-slide-upload-file" class="btn btn-outline" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; flex: 1;">
+                                        📁 Or Upload Image File
+                                    </button>
+                                    <input type="file" id="slide-image-file-input" accept="image/*" style="display:none;">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="slide-title-input">3. Slide Main Headline *</label>
+                                <input class="form-input" type="text" id="slide-title-input" required placeholder="e.g. From Our Wild Forest Garden to Your Cup" value="Wild Arbor Tea Garden. Mountain Foothill Heritage.">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="slide-subtitle-input">4. Subtitle / Region Tag *</label>
+                                <input class="form-input" type="text" id="slide-subtitle-input" required placeholder="e.g. Rock One Wild Tea (Pvt) Limited • Uva Medium Region" value="Forested Rock Formation Terroir • 1,240m Elevation">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="slide-desc-input">5. Narrative Story / Description *</label>
+                                <textarea class="form-input" id="slide-desc-input" rows="3" required placeholder="Describe the origin, hand-craft, or experience depicted in this slide...">Grown naturally amidst virgin mountain forest and ancient flora at the foot of our iconic rock formation in Ettampitiya, free from synthetic chemicals.</textarea>
+                            </div>
+
+                            <button type="submit" id="btn-save-hero-slide" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">
+                                + Add Slide to Hero Slideshow
                             </button>
                         </form>
                     </div>

@@ -5037,7 +5037,178 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
             });
+        // ─── Hero Slideshow Desk Bindings ─────────────────────────────
+        const slideGalleryPicker = document.getElementById('slide-gallery-picker');
+        const slidePreviewImg = document.getElementById('slide-preview-img');
+        const slideHiddenSrc = document.getElementById('slide-image-src-hidden');
+        const slideFileInput = document.getElementById('slide-image-file-input');
+        const btnSlideUpload = document.getElementById('btn-slide-upload-file');
+        const slideTitleInput = document.getElementById('slide-title-input');
+        const slideSubtitleInput = document.getElementById('slide-subtitle-input');
+        const slideDescInput = document.getElementById('slide-desc-input');
+
+        if (slideGalleryPicker && slidePreviewImg && slideHiddenSrc) {
+            slideGalleryPicker.addEventListener('change', () => {
+                const selectedSrc = slideGalleryPicker.value;
+                if (selectedSrc) {
+                    slideHiddenSrc.value = selectedSrc;
+                    slidePreviewImg.src = selectedSrc;
+                    const selectedOpt = slideGalleryPicker.options[slideGalleryPicker.selectedIndex];
+                    const caption = selectedOpt.getAttribute('data-caption');
+                    const tag = selectedOpt.getAttribute('data-tag');
+                    if (caption && slideTitleInput) {
+                        slideTitleInput.value = `${caption}. Ceylon Heritage.`;
+                    }
+                    if (tag && slideSubtitleInput) {
+                        slideSubtitleInput.value = `${tag} • Rock One Wild Tea (Ettampitiya)`;
+                    }
+                }
+            });
+        }
+
+        if (btnSlideUpload && slideFileInput) {
+            btnSlideUpload.addEventListener('click', () => {
+                slideFileInput.click();
+            });
+
+            slideFileInput.addEventListener('change', () => {
+                if (slideFileInput.files && slideFileInput.files.length > 0) {
+                    const file = slideFileInput.files[0];
+                    if (file.size > 5 * 1024 * 1024) {
+                        showToast('File Too Large', 'Please upload a photo under 5MB.', 'error');
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const base64 = e.target.result;
+                        if (slideHiddenSrc) slideHiddenSrc.value = base64;
+                        if (slidePreviewImg) slidePreviewImg.src = base64;
+                        if (slideGalleryPicker) slideGalleryPicker.value = '';
+                        showToast('Photo Loaded', `${file.name} ready to add to slideshow.`, 'info');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // Add Slide Form Handler
+        const addSlideForm = document.getElementById('admin-add-slide-form');
+        if (addSlideForm) {
+            addSlideForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const image = slideHiddenSrc ? slideHiddenSrc.value.trim() : '';
+                if (!image) {
+                    showToast("Photo Required", "Please select a gallery image or upload a photograph.", "error");
+                    return;
+                }
+                const title = slideTitleInput ? slideTitleInput.value.trim() : 'Artisanal Ceylon Wild Tea';
+                const subtitle = slideSubtitleInput ? slideSubtitleInput.value.trim() : 'Rock One Wild Tea (Pvt) Limited • Uva Medium Region';
+                const description = slideDescInput ? slideDescInput.value.trim() : 'Hand made with Care, Crafted from Ceylon.';
+
+                window.TeaFactoryStore.addHeroSlide({
+                    image,
+                    title,
+                    subtitle,
+                    description,
+                    enabled: true
+                });
+
+                showToast("Slide Added", "New slide added to the Home landing screen slideshow.", "success");
+                addSlideForm.reset();
+                renderTabContent('admin');
+                if (typeof initHeroSlider === 'function') {
+                    initHeroSlider();
+                }
+            });
+        }
+
+        // Toggle Hero Slide visibility
+        document.querySelectorAll('.btn-toggle-hero-slide').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const slideId = btn.getAttribute('data-id');
+                const updated = window.TeaFactoryStore.toggleHeroSlide(slideId);
+                if (updated) {
+                    showToast(
+                        updated.enabled !== false ? "Slide Activated" : "Slide Hidden",
+                        updated.enabled !== false ? "Slide is now visible on the home landing screen." : "Slide is hidden from public display.",
+                        "info"
+                    );
+                    renderTabContent('admin');
+                    if (typeof initHeroSlider === 'function') {
+                        initHeroSlider();
+                    }
+                }
+            });
         });
+
+        // Move Slide Up
+        document.querySelectorAll('.btn-move-slide-up').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const slideId = btn.getAttribute('data-id');
+                window.TeaFactoryStore.moveHeroSlide(slideId, 'up');
+                renderTabContent('admin');
+                if (typeof initHeroSlider === 'function') {
+                    initHeroSlider();
+                }
+            });
+        });
+
+        // Move Slide Down
+        document.querySelectorAll('.btn-move-slide-down').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const slideId = btn.getAttribute('data-id');
+                window.TeaFactoryStore.moveHeroSlide(slideId, 'down');
+                renderTabContent('admin');
+                if (typeof initHeroSlider === 'function') {
+                    initHeroSlider();
+                }
+            });
+        });
+
+        // Delete Hero Slide click binding
+        document.querySelectorAll('.btn-delete-hero-slide').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const slideId = btn.getAttribute('data-id');
+                const slideTitle = btn.getAttribute('data-title') || 'Landing Screen Slide';
+                showDeleteConfirmModal({
+                    title: 'Remove Landing Slide',
+                    subtitle: 'Hero Slideshow Desk',
+                    itemName: slideTitle,
+                    message: 'Are you sure you want to remove this slide from the home landing rotation?',
+                    confirmText: 'Remove Slide',
+                    onConfirm: () => {
+                        window.TeaFactoryStore.deleteHeroSlide(slideId);
+                        showToast("Slide Removed", "The slide was removed from the landing screen.", "success");
+                        renderTabContent('admin');
+                        if (typeof initHeroSlider === 'function') {
+                            initHeroSlider();
+                        }
+                    }
+                });
+            });
+        });
+
+        // Reset Hero Slides to Curated
+        const resetHeroSlidesBtn = document.getElementById('btn-reset-hero-slides');
+        if (resetHeroSlidesBtn) {
+            resetHeroSlidesBtn.addEventListener('click', () => {
+                showDeleteConfirmModal({
+                    title: 'Reset Curated Slideshow',
+                    subtitle: 'Hero Slideshow Desk',
+                    itemName: 'Curated 8-Slide Series',
+                    message: 'Reset the home landing slideshow back to the default curated selection of estate photographs?',
+                    confirmText: 'Reset Curated',
+                    onConfirm: () => {
+                        window.TeaFactoryStore.resetHeroSlides();
+                        showToast("Slideshow Reset", "Landing screen reset to curated estate series.", "success");
+                        renderTabContent('admin');
+                        if (typeof initHeroSlider === 'function') {
+                            initHeroSlider();
+                        }
+                    }
+                });
+            });
+        }
 
         // Bind Gift Box Image File Uploader
         const boxImageInput = document.getElementById('box-image-file');
@@ -7039,12 +7210,51 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         const sliderContainer = document.getElementById('hero-slider-container');
         if (!sliderContainer) return;
 
+        const storeHeroSlides = (window.TeaFactoryStore && window.TeaFactoryStore.getHeroSlides) 
+            ? window.TeaFactoryStore.getHeroSlides().filter(s => s.enabled !== false) 
+            : [];
         const galleryImages = window.TeaFactoryStore ? window.TeaFactoryStore.getGalleryImages() : [];
         const slidesWrapper = sliderContainer.querySelector('.hero-slides-wrapper');
         const dotsContainer = document.getElementById('hero-dots');
 
-        // Dynamically build slides from gallery images if available
-        if (slidesWrapper && galleryImages && galleryImages.length > 0) {
+        // Dynamically build slides from store hero slides (or fallback to gallery)
+        if (slidesWrapper && storeHeroSlides.length > 0) {
+            slidesWrapper.innerHTML = storeHeroSlides.map((slideObj, idx) => {
+                const isActive = idx === currentHeroIndex || (idx === 0 && currentHeroIndex >= storeHeroSlides.length);
+                const subtitle = slideObj.subtitle || 'Rock One Wild Tea (Pvt) Limited • Uva Medium Region';
+                const title = slideObj.title || 'Artisanal Ceylon Wild Tea';
+                const description = slideObj.description || 'Hand made with Care, Crafted from Ceylon — born from our own tea garden in Sri Lanka’s Uva Medium region.';
+                const imgSrc = slideObj.image || 'images/1 (1).jpeg';
+
+                return `
+                    <div class="hero-slide${isActive ? ' active' : ''}" style="background-image: url('${imgSrc}');">
+                        <div class="hero-slide-overlay"></div>
+                        <div class="hero-slide-content">
+                            <div class="hero-logo-box">
+                                <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" class="hero-logo-gold" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
+                            </div>
+                            <span class="hero-subtitle">${subtitle}</span>
+                            <h1 class="hero-title">${title}</h1>
+                            <p class="hero-description">${description}</p>
+                            <div class="hero-cta">
+                                <span class="btn btn-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') &amp;&amp; document.getElementById('nav-gifts').click())">
+                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+                                    Reserve Gift Chests
+                                </span>
+                                <span class="btn btn-outline" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') &amp;&amp; document.getElementById('nav-tours').click())">
+                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                                    Experience the Tour
+                                </span>
+                                <span class="btn btn-outline" style="background: rgba(4,14,8,0.6); border-color: rgba(212,175,55,0.4);" onclick="window.appSwitchTab ? window.appSwitchTab('gallery') : (document.getElementById('nav-gallery') &amp;&amp; document.getElementById('nav-gallery').click())">
+                                    <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    View Full Gallery (${galleryImages.length})
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } else if (slidesWrapper && galleryImages && galleryImages.length > 0) {
             slidesWrapper.innerHTML = galleryImages.map((imgObj, idx) => {
                 const meta = getHeroSlideMetadata(imgObj, idx);
                 const isActive = idx === currentHeroIndex || (idx === 0 && currentHeroIndex >= galleryImages.length);
