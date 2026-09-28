@@ -2175,7 +2175,7 @@ Rock One Wild Tea Sanctuary Concierge Team
         this.state.emailLogs.unshift({
             id: `EMAIL-ORD-${Date.now().toString().slice(-6)}`,
             timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-            to: `${order.email}, orders@rockonewildtea.com`,
+            to: `${order.email}, rockonewild@gmail.com`,
             subject: `Order Confirmation [${order.id}] — Rock One Wild Tea`,
             body: emailContent
         });
