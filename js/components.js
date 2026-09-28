@@ -888,14 +888,6 @@ const UIComponents = {
                     <span class="stat-value">${stats.tourBookingsCount}</span>
                     <span class="stat-desc">Factory visit reservations</span>
                 </div>
-                <div class="admin-stat-card" style="cursor: pointer; border: 1px solid rgba(212,175,55,0.4); background: linear-gradient(135deg, rgba(14,35,20,0.9), rgba(4,14,8,0.95)); transition: all 0.3s ease;" onclick="window.switchAdminSubTab ? window.switchAdminSubTab('slides') : null" title="Click to manage Home Landing Screen Hero Slideshow">
-                    <span class="stat-label" style="color: var(--color-gold); display: flex; align-items: center; justify-content: space-between;">
-                        <span>Hero Slideshow</span>
-                        <span class="box-badge status-available" style="font-size: 0.6rem; padding: 0.1rem 0.4rem;">${activeHeroSlidesCount} Live</span>
-                    </span>
-                    <span class="stat-value" style="color: #ffffff;">${heroSlides.length} <span style="font-size: 0.85rem; font-weight: 500; color: #94a3b8;">Slides</span></span>
-                    <span class="stat-desc" style="color: var(--color-gold); font-weight: 600;">Manage Landing Slides →</span>
-                </div>
             </div>
 
             <!-- Sub Navigation Tabs for Admin Console -->
