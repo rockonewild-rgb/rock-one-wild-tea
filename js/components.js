@@ -1280,7 +1280,7 @@ const UIComponents = {
                         </div>
                     </div>
                     <button type="button" class="btn btn-primary" onclick="window.switchAdminSubTab ? window.switchAdminSubTab('slides') : null" style="font-size: 0.75rem; padding: 0.45rem 1rem; display: inline-flex; align-items: center; gap: 0.35rem;">
-                        Open Hero Slideshow Desk →
+                        Open Hero Slideshow Desk <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-left:2px"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                     </button>
                 </div>
 
@@ -4327,13 +4327,13 @@ const UIComponents = {
                             <!-- Timer Action Buttons -->
                             <div style="display:flex; gap:0.6rem; align-items:center;">
                                 <button type="button" id="btn-timer-start-pause" class="btn btn-primary" style="padding:0.65rem 1.4rem; font-size:0.82rem; font-weight:700;">
-                                    ▶ ${_t('btn_start_steep', 'Start Steep')}
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5,3 19,12 5,21"/></svg> ${_t('btn_start_steep', 'Start Steep')}
                                 </button>
                                 <button type="button" id="btn-timer-plus-30" class="btn btn-outline" style="padding:0.65rem 0.9rem; font-size:0.8rem; border-color:rgba(212,175,55,0.3); color:var(--color-gold);" title="Add 30 Seconds">
                                     +30s
                                 </button>
                                 <button type="button" id="btn-timer-reset" class="btn btn-outline" style="padding:0.65rem 0.9rem; font-size:0.8rem; border-color:rgba(255,255,255,0.15); color:var(--color-text-muted);" title="${_t('btn_reset_steep', 'Reset Timer')}">
-                                    ↺ ${_t('btn_reset_steep', 'Reset')}
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3"/></svg> ${_t('btn_reset_steep', 'Reset')}
                                 </button>
                             </div>
                         </div>
@@ -4443,10 +4443,10 @@ const UIComponents = {
                         <!-- Timer Controls -->
                         <div style="display:flex; gap:0.5rem; align-items:center;">
                             <button type="button" id="btn-home-timer-start" class="btn btn-primary" style="padding:0.6rem 1.25rem; font-size:0.8rem; font-weight:700;">
-                                ▶ ${_t('btn_start_steep', 'Start Steep')}
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5,3 19,12 5,21"/></svg> ${_t('btn_start_steep', 'Start Steep')}
                             </button>
                             <button type="button" id="btn-home-timer-reset" class="btn btn-outline" style="padding:0.6rem 0.85rem; font-size:0.78rem; border-color:rgba(255,255,255,0.2); color:var(--color-text-muted);">
-                                ↺ ${_t('btn_reset_steep', 'Reset')}
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3"/></svg> ${_t('btn_reset_steep', 'Reset')}
                             </button>
                         </div>
                     </div>
@@ -4569,7 +4569,7 @@ const UIComponents = {
                             <label for="order-id-input">Reference / Booking ID</label>
                             <input type="text" id="order-id-input" placeholder="ORD-12345678 or TB-XXXXX" style="font-family: monospace; text-transform: uppercase; font-size: 1rem;" required>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem; white-space: nowrap;">Look Up Status →</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem; white-space: nowrap;">Look Up Status <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
                     </form>
                 </div>
 

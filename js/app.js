@@ -7107,7 +7107,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             isRunning = true;
             statusEl.innerText = _t('timer_steeping', 'STEEPING IN PROGRESS...');
             statusEl.style.color = "var(--color-gold)";
-            startBtn.innerHTML = `⏸ ${_t('btn_pause_steep', 'Pause')}`;
+            startBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align:middle;margin-right:3px"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> ${_t('btn_pause_steep', 'Pause')}`;
 
             timerInterval = setInterval(() => {
                 if (remainingSeconds > 0) {
@@ -7117,7 +7117,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                     stopTimer();
                     statusEl.innerText = _t('timer_ready', 'INFUSION PERFECT');
                     statusEl.style.color = "#00e5c9";
-                    startBtn.innerHTML = `↺ ${_t('btn_steep_again', 'Steep Again')}`;
+                    startBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3"/></svg> ${_t('btn_steep_again', 'Steep Again')}`;
                     ringEl.style.strokeDashoffset = 0;
                     playSommelierChime();
                     showToast("Steeping Complete!", `Your ${product.name} has infused to perfection. Pour and savor the aroma.`, "success");
@@ -7131,7 +7131,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             stopTimer();
             statusEl.innerText = _t('timer_paused', 'PAUSED');
             statusEl.style.color = "var(--color-text-muted)";
-            startBtn.innerHTML = `▶ ${_t('btn_resume_steep', 'Resume')}`;
+            startBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align:middle;margin-right:3px"><polygon points="5,3 19,12 5,21"/></svg> ${_t('btn_resume_steep', 'Resume')}`;
         }
 
         startBtn.addEventListener('click', () => {
@@ -7152,7 +7152,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             updateDisplay();
             statusEl.innerText = _t('timer_standby', 'READY TO STEEP');
             statusEl.style.color = "var(--color-gold)";
-            startBtn.innerHTML = `▶ ${_t('btn_start_steep', 'Start Steep')}`;
+            startBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align:middle;margin-right:3px"><polygon points="5,3 19,12 5,21"/></svg> ${_t('btn_start_steep', 'Start Steep')}`;
         });
 
         plus30Btn.addEventListener('click', () => {
@@ -7176,7 +7176,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 updateDisplay();
                 statusEl.innerText = _t('timer_standby', 'READY TO STEEP');
                 statusEl.style.color = "var(--color-gold)";
-                startBtn.innerHTML = `▶ ${_t('btn_start_steep', 'Start Steep')}`;
+                startBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align:middle;margin-right:3px"><polygon points="5,3 19,12 5,21"/></svg> ${_t('btn_start_steep', 'Start Steep')}`;
             });
         });
 
@@ -7228,7 +7228,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             homeTimerRunning = true;
             statusEl.innerText = _t('timer_steeping', 'STEEPING...');
             statusEl.style.color = "var(--color-gold)";
-            startBtn.innerHTML = `⏸ ${_t('btn_pause_steep', 'Pause')}`;
+            startBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align:middle;margin-right:3px"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> ${_t('btn_pause_steep', 'Pause')}`;
 
             homeTimerInterval = setInterval(() => {
                 if (homeRemainingSeconds > 0) {
@@ -7238,7 +7238,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                     stopHomeTimer();
                     statusEl.innerText = _t('timer_ready', 'READY');
                     statusEl.style.color = "#00e5c9";
-                    startBtn.innerHTML = `↺ ${_t('btn_steep_again', 'Steep Again')}`;
+                    startBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3"/></svg> ${_t('btn_steep_again', 'Steep Again')}`;
                     ringEl.style.strokeDashoffset = 0;
                     playSommelierChime();
                     showToast("Steeping Complete!", "Your tea infusion is perfectly extracted.", "success");
@@ -7250,7 +7250,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             stopHomeTimer();
             statusEl.innerText = _t('timer_paused', 'PAUSED');
             statusEl.style.color = "var(--color-text-muted)";
-            startBtn.innerHTML = `▶ ${_t('btn_resume_steep', 'Resume')}`;
+            startBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align:middle;margin-right:3px"><polygon points="5,3 19,12 5,21"/></svg> ${_t('btn_resume_steep', 'Resume')}`;
         }
 
         startBtn.addEventListener('click', () => {
@@ -7271,7 +7271,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             updateHomeDisplay();
             statusEl.innerText = _t('timer_standby', 'STANDBY');
             statusEl.style.color = "var(--color-gold)";
-            startBtn.innerHTML = `▶ ${_t('btn_start_steep', 'Start Steep')}`;
+            startBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align:middle;margin-right:3px"><polygon points="5,3 19,12 5,21"/></svg> ${_t('btn_start_steep', 'Start Steep')}`;
         });
 
         tabs.forEach(tab => {
@@ -7295,7 +7295,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 updateHomeDisplay();
                 statusEl.innerText = _t('timer_standby', 'STANDBY');
                 statusEl.style.color = "var(--color-gold)";
-                startBtn.innerHTML = `▶ ${_t('btn_start_steep', 'Start Steep')}`;
+                startBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align:middle;margin-right:3px"><polygon points="5,3 19,12 5,21"/></svg> ${_t('btn_start_steep', 'Start Steep')}`;
             });
         });
 
@@ -8131,11 +8131,11 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 html += '<div style="margin-top: 0.65rem;">';
                 actions.forEach(action => {
                     if (action.tab) {
-                        html += `<button type="button" class="chat-action-btn" data-tab="${action.tab}">${action.label} &rarr;</button>`;
+                        html += `<button type="button" class="chat-action-btn" data-tab="${action.tab}">${action.label} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>`;
                     } else if (action.onclick) {
                         html += `<button type="button" class="chat-action-btn" onclick="${action.onclick}">${action.label}</button>`;
                     } else if (action.href) {
-                        html += `<a href="${action.href}" target="_blank" rel="noopener noreferrer" class="chat-action-btn">${action.label} ↗</a>`;
+                        html += `<a href="${action.href}" target="_blank" rel="noopener noreferrer" class="chat-action-btn">${action.label} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>`;
                     }
                 });
                 html += '</div>';
@@ -8174,9 +8174,9 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 html += '<div style="margin-top: 0.65rem;">';
                 topic.actions.forEach(action => {
                     if (action.tab) {
-                        html += `<button type="button" class="chat-action-btn" data-tab="${action.tab}">${action.label} &rarr;</button>`;
+                        html += `<button type="button" class="chat-action-btn" data-tab="${action.tab}">${action.label} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>`;
                     } else if (action.href) {
-                        html += `<a href="${action.href}" target="_blank" rel="noopener noreferrer" class="chat-action-btn">${action.label} ↗</a>`;
+                        html += `<a href="${action.href}" target="_blank" rel="noopener noreferrer" class="chat-action-btn">${action.label} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>`;
                     }
                 });
                 html += '</div>';
