@@ -318,9 +318,9 @@
                         </button>
                     </li>
                     <li>
-                        <button class="nav-link nav-btn" data-tab="announcements" id="nav-announcements">
-                            <svg class="nav-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><line x1="8" y1="7" x2="16" y2="7"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
-                            <span class="nav-text" data-i18n="nav_bulletins">Bulletins</span>
+                        <button class="nav-link nav-btn" data-tab="about" id="nav-about">
+                            <svg class="nav-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            <span class="nav-text" data-i18n="nav_about">About Us</span>
                         </button>
                     </li>
                     <li>
@@ -383,13 +383,13 @@
                             <span class="m-desc">Main portal &amp; rituals</span>
                         </div>
                     </button>
-                    <button class="nav-link mobile-nav-item" data-tab="announcements">
+                    <button class="nav-link mobile-nav-item" data-tab="about" id="nav-about-mobile">
                         <span class="m-icon-box">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><line x1="8" y1="7" x2="16" y2="7"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                         </span>
                         <div class="m-text-group">
-                            <span class="m-title" data-i18n="nav_bulletins">Bulletins</span>
-                            <span class="m-desc">Estate news &amp; releases</span>
+                            <span class="m-title" data-i18n="nav_about">About Us</span>
+                            <span class="m-desc">Story, vision &amp; craft</span>
                         </div>
                     </button>
                     <button class="nav-link mobile-nav-item" data-tab="gifts">
@@ -1031,20 +1031,24 @@
         </div>
     </button>
 
-    <!-- Floating Luxury About Us / Estate Heritage Button (Emerald Forest & Gold) -->
-    <button id="floating-about-btn" 
-            class="floating-about-btn" 
-            aria-label="Discover Our Story & About Us" 
-            title="About Us • From Our Wild Forest Garden to Your Cup">
-        <div class="about-btn-pulse-ring"></div>
-        <div class="about-shine-sheen"></div>
-        <div class="about-icon-box">
-            <!-- Luxury Tea Leaf Shield Crest Icon -->
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                <path d="M12 8a2.5 2.5 0 0 0-2.5 2.5c0 2 2.5 4.5 2.5 4.5s2.5-2.5 2.5-4.5A2.5 2.5 0 0 0 12 8z"></path>
+    <!-- Floating Luxury Bulletins / Daily Updates & Offers Button (Left Screen Side) -->
+    <button id="floating-bulletins-btn" 
+            class="floating-bulletins-btn" 
+            onclick="window.appSwitchTab ? window.appSwitchTab('announcements') : (document.getElementById('nav-announcements') &amp;&amp; document.getElementById('nav-announcements').click())"
+            aria-label="Estate Bulletins, Daily Updates &amp; Special Offers" 
+            title="Daily Bulletins • Latest Estate News &amp; Offers">
+        <div class="bulletins-btn-pulse-ring"></div>
+        <div class="bulletins-shine-sheen"></div>
+        <div class="bulletins-icon-box">
+            <!-- Luxury Newspaper / Bulletin Icon -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                <line x1="8" y1="7" x2="16" y2="7"></line>
+                <line x1="8" y1="11" x2="14" y2="11"></line>
             </svg>
         </div>
+        <span class="floating-bulletins-badge" id="floating-bulletins-badge">News</span>
     </button>
 
     <!-- Luxury FAQ Chatbot Window -->
@@ -1567,9 +1571,9 @@
     </button>
 
     <!-- Script Loads (Execution dependency order: i18n -> store -> components -> app) -->
-    <script defer src="js/i18n.js?v=2.24.0"></script>
-    <script defer src="js/store.js?v=2.24.0"></script>
-    <script defer src="js/components.js?v=2.24.0"></script>
-    <script defer src="js/app.js?v=2.24.0"></script>
+    <script defer src="js/i18n.js?v=2.25.0"></script>
+    <script defer src="js/store.js?v=2.25.0"></script>
+    <script defer src="js/components.js?v=2.25.0"></script>
+    <script defer src="js/app.js?v=2.25.0"></script>
 </body>
 </html>
