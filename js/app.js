@@ -370,6 +370,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 bindCinemaEvents();
                 window.UIComponents.renderTestimonials('home-testimonials-container');
                 bindReviewEvents();
+                if (window.UIComponents.renderHomeGalleryShowcase) {
+                    window.UIComponents.renderHomeGalleryShowcase('home-gallery-showcase-container');
+                    bindGalleryEvents();
+                }
                 window.UIComponents.renderLocationMapSection('home-location-container');
                 window.UIComponents.renderNewsletterBanner('home-newsletter-container');
                 bindNewsletterForm();
@@ -6839,41 +6843,202 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         updateHomeDisplay();
     }
 
-    // 8. Dynamic Rotating Hero Background Image Slideshow
+    // 8. Dynamic Rotating Hero Background Image Slideshow from Gallery
     let heroSliderTimer = null;
     let currentHeroIndex = 0;
 
+    function getHeroSlideMetadata(imgObj, index) {
+        const src = imgObj.src || '';
+        const caption = imgObj.caption || '';
+        const tag = imgObj.tag || 'Estate & Harvest';
+
+        if (src.includes('tea_garden_hand_plucking') || index === 0) {
+            return {
+                subtitle: 'Rock One Wild Tea (Pvt) Limited • Uva Medium Region',
+                title: 'From Our Wild Forest Garden <span>to Your Cup.</span>',
+                description: 'Rock One Wild Tea is a family-owned tea business born from our own tea garden in Sri Lanka’s Uva Medium region, nestled in a forested environment at the foot of a large rock formation. Hand made with Care, Crafted from Ceylon — from selecting the tea leaves to small-batch processing in our family factory.'
+            };
+        } else if (src.includes('mana_ella')) {
+            return {
+                subtitle: 'Lunuwatta Valley Terroir • 15 km from Estate',
+                title: 'Mana Ella Cascade. <span>Pure Mountain Terroir.</span>',
+                description: 'Flowing through the pristine Lunuwatta valley near our family tea garden, natural mountain mist and clean alpine breezes nurture our wild arbor tea trees.'
+            };
+        } else if (src.includes('sthreepura_cave')) {
+            return {
+                subtitle: 'Ettampitiya Mountain Sanctuary • Ancient Cavern',
+                title: 'Ancient Sthreepura. <span>Legendary Mist Foothills.</span>',
+                description: 'Set against legendary rock caverns and misted peaks, our wild tea garden thrives in untouched biodiversity free from synthetic chemicals.'
+            };
+        } else if (src.includes('bomburu_ella')) {
+            return {
+                subtitle: 'Perawella Highland Falls • Widest Waterfall in Sri Lanka',
+                title: 'Bomburu Ella. <span>Highland Waterfall Mist.</span>',
+                description: 'The cool spray of Perawella feeds the high-altitude cloud cover that gives Uva teas their world-renowned brisk, golden character.'
+            };
+        } else if (src.includes('seetha_amman')) {
+            return {
+                subtitle: 'Ashoka Vatika Foothills • Sacred Hill Country',
+                title: 'Highland Sanctuaries. <span>Timeless Ceylon Heritage.</span>',
+                description: 'Surrounded by historic cloud-forest sanctuaries and highland peaks, crafting Ceylon\'s purest orthodox loose-leaf teas.'
+            };
+        } else if (src.includes('liptons_seat')) {
+            return {
+                subtitle: '1,970m Panoramic Cloud Peak • Historic Vantage',
+                title: 'Lipton\'s Seat Panorama. <span>Crown of Ceylon Tea.</span>',
+                description: 'Gaze across 7 provinces from the historic vantage point overlooking the southern hills, where Ceylon\'s timeless tea legacy was born.'
+            };
+        } else if (src.includes('dunhinda_falls')) {
+            return {
+                subtitle: 'Badulla Valley • Mist-Enriched Microclimate',
+                title: 'Dunhinda Falls. <span>Smoky Mist & Mountain Power.</span>',
+                description: 'The famous smoky mist cataract sweeps humidity through the valleys, creating perfect slow-growth conditions for artisanal tea flushes.'
+            };
+        } else if (src.includes('ravana_falls')) {
+            return {
+                subtitle: 'Ella Mountain Pass • Southern Hill Country',
+                title: 'Ravana Falls & Ella Rock. <span>Wild Highland Beauty.</span>',
+                description: 'Dramatic gorges and tropical montane flora surround our growing region, imparting floral aroma and amber liquor notes.'
+            };
+        } else if (src.includes('little_adams_peak')) {
+            return {
+                subtitle: 'Punchi Sri Pada • Morning Sun & Cool Winds',
+                title: 'Little Adam\'s Peak. <span>Sunrise Over Wild Ridges.</span>',
+                description: 'Golden dawn rays warm the high ridges each morning as our generational pluckers select tender silver two leaves and a bud.'
+            };
+        } else if (src.includes('nine_arches')) {
+            return {
+                subtitle: 'Historic Colonial Line • Forest Canopy Rail',
+                title: 'Nine Arches Viaduct. <span>Highland Heritage Trail.</span>',
+                description: 'A testament to century-old hill-country history, nestled amidst verdant tea hills just beyond our factory boundary.'
+            };
+        } else if (src.includes('hakgala_gardens')) {
+            return {
+                subtitle: 'Hakgala Strict Nature Reserve • Alpine Climate',
+                title: 'Hakgala Botanical Haven. <span>Subtropical Highlands.</span>',
+                description: 'Sri Lanka\'s highest botanical sanctuary nurtures endemic micro-ecology, reflecting the wild biodiversity of our forest tea garden.'
+            };
+        } else if (src.includes('Gift%20box') || src.includes('Gift box') || src.includes('1%20(16)') || src.includes('1 (16)')) {
+            return {
+                subtitle: 'Solid Light-Wood Cedar Chests • Individually Numbered (1 to 10)',
+                title: 'Handcrafted Teak Chests. <span>Collector\'s Masterpieces.</span>',
+                description: 'Each seasonal equinox release yields strictly 10 individually numbered collector cedar chests, hand-sealed with private estate gold bullion wax.'
+            };
+        } else if (src.includes('1%20(12)') || src.includes('1 (12)')) {
+            return {
+                subtitle: 'Time-Honored Orthodox Methods • Fragrant Cedar Troughs',
+                title: 'Historic Craft. <span>Precision Wood-Firing.</span>',
+                description: 'Inside our heritage facility, leaves undergo natural mountain air-withering on fragrant cedar troughs, gentle orthodox brass rolling, and wood-fired curing.'
+            };
+        } else if (src.includes('luxury_tea_tour')) {
+            return {
+                subtitle: 'Small-Batch Family Factory • Max 10 Guests',
+                title: 'Experience the Tour. <span>Sommelier Cupping Flights.</span>',
+                description: 'Visit our working family factory at Ettampitiya (9:30 AM, 11:00 AM, 1:30 PM, 3:30 PM) for intimate walkthroughs, hand-rolling demonstrations, and guided tastings.'
+            };
+        } else {
+            return {
+                subtitle: `${tag} • Rock One Wild Tea (Ettampitiya)`,
+                title: `${caption || 'Handcrafted Ceylon Artisanal Tea'}`,
+                description: 'Hand made with Care, Crafted from Ceylon — from selecting the tea leaves to small-batch processing in our family factory in Sri Lanka’s Uva Medium region.'
+            };
+        }
+    }
+
     function initHeroSlider() {
         const sliderContainer = document.getElementById('hero-slider-container');
-        const slides = document.querySelectorAll('.hero-slide');
-        const dots = document.querySelectorAll('.hero-dot');
+        if (!sliderContainer) return;
+
+        const galleryImages = window.TeaFactoryStore ? window.TeaFactoryStore.getGalleryImages() : [];
+        const slidesWrapper = sliderContainer.querySelector('.hero-slides-wrapper');
+        const dotsContainer = document.getElementById('hero-dots');
+
+        // Dynamically build slides from gallery images if available
+        if (slidesWrapper && galleryImages && galleryImages.length > 0) {
+            slidesWrapper.innerHTML = galleryImages.map((imgObj, idx) => {
+                const meta = getHeroSlideMetadata(imgObj, idx);
+                const isActive = idx === currentHeroIndex || (idx === 0 && currentHeroIndex >= galleryImages.length);
+                return `
+                    <div class="hero-slide${isActive ? ' active' : ''}" style="background-image: url('${imgObj.src}');">
+                        <div class="hero-slide-overlay"></div>
+                        <div class="hero-slide-content">
+                            <div class="hero-logo-box">
+                                <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" class="hero-logo-gold" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
+                            </div>
+                            <span class="hero-subtitle">${meta.subtitle}</span>
+                            <h1 class="hero-title">${meta.title}</h1>
+                            <p class="hero-description">${meta.description}</p>
+                            <div class="hero-cta">
+                                <span class="btn btn-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') &amp;&amp; document.getElementById('nav-gifts').click())">
+                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+                                    Reserve Gift Chests
+                                </span>
+                                <span class="btn btn-outline" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') &amp;&amp; document.getElementById('nav-tours').click())">
+                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                                    Experience the Tour
+                                </span>
+                                <span class="btn btn-outline" style="background: rgba(4,14,8,0.6); border-color: rgba(212,175,55,0.4);" onclick="window.appSwitchTab ? window.appSwitchTab('gallery') : (document.getElementById('nav-gallery') &amp;&amp; document.getElementById('nav-gallery').click())">
+                                    <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    View Full Gallery (${galleryImages.length})
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        const slides = sliderContainer.querySelectorAll('.hero-slide');
+        if (slides.length === 0) return;
+
+        // Build dynamic dots and slide counter
+        if (dotsContainer) {
+            const totalSlides = slides.length;
+            const maxDots = Math.min(totalSlides, 8);
+            let dotsHtml = `<div class="hero-dots-track" style="display: flex; gap: 0.35rem; align-items: center;">`;
+            for (let i = 0; i < maxDots; i++) {
+                const isActive = (i === (currentHeroIndex % maxDots)) ? ' active' : '';
+                dotsHtml += `<span class="hero-dot${isActive}" data-index="${i}"></span>`;
+            }
+            dotsHtml += `</div>`;
+            dotsHtml += `<span class="hero-slide-counter" id="hero-slide-counter" style="color: var(--color-gold); font-size: 0.78rem; font-weight: 700; font-family: monospace; letter-spacing: 1px; margin-left: 0.35rem;">${String(currentHeroIndex + 1).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}</span>`;
+            dotsContainer.innerHTML = dotsHtml;
+        }
+
+        const dots = dotsContainer ? dotsContainer.querySelectorAll('.hero-dot') : [];
         const prevBtn = document.getElementById('hero-prev-btn');
         const nextBtn = document.getElementById('hero-next-btn');
 
-        if (!sliderContainer || slides.length === 0) return;
-
-        function goToSlide(idx) {
+        function updateSlideDisplay(idx) {
             slides.forEach(s => s.classList.remove('active'));
             dots.forEach(d => d.classList.remove('active'));
 
             currentHeroIndex = (idx + slides.length) % slides.length;
             slides[currentHeroIndex].classList.add('active');
-            if (dots[currentHeroIndex]) {
-                dots[currentHeroIndex].classList.add('active');
+
+            const maxDots = Math.min(slides.length, 8);
+            const activeDotIdx = currentHeroIndex % maxDots;
+            if (dots[activeDotIdx]) {
+                dots[activeDotIdx].classList.add('active');
+            }
+
+            const counter = document.getElementById('hero-slide-counter');
+            if (counter) {
+                counter.innerText = `${String(currentHeroIndex + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
             }
         }
 
         function nextSlide() {
-            goToSlide(currentHeroIndex + 1);
+            updateSlideDisplay(currentHeroIndex + 1);
         }
 
         function prevSlide() {
-            goToSlide(currentHeroIndex - 1);
+            updateSlideDisplay(currentHeroIndex - 1);
         }
 
         function startAutoPlay() {
             stopAutoPlay();
-            heroSliderTimer = setInterval(nextSlide, 6000);
+            heroSliderTimer = setInterval(nextSlide, 5500);
         }
 
         function stopAutoPlay() {
@@ -6889,7 +7054,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 e.stopPropagation();
                 const targetIdx = parseInt(dot.getAttribute('data-index'), 10);
                 if (!isNaN(targetIdx)) {
-                    goToSlide(targetIdx);
+                    updateSlideDisplay(targetIdx);
                     startAutoPlay();
                 }
             };
@@ -6911,6 +7076,25 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             };
         }
 
+        // Touch Swipe Support for Mobile screens
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        sliderContainer.ontouchstart = (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        };
+
+        sliderContainer.ontouchend = (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 50) {
+                nextSlide();
+                startAutoPlay();
+            } else if (touchEndX - touchStartX > 50) {
+                prevSlide();
+                startAutoPlay();
+            }
+        };
+
         // Pause on hover
         sliderContainer.onmouseenter = stopAutoPlay;
         sliderContainer.onmouseleave = startAutoPlay;
@@ -6918,6 +7102,9 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         // Start auto play
         startAutoPlay();
     }
+
+    // Expose initHeroSlider globally
+    window.initHeroSlider = initHeroSlider;
 
     // 8b. Luxury Custom Glowing Cursor Pointer
     function initCustomCursor() {

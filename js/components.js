@@ -2490,6 +2490,56 @@ const UIComponents = {
         container.innerHTML = html;
     },
 
+    // 4b. Render Photographic Gallery Highlights Showcase on Home Screen
+    renderHomeGalleryShowcase(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const galleryImages = window.TeaFactoryStore ? window.TeaFactoryStore.getGalleryImages() : [];
+        if (!galleryImages || galleryImages.length === 0) return;
+
+        // Display curated top highlight images on the home screen
+        const highlightImages = galleryImages.slice(0, 8);
+
+        container.innerHTML = `
+            <div style="margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <span class="section-tag">Visual Terroir &amp; Craft</span>
+                    <h3 class="home-section-title" style="margin-bottom: 0.5rem;">Photographic Gallery Highlights</h3>
+                    <p style="color: var(--color-text-muted); font-size: 0.92rem; max-width: 650px; margin: 0;">
+                        Explore authentic imagery from our family tea garden at Ettampitiya (1,240m elevation), hand-plucking of two leaves and a bud, orthodox artisanal processing, and surrounding landmark waterfalls.
+                    </p>
+                </div>
+                <div>
+                    <span class="btn btn-outline" style="font-size: 0.85rem; padding: 0.55rem 1.25rem; display: inline-flex; align-items: center; gap: 0.5rem;" onclick="window.appSwitchTab ? window.appSwitchTab('gallery') : (document.getElementById('nav-gallery') &amp;&amp; document.getElementById('nav-gallery').click())">
+                        <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        Explore All ${galleryImages.length} Photos in Gallery
+                    </span>
+                </div>
+            </div>
+
+            <div class="home-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1.35rem; margin-bottom: 2.5rem;">
+                ${highlightImages.map((imgObj, idx) => `
+                    <div class="gallery-item-card" data-index="${idx}" data-id="${imgObj.id}" data-tag="${imgObj.tag || 'Estate & Harvest'}" style="position: relative; overflow: hidden; border-radius: 10px; border: 1px solid rgba(212,175,55,0.3); aspect-ratio: 4/3; cursor: pointer; background: #040e08; transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;">
+                        <img src="${imgObj.src}" alt="${imgObj.caption || 'Estate Scene'}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); display: block;" loading="lazy" onerror="window.handleImageError && window.handleImageError(this, 'gallery')">
+                        <div class="gallery-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(4,14,8,0.92) 0%, rgba(4,14,8,0.25) 50%, rgba(0,0,0,0) 100%); opacity: 0; transition: opacity 0.3s ease; display: flex; flex-direction: column; justify-content: flex-end; padding: 1.15rem;">
+                            <span style="background: rgba(212,175,55,0.25); color: var(--color-gold); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 0.15rem 0.5rem; border-radius: 10px; border: 1px solid rgba(212,175,55,0.45); display: inline-block; align-self: flex-start; margin-bottom: 0.35rem;">
+                                ${imgObj.tag || 'Estate & Harvest'}
+                            </span>
+                            <span style="color: #ffffff; font-family: var(--font-serif); font-size: 0.9rem; font-weight: 600; line-height: 1.35; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">
+                                ${imgObj.caption || 'Estate Photograph'}
+                            </span>
+                            <span style="color: #a7f3d0; font-size: 0.7rem; margin-top: 0.35rem; display: flex; align-items: center; gap: 0.3rem;">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                Click to enlarge in HD Lightbox
+                            </span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    },
+
     renderHeritageShowcase(containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
