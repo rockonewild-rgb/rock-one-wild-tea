@@ -319,6 +319,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Update visibility of staff-only navigation items
+    function updateNavStaffVisibility() {
+        const staffNavItems = document.querySelectorAll('.staff-only-nav');
+        staffNavItems.forEach(el => {
+            if (isAdminAuthenticated) {
+                el.style.display = el.classList.contains('mobile-nav-item') ? 'flex' : 'inline-flex';
+            } else {
+                el.style.display = 'none';
+            }
+        });
+    }
+
+    // Initial check on load
+    updateNavStaffVisibility();
+
+    // Discreet Shortcut: Ctrl + Shift + A or Alt + A to open Concierge Desk
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) || (e.altKey && (e.key === 'a' || e.key === 'A'))) {
+            e.preventDefault();
+            switchTab('admin');
+        }
+    });
+
+    // Hash navigation (e.g. #admin)
+    window.addEventListener('hashchange', () => {
+        if (window.location.hash === '#admin') {
+            switchTab('admin');
+        }
+    });
+    if (window.location.hash === '#admin') {
+        setTimeout(() => switchTab('admin'), 250);
+    }
+
     function switchTab(tabId) {
         activeTab = tabId;
         
@@ -574,6 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (passcode === storedPasscode) {
                 isAdminAuthenticated = true;
                 try { sessionStorage.setItem('tea_factory_admin_auth', 'true'); } catch(e){}
+                updateNavStaffVisibility();
                 showToast("Access Granted", "Welcome back, Estate Concierge.", "success");
                 renderTabContent('admin');
             } else {
@@ -5815,6 +5849,7 @@ document.addEventListener('DOMContentLoaded', () => {
             logoutBtn.addEventListener('click', () => {
                 isAdminAuthenticated = false;
                 try { sessionStorage.removeItem('tea_factory_admin_auth'); } catch(e){}
+                updateNavStaffVisibility();
                 showToast("Console Locked", "Concierge Operational Desk has been secured.", "success");
                 renderTabContent('admin');
             });

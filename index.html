@@ -348,7 +348,7 @@
                             <span class="nav-text" data-i18n="nav_order">My Order</span>
                         </button>
                     </li>
-                    <li>
+                    <li class="staff-only-nav" style="display: none;">
                         <button class="nav-link nav-btn nav-btn-admin" data-tab="admin" id="nav-admin" title="Concierge Desk Console">
                             <svg class="nav-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                             <span class="nav-text" data-i18n="nav_concierge">Concierge Desk</span>
@@ -432,7 +432,7 @@
                             <span class="m-desc">Track &amp; upload deposit slips</span>
                         </div>
                     </button>
-                    <button class="nav-link mobile-nav-item mobile-admin-item" data-tab="admin">
+                    <button class="nav-link mobile-nav-item mobile-admin-item staff-only-nav" data-tab="admin" style="display: none;">
                         <span class="m-icon-box">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                         </span>
@@ -847,7 +847,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 Rock One Wild Tea (Pvt) Limited. All Rights Reserved. Handcrafted in Sri Lanka's Uva Medium Region.</p>
+            <p>&copy; 2026 Rock One Wild Tea (Pvt) Limited. All Rights Reserved. Handcrafted in Sri Lanka's Uva Medium Region. <button class="nav-link footer-staff-portal-btn" data-tab="admin" style="background: none; border: none; color: rgba(255,255,255,0.2); font-size: 0.72rem; cursor: pointer; padding: 0.15rem 0.45rem; margin-left: 0.35rem; transition: color 0.2s;" title="Estate Staff & Concierge Portal" onmouseover="this.style.color='var(--color-gold)'" onmouseout="this.style.color='rgba(255,255,255,0.2)'">🔒 Staff Portal</button></p>
             <div class="developer-credit">
                 <span>Designed & Programmed by Axentra Tech Software Solution</span>
                 <img src="images/Axentra.png" alt="Axentra Developer Logo" class="footer-dev-logo" onerror="this.style.display='none'" decoding="async">
