@@ -2165,7 +2165,7 @@ const UIComponents = {
                             <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                             Read Full Company Story
                         </span>
-                        <span class="btn btn-outline" onclick="document.getElementById('nav-tours').click()">
+                        <span class="btn btn-outline" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') &amp;&amp; document.getElementById('nav-tours').click())">
                             <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
                             Book Estate Tour
                         </span>
@@ -2632,11 +2632,11 @@ const UIComponents = {
                         "Rock One Wild Tea — From the wild, crafted by our hands, to your cup."
                     </p>
                     <div style="display: flex; gap: 1.25rem; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn btn-primary" onclick="window.appCloseAboutModal && window.appCloseAboutModal(); document.getElementById('nav-tours').click();" style="padding: 0.85rem 1.75rem; font-size: 0.92rem;">
+                        <button class="btn btn-primary" onclick="window.appCloseAboutModal &amp;&amp; window.appCloseAboutModal(); window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') &amp;&amp; document.getElementById('nav-tours').click());" style="padding: 0.85rem 1.75rem; font-size: 0.92rem;">
                             <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
                             Book Factory Tour &amp; Experience
                         </button>
-                        <button class="btn btn-outline" onclick="window.appCloseAboutModal && window.appCloseAboutModal(); document.getElementById('nav-catalog').click();" style="padding: 0.85rem 1.75rem; font-size: 0.92rem;">
+                        <button class="btn btn-outline" onclick="window.appCloseAboutModal &amp;&amp; window.appCloseAboutModal(); window.appSwitchTab ? window.appSwitchTab('catalog') : (document.getElementById('nav-catalog') &amp;&amp; document.getElementById('nav-catalog').click());" style="padding: 0.85rem 1.75rem; font-size: 0.92rem;">
                             <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
                             Explore Handcrafted Teas &amp; Gifts
                         </button>
@@ -4399,7 +4399,7 @@ const UIComponents = {
                     <p style="color: var(--color-text-muted); font-size: 0.85rem; max-width: 320px; margin: 0 auto 2rem auto; line-height: 1.55;">
                         ${_t('cart_empty_sub', 'Explore our single-estate montane harvests and collector series chests to assemble your multi-item allocation.')}
                     </p>
-                    <button type="button" class="btn btn-primary" onclick="if(window.appCloseCart){window.appCloseCart()}document.getElementById('nav-catalog').click()" style="padding: 0.75rem 2rem; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <button type="button" class="btn btn-primary" onclick="if(window.appCloseCart){window.appCloseCart()} window.appSwitchTab ? window.appSwitchTab('catalog') : (document.getElementById('nav-catalog') &amp;&amp; document.getElementById('nav-catalog').click());" style="padding: 0.75rem 2rem; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 0.45rem;">
                         <span>${_t('btn_browse_catalog', 'Explore Storefront Catalog')}</span>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
                     </button>

@@ -7585,7 +7585,7 @@ Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
                                     <a href="https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge%2C%20I%20have%20placed%20Order%20${order.id}%20for%20${encodeURIComponent(order.formattedPrice)}.%20Please%20confirm%20my%20dispatch." target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; font-weight: 700;">
                                         <span>Notify Concierge on WhatsApp</span>
                                     </a>
-                                    <button type="button" class="btn btn-outline" onclick="if(window.appCloseCart){window.appCloseCart()}document.getElementById('nav-order').click()" style="padding: 0.8rem; font-size: 0.85rem; border-color: rgba(255,255,255,0.25); color: #fff;">
+                                    <button type="button" class="btn btn-outline" onclick="if(window.appCloseCart){window.appCloseCart()} window.appSwitchTab ? window.appSwitchTab('order') : (document.getElementById('nav-order') &amp;&amp; document.getElementById('nav-order').click())" style="padding: 0.8rem; font-size: 0.85rem; border-color: rgba(255,255,255,0.25); color: #fff;">
                                         View in "My Order &amp; Pay" Desk &rarr;
                                     </button>
                                 </div>
