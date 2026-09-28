@@ -6852,17 +6852,11 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         const caption = (imgObj && imgObj.caption) ? imgObj.caption : '';
         const tag = (imgObj && imgObj.tag) ? imgObj.tag : 'Estate & Harvest';
 
-        if (src.includes('tea_garden_hand_plucking') || index === 0) {
+        if (index === 0 || src.includes('1%20(1).') || src.includes('1 (1).')) {
             return {
                 subtitle: 'Rock One Wild Tea (Pvt) Limited • Uva Medium Region',
                 title: 'From Our Wild Forest Garden <span>to Your Cup.</span>',
                 description: 'Rock One Wild Tea is a family-owned tea business born from our own tea garden in Sri Lanka’s Uva Medium region, nestled in a forested environment at the foot of a large rock formation. Hand made with Care, Crafted from Ceylon — from selecting the tea leaves to small-batch processing in our family factory.'
-            };
-        } else if (src.includes('1%20(1).') || src.includes('1 (1).')) {
-            return {
-                subtitle: 'Forested Rock Formation Terroir • 1,240m Elevation',
-                title: 'Wild Arbor Garden. <span>Mountain Foothill Heritage.</span>',
-                description: 'Grown naturally amidst virgin mountain forest and ancient flora at the foot of our iconic rock formation in Ettampitiya, free from synthetic chemicals.'
             };
         } else if (src.includes('1%20(2).') || src.includes('1 (2).')) {
             return {

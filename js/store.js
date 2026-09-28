@@ -27,7 +27,7 @@ const DEFAULT_ANNOUNCEMENTS = [
         content: "We are hosting an exclusive private tasting session for tea connoisseurs. Learn the art of tea brewing from our Master Tea Sommelier. Limited slots available.",
         tag: "Event",
         premium: false,
-        image: "images/tea_garden_hand_plucking.jpg"
+        image: "images/1 (5).jpeg"
     },
     {
         id: 3,
@@ -41,12 +41,6 @@ const DEFAULT_ANNOUNCEMENTS = [
 ];
 
 const DEFAULT_GALLERY_IMAGES = [
-    {
-        id: "g_featured_01",
-        src: "images/tea_garden_hand_plucking.jpg",
-        caption: "Dawn Hand-Plucking in Our Wild Tea Garden — Selective Two Leaves & A Bud",
-        tag: "Estate & Harvest"
-    },
     {
         id: "g_est_01",
         src: "images/1 (1).jpeg",
@@ -902,8 +896,13 @@ class TeaFactoryStore {
             this.state.gallery = [...DEFAULT_GALLERY_IMAGES];
             this.saveState();
         } else {
-            // Keep custom user-added photos, but ensure default gallery order starts with authentic Estate photos
-            const customPhotos = this.state.gallery.filter(g => g && g.id && !DEFAULT_GALLERY_IMAGES.some(d => d.id === g.id || d.src === g.src));
+            // Filter out any obsolete or removed images (like tea_garden_hand_plucking, landmark_*, luxury_*)
+            const validPhotos = this.state.gallery.filter(g => 
+                g && g.src && !g.src.includes('tea_garden_hand_plucking') && !g.src.includes('landmark_') && !g.src.includes('luxury_')
+            );
+            const customPhotos = validPhotos.filter(g => 
+                g && g.id && !DEFAULT_GALLERY_IMAGES.some(d => d.id === g.id || d.src === g.src)
+            );
             this.state.gallery = [...DEFAULT_GALLERY_IMAGES, ...customPhotos];
             this.saveState();
         }
