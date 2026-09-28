@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.appSwitchTab = switchTab;
     window.switchAdminSubTab = function(subTab) {
         activeAdminSubTab = subTab || 'audits';
-        if (currentActiveTab !== 'admin') {
+        if (activeTab !== 'admin') {
             switchTab('admin');
         } else {
             renderTabContent('admin');
