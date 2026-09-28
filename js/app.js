@@ -523,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="form-group" style="text-align: left;">
                             <label for="admin-passcode" class="admin-login-label">Estate Passcode</label>
                             <div class="admin-login-input-wrapper">
-                                <input type="password" id="admin-passcode" placeholder="Enter staff passcode (e.g. admin)" autocomplete="current-password" class="admin-login-input" required>
+                                <input type="password" id="admin-passcode" placeholder="Enter staff passcode" autocomplete="current-password" class="admin-login-input" required>
                                 <button type="button" id="toggle-admin-passcode-btn" class="admin-login-eye-btn" title="Show/Hide Passcode">
                                     <svg id="passcode-eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -533,9 +533,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary w-full admin-login-btn">Unlock Console</button>
-                        <button type="button" id="btn-quick-admin-login" class="btn btn-outline w-full" style="font-size: 0.75rem; padding: 0.45rem 0.75rem; border-color: rgba(212,175,55,0.35); color: var(--color-gold);">
-                            ⚡ Quick Unlock Console (Passcode: admin)
-                        </button>
                     </form>
                 </div>
             </div>
@@ -564,17 +561,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <circle cx="12" cy="12" r="3"></circle>
                     </svg>
                 `;
-            });
-        }
-
-        // Quick Unlock handler
-        const quickUnlockBtn = document.getElementById('btn-quick-admin-login');
-        if (quickUnlockBtn) {
-            quickUnlockBtn.addEventListener('click', () => {
-                isAdminAuthenticated = true;
-                try { sessionStorage.setItem('tea_factory_admin_auth', 'true'); } catch(e){}
-                showToast("Console Unlocked", "Welcome back, Estate Concierge.", "success");
-                renderTabContent('admin');
             });
         }
 
