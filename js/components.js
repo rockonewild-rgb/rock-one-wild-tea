@@ -3207,9 +3207,9 @@ const UIComponents = {
         if (!container) return;
 
         const addressText = "No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka";
-        const mapEmbedUrl = "https://maps.google.com/maps?q=54+Gannilawattha,+Wallawela,+Ettampitiya,+Sri+Lanka&t=&z=14&ie=UTF8&iwloc=&output=embed";
-        const googleMapsDirectUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(addressText);
-        const directionsUrl = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(addressText);
+        const mapEmbedUrl = "https://maps.google.com/maps?q=Rock+One+Wild+Tea,+54+Gannilawattha,+Wallawela,+Ettampitiya,+Sri+Lanka&t=&z=15&ie=UTF8&iwloc=&output=embed";
+        const googleMapsDirectUrl = "https://maps.google.com?ftid=0x3ae4630013bcccbb:0x453d082c477ea3bf";
+        const directionsUrl = "https://www.google.com/maps/dir/?api=1&destination=Rock+One+Wild+Tea+(Pvt)+Limited&destination_place_id=0x3ae4630013bcccbb:0x453d082c477ea3bf";
 
         const nearbyCities = [
             { name: "Bandarawela", type: "Colonial Hill Station", dist: "14 km", time: "25 min drive", routeQuery: "Bandarawela" },
@@ -3382,7 +3382,7 @@ const UIComponents = {
                                         <h5 style="color: var(--color-white); font-size: 1rem; font-family: var(--font-serif); margin: 0 0 0.4rem 0; letter-spacing: 0.5px;">${place.name}</h5>
                                         <p style="color: var(--color-text-muted); font-size: 0.78rem; line-height: 1.5; margin: 0 0 1rem 0;">${place.desc}</p>
                                     </div>
-                                    <a href="https://www.google.com/maps/dir/${encodeURIComponent(place.routeQuery)}/${encodeURIComponent(addressText)}" target="_blank" rel="noopener noreferrer" class="landmark-directions-btn" style="display: flex; align-items: center; justify-content: center; gap: 0.45rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,55,0.3); color: var(--color-gold); text-decoration: none; padding: 0.55rem 0.9rem; border-radius: 8px; font-size: 0.76rem; font-weight: 600; transition: all 0.25s ease;">
+                                    <a href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(place.routeQuery)}&destination=Rock+One+Wild+Tea+(Pvt)+Limited&destination_place_id=0x3ae4630013bcccbb:0x453d082c477ea3bf" target="_blank" rel="noopener noreferrer" class="landmark-directions-btn" style="display: flex; align-items: center; justify-content: center; gap: 0.45rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,55,0.3); color: var(--color-gold); text-decoration: none; padding: 0.55rem 0.9rem; border-radius: 8px; font-size: 0.76rem; font-weight: 600; transition: all 0.25s ease;">
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
                                         Driving Route to Estate
                                     </a>
@@ -3417,7 +3417,7 @@ const UIComponents = {
                                         <span class="proximity-badge-dist" style="display: inline-block; background: rgba(212, 175, 55, 0.15); color: #ffd875; border: 1px solid rgba(212, 175, 55, 0.35); font-size: 0.72rem; font-weight: 700; padding: 0.18rem 0.5rem; border-radius: 6px;">${city.dist}</span>
                                         <span style="display: block; font-size: 0.62rem; color: var(--color-text-muted); margin-top: 2px;">~${city.time}</span>
                                     </div>
-                                    <a href="https://www.google.com/maps/dir/${encodeURIComponent(city.routeQuery)}/${encodeURIComponent(addressText)}" target="_blank" rel="noopener noreferrer" title="Get Driving Route from ${city.name}" class="proximity-route-btn" style="color: var(--color-gold); display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(212, 175, 55, 0.2); text-decoration: none; transition: all 0.2s ease; flex-shrink: 0;">
+                                    <a href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(city.routeQuery)}&destination=Rock+One+Wild+Tea+(Pvt)+Limited&destination_place_id=0x3ae4630013bcccbb:0x453d082c477ea3bf" target="_blank" rel="noopener noreferrer" title="Get Driving Route from ${city.name}" class="proximity-route-btn" style="color: var(--color-gold); display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(212, 175, 55, 0.2); text-decoration: none; transition: all 0.2s ease; flex-shrink: 0;">
                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                     </a>
                                 </div>
