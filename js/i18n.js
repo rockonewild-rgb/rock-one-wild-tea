@@ -102,11 +102,11 @@
             chatbot_welcome: "Greetings! Welcome to **Rock One Wild Tea Estate**. I am your **AI Tea Sommelier & Concierge**.\n\nPlease select any inquiry topic below for instant answers, or type your own question:",
 
             // Footer
-            footer_about_title: "Rock One Wild Tea",
-            footer_about_text: "High-altitude artisanal tea sanctuary located in Ettampitiya, Sri Lanka. Dedicated to single-estate unblended tea craft.",
+            footer_about_title: "Rock One Wild Tea (Pvt) Limited",
+            footer_about_text: "Family-owned handcrafted Ceylon Tea business in Sri Lanka’s Uva Medium region, nestled at the foot of a natural rock formation. Hand made with Care, Crafted from Ceylon.",
             footer_quick_links: "Explore Sanctuary",
             footer_contact_title: "Concierge & Inquiries",
-            footer_rights: "All Rights Reserved. Single-Estate Ceylon Artisanal Reserve.",
+            footer_rights: "All Rights Reserved. Rock One Wild Tea (Pvt) Limited. Handcrafted in Sri Lanka's Uva Medium Region.",
 
             // Common UI
             common_close: "Close",
