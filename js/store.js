@@ -103,15 +103,12 @@ class TeaFactoryStore {
                     this.state.bookings = [];
                     needsSave = true;
                 }
-                if (!this.state.tourSlots || !Array.isArray(this.state.tourSlots) || this.state.tourSlots.length === 0) {
+                if (!this.state.tourSlots || !Array.isArray(this.state.tourSlots) || this.state.tourSlots.length === 0 || this.state.tourSlots.length > 4) {
                     this.state.tourSlots = [
-                        { id: 1, timeSlot: "09:00 AM - 10:00 AM", status: "Available", booking: null, package: "Silver Leaf Tour" },
-                        { id: 2, timeSlot: "10:15 AM - 11:15 AM", status: "Available", booking: null, package: "Silver Leaf Tour" },
-                        { id: 3, timeSlot: "11:30 AM - 12:30 PM", status: "Available", booking: null, package: "Golden Sommelier Tour" },
-                        { id: 4, timeSlot: "01:00 PM - 02:00 PM", status: "Booked", booking: { name: "Archibald Sterling", guests: 4 }, package: "Golden Sommelier Tour" },
-                        { id: 5, timeSlot: "02:15 PM - 03:15 PM", status: "Available", booking: null, package: "Imperial Grand Tasting" },
-                        { id: 6, timeSlot: "03:30 PM - 04:30 PM", status: "Available", booking: null, package: "Imperial Grand Tasting" },
-                        { id: 7, timeSlot: "04:45 PM - 05:45 PM", status: "Available", booking: null, package: "Silver Leaf Tour" }
+                        { id: 1, timeSlot: "09:30 AM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
+                        { id: 2, timeSlot: "11:00 AM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
+                        { id: 3, timeSlot: "01:30 PM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
+                        { id: 4, timeSlot: "03:30 PM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 }
                     ];
                     needsSave = true;
                 }
@@ -631,15 +628,12 @@ class TeaFactoryStore {
             })),
             products: this.getDefaultProducts(),
             bookings: [],
-            // Hourly tour slots for tomorrow/general bookings
+            // 4 Daily Tour Slots (Monday - Saturday, Max 10 visitors)
             tourSlots: [
-                { id: 1, timeSlot: "09:00 AM - 10:00 AM", status: "Available", booking: null, package: "Silver Leaf Tour" },
-                { id: 2, timeSlot: "10:15 AM - 11:15 AM", status: "Available", booking: null, package: "Silver Leaf Tour" },
-                { id: 3, timeSlot: "11:30 AM - 12:30 PM", status: "Available", booking: null, package: "Golden Sommelier Tour" },
-                { id: 4, timeSlot: "01:00 PM - 02:00 PM", status: "Booked", booking: { name: "Archibald Sterling", guests: 4 }, package: "Golden Sommelier Tour" },
-                { id: 5, timeSlot: "02:15 PM - 03:15 PM", status: "Available", booking: null, package: "Imperial Grand Tasting" },
-                { id: 6, timeSlot: "03:30 PM - 04:30 PM", status: "Available", booking: null, package: "Imperial Grand Tasting" },
-                { id: 7, timeSlot: "04:45 PM - 05:45 PM", status: "Available", booking: null, package: "Silver Leaf Tour" }
+                { id: 1, timeSlot: "09:30 AM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
+                { id: 2, timeSlot: "11:00 AM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
+                { id: 3, timeSlot: "01:30 PM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
+                { id: 4, timeSlot: "03:30 PM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 }
             ],
             announcements: [...DEFAULT_ANNOUNCEMENTS],
             gallery: [...DEFAULT_GALLERY_IMAGES],
@@ -1238,13 +1232,10 @@ class TeaFactoryStore {
     // Reset Tour slots
     resetTourSlots() {
         this.state.tourSlots = [
-            { id: 1, timeSlot: "09:00 AM - 10:00 AM", status: "Available", booking: null, package: "Silver Leaf Tour" },
-            { id: 2, timeSlot: "10:15 AM - 11:15 AM", status: "Available", booking: null, package: "Silver Leaf Tour" },
-            { id: 3, timeSlot: "11:30 AM - 12:30 PM", status: "Available", booking: null, package: "Golden Sommelier Tour" },
-            { id: 4, timeSlot: "01:00 PM - 02:00 PM", status: "Available", booking: null, package: "Golden Sommelier Tour" },
-            { id: 5, timeSlot: "02:15 PM - 03:15 PM", status: "Available", booking: null, package: "Imperial Grand Tasting" },
-            { id: 6, timeSlot: "03:30 PM - 04:30 PM", status: "Available", booking: null, package: "Imperial Grand Tasting" },
-            { id: 7, timeSlot: "04:45 PM - 05:45 PM", status: "Available", booking: null, package: "Silver Leaf Tour" }
+            { id: 1, timeSlot: "09:30 AM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
+            { id: 2, timeSlot: "11:00 AM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
+            { id: 3, timeSlot: "01:30 PM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
+            { id: 4, timeSlot: "03:30 PM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 }
         ];
         this.saveState();
     }

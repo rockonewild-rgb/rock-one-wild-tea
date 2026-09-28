@@ -1104,45 +1104,46 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('box-enquiry-email-btn').addEventListener('click', () => handleBoxEnquirySubmit('Email'));
 
         } else if (type === 'tour') {
-            const timeSlot = data.timeSlot;
+            const timeSlot = data.timeSlot || '09:30 AM';
             selectedTourSlipBase64 = '';
 
             const tourMinDate = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
             // Get selected package details
             const selectedPkgCard = document.querySelector('.package-card.selected');
-            const pkgName = selectedPkgCard ? selectedPkgCard.getAttribute('data-package') : 'Golden Sommelier Tour';
-            const pkgPrice = parseFloat(selectedPkgCard ? selectedPkgCard.getAttribute('data-price') : 150.00);
-            const pkgDeposit = parseFloat(selectedPkgCard ? selectedPkgCard.getAttribute('data-deposit') : 50.00);
+            const pkgName = selectedPkgCard ? selectedPkgCard.getAttribute('data-package') : '01. Gongfu-Style Black Tea Brewing Experience';
+            const pkgPrice = parseFloat(selectedPkgCard ? selectedPkgCard.getAttribute('data-price') : 4.754) || 4.754;
+            const pkgDeposit = parseFloat(selectedPkgCard ? selectedPkgCard.getAttribute('data-deposit') : 4.754) || 4.754;
+            const lkrPerGuest = 1450;
 
             drawerTitle.innerText = `Book Tour: ${pkgName}`;
 
             drawerFormContainer.innerHTML = `
                 <div class="booking-summary-box">
                     <div class="summary-row"><span>Experience:</span><strong style="color:var(--color-gold);">${pkgName}</strong></div>
-                    <div class="summary-row"><span>Time Slot:</span><span>${timeSlot}</span></div>
-                    <div class="summary-row"><span>Guests:</span><strong id="summary-guest-count" style="color:var(--color-white);">1</strong></div>
-                    <div class="summary-row"><span>Total Package Value:</span><span id="summary-total-price">${window.TeaFactoryStore.formatCurrency(pkgPrice)}</span></div>
-                    <div class="summary-row"><span>Seat Deposit:</span><span id="summary-deposit-due">${window.TeaFactoryStore.formatCurrency(pkgDeposit)}</span> (${window.TeaFactoryStore.formatCurrency(pkgDeposit)} / guest)</div>
-                    <div class="summary-row total"><span>Total Payable Now:</span><span id="tour-total-deposit">${window.TeaFactoryStore.formatCurrency(pkgDeposit)}</span></div>
+                    <div class="summary-row"><span>Time Slot:</span><span>${timeSlot} (Approx. 1.5 – 2 Hours)</span></div>
+                    <div class="summary-row"><span>Operating Days:</span><span style="color:#86efac;">Monday – Saturday (9:00 AM – 5:00 PM)</span></div>
+                    <div class="summary-row"><span>Guests:</span><strong id="summary-guest-count" style="color:var(--color-white);">1 Guest</strong></div>
+                    <div class="summary-row"><span>Experience Fee:</span><span id="summary-total-price">LKR 1,450 <small>(${window.TeaFactoryStore.formatCurrency(pkgPrice)})</small></span></div>
+                    <div class="summary-row total"><span>Total Payable:</span><span id="tour-total-deposit" style="color:var(--color-gold);">LKR 1,450 <small>(${window.TeaFactoryStore.formatCurrency(pkgDeposit)})</small></span></div>
                 </div>
 
                 <form id="tour-booking-form" class="admin-form">
                     <div class="form-group">
-                        <label for="tour-cust-name">Full Name</label>
-                        <input type="text" id="tour-cust-name" placeholder="Lord Archibald Sterling" required>
+                        <label for="tour-cust-name">Full Name *</label>
+                        <input type="text" id="tour-cust-name" placeholder="Your Full Name" required>
                     </div>
                     <div class="form-group">
-                        <label for="tour-cust-email">Email Address</label>
-                        <input type="email" id="tour-cust-email" placeholder="archibald@heritage.com" required>
+                        <label for="tour-cust-email">Email Address *</label>
+                        <input type="email" id="tour-cust-email" placeholder="your.email@example.com" required>
                         <span class="field-hint">Seat confirmation &amp; boarding pass will be dispatched here.</span>
                     </div>
                     <div class="form-group">
-                        <label for="tour-cust-phone">WhatsApp / Contact Number</label>
+                        <label for="tour-cust-phone">WhatsApp / Contact Number *</label>
                         <input type="tel" id="tour-cust-phone" placeholder="+94 77 123 4567" required>
                     </div>
                     <div class="form-group">
-                        <label for="tour-date-input">Tour Date</label>
+                        <label for="tour-date-input">Tour Date (Monday – Saturday) *</label>
                         <div class="date-input-wrapper">
                             <input type="date" id="tour-date-input" min="${tourMinDate}" value="${tourMinDate}" required>
                             <span class="date-calendar-icon" aria-hidden="true">
@@ -1154,29 +1155,32 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </svg>
                             </span>
                         </div>
-                        <span class="field-hint">Select your preferred date for the guided estate &amp; factory tour.</span>
+                        <span class="field-hint" id="tour-date-hint">Advance booking required. Factory is closed on Sundays and public holidays.</span>
                     </div>
                     <div class="form-group">
-                        <label for="tour-guests">Number of Guests</label>
-                        <input type="number" id="tour-guests" value="1" min="1" max="12" required>
+                        <label for="tour-guests">Number of Guests (Max 10 / Tour) *</label>
+                        <input type="number" id="tour-guests" value="1" min="1" max="10" required>
+                        <span class="field-hint">Each tour is limited to 10 visitors to ensure a personal and relaxed experience. No minimum guests.</span>
                     </div>
                     <div class="form-group">
-                        <label for="tour-dietary">Dietary Preferences / High-Tea Notes</label>
-                        <input type="text" id="tour-dietary" placeholder="e.g. Vegetarian, Gluten-Free, None">
+                        <label for="tour-dietary">Special Requests / Dietary Notes (Optional)</label>
+                        <input type="text" id="tour-dietary" placeholder="e.g. Vegetarian, Gluten-Free, Special occasion">
                     </div>
                     <div class="form-group">
                         <label for="tour-transport">Estate Transfer Transport</label>
                         <select id="tour-transport">
-                            <option value="No">No (Self-driving to Rock One Wild Tea Estate)</option>
-                            <option value="Kandy">Yes (Round-trip pick-up from Kandy Hotels)</option>
-                            <option value="Nuwara Eliya">Yes (Round-trip pick-up from Nuwara Eliya)</option>
-                            <option value="Colombo">Yes (Round-trip pick-up from Colombo Hotels)</option>
+                            <option value="No">No (Self-driving to Rock One Wild Tea Estate, Ettampitiya)</option>
+                            <option value="Ella">Yes (Pick-up arrangement from Ella)</option>
+                            <option value="Badulla">Yes (Pick-up arrangement from Badulla / Bandarawela)</option>
+                            <option value="Nuwara Eliya">Yes (Pick-up arrangement from Nuwara Eliya)</option>
+                            <option value="Kandy">Yes (Pick-up arrangement from Kandy)</option>
+                            <option value="Colombo">Yes (Private transfer from Colombo)</option>
                         </select>
                     </div>
 
                     <!-- Deposit Payment Method Switcher -->
                     <div class="form-group">
-                        <label>Deposit Payment Method (Live: Bank Deposit &amp; Slip Upload)</label>
+                        <label>Payment Settlement Mode (Live: Bank Deposit &amp; Slip Upload)</label>
                         <div class="payment-method-tabs">
                             <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
@@ -1275,21 +1279,44 @@ document.addEventListener('DOMContentLoaded', () => {
             const guestsInput = document.getElementById('tour-guests');
             if (guestsInput) {
                 guestsInput.addEventListener('input', () => {
-                    const g = Math.max(1, parseInt(guestsInput.value) || 1);
+                    const g = Math.max(1, Math.min(10, parseInt(guestsInput.value) || 1));
                     const totalP = g * pkgPrice;
                     const totalD = g * pkgDeposit;
+                    const totalLkr = g * lkrPerGuest;
+
                     const guestCountEl = document.getElementById('summary-guest-count');
-                    if (guestCountEl) guestCountEl.innerText = g;
+                    if (guestCountEl) guestCountEl.innerText = `${g} ${g === 1 ? 'Guest' : 'Guests'}`;
+
                     const totalPriceEl = document.getElementById('summary-total-price');
-                    if (totalPriceEl) totalPriceEl.innerText = window.TeaFactoryStore.formatCurrency(totalP);
-                    const depositDueEl = document.getElementById('summary-deposit-due');
-                    if (depositDueEl) depositDueEl.innerText = window.TeaFactoryStore.formatCurrency(totalD);
+                    if (totalPriceEl) totalPriceEl.innerHTML = `LKR ${totalLkr.toLocaleString()} <small>(${window.TeaFactoryStore.formatCurrency(totalP)})</small>`;
+
                     const totalPayableEl = document.getElementById('tour-total-deposit');
-                    if (totalPayableEl) totalPayableEl.innerText = window.TeaFactoryStore.formatCurrency(totalD);
+                    if (totalPayableEl) totalPayableEl.innerHTML = `LKR ${totalLkr.toLocaleString()} <small>(${window.TeaFactoryStore.formatCurrency(totalD)})</small>`;
+
                     const bDisp = document.getElementById('bank-deposit-display');
                     const cDisp = document.getElementById('cash-deposit-display');
-                    if (bDisp) bDisp.innerText = window.TeaFactoryStore.formatCurrency(totalD);
-                    if (cDisp) cDisp.innerText = window.TeaFactoryStore.formatCurrency(totalD);
+                    if (bDisp) bDisp.innerText = `LKR ${totalLkr.toLocaleString()} (${window.TeaFactoryStore.formatCurrency(totalD)})`;
+                    if (cDisp) cDisp.innerText = `LKR ${totalLkr.toLocaleString()} (${window.TeaFactoryStore.formatCurrency(totalD)})`;
+                });
+            }
+
+            // Sunday closure guidance on date picker
+            const dateInput = document.getElementById('tour-date-input');
+            const dateHint = document.getElementById('tour-date-hint');
+            if (dateInput) {
+                dateInput.addEventListener('change', () => {
+                    if (dateInput.value) {
+                        const chosen = new Date(dateInput.value + 'T00:00:00');
+                        if (chosen.getDay() === 0) { // Sunday
+                            if (dateHint) {
+                                dateHint.innerHTML = '<span style="color:#ef4444; font-weight:600;">⚠️ The factory is closed on Sundays for family & processing. Please select a Monday – Saturday date.</span>';
+                            }
+                        } else {
+                            if (dateHint) {
+                                dateHint.innerHTML = '<span style="color:#86efac;">✓ Operating day confirmed (Monday – Saturday, 9:00 AM – 5:00 PM).</span>';
+                            }
+                        }
+                    }
                 });
             }
 
@@ -1827,15 +1854,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const selectedPkgCard = document.querySelector('.package-card.selected');
-        const packageName = selectedPkgCard ? selectedPkgCard.getAttribute('data-package') : 'Golden Sommelier Tour';
-        const pkgPrice = parseFloat(selectedPkgCard ? selectedPkgCard.getAttribute('data-price') : 150.00) || 150.00;
-        const pkgDeposit = parseFloat(selectedPkgCard ? selectedPkgCard.getAttribute('data-deposit') : 50.00) || 50.00;
+        const packageName = selectedPkgCard ? selectedPkgCard.getAttribute('data-package') : '01. Gongfu-Style Black Tea Brewing Experience';
+        const pkgPrice = parseFloat(selectedPkgCard ? selectedPkgCard.getAttribute('data-price') : 4.754) || 4.754;
+        const pkgDeposit = parseFloat(selectedPkgCard ? selectedPkgCard.getAttribute('data-deposit') : 4.754) || 4.754;
 
         const totalDeposit = guests * pkgDeposit;
         const totalPrice = guests * pkgPrice;
+        const totalLkr = guests * 1450;
 
         const slotId = currentDrawerContext ? currentDrawerContext.id : 1;
-        const timeSlot = (currentDrawerContext && currentDrawerContext.data && currentDrawerContext.data.timeSlot) ? currentDrawerContext.data.timeSlot : "10:15 AM - 11:15 AM";
+        const timeSlot = (currentDrawerContext && currentDrawerContext.data && currentDrawerContext.data.timeSlot) ? currentDrawerContext.data.timeSlot : "09:30 AM";
 
         const result = window.TeaFactoryStore.bookTour(slotId, {
             name, 
@@ -1846,7 +1874,7 @@ document.addEventListener('DOMContentLoaded', () => {
             deposit: totalDeposit, 
             totalPrice: totalPrice,
             tourDate, 
-            timeSlot,
+            timeSlot, 
             dietaryNotes, 
             transportRequired,
             paymentMethod,
@@ -1881,7 +1909,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 showToast(
                     "Tour Booking Confirmed!", 
-                    `Boarding pass ${booking.id} created for ${guests} guests (${timeSlot}). Confirmation email dispatched to ${email}.`, 
+                    `Boarding pass ${booking.id} created for ${guests} ${guests === 1 ? 'guest' : 'guests'} (${timeSlot}). Confirmation email dispatched to ${email}.`, 
                     'success'
                 );
             }
@@ -1890,7 +1918,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderTabContent(activeTab);
 
             // Forward summary message / connect to concierge desk
-            const message = `Hello Rock One Wild Tea!\n\nI have booked an Estate Factory Tour:\n• Booking Ref: ${booking.id}\n• Lead Guest: ${name}\n• Email: ${email}\n• Phone: ${phone}\n• Date: ${tourDate}\n• Slot: ${booking.timeSlot}\n• Party: ${guests} Guests\n• Package: ${packageName}\n• Deposit: $${totalDeposit.toFixed(2)} USD\n\nPlease confirm my gate pass arrival.`;
+            const message = `Hello Rock One Wild Tea!\n\nI would like to confirm my Factory Tour reservation:\n• Booking Ref: ${booking.id}\n• Lead Guest: ${name}\n• Contact Email: ${email}\n• WhatsApp: ${phone}\n• Tour Date: ${tourDate}\n• Time Slot: ${booking.timeSlot}\n• Number of Guests: ${guests} ${guests === 1 ? 'Guest' : 'Guests'}\n• Experience: ${packageName}\n• Total Amount: LKR ${totalLkr.toLocaleString()} (approx. $${totalDeposit.toFixed(2)} USD)\n\nPlease confirm availability and gate access guidance.`;
             const encodedMsg = encodeURIComponent(message);
 
             setTimeout(() => {

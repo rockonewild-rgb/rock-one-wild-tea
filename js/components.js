@@ -463,100 +463,326 @@ const UIComponents = {
         if (!container) return;
 
         const slots = window.TeaFactoryStore.getTourSlots();
+        const activeCurr = window.TeaFactoryStore.getActiveCurrency();
 
-        const packages = [
-            {
-                name: "Silver Leaf Tour",
-                price: "75.00",
-                deposit: "25.00",
-                duration: "60 Mins",
-                desc: "Guided garden walk, tea harvesting experience, and fresh brew tasting."
-            },
-            {
-                name: "Golden Sommelier Tour",
-                price: "150.00",
-                deposit: "50.00",
-                duration: "75 Mins",
-                desc: "Full factory floor access, private heritage room tasting of 5 reserves, and gourmet pairings."
-            },
-            {
-                name: "Imperial Grand Tasting",
-                price: "290.00",
-                deposit: "100.00",
-                duration: "90 Mins",
-                desc: "Exclusive private session with the chief tea maker, custom blend workshop, and rare vintage tastings."
-            }
-        ];
+        // 01. Gongfu-Style Black Tea Brewing Experience
+        const gongfuPackage = {
+            id: "pkg-gongfu-01",
+            number: "01",
+            name: "Gongfu-Style Black Tea Brewing Experience",
+            tagline: "Handcrafted Ceylon Black Tea from the Uva Medium Region",
+            priceUsd: 4.754, // LKR 1450 at 305/USD
+            priceLkr: 1450,
+            duration: "1.5 – 2.0 Hours",
+            maxCapacity: 10,
+            image: "images/luxury_tea_tour.jpg"
+        };
 
         let html = `
-            <div class="tour-header-block">
-                <span class="section-tag">${_t('tours_header_tag', 'Exclusive Experiences')}</span>
-                <h2 class="view-title">${_t('tours_header_title', 'Heritage Estate Factory Tours')}</h2>
-                <p class="view-subtitle">${_t('tours_header_sub', 'Walk through history. Journey through our organic tea plantation, witness the artisan production, and taste the finest estate reserves.')}</p>
-            </div>
-            
-            <h3 class="subsection-title">1. ${_t('tours_header_title', 'Select Your Estate Experience Package')}</h3>
-            <div class="packages-grid">
-        `;
+            <!-- Header Block -->
+            <div class="tour-header-block" style="text-align: center; max-width: 860px; margin: 0 auto 2.5rem auto;">
+                <span class="section-tag" style="background: rgba(212,175,55,0.12); color: var(--color-gold); border: 1px solid rgba(212,175,55,0.3); padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 2px; display: inline-block; margin-bottom: 0.75rem;">
+                    Artisanal Ceylon Tea Experience
+                </span>
+                <h2 class="view-title" style="font-size: 2.4rem; font-family: var(--font-serif); color: var(--color-white); margin-bottom: 0.85rem;">
+                    Factory Tour Time Slots
+                </h2>
+                <p class="view-subtitle" style="font-size: 1.05rem; color: var(--color-text-muted); line-height: 1.7; margin-bottom: 1.75rem;">
+                    Experience the story of Rock One Wild Tea and discover how our handcrafted Ceylon Tea is made in our small family factory.
+                </p>
 
-        html += packages.map(pkg => `
-            <div class="package-card" data-package="${pkg.name}" data-deposit="${pkg.deposit}" data-price="${pkg.price}" style="background-image: url('images/luxury_tea_tour.jpg');">
-                <div class="package-header">
-                    <h4 class="package-name">${pkg.name}</h4>
-                    <span class="package-price">${window.TeaFactoryStore.formatCurrency(parseFloat(pkg.price))} <small>/ guest</small></span>
+                <!-- Tour Highlights Key Badges -->
+                <div style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                    <span style="background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,55,0.25); color: #e5e7eb; padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <strong>Monday – Saturday</strong> (Advance Booking)
+                    </span>
+                    <span style="background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,55,0.25); color: #e5e7eb; padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <strong>9:00 AM – 5:00 PM</strong>
+                    </span>
+                    <span style="background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,55,0.25); color: #e5e7eb; padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        <strong>Max 10 Visitors</strong> (No Minimum)
+                    </span>
+                    <span style="background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,55,0.25); color: #e5e7eb; padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 10"></polyline></svg>
+                        <strong>Duration: ~1.5 – 2 Hours</strong>
+                    </span>
                 </div>
-                <p class="package-desc">${pkg.desc}</p>
-                <div class="package-meta">
-                    <span class="meta-item">${SVG_ICONS.clock} ${pkg.duration} ${_t('tour_duration_label', 'Duration')}</span>
-                    <span class="meta-item gold-meta">${SVG_ICONS.dollar} ${window.TeaFactoryStore.formatCurrency(parseFloat(pkg.deposit))} ${_t('tour_deposit_card_label', 'Slot Deposit')}</span>
+            </div>
+
+            <!-- Operating Guidelines 4-Card Summary Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 3.5rem;">
+                <div style="background: rgba(6, 20, 12, 0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 12px; padding: 1.25rem; backdrop-filter: blur(8px);">
+                    <div style="color: var(--color-gold); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.4rem;">Operating Days</div>
+                    <div style="font-size: 1.05rem; font-weight: 600; color: #ffffff; margin-bottom: 0.25rem;">Monday – Saturday</div>
+                    <div style="font-size: 0.8rem; color: var(--color-text-muted);">Available by advance booking. Sunday reserved for family &amp; processing.</div>
+                </div>
+
+                <div style="background: rgba(6, 20, 12, 0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 12px; padding: 1.25rem; backdrop-filter: blur(8px);">
+                    <div style="color: var(--color-gold); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.4rem;">Opening Hours</div>
+                    <div style="font-size: 1.05rem; font-weight: 600; color: #ffffff; margin-bottom: 0.25rem;">9:00 AM – 5:00 PM</div>
+                    <div style="font-size: 0.8rem; color: var(--color-text-muted);">4 designated daily slots: 9:30 AM, 11:00 AM, 1:30 PM &amp; 3:30 PM.</div>
+                </div>
+
+                <div style="background: rgba(6, 20, 12, 0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 12px; padding: 1.25rem; backdrop-filter: blur(8px);">
+                    <div style="color: var(--color-gold); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.4rem;">Visitor Capacity</div>
+                    <div style="font-size: 1.05rem; font-weight: 600; color: #ffffff; margin-bottom: 0.25rem;">Max 10 / No Minimum</div>
+                    <div style="font-size: 0.8rem; color: var(--color-text-muted);">Private tours for individuals, couples and small groups are welcome.</div>
+                </div>
+
+                <div style="background: rgba(6, 20, 12, 0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 12px; padding: 1.25rem; backdrop-filter: blur(8px);">
+                    <div style="color: var(--color-gold); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.4rem;">Tour Duration</div>
+                    <div style="font-size: 1.05rem; font-weight: 600; color: #ffffff; margin-bottom: 0.25rem;">Approx. 1.5 – 2 Hours</div>
+                    <div style="font-size: 0.8rem; color: var(--color-text-muted);">Personalized, unhurried walk through our estate and handcrafted factory.</div>
                 </div>
             </div>
-        `).join('');
 
-        html += `
-            </div>
+            <!-- What the Experience May Include (Walkthrough Highlights) -->
+            <div style="background: linear-gradient(135deg, rgba(6, 24, 14, 0.85) 0%, rgba(4, 14, 8, 0.95) 100%); border: 1px solid rgba(212,175,55,0.3); border-radius: 16px; padding: 2.25rem 2rem; margin-bottom: 3.5rem; box-shadow: 0 12px 40px rgba(0,0,0,0.5);">
+                <div style="text-align: center; max-width: 680px; margin: 0 auto 1.75rem auto;">
+                    <span style="font-size: 0.75rem; color: var(--color-gold); text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">Estate Immersion</span>
+                    <h3 style="font-family: var(--font-serif); font-size: 1.8rem; color: var(--color-white); margin: 0.35rem 0 0.5rem 0;">What You Will Discover on Your Tour</h3>
+                    <p style="font-size: 0.88rem; color: var(--color-text-muted); line-height: 1.6;">Our guided experience opens the doors to our artisanal family craft and living highland ecosystem.</p>
+                </div>
 
-            <h3 class="subsection-title" style="margin-top: 3rem;">2. ${_t('tour_slots_card_label', 'Daily Tour Slots & Availability Timeline')}</h3>
-            <div class="timeline-container">
-                <div class="timeline-intro">
-                    <p>${_t('tours_header_sub', 'Select an hourly booking slot. Tours operate with limited capacity. A refundable seat deposit secures your slot.')}</p>
-                    <div class="timeline-legend">
-                        <span class="legend-item"><span class="bullet bullet-avail"></span> ${_t('status_available', 'Available')}</span>
-                        <span class="legend-item"><span class="bullet bullet-booked"></span> ${_t('status_reserved', 'Reserved')}</span>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: rgba(255,255,255,0.03); padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
+                        <span style="color: var(--color-gold); font-size: 1.1rem; line-height: 1;">✦</span>
+                        <div>
+                            <strong style="color: #ffffff; font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">History of Our Tea Garden</strong>
+                            <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Learn the origin of our Uva Medium estate, natural forest biome, and landmark rock formation.</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: rgba(255,255,255,0.03); padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
+                        <span style="color: var(--color-gold); font-size: 1.1rem; line-height: 1;">✦</span>
+                        <div>
+                            <strong style="color: #ffffff; font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Walk Through Our Family Tea Factory</strong>
+                            <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Step inside our small-batch processing rooms where the human touch guides every batch.</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: rgba(255,255,255,0.03); padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
+                        <span style="color: var(--color-gold); font-size: 1.1rem; line-height: 1;">✦</span>
+                        <div>
+                            <strong style="color: #ffffff; font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Traditional Handcrafted Production</strong>
+                            <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Understand the delicate techniques of artisan withering, rolling, oxidation, and wood-fired drying.</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: rgba(255,255,255,0.03); padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
+                        <span style="color: var(--color-gold); font-size: 1.1rem; line-height: 1;">✦</span>
+                        <div>
+                            <strong style="color: #ffffff; font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Tea Leaf Selection &amp; Processing</strong>
+                            <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Discover how carefully chosen leaf plucking produces distinctive aromas and tasting profiles.</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: rgba(255,255,255,0.03); padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
+                        <span style="color: var(--color-gold); font-size: 1.1rem; line-height: 1;">✦</span>
+                        <div>
+                            <strong style="color: #ffffff; font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Guided Tea Tasting Experience</strong>
+                            <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Taste and compare our pure Ceylon varieties brewed to perfection.</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: rgba(255,255,255,0.03); padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
+                        <span style="color: var(--color-gold); font-size: 1.1rem; line-height: 1;">✦</span>
+                        <div>
+                            <strong style="color: #ffffff; font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Q&amp;A &amp; Natural Surroundings</strong>
+                            <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Ample time to converse with our tea makers and enjoy the serene mountain sanctuary.</span>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- 01. Gongfu-Style Black Tea Brewing Experience Feature Block -->
+            <div id="featured-gongfu-experience" class="package-card selected" data-package="01. Gongfu-Style Black Tea Brewing Experience" data-deposit="2.00" data-price="4.754" style="background: linear-gradient(135deg, rgba(8, 32, 18, 0.92) 0%, rgba(4, 16, 10, 0.96) 100%); border: 1.5px solid var(--color-gold); border-radius: 18px; padding: 2.5rem 2.25rem; margin-bottom: 3.5rem; position: relative; overflow: hidden; box-shadow: 0 15px 50px rgba(0,0,0,0.6);">
+                <div style="position: absolute; top: 0; right: 0; background: linear-gradient(135deg, var(--color-gold), #b89127); color: #040e08; font-weight: 800; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; padding: 0.45rem 1.25rem; border-bottom-left-radius: 14px;">
+                    Signature Visitor Experience &bull; 01
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                    <div>
+                        <span style="color: var(--color-gold); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">Experience 01</span>
+                        <h3 style="font-family: var(--font-serif); font-size: 2.1rem; color: var(--color-white); margin: 0.25rem 0 0.4rem 0;">
+                            Gongfu-Style Black Tea Brewing Experience
+                        </h3>
+                        <div style="color: #cbd5e1; font-size: 0.95rem; font-style: italic;">
+                            Handcrafted Ceylon Black Tea from the Uva Medium region
+                        </div>
+                    </div>
+                    <div style="background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.35); border-radius: 12px; padding: 0.85rem 1.4rem; text-align: right;">
+                        <span style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; display: block;">Per Person Fee</span>
+                        <div style="font-size: 1.8rem; font-family: var(--font-serif); font-weight: 700; color: var(--color-gold);">
+                            LKR 1,450
+                        </div>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">(approx. $4.75 USD / €4.40 EUR)</span>
+                    </div>
+                </div>
+
+                <!-- Story & Narrative Introduction -->
+                <div style="color: #e2e8f0; font-size: 0.95rem; line-height: 1.8; margin-bottom: 1.75rem; border-left: 3px solid var(--color-gold); padding-left: 1.25rem;">
+                    <p style="margin: 0 0 0.85rem 0;">
+                        Begin your Rock One Wild Tea experience with a traditional <strong>Gongfu-style brewing session</strong> using our handcrafted Ceylon Black Tea from the Uva Medium region.
+                    </p>
+                    <p style="margin: 0 0 0.85rem 0;">
+                        Before brewing, our tea host will introduce you to the story of our tea — where it comes from, how the leaves are selected, and how we carefully transform fresh tea leaves into our handcrafted black tea.
+                    </p>
+                    <p style="margin: 0; color: #fde047; font-weight: 500;">
+                        You will then prepare the tea yourself, following the Gongfu-style brewing method.
+                    </p>
+                </div>
+
+                <!-- What You Will Experience Checklist -->
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--color-gold); font-size: 1.05rem; font-family: var(--font-serif); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>✦</span> What You Will Experience
+                    </h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.75rem;">
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
+                            <span style="color: var(--color-gold); font-weight: bold;">•</span> A brief introduction to our Uva Medium tea garden
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
+                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Learn about the tea leaves used to make our black tea
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
+                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Introduction to our handcrafted black tea production process
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
+                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Learn how Gongfu-style brewing works
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
+                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Measure the tea leaves and prepare your own brew
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
+                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Observe how the whole tea leaves gradually open during brewing
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
+                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Smell the tea before and after brewing
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
+                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Taste the tea through several short infusions
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
+                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Notice how the aroma, flavour and aftertaste develop with each infusion
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Philosophy Box: A Tea Experience, Not Just a Cup of Tea -->
+                <div style="background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.35); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <h5 style="color: var(--color-gold); font-size: 0.98rem; font-family: var(--font-serif); margin: 0 0 0.6rem 0;">
+                        A Tea Experience, Not Just a Cup of Tea
+                    </h5>
+                    <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.7; margin: 0 0 0.75rem 0;">
+                        Gongfu-style brewing allows you to slow down and pay attention to the tea. Rather than simply drinking one cup, you will experience how the same tea can reveal different aromas, flavours and sensations through multiple infusions.
+                    </p>
+                    <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.7; margin: 0 0 0.85rem 0;">
+                        Our tea host will guide you throughout the session and explain what you are experiencing, while giving you the freedom to discover the character of the tea for yourself.
+                    </p>
+                    <div style="font-family: var(--font-serif); font-size: 1.05rem; color: #ffd875; letter-spacing: 1px; text-transform: uppercase;">
+                        Take your time. Observe. Smell. Taste. Discover.
+                    </div>
+                </div>
+
+                <!-- Included in Experience & Action Row -->
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap; border-top: 1px solid rgba(212,175,55,0.25); padding-top: 1.5rem;">
+                    <div>
+                        <span style="font-size: 0.78rem; text-transform: uppercase; color: var(--color-gold); letter-spacing: 1.5px; font-weight: 700; display: block; margin-bottom: 0.5rem;">
+                            Included in the Experience
+                        </span>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.6rem 1.25rem; font-size: 0.82rem; color: #e2e8f0;">
+                            <span><strong style="color:#86efac;">✓</strong> Handcrafted Rock One Wild Tea Black Tea</span>
+                            <span><strong style="color:#86efac;">✓</strong> Gongfu-style brewing session</span>
+                            <span><strong style="color:#86efac;">✓</strong> Tea host guidance</span>
+                            <span><strong style="color:#86efac;">✓</strong> Multiple tea infusions</span>
+                            <span><strong style="color:#86efac;">✓</strong> Tea tasting experience</span>
+                            <span><strong style="color:#86efac;">✓</strong> Introduction to tea garden &amp; production</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-primary btn-book-slot" data-id="1" data-timeslot="09:30 AM" style="padding: 0.95rem 2rem; font-size: 0.95rem; white-space: nowrap; box-shadow: 0 4px 20px rgba(212,175,55,0.3);">
+                            Reserve Gongfu Experience (LKR 1,450)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Available Tour Time Slots Timeline -->
+            <div style="margin-top: 3.5rem;">
+                <div style="text-align: center; max-width: 720px; margin: 0 auto 2rem auto;">
+                    <span class="section-tag" style="background: rgba(212,175,55,0.12); color: var(--color-gold); border: 1px solid rgba(212,175,55,0.3); padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 2px; display: inline-block; margin-bottom: 0.5rem;">
+                        Available Tour Time Slots
+                    </span>
+                    <h3 class="subsection-title" style="font-size: 1.9rem; margin-bottom: 0.5rem;">
+                        Daily Tour Time Slots &amp; Availability
+                    </h3>
+                    <p style="color: var(--color-text-muted); font-size: 0.9rem;">
+                        Select your preferred daily time slot. Each session is capped at 10 visitors to preserve intimacy.
+                    </p>
+                    <div class="timeline-legend" style="margin-top: 1rem; display: flex; justify-content: center; gap: 1.5rem;">
+                        <span class="legend-item"><span class="bullet bullet-avail"></span> Available (Advance Booking)</span>
+                        <span class="legend-item"><span class="bullet bullet-booked"></span> Fully Booked</span>
+                    </div>
+                </div>
+
                 <div class="slots-timeline">
         `;
 
+        // Map through slots
         html += slots.map((slot, idx) => {
-            const timeStr = slot.timeSlot || slot.time_slot || slot.time || '09:00 AM - 10:00 AM';
-            const pkgName = (slot.booking && slot.booking.package) || slot.package || slot.name || 'Silver Leaf Tour';
-            const isBooked = slot.status === 'Booked' || (slot.booked_seats >= (slot.max_capacity || 12));
+            const timeStr = slot.timeSlot || slot.time_slot || slot.time || '09:30 AM';
+            const pkgName = (slot.booking && slot.booking.package) || slot.package || slot.name || 'Gongfu-Style Black Tea Brewing Experience';
+            const isBooked = slot.status === 'Booked' || (slot.booked_seats >= (slot.max_capacity || 10));
             const alignClass = idx % 2 === 0 ? 'left-aligned' : 'right-aligned';
             const statusBadge = isBooked 
                 ? `<span class="slot-status-badge booked">${_t('status_reserved', 'Reserved')}</span>` 
                 : `<span class="slot-status-badge available">${_t('status_available', 'Available')}</span>`;
 
+            // Sub-descriptions for the 4 slots
+            let slotSubtitle = "Factory walkthrough & Gongfu-style black tea brewing session.";
+            if (timeStr.includes('09:30') || timeStr.includes('9:30')) {
+                slotSubtitle = "Morning Session &bull; Fresh garden mountain air & first leaf harvest walkthrough.";
+            } else if (timeStr.includes('11:00')) {
+                slotSubtitle = "Midday Session &bull; Orthodox artisan rolling & master tea processing introduction.";
+            } else if (timeStr.includes('01:30') || timeStr.includes('1:30')) {
+                slotSubtitle = "Afternoon Session &bull; Guided Gongfu brewing and multi-infusion tasting ritual.";
+            } else if (timeStr.includes('03:30') || timeStr.includes('3:30')) {
+                slotSubtitle = "Late Afternoon Session &bull; Serene highland golden hour cupping & garden walk.";
+            }
+
             return `
                 <div class="timeline-item ${alignClass}">
                     <div class="timeline-dot"></div>
-                    <div class="timeline-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.75rem;">
-                            <span class="slot-time" style="font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600; color: var(--color-white);">${timeStr}</span>
+                    <div class="timeline-card" style="background: rgba(6, 22, 13, 0.9); border: 1px solid rgba(212,175,55,0.3); border-radius: 14px; padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.75rem;">
+                            <div>
+                                <span class="slot-time" style="font-family: var(--font-serif); font-size: 1.3rem; font-weight: 700; color: var(--color-white);">${timeStr}</span>
+                                <span style="display: block; font-size: 0.72rem; color: var(--color-gold); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.15rem;">Duration: ~1.5 - 2.0 Hours</span>
+                            </div>
                             ${statusBadge}
                         </div>
-                        <div style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.5; margin-top: 0.75rem;">
+                        <div style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6; margin-top: 0.85rem;">
                             ${isBooked ? `
                                 <div style="color: var(--color-text-muted); font-size: 0.85rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
                                     <span style="color: var(--color-gold); display: inline-flex; align-items: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span> Fully Booked &bull; Private Session
                                 </div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 0.6rem;">
-                                    <span style="font-size: 0.75rem; color: var(--color-text-muted);">Estate Sommelier Tour</span>
+                                    <span style="font-size: 0.75rem; color: var(--color-text-muted);">Estate Experience</span>
                                     <span class="slot-pkg-badge" style="color: var(--color-gold); font-size: 0.7rem; text-transform: uppercase; font-weight: 600;">${pkgName}</span>
                                 </div>
                             ` : `
-                                <div style="margin-bottom: 1rem;">Available for heritage factory tour &amp; organic gardens tasting.</div>
-                                <button class="btn btn-outline btn-book-slot" data-id="${slot.id}" data-timeslot="${timeStr}" style="width: 100%; text-align: center;">${_t('btn_book_slot', 'Book Slot')}</button>
+                                <div style="margin-bottom: 1rem; color: #cbd5e1;">${slotSubtitle}</div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; background: rgba(0,0,0,0.3); padding: 0.5rem 0.75rem; border-radius: 8px;">
+                                    <span style="font-size: 0.78rem; color: #94a3b8;">Rate / Guest:</span>
+                                    <strong style="color: var(--color-gold); font-size: 0.95rem;">LKR 1,450 <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">($4.75)</span></strong>
+                                </div>
+                                <button class="btn btn-primary btn-book-slot" data-id="${slot.id}" data-timeslot="${timeStr}" style="width: 100%; text-align: center; font-size: 0.88rem; padding: 0.75rem 1rem;">
+                                    Book ${timeStr} Slot
+                                </button>
                             `}
                         </div>
                     </div>
@@ -567,19 +793,38 @@ const UIComponents = {
         html += `
                 </div>
             </div>
+
+            <!-- Holidays, Closures & Advance Booking Requirements Notice -->
+            <div style="background: linear-gradient(135deg, rgba(32, 20, 4, 0.75) 0%, rgba(14, 10, 4, 0.85) 100%); border: 1.5px solid rgba(212,175,55,0.45); border-radius: 14px; padding: 1.75rem 2rem; margin-top: 3.5rem;">
+                <div style="display: flex; gap: 1rem; align-items: flex-start; flex-wrap: wrap;">
+                    <div style="background: rgba(212,175,55,0.15); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-gold);">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    </div>
+                    <div style="flex: 1; min-width: 260px;">
+                        <h4 style="color: #ffd875; font-family: var(--font-serif); font-size: 1.15rem; margin: 0 0 0.5rem 0;">
+                            Booking Requirements, Holidays &amp; Closures
+                        </h4>
+                        <p style="color: #e2e8f0; font-size: 0.88rem; line-height: 1.7; margin: 0 0 0.6rem 0;">
+                            <strong>Advance booking is required.</strong> Please contact us before your visit to confirm your date, preferred time slot, and number of visitors. For larger groups or customized tea experiences, kindly reach out in advance.
+                        </p>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; line-height: 1.6; margin: 0 0 1rem 0;">
+                            <em>Notice:</em> The factory may be closed on Sundays, public holidays, and selected days for family or tea-production activities. Please contact us before travelling to confirm availability.
+                        </p>
+                        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                            <a href="https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20Factory%20Tour%20and%20Gongfu%20Brewing%20Experience." target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="border-color: #25D366; color: #25D366; font-size: 0.82rem; padding: 0.55rem 1.15rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                                WhatsApp Concierge (+94 77 175 7556)
+                            </a>
+                            <span style="font-size: 0.8rem; color: var(--color-text-muted);">
+                                We look forward to welcoming you to Rock One Wild Tea and sharing our tea, our story and our way of life with you.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         `;
 
         container.innerHTML = html;
-
-        // Add package selection triggers
-        const cards = container.querySelectorAll('.package-card');
-        cards.forEach((card, idx) => {
-            if (idx === 1) card.classList.add('selected'); // default selection is Sommelier
-            card.addEventListener('click', () => {
-                cards.forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-            });
-        });
     },
 
     // 4. Render Admin Management Dashboard

@@ -323,13 +323,10 @@ function seedInitialData() {
         `);
 
         const defaultTourSlots = [
-            { id: 'tour-01', tour_date: '2026-09-05', time_slot: '08:30 AM', name: 'Sunrise Wild Terroir Trek & Dawn Plucking', category: 'terroir_trek', max_capacity: 8, booked_seats: 4, price_usd: 85.0 },
-            { id: 'tour-02', tour_date: '2026-09-05', time_slot: '11:00 AM', name: 'Orthodox Rolling & Wood-Fired Kiln Masterclass', category: 'factory_masterclass', max_capacity: 12, booked_seats: 6, price_usd: 65.0 },
-            { id: 'tour-03', tour_date: '2026-09-05', time_slot: '03:00 PM', name: 'Connoisseur Reserve Tea Cupping & Sommelier Flight', category: 'sommelier_flight', max_capacity: 10, booked_seats: 3, price_usd: 75.0 },
-            { id: 'tour-04', tour_date: '2026-09-06', time_slot: '08:30 AM', name: 'Sunrise Wild Terroir Trek & Dawn Plucking', category: 'terroir_trek', max_capacity: 8, booked_seats: 2, price_usd: 85.0 },
-            { id: 'tour-05', tour_date: '2026-09-06', time_slot: '11:00 AM', name: 'Orthodox Rolling & Wood-Fired Kiln Masterclass', category: 'factory_masterclass', max_capacity: 12, booked_seats: 8, price_usd: 65.0 },
-            { id: 'tour-06', tour_date: '2026-09-06', time_slot: '03:00 PM', name: 'Connoisseur Reserve Tea Cupping & Sommelier Flight', category: 'sommelier_flight', max_capacity: 10, booked_seats: 5, price_usd: 75.0 },
-            { id: 'tour-07', tour_date: '2026-09-07', time_slot: '11:00 AM', name: 'Orthodox Rolling & Wood-Fired Kiln Masterclass', category: 'factory_masterclass', max_capacity: 12, booked_seats: 1, price_usd: 65.0 }
+            { id: 'tour-01', tour_date: '2026-09-05', time_slot: '09:30 AM', name: '01. Gongfu-Style Black Tea Brewing Experience', category: 'gongfu_experience', max_capacity: 10, booked_seats: 2, price_usd: 4.75 },
+            { id: 'tour-02', tour_date: '2026-09-05', time_slot: '11:00 AM', name: '01. Gongfu-Style Black Tea Brewing Experience', category: 'gongfu_experience', max_capacity: 10, booked_seats: 0, price_usd: 4.75 },
+            { id: 'tour-03', tour_date: '2026-09-05', time_slot: '01:30 PM', name: '01. Gongfu-Style Black Tea Brewing Experience', category: 'gongfu_experience', max_capacity: 10, booked_seats: 1, price_usd: 4.75 },
+            { id: 'tour-04', tour_date: '2026-09-05', time_slot: '03:30 PM', name: '01. Gongfu-Style Black Tea Brewing Experience', category: 'gongfu_experience', max_capacity: 10, booked_seats: 0, price_usd: 4.75 }
         ];
 
         defaultTourSlots.forEach(t => {
