@@ -3978,7 +3978,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <!-- Footer -->
     <div class="cert-footer">
         <p>Rock One Wild Tea (Pvt) Ltd · Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka</p>
-        <p>rockonewild@gmail.com · +94 77 320 9950 · rockonewildtea.com</p>
+        <p>rockonewild@gmail.com · Call: +94 76 789 7817 · WhatsApp: +94 77 320 9950 · rockonewildtea.com</p>
         <p style="margin-top: 3px; font-style: italic; font-size: 8px; color: #b09040;">
             This certificate is an official allocation record issued by Rock One Wild Tea Estate. It does not constitute a final receipt until payment is fully confirmed.
         </p>
@@ -6337,7 +6337,7 @@ PROJECT DETAILS & REQUIREMENTS:
 
 ============================================================
 Sent from Rock One Wild Tea Official Portal
-Direct Inbox: rockonewild@gmail.com | WhatsApp: +94 77 320 9950
+Direct Inbox: rockonewild@gmail.com | Voice Hotline: +94 76 789 7817 | WhatsApp: +94 77 320 9950
 Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             `.trim();
 

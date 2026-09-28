@@ -84,7 +84,7 @@ async function sendInquiryEmails(inquiry) {
 
                     <!-- Footer -->
                     <div style="text-align: center; margin-top: 30px; color: #888; font-size: 11px; line-height: 1.5;">
-                        <p>Rock One Wild Tea Estate &bull; Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka<br>Direct WhatsApp Desk: +94 77 320 9950</p>
+                        <p>Rock One Wild Tea Estate &bull; Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka<br>Direct Voice Hotline: +94 76 789 7817 &bull; WhatsApp Desk: +94 77 320 9950</p>
                     </div>
                 </div>
             `
@@ -119,11 +119,13 @@ async function sendInquiryEmails(inquiry) {
                             Our Master Tea Sommelier and estate team are reviewing your dossier and will reply to you within <strong>24 business hours</strong>.
                         </p>
 
-                        <!-- Priority WhatsApp Box -->
+                        <!-- Priority Assistance Box -->
                         <div style="background: rgba(37, 211, 102, 0.1); border: 1px solid rgba(37, 211, 102, 0.3); border-radius: 8px; padding: 16px; margin: 25px 0; text-align: center;">
                             <p style="margin: 0 0 8px 0; font-size: 13px; color: #4ade80; font-weight: bold;">Need Immediate Concierge Assistance?</p>
-                            <p style="margin: 0; font-size: 12px; color: #d1d5db;">You can message our direct WhatsApp allocation line at:</p>
-                            <p style="margin: 8px 0 0 0; font-size: 15px; font-weight: bold; color: #ffffff;">+94 77 320 9950</p>
+                            <p style="margin: 0; font-size: 12px; color: #d1d5db;">You can call our direct hotline or chat with our WhatsApp desk:</p>
+                            <p style="margin: 8px 0 0 0; font-size: 14px; font-weight: bold; color: #ffffff;">
+                                Voice: +94 76 789 7817 &bull; WhatsApp: +94 77 320 9950
+                            </p>
                         </div>
                     </div>
 
@@ -370,7 +372,7 @@ async function sendOrderConfirmationEmails(order) {
                         <!-- Footer -->
                         <div style="text-align: center; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #888; font-size: 11px; line-height: 1.6;">
                             <p style="color: #d4af37; font-weight: bold; margin-bottom: 4px;">ROCK ONE WILD TEA ESTATE</p>
-                            <p>Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Sri Lanka<br>Direct WhatsApp Desk: +94 77 320 9950</p>
+                            <p>Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Sri Lanka<br>Direct Voice Hotline: +94 76 789 7817 &bull; WhatsApp Desk: +94 77 320 9950</p>
                         </div>
                     </div>
                 `
@@ -577,7 +579,7 @@ async function sendTourConfirmationEmails(booking) {
                         <!-- Footer -->
                         <div style="text-align: center; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #888; font-size: 11px; line-height: 1.6;">
                             <p style="color: #d4af37; font-weight: bold; margin-bottom: 4px;">ROCK ONE WILD TEA ESTATE</p>
-                            <p>Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Sri Lanka<br>Direct WhatsApp Concierge: +94 77 320 9950</p>
+                            <p>Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Sri Lanka<br>Direct Voice Hotline: +94 76 789 7817 &bull; Direct WhatsApp Concierge: +94 77 320 9950</p>
                         </div>
                     </div>
                 `

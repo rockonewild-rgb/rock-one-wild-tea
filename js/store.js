@@ -1702,7 +1702,7 @@ Warm regards,
 Rock One Wild Tea (Pvt) Limited
 Family Tea Garden & Boutique Factory
 Uva Medium Region, Sri Lanka
-WhatsApp Concierge: +94 77 320 9950
+Direct Hotline: +94 76 789 7817 | WhatsApp: +94 77 320 9950
 `.trim();
 
         this.state.emailLogs.unshift({
@@ -1948,7 +1948,7 @@ Our Master Tea Sommelier & Private Ledger Registrar will review your request and
 With distinguished regards,
 Rock One Wild Tea Estate Sanctuary
 Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
-Direct Desk: +94 77 320 9950 | rockonewild@gmail.com
+Direct Desk: +94 76 789 7817 (Voice) | +94 77 320 9950 (WhatsApp) | rockonewild@gmail.com
         `.trim();
 
         this.state.emailLogs.unshift({
@@ -2166,7 +2166,7 @@ Estimated Dispatch Range: ${order.deliveryRange}
 Payment Mode: ${order.paymentMethod === 'bank' ? 'Bank Cash Deposit' : 'Online Payment Gateway'}
 Reference ID: ${order.id}
 
-Our Master Concierge will review your dispatch instructions. For immediate support, reply to this email or reach us on WhatsApp: +94 77 320 9950.
+Our Master Concierge will review your dispatch instructions. For immediate support, call us at +94 76 789 7817, reach us on WhatsApp at +94 77 320 9950, or reply to this email.
 
 With warm regards,
 Rock One Wild Tea Sanctuary Concierge Team

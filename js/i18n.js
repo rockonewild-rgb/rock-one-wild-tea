@@ -1475,8 +1475,9 @@
                     category: "CONCIERGE",
                     iconKey: "phone",
                     question: "How can I speak directly with the master tea maker?",
-                    answer: "You can reach our Master Tea Concierge directly by phone at **+94 77 320 9950**, email at **rockonewild@gmail.com**, or directly via WhatsApp.",
+                    answer: "You can reach our Master Tea Concierge directly by voice call at **+94 76 789 7817**, on WhatsApp at **+94 77 320 9950**, or via email at **rockonewild@gmail.com**.",
                     actions: [
+                        { label: "Call Hotline", href: "tel:+94767897817" },
                         { label: "Open WhatsApp Chat", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],
                     followUps: [0, 2, 4]
@@ -1608,8 +1609,9 @@
                     category: "සේවා කවුළුව",
                     iconKey: "phone",
                     question: "ප්‍රධාන තේ විශේෂඥයා සමග සෘජුව සම්බන්ධ වන්නේ කෙසේද?",
-                    answer: "අපගේ ප්‍රධාන තේ සේවා කවුළුව **+94 77 320 9950**, විද්‍යුත් තැපෑල **rockonewild@gmail.com** හෝ WhatsApp මගින් සෘජුවම සම්බන්ධ කරගත හැක.",
+                    answer: "අපගේ ප්‍රධාන තේ සේවා කවුළුව ඇමතුම් මගින් **+94 76 789 7817**, WhatsApp මගින් **+94 77 320 9950**, හෝ විද්‍යුත් තැපෑල **rockonewild@gmail.com** මගින් සෘජුවම සම්බන්ධ කරගත හැක.",
                     actions: [
+                        { label: "දුරකථන ඇමතුමක් ලබාගන්න", href: "tel:+94767897817" },
                         { label: "WhatsApp විවෘත කරන්න", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],
                     followUps: [0, 2, 4]
@@ -1741,8 +1743,9 @@
                     category: "உதவி மையம்",
                     iconKey: "phone",
                     question: "முதன்மை தேயிலை தயாரிப்பாளரை எவ்வாறு தொடர்புகொள்வது?",
-                    answer: "எமது உதவி மையத்தை **+94 77 320 9950** தொலைபேசி, **rockonewild@gmail.com** மின்னஞ்சல் அல்லது WhatsApp மூலம் நேரடியாகத் தொடர்பு கொள்ளலாம்.",
+                    answer: "எமது உதவி மையத்தை நேரடி அழைப்பு **+94 76 789 7817**, WhatsApp **+94 77 320 9950**, அல்லது **rockonewild@gmail.com** மின்னஞ்சல் மூலம் நேரடியாகத் தொடர்பு கொள்ளலாம்.",
                     actions: [
+                        { label: "அழைக்க", href: "tel:+94767897817" },
                         { label: "WhatsApp தொடர்பு", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],
                     followUps: [0, 2, 4]
@@ -2140,8 +2143,9 @@
                     category: "الكونسيرج",
                     iconKey: "phone",
                     question: "كيف أتواصل مباشرة مع خبير صناعة الشاي في المزرعة؟",
-                    answer: "يمكنك التواصل مع مكتب الكونسيرج عبر الهاتف **+94 77 320 9950** أو البريد الإلكتروني **rockonewild@gmail.com** أو مباشرة عبر الواتساب.",
+                    answer: "يمكنك التواصل مع مكتب الكونسيرج عبر الهاتف المباشر **+94 76 789 7817** أو عبر الواتساب **+94 77 320 9950** أو البريد الإلكتروني **rockonewild@gmail.com**.",
                     actions: [
+                        { label: "الاتصال بالهاتف", href: "tel:+94767897817" },
                         { label: "محادثة عبر واتساب", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],
                     followUps: [0, 2, 4]
