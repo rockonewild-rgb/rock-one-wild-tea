@@ -6222,12 +6222,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function bindGalleryEvents() {
         const cards = document.querySelectorAll('.gallery-item-card');
+        const filterBtns = document.querySelectorAll('.gallery-filter-btn');
         const lightbox = document.getElementById('gallery-lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
         const lightboxCaption = document.getElementById('lightbox-caption');
         const lightboxClose = document.getElementById('lightbox-close');
         const lightboxPrev = document.getElementById('lightbox-prev');
         const lightboxNext = document.getElementById('lightbox-next');
+
+        // Gallery Filter Buttons
+        if (filterBtns.length > 0 && cards.length > 0) {
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => {
+                        b.classList.remove('active');
+                        b.style.background = 'rgba(0,0,0,0.5)';
+                        b.style.color = '#e2e8f0';
+                        b.style.borderColor = 'rgba(212,175,55,0.35)';
+                    });
+                    btn.classList.add('active');
+                    btn.style.background = 'var(--color-gold, #d4af37)';
+                    btn.style.color = '#040e08';
+                    btn.style.borderColor = 'var(--color-gold, #d4af37)';
+
+                    const filter = (btn.getAttribute('data-filter') || 'all').toLowerCase();
+                    cards.forEach(card => {
+                        const tag = (card.getAttribute('data-tag') || '').toLowerCase();
+                        if (filter === 'all' || tag.includes(filter) || filter.includes(tag)) {
+                            card.style.display = '';
+                            card.style.opacity = '1';
+                            card.style.transform = 'scale(1)';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        }
 
         if (!lightbox || !lightboxImg) return;
 
@@ -6239,9 +6270,13 @@ document.addEventListener('DOMContentLoaded', () => {
         function showImage(idx) {
             currentIdx = (idx + galleryImages.length) % galleryImages.length;
             const imgObj = galleryImages[currentIdx];
+            if (!imgObj) return;
             lightboxImg.src = imgObj.src;
             
             let captionText = imgObj.caption || `Estate Photograph ${currentIdx + 1} of ${galleryImages.length}`;
+            if (imgObj.tag) {
+                captionText = `[${imgObj.tag}] ${captionText}`;
+            }
             if (lightboxCaption) {
                 lightboxCaption.innerText = captionText;
             }
@@ -6250,9 +6285,11 @@ document.addEventListener('DOMContentLoaded', () => {
         cards.forEach(card => {
             card.addEventListener('click', () => {
                 const idx = parseInt(card.getAttribute('data-index'));
-                showImage(idx);
-                lightbox.classList.add('active');
-                document.body.style.overflow = 'hidden';
+                if (!isNaN(idx)) {
+                    showImage(idx);
+                    lightbox.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
             });
         });
 

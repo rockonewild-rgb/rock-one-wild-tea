@@ -2434,21 +2434,53 @@ const UIComponents = {
         if (!container) return;
 
         const galleryImages = window.TeaFactoryStore.getGalleryImages();
+        const totalPhotos = galleryImages.length;
+        const estateCount = galleryImages.filter(g => (g.tag || '').includes('Estate')).length;
+        const landmarkCount = galleryImages.filter(g => (g.tag || '').includes('Landmarks') || (g.tag || '').includes('Terroir')).length;
+        const packagingCount = galleryImages.filter(g => (g.tag || '').includes('Packaging')).length;
 
         let html = `
-            <div class="gallery-header-block" style="margin-bottom: 3rem;">
-                <span class="section-tag">Visual Heritage</span>
-                <h2 class="view-title">Estate Gallery</h2>
-                <p class="view-subtitle">Explore the breathtaking scenery of our wild high-elevation tea plantations, artisanal manufacturing, and luxury packing operations.</p>
+            <div class="gallery-header-block" style="margin-bottom: 2.5rem; text-align: center;">
+                <span class="section-tag">Visual Terroir &amp; Craft</span>
+                <h2 class="view-title">Rock One Wild Tea Photographic Gallery</h2>
+                <p class="view-subtitle" style="max-width: 780px; margin: 0 auto 1.75rem auto;">
+                    Immerse yourself in authentic visuals from our family tea garden in Ettampitiya (elevation 1,240m), artisanal hand-harvesting, orthodox wood-firing, and surrounding landmark waterfalls.
+                </p>
+
+                <!-- Category Filter Pills -->
+                <div class="gallery-filter-bar" style="display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem;">
+                    <button type="button" class="gallery-filter-btn active" data-filter="all" style="padding: 0.5rem 1.1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.25s ease; background: var(--color-gold); color: #040e08; border: 1px solid var(--color-gold);">
+                        All Photos (${totalPhotos})
+                    </button>
+                    <button type="button" class="gallery-filter-btn" data-filter="Estate & Harvest" style="padding: 0.5rem 1.1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.25s ease; background: rgba(0,0,0,0.5); color: #e2e8f0; border: 1px solid rgba(212,175,55,0.35);">
+                        🌱 Estate &amp; Hand-Plucking (${estateCount})
+                    </button>
+                    <button type="button" class="gallery-filter-btn" data-filter="Landmarks & Terroir" style="padding: 0.5rem 1.1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.25s ease; background: rgba(0,0,0,0.5); color: #e2e8f0; border: 1px solid rgba(212,175,55,0.35);">
+                        ⛰️ Landmark Waterfalls &amp; Mountains (${landmarkCount})
+                    </button>
+                    <button type="button" class="gallery-filter-btn" data-filter="Packaging & Reserves" style="padding: 0.5rem 1.1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.25s ease; background: rgba(0,0,0,0.5); color: #e2e8f0; border: 1px solid rgba(212,175,55,0.35);">
+                        📦 Teak Chests &amp; Packaging (${packagingCount})
+                    </button>
+                </div>
             </div>
 
-            <div class="gallery-grid-layout" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 4rem;">
+            <div class="gallery-grid-layout" id="gallery-grid-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1.5rem; margin-bottom: 4rem;">
                 ${galleryImages.map((imgObj, index) => `
-                    <div class="gallery-item-card" data-index="${index}" data-id="${imgObj.id}" style="position: relative; overflow: hidden; border-radius: 6px; border: var(--border-gold); aspect-ratio: 4/3; cursor: pointer; background: #000; transition: var(--transition-smooth);">
+                    <div class="gallery-item-card" data-index="${index}" data-id="${imgObj.id}" data-tag="${imgObj.tag || 'Estate & Harvest'}" style="position: relative; overflow: hidden; border-radius: 10px; border: 1px solid rgba(212,175,55,0.3); aspect-ratio: 4/3; cursor: pointer; background: #040e08; transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;">
                         <img src="${imgObj.src}" alt="${imgObj.caption || 'Estate Scene'}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); display: block;" loading="lazy" onerror="window.handleImageError && window.handleImageError(this, 'gallery')">
-                        <div class="gallery-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 60%); opacity: 0; transition: var(--transition-smooth); display: flex; flex-direction: column; justify-content: flex-end; padding: 1.25rem;">
-                            <span style="color: var(--color-gold); font-family: var(--font-serif); font-size: 0.95rem; font-weight: 500; letter-spacing: 0.5px;">${imgObj.caption || 'Estate Photograph'}</span>
-                            <span style="color: var(--color-text-muted); font-size: 0.75rem; margin-top: 0.25rem;">${imgObj.tag || 'Estate & Harvest'}</span>
+                        <div class="gallery-overlay" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(4,14,8,0.92) 0%, rgba(4,14,8,0.3) 50%, rgba(0,0,0,0) 100%); opacity: 0; transition: opacity 0.3s ease; display: flex; flex-direction: column; justify-content: flex-end; padding: 1.25rem;">
+                            <div style="margin-bottom: 0.35rem;">
+                                <span style="background: rgba(212,175,55,0.25); color: var(--color-gold); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 0.2rem 0.55rem; border-radius: 12px; border: 1px solid rgba(212,175,55,0.45); display: inline-block;">
+                                    ${imgObj.tag || 'Estate & Harvest'}
+                                </span>
+                            </div>
+                            <span style="color: #ffffff; font-family: var(--font-serif); font-size: 0.95rem; font-weight: 600; line-height: 1.35; letter-spacing: 0.3px;">
+                                ${imgObj.caption || 'Estate Photograph'}
+                            </span>
+                            <span style="color: #a7f3d0; font-size: 0.72rem; margin-top: 0.4rem; display: flex; align-items: center; gap: 0.3rem;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                Click to enlarge in HD Lightbox
+                            </span>
                         </div>
                     </div>
                 `).join('')}
@@ -2491,7 +2523,7 @@ const UIComponents = {
                     </div>
                 </div>
                 <div class="heritage-visual-wrapper">
-                    <img src="images/luxury_tea_estate.jpg" alt="Rock One Wild Tea Garden - Forested Rock Formation Terroir" onerror="window.handleImageError && window.handleImageError(this, 'gallery')" loading="lazy" decoding="async">
+                    <img src="images/tea_garden_hand_plucking.jpg" alt="Rock One Wild Tea Garden - Forested Rock Formation Terroir & Dawn Hand-Plucking" onerror="window.handleImageError && window.handleImageError(this, 'gallery')" loading="lazy" decoding="async">
                     <div class="card-image-overlay"></div>
                 </div>
             </div>

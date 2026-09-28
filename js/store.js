@@ -41,17 +41,86 @@ const DEFAULT_ANNOUNCEMENTS = [
 ];
 
 const DEFAULT_GALLERY_IMAGES = [
-    "1 (1).jpeg", "1 (2).jpeg", "1 (3).jpeg", "1 (4).jpeg", "1 (5).jpeg",
-    "1 (6).jpeg", "1 (7).jpeg", "1 (8).jpeg", "1 (9).jpeg", "1 (10).jpeg",
-    "1 (12).jpeg", "1 (13).jpeg", "1 (14).jpeg", "1 (15).jpeg", "1 (16).jpeg",
-    "1 (17).jpeg", "1 (18).jpeg", "1 (19).jpeg", "1 (20).jpeg", "1 (21).jpeg",
-    "1 (22).jpeg", "1 (23).jpeg", "1 (24).jpeg", "1 (25).jpeg", "1 (26).jpeg",
-    "1 (27).jpeg", "1 (28).jpeg", "1 (29).jpeg", "Gift box 2.jpeg", "WhatsApp Image 2026-08-13 at 10.50.29 AM.jpeg"
-].map((img, i) => ({
-    id: `g_${i + 1}`,
-    src: `images/${encodeURIComponent(img)}`,
-    tag: img.includes('Gift box') ? 'Packaging & Reserves' : 'Estate & Harvest'
-}));
+    {
+        id: "g_featured_01",
+        src: "images/tea_garden_hand_plucking.jpg",
+        caption: "Dawn Hand-Plucking in Our Wild Tea Garden — Selective Two Leaves & A Bud",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_landmark_mana",
+        src: "images/landmark_mana_ella.jpg",
+        caption: "Mana Ella Waterfall — 15–18 km from Estate (Lunuwatta Valley)",
+        tag: "Landmarks & Terroir"
+    },
+    {
+        id: "g_landmark_sthreepura",
+        src: "images/landmark_sthreepura_cave.jpg",
+        caption: "Sthreepura Cave & Mountain Temple — 10–12 km from Rock One Wild Tea",
+        tag: "Landmarks & Terroir"
+    },
+    {
+        id: "g_landmark_bomburu",
+        src: "images/landmark_bomburu_ella.jpg",
+        caption: "Bomburu Ella (Perawella Falls) — Widest Waterfall in Sri Lanka (22–26 km)",
+        tag: "Landmarks & Terroir"
+    },
+    {
+        id: "g_landmark_seetha",
+        src: "images/landmark_seetha_amman_temple.jpg",
+        caption: "Seetha Amman Temple & Ashoka Vatika — 28–32 km Scenic Drive",
+        tag: "Landmarks & Terroir"
+    },
+    {
+        id: "g_landmark_lipton",
+        src: "images/landmark_liptons_seat.jpg",
+        caption: "Lipton's Seat Panoramic Lookout — 24 km from Sanctuary",
+        tag: "Landmarks & Terroir"
+    },
+    {
+        id: "g_landmark_dunhinda",
+        src: "images/landmark_dunhinda_falls.jpg",
+        caption: "Dunhinda Waterfall Mist Gorge — 28 km from Estate",
+        tag: "Landmarks & Terroir"
+    },
+    {
+        id: "g_landmark_ravana",
+        src: "images/landmark_ravana_falls.jpg",
+        caption: "Ravana Falls & Ella Mountain Gap — 20 km from Factory",
+        tag: "Landmarks & Terroir"
+    },
+    {
+        id: "g_landmark_adams_peak",
+        src: "images/landmark_little_adams_peak.jpg",
+        caption: "Little Adam's Peak (Punchi Sri Pada) — 18 km Trekking Terroir",
+        tag: "Landmarks & Terroir"
+    },
+    {
+        id: "g_landmark_nine_arches",
+        src: "images/landmark_nine_arches.jpg",
+        caption: "Nine Arches Bridge Viaduct — 20 km from Factory",
+        tag: "Landmarks & Terroir"
+    },
+    {
+        id: "g_landmark_hakgala",
+        src: "images/landmark_hakgala_gardens.jpg",
+        caption: "Hakgala Botanical Gardens & Subtropical Highlands — 28 km",
+        tag: "Landmarks & Terroir"
+    },
+    ...[
+        "1 (1).jpeg", "1 (2).jpeg", "1 (3).jpeg", "1 (4).jpeg", "1 (5).jpeg",
+        "1 (7).jpeg", "1 (8).jpeg", "1 (9).jpeg", "1 (10).jpeg",
+        "1 (12).jpeg", "1 (13).jpeg", "1 (14).jpeg", "1 (15).jpeg", "1 (16).jpeg",
+        "1 (17).jpeg", "1 (18).jpeg", "1 (19).jpeg", "1 (20).jpeg", "1 (21).jpeg",
+        "1 (22).jpeg", "1 (23).jpeg", "1 (24).jpeg", "1 (25).jpeg", "1 (26).jpeg",
+        "1 (27).jpeg", "1 (28).jpeg", "1 (29).jpeg", "Gift box 2.jpeg", "WhatsApp Image 2026-08-13 at 10.50.29 AM.jpeg"
+    ].map((img, i) => ({
+        id: `g_est_${i + 1}`,
+        src: `images/${encodeURIComponent(img)}`,
+        caption: img.includes('Gift box') ? 'Artisanal Teak Wood Gift Chest Packaging' : `Wild Tea Plantation & Factory Moment #${i + 1}`,
+        tag: img.includes('Gift box') ? 'Packaging & Reserves' : 'Estate & Harvest'
+    }))
+];
 
 const CURRENCIES = {
     USD: { code: 'USD', symbol: '$', rate: 1.0, decimals: 2, label: 'USD ($)', symbolPosition: 'prefix' },
@@ -731,6 +800,17 @@ class TeaFactoryStore {
         if (!this.state.gallery || !Array.isArray(this.state.gallery) || this.state.gallery.length === 0) {
             this.state.gallery = [...DEFAULT_GALLERY_IMAGES];
             this.saveState();
+        } else {
+            // Merge in any missing default gallery photos (e.g. g_featured_01)
+            let hasNew = false;
+            DEFAULT_GALLERY_IMAGES.forEach((defImg, idx) => {
+                const exists = this.state.gallery.some(g => g.id === defImg.id || g.src === defImg.src);
+                if (!exists) {
+                    this.state.gallery.splice(idx, 0, defImg);
+                    hasNew = true;
+                }
+            });
+            if (hasNew) this.saveState();
         }
         return this.state.gallery;
     }
