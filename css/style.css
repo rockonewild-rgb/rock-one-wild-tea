@@ -9387,9 +9387,57 @@ input, select, textarea, button {
         animation: drawerSlideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
     }
 
-    /* HIDE Left-Side Social Dock on Mobile to Free Screen Width (100% Full Width Content) */
+    /* Left-Side Social Dock on Mobile (Compact, Sleek & Touch Expandable) */
     .side-social-dock {
-        display: none !important;
+        display: flex !important;
+        position: fixed !important;
+        left: 0 !important;
+        bottom: 1rem !important;
+        top: auto !important;
+        transform: none !important;
+        z-index: 1040 !important;
+        flex-direction: column !important;
+        pointer-events: none !important;
+    }
+    .side-social-list {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 5px !important;
+        padding: 0 !important;
+        pointer-events: auto !important;
+    }
+    .side-social-pill {
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 0 18px 18px 0 !important;
+        background: rgba(4, 14, 8, 0.94) !important;
+        border: 1px solid rgba(212, 175, 55, 0.45) !important;
+        border-left: none !important;
+        box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.6) !important;
+        display: flex !important;
+        align-items: center !important;
+        overflow: hidden !important;
+        transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    .side-social-pill .pill-icon {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: var(--color-gold) !important;
+    }
+    .side-social-pill .pill-icon svg {
+        width: 17px !important;
+        height: 17px !important;
+        display: block !important;
+    }
+    .side-social-pill.touch-active {
+        width: 160px !important;
+        background: rgba(8, 24, 14, 0.98) !important;
+        border-color: var(--color-gold) !important;
+        box-shadow: 4px 6px 20px rgba(0, 0, 0, 0.8), 0 0 12px rgba(212, 175, 55, 0.3) !important;
     }
 
     /* Hero Section Mobile Optimization (Full-Width Clean Presentation) */
