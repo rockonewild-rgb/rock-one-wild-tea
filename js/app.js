@@ -5544,18 +5544,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 const timeSlot = document.getElementById('slot-time-input').value.trim();
                 const packageType = document.getElementById('slot-package-input').value;
                 const status = document.getElementById('slot-status-input').value;
+                const capacity = parseInt(document.getElementById('slot-capacity-input')?.value) || 10;
+                const priceLkr = parseFloat(document.getElementById('slot-price-input')?.value) || 1450;
+                const priceUsd = priceLkr / 305;
 
                 if (editId) {
                     window.TeaFactoryStore.updateTourSlot(editId, {
                         timeSlot,
                         package: packageType,
+                        max_capacity: capacity,
+                        price: priceUsd,
+                        price_lkr: priceLkr,
                         status
                     });
-                    showToast("Tour Slot Updated", `Slot #${editId} (${timeSlot}) has been updated.`, "success");
+                    showToast("Tour Slot Updated", `Slot #${editId} (${timeSlot}) updated to ${packageType}.`, "success");
                 } else {
                     window.TeaFactoryStore.addTourSlot({
                         timeSlot,
                         package: packageType,
+                        max_capacity: capacity,
+                        price: priceUsd,
+                        price_lkr: priceLkr,
                         status
                     });
                     showToast("Tour Slot Created", `New time slot "${timeSlot}" scheduled successfully.`, "success");
@@ -5565,6 +5574,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const editIdInput = document.getElementById('slot-edit-id');
                 if (editIdInput) editIdInput.value = '';
                 renderTabContent('admin');
+            });
+
+            // Quick select standard factory time slot pills
+            document.querySelectorAll('.quick-slot-pill').forEach(pill => {
+                pill.addEventListener('click', () => {
+                    const t = pill.getAttribute('data-time');
+                    const timeInput = document.getElementById('slot-time-input');
+                    if (timeInput && t) timeInput.value = t;
+                });
             });
         }
 
@@ -5576,11 +5594,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const timeSlot = btn.getAttribute('data-timeslot');
                 const packageType = btn.getAttribute('data-package');
                 const status = btn.getAttribute('data-status');
+                const capacity = btn.getAttribute('data-capacity') || '10';
+                const priceLkr = btn.getAttribute('data-price-lkr') || '1450';
 
                 const editIdInput = document.getElementById('slot-edit-id');
                 const timeInput = document.getElementById('slot-time-input');
                 const packageInput = document.getElementById('slot-package-input');
                 const statusInput = document.getElementById('slot-status-input');
+                const capacityInput = document.getElementById('slot-capacity-input');
+                const priceInput = document.getElementById('slot-price-input');
                 const titleEl = document.getElementById('tour-slot-form-title');
                 const descEl = document.getElementById('tour-slot-form-desc');
                 const saveBtn = document.getElementById('btn-save-slot');
@@ -5590,7 +5612,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (timeInput) timeInput.value = timeSlot;
                 if (packageInput) packageInput.value = packageType;
                 if (statusInput) statusInput.value = status;
-                if (titleEl) titleEl.innerText = `Edit Tour Time Slot #${String(id).padStart(2, '0')}`;
+                if (capacityInput) capacityInput.value = capacity;
+                if (priceInput) priceInput.value = priceLkr;
+                if (titleEl) titleEl.innerText = `Edit Tour Slot #${String(id).padStart(2, '0')}`;
                 if (descEl) descEl.innerText = `Update schedule and package specifications for Slot #${id}.`;
                 if (saveBtn) saveBtn.innerText = 'Update Tour Slot';
                 if (cancelBtn) cancelBtn.style.display = 'inline-block';
@@ -5608,9 +5632,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const editIdInput = document.getElementById('slot-edit-id');
                 if (editIdInput) editIdInput.value = '';
                 const titleEl = document.getElementById('tour-slot-form-title');
-                if (titleEl) titleEl.innerText = 'Introduce New Tour Time Slot';
+                if (titleEl) titleEl.innerText = 'Add / Configure Tour Slot';
                 const descEl = document.getElementById('tour-slot-form-desc');
-                if (descEl) descEl.innerText = 'Schedule a new visit time window in the factory timeline.';
+                if (descEl) descEl.innerText = 'Configure daily factory visit time windows and visitor capacity limits.';
                 const saveBtn = document.getElementById('btn-save-slot');
                 if (saveBtn) saveBtn.innerText = 'Save Tour Slot';
                 cancelEditSlotBtn.style.display = 'none';

@@ -1402,13 +1402,15 @@ class TeaFactoryStore {
         const maxId = this.state.tourSlots.reduce((max, s) => Math.max(max, typeof s.id === 'number' ? s.id : 0), 0);
         const newSlot = {
             id: maxId + 1,
-            timeSlot: slotData.timeSlot || slotData.time_slot || "09:00 AM - 10:00 AM",
-            time_slot: slotData.timeSlot || slotData.time_slot || "09:00 AM - 10:00 AM",
-            package: slotData.package || slotData.name || "Silver Leaf Tour",
-            name: slotData.package || slotData.name || "Silver Leaf Tour",
+            timeSlot: slotData.timeSlot || slotData.time_slot || "09:30 AM",
+            time_slot: slotData.timeSlot || slotData.time_slot || "09:30 AM",
+            package: slotData.package || slotData.name || "01. Gongfu-Style Black Tea Brewing Experience",
+            name: slotData.package || slotData.name || "01. Gongfu-Style Black Tea Brewing Experience",
             status: slotData.status || "Available",
             booking: null,
-            price: slotData.price || 75.00
+            max_capacity: slotData.max_capacity !== undefined ? slotData.max_capacity : 10,
+            price: slotData.price !== undefined ? slotData.price : 4.754,
+            price_lkr: slotData.price_lkr !== undefined ? slotData.price_lkr : 1450
         };
         this.state.tourSlots.push(newSlot);
         this.saveState();
@@ -1424,6 +1426,9 @@ class TeaFactoryStore {
         const updatedTime = updatedData.timeSlot !== undefined ? updatedData.timeSlot : (current.timeSlot || current.time_slot);
         const updatedPkg = updatedData.package !== undefined ? updatedData.package : (current.package || current.name);
         const updatedStatus = updatedData.status !== undefined ? updatedData.status : current.status;
+        const updatedCapacity = updatedData.max_capacity !== undefined ? updatedData.max_capacity : (current.max_capacity || 10);
+        const updatedPrice = updatedData.price !== undefined ? updatedData.price : (current.price || 4.754);
+        const updatedPriceLkr = updatedData.price_lkr !== undefined ? updatedData.price_lkr : (current.price_lkr || 1450);
 
         this.state.tourSlots[idx] = {
             ...current,
@@ -1431,6 +1436,9 @@ class TeaFactoryStore {
             time_slot: updatedTime,
             package: updatedPkg,
             name: updatedPkg,
+            max_capacity: updatedCapacity,
+            price: updatedPrice,
+            price_lkr: updatedPriceLkr,
             status: updatedStatus,
             booking: updatedStatus === 'Available' ? null : current.booking
         };

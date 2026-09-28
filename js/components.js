@@ -1336,15 +1336,41 @@ const UIComponents = {
             `;
         } else if (activeSubTab === 'tours') {
             html += `
+                <!-- Tour Operations Policy & Schedule Summary -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.75rem;">
+                    <div style="background: rgba(6, 20, 12, 0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 10px; padding: 1rem 1.25rem;">
+                        <div style="color: var(--color-gold); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.25rem;">Operating Days</div>
+                        <div style="font-size: 0.98rem; font-weight: 600; color: #ffffff;">Monday – Saturday</div>
+                        <div style="font-size: 0.75rem; color: #86efac; margin-top: 0.2rem;">Advance booking &bull; Closed Sundays</div>
+                    </div>
+                    <div style="background: rgba(6, 20, 12, 0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 10px; padding: 1rem 1.25rem;">
+                        <div style="color: var(--color-gold); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.25rem;">Daily Schedule</div>
+                        <div style="font-size: 0.98rem; font-weight: 600; color: #ffffff;">9:00 AM – 5:00 PM</div>
+                        <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.2rem;">4 Designated Slots (~1.5 – 2.0 Hrs)</div>
+                    </div>
+                    <div style="background: rgba(6, 20, 12, 0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 10px; padding: 1rem 1.25rem;">
+                        <div style="color: var(--color-gold); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.25rem;">Visitor Capacity</div>
+                        <div style="font-size: 0.98rem; font-weight: 600; color: #ffffff;">Max 10 / Session</div>
+                        <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.2rem;">No minimum visitors required</div>
+                    </div>
+                    <div style="background: rgba(6, 20, 12, 0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 10px; padding: 1rem 1.25rem;">
+                        <div style="color: var(--color-gold); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.25rem;">Standard Experience</div>
+                        <div style="font-size: 0.95rem; font-weight: 600; color: var(--color-gold);">LKR 1,450 / person</div>
+                        <div style="font-size: 0.75rem; color: #cbd5e1; margin-top: 0.2rem;">01. Gongfu-Style Brewing Experience</div>
+                    </div>
+                </div>
+
                 <div class="admin-columns">
                     <!-- Active Tour Slots Table Card -->
                     <div class="panel-card" style="margin-bottom: 0;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
                             <div>
-                                <h3 class="panel-title" style="margin-bottom: 0.25rem;">Active Tour Time Slots</h3>
-                                <p class="panel-desc" style="margin-bottom: 0;">Manage daily factory visit schedule, assigned experiences, and availability.</p>
+                                <h3 class="panel-title" style="margin-bottom: 0.25rem;">Factory Tour Schedule &amp; Slots Desk</h3>
+                                <p class="panel-desc" style="margin-bottom: 0;">Manage daily 9:30 AM, 11:00 AM, 1:30 PM &amp; 3:30 PM tour time windows, visitor capacity limits, and assigned guest bookings.</p>
                             </div>
-                            <span class="box-badge status-available" style="font-size: 0.75rem;">${tourSlots.filter(s => s.status === 'Available').length} Available</span>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <span class="box-badge status-available" style="font-size: 0.75rem;">${tourSlots.filter(s => s.status === 'Available').length} Available Slots</span>
+                            </div>
                         </div>
                         
                         <div class="table-responsive">
@@ -1352,27 +1378,47 @@ const UIComponents = {
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Time Slot Range</th>
-                                        <th>Assigned Package</th>
+                                        <th>Time Slot</th>
+                                        <th>Experience Package</th>
+                                        <th>Capacity</th>
+                                        <th>Rate</th>
                                         <th>Status</th>
-                                        <th>Booked Guest</th>
+                                        <th>Booked Guest / Info</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     ${tourSlots.length === 0 ? `
-                                        <tr><td colspan="6" class="text-center" style="padding: 2.5rem; color: #888;">No tour time slots configured. Add your first time slot below.</td></tr>
+                                        <tr><td colspan="8" class="text-center" style="padding: 2.5rem; color: #888;">No tour time slots configured. Add your first time slot below or reset to defaults.</td></tr>
                                     ` : tourSlots.map(slot => {
-                                        const timeStr = slot.timeSlot || slot.time_slot || slot.time || '09:00 AM - 10:00 AM';
-                                        const pkgName = slot.package || slot.name || 'Silver Leaf Tour';
-                                        const isBooked = slot.status === 'Booked' || (slot.booked_seats >= (slot.max_capacity || 12));
+                                        const timeStr = slot.timeSlot || slot.time_slot || slot.time || '09:30 AM';
+                                        const pkgName = slot.package || slot.name || '01. Gongfu-Style Black Tea Brewing Experience';
+                                        const maxCap = slot.max_capacity || 10;
+                                        const bookedSeats = (slot.booking && slot.booking.guests) || slot.booked_seats || 0;
+                                        const isBooked = slot.status === 'Booked' || (bookedSeats >= maxCap);
                                         const statusStr = isBooked ? 'Booked' : 'Available';
+                                        const priceLkr = slot.price_lkr || (slot.price ? Math.round(slot.price * 305) : 1450);
 
                                         return `
                                         <tr>
                                             <td class="font-mono text-gold font-bold">#${String(slot.id).padStart(2, '0')}</td>
-                                            <td><strong style="color:var(--color-white); font-family:var(--font-serif);">${timeStr}</strong></td>
-                                            <td><span style="font-size:0.8rem; color:var(--color-gold); font-weight:600;">${pkgName}</span></td>
+                                            <td>
+                                                <strong style="color:var(--color-white); font-family:var(--font-serif); font-size: 1.05rem;">${timeStr}</strong>
+                                                <small style="display:block; color:var(--color-text-muted); font-size:0.7rem;">~1.5 - 2.0 Hrs</small>
+                                            </td>
+                                            <td>
+                                                <span style="font-size:0.82rem; color:var(--color-gold); font-weight:600; display:block;">${pkgName}</span>
+                                                <small style="color: #94a3b8; font-size:0.7rem;">Uva Medium Handcrafted</small>
+                                            </td>
+                                            <td>
+                                                <span style="font-size: 0.8rem; color: ${bookedSeats > 0 ? '#86efac' : '#e2e8f0'}; font-weight: 600;">
+                                                    ${bookedSeats} / ${maxCap} Guests
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span style="font-size:0.82rem; color:var(--color-white); font-weight:600;">LKR ${priceLkr.toLocaleString()}</span>
+                                                <small style="display:block; color:var(--color-text-muted); font-size:0.7rem;">($${(priceLkr / 305).toFixed(2)})</small>
+                                            </td>
                                             <td>
                                                 <span class="box-badge ${statusStr === 'Available' ? 'status-available' : 'status-booked'}" style="font-size: 0.65rem;">
                                                     ${statusStr}
@@ -1381,30 +1427,32 @@ const UIComponents = {
                                             <td>
                                                 ${slot.booking ? `
                                                     <div style="font-size: 0.8rem; color: var(--color-gold); font-weight: 600;">${slot.booking.customerName || slot.booking.name || 'Guest'}</div>
-                                                    <small style="color: var(--color-text-muted);">${slot.booking.guests || 1} Guests &bull; ${slot.booking.package || pkgName}</small>
-                                                ` : `<span style="font-size: 0.75rem; color: var(--color-text-muted);">No Bookings</span>`}
+                                                    <small style="color: var(--color-text-muted); display:block;">${slot.booking.guests || 1} Guests &bull; Ref: ${slot.booking.bookingId || 'TB-CONFIRMED'}</small>
+                                                    ${slot.booking.tourDate ? `<small style="color: #86efac; font-size: 0.68rem;">Date: ${slot.booking.tourDate}</small>` : ''}
+                                                ` : `<span style="font-size: 0.75rem; color: var(--color-text-muted);">No Active Booking</span>`}
                                             </td>
                                             <td>
-                                                <div style="display: flex; gap: 0.4rem; align-items: center;">
+                                                <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
                                                     <button class="btn-edit-slot" 
                                                             data-id="${slot.id}" 
                                                             data-timeslot="${timeStr}" 
                                                             data-package="${pkgName}" 
+                                                            data-capacity="${maxCap}"
+                                                            data-price-lkr="${priceLkr}"
                                                             data-status="${statusStr}" 
-                                                            style="background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); color: var(--color-gold); padding: 0.35rem 0.65rem; font-size: 0.7rem; border-radius: 3px; cursor: pointer; transition: var(--transition-smooth); display: inline-flex; align-items: center; gap: 0.25rem;" 
+                                                            style="background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); color: var(--color-gold); padding: 0.35rem 0.6rem; font-size: 0.7rem; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem;" 
                                                             title="Edit Time Slot">
                                                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                                         Edit
                                                     </button>
                                                     ${statusStr === 'Booked' ? `
-                                                        <button class="btn-reset-slot" data-id="${slot.id}" style="background: rgba(46,125,50,0.15); border: 1px solid rgba(46,125,50,0.3); color: #81c784; padding: 0.35rem 0.65rem; font-size: 0.7rem; border-radius: 3px; cursor: pointer; transition: var(--transition-smooth); display: inline-flex; align-items: center; gap: 0.25rem;" title="Free slot for new bookings">
+                                                        <button class="btn-reset-slot" data-id="${slot.id}" style="background: rgba(46,125,50,0.15); border: 1px solid rgba(46,125,50,0.3); color: #81c784; padding: 0.35rem 0.6rem; font-size: 0.7rem; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem;" title="Free slot for new bookings">
                                                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                                                            Free Slot
+                                                            Free
                                                         </button>
                                                     ` : ''}
-                                                    <button class="btn-delete-slot" data-id="${slot.id}" style="background: transparent; border: 1px solid rgba(255,94,94,0.3); color: #ff5e5e; padding: 0.35rem 0.65rem; font-size: 0.7rem; border-radius: 3px; cursor: pointer; transition: var(--transition-smooth); display: inline-flex; align-items: center; gap: 0.25rem;" title="Delete Time Slot">
+                                                    <button class="btn-delete-slot" data-id="${slot.id}" style="background: transparent; border: 1px solid rgba(255,94,94,0.3); color: #ff5e5e; padding: 0.35rem 0.6rem; font-size: 0.7rem; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem;" title="Delete Time Slot">
                                                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                                        Remove
                                                     </button>
                                                 </div>
                                             </td>
@@ -1416,39 +1464,65 @@ const UIComponents = {
                         </div>
                     </div>
                     
-                    <!-- Add / Edit Tour Slot Form -->
+                    <!-- Add / Edit Tour Slot Form Card -->
                     <div class="panel-card admin-form-card" style="margin-bottom: 0;">
                         <div class="admin-card-header" style="border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 1rem; margin-bottom: 1.5rem;">
                             <div style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold); margin-bottom: 0.35rem;">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path></svg>
-                                <span>HOSPITALITY SCHEDULE</span>
+                                <span>FACTORY TOUR TIMELINE</span>
                             </div>
-                            <h3 class="panel-title" id="tour-slot-form-title" style="margin-bottom: 0.25rem; font-size: 1.35rem;">Introduce New Tour Time Slot</h3>
-                            <p class="panel-desc" id="tour-slot-form-desc" style="margin-bottom: 0; font-size: 0.8rem; color: var(--color-text-muted);">Schedule a new visit time window in the factory timeline.</p>
+                            <h3 class="panel-title" id="tour-slot-form-title" style="margin-bottom: 0.25rem; font-size: 1.35rem;">Add / Configure Tour Slot</h3>
+                            <p class="panel-desc" id="tour-slot-form-desc" style="margin-bottom: 0; font-size: 0.8rem; color: var(--color-text-muted);">Configure daily factory visit time windows and visitor capacity limits.</p>
                         </div>
                         
-                        <form id="admin-add-slot-form" class="admin-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                        <form id="admin-add-slot-form" class="admin-form" style="display: flex; flex-direction: column; gap: 1.15rem;">
                             <input type="hidden" id="slot-edit-id" value="">
                             
-                            <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                <label class="form-label" for="slot-time-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Time Slot Range *</label>
-                                <input class="form-input" type="text" id="slot-time-input" required placeholder="e.g. 05:30 PM - 06:30 PM" value="">
-                                <span class="field-hint" style="font-size: 0.72rem; color: var(--color-text-muted); margin-top: 0.2rem; display: block;">Format: HH:MM AM/PM - HH:MM AM/PM (e.g. 09:00 AM - 10:00 AM)</span>
+                            <!-- Quick-Select Standard Slot Time Pills -->
+                            <div>
+                                <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); display: block; margin-bottom: 0.4rem;">
+                                    Quick Select Standard Factory Slot
+                                </label>
+                                <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                                    <button type="button" class="quick-slot-pill" data-time="09:30 AM" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(212,175,55,0.3); color: #fff; font-size: 0.75rem; padding: 0.3rem 0.65rem; border-radius: 4px; cursor: pointer;">09:30 AM</button>
+                                    <button type="button" class="quick-slot-pill" data-time="11:00 AM" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(212,175,55,0.3); color: #fff; font-size: 0.75rem; padding: 0.3rem 0.65rem; border-radius: 4px; cursor: pointer;">11:00 AM</button>
+                                    <button type="button" class="quick-slot-pill" data-time="01:30 PM" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(212,175,55,0.3); color: #fff; font-size: 0.75rem; padding: 0.3rem 0.65rem; border-radius: 4px; cursor: pointer;">01:30 PM</button>
+                                    <button type="button" class="quick-slot-pill" data-time="03:30 PM" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(212,175,55,0.3); color: #fff; font-size: 0.75rem; padding: 0.3rem 0.65rem; border-radius: 4px; cursor: pointer;">03:30 PM</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="display: flex; flex-direction: column; gap: 0.4rem;">
+                                <label class="form-label" for="slot-time-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Time Slot *</label>
+                                <input class="form-input" type="text" id="slot-time-input" required placeholder="e.g. 09:30 AM or 09:30 AM - 11:30 AM" value="09:30 AM">
+                                <span class="field-hint" style="font-size: 0.72rem; color: var(--color-text-muted); display: block;">Standard sessions run ~1.5 to 2.0 hours.</span>
                             </div>
                             
-                            <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                <label class="form-label" for="slot-package-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Default Experience Package *</label>
+                            <div class="form-group" style="display: flex; flex-direction: column; gap: 0.4rem;">
+                                <label class="form-label" for="slot-package-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Experience Package *</label>
                                 <select class="form-input" id="slot-package-input" required>
-                                    <option value="Silver Leaf Tour">Silver Leaf Tour ($75 / $25 Deposit)</option>
-                                    <option value="Golden Sommelier Tour">Golden Sommelier Tour ($150 / $50 Deposit)</option>
-                                    <option value="Imperial Grand Tasting">Imperial Grand Tasting ($290 / $100 Deposit)</option>
+                                    <option value="01. Gongfu-Style Black Tea Brewing Experience" selected>01. Gongfu-Style Black Tea Brewing Experience (LKR 1,450)</option>
+                                    <option value="Private Estate Terroir Tour &amp; Masterclass">Private Estate Terroir Tour &amp; Masterclass (Custom)</option>
+                                    <option value="Highland Garden Walk &amp; Artisan Cupping">Highland Garden Walk &amp; Artisan Cupping (VIP)</option>
                                 </select>
                             </div>
 
-                            <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.4rem;">
+                                    <label class="form-label" for="slot-capacity-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Max Capacity (Guests)</label>
+                                    <input class="form-input" type="number" id="slot-capacity-input" min="1" max="50" value="10" required>
+                                    <span class="field-hint" style="font-size: 0.7rem; color: var(--color-text-muted);">Default: 10 visitors</span>
+                                </div>
+                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.4rem;">
+                                    <label class="form-label" for="slot-price-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Fee / Person (LKR)</label>
+                                    <input class="form-input" type="number" id="slot-price-input" min="0" value="1450" required>
+                                    <span class="field-hint" style="font-size: 0.7rem; color: var(--color-text-muted);">Default: LKR 1,450</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="display: flex; flex-direction: column; gap: 0.4rem;">
                                 <label class="form-label" for="slot-status-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Slot Availability Status *</label>
                                 <select class="form-input" id="slot-status-input" required>
-                                    <option value="Available">Available (Open for booking)</option>
+                                    <option value="Available" selected>Available (Open for booking)</option>
                                     <option value="Booked">Booked (Reserved)</option>
                                 </select>
                             </div>
