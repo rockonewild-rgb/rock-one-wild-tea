@@ -569,9 +569,9 @@ document.addEventListener('DOMContentLoaded', () => {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const passcode = (document.getElementById('admin-passcode').value || '').trim();
-            const storedPasscode = (window.TeaFactoryStore.getAdminPasscode() || 'admin').trim();
+            const storedPasscode = (window.TeaFactoryStore.getAdminPasscode() || 'hasi@123').trim();
             
-            if (passcode.toLowerCase() === storedPasscode.toLowerCase() || passcode === 'admin' || passcode === '1978') {
+            if (passcode === storedPasscode) {
                 isAdminAuthenticated = true;
                 try { sessionStorage.setItem('tea_factory_admin_auth', 'true'); } catch(e){}
                 showToast("Access Granted", "Welcome back, Estate Concierge.", "success");
@@ -683,9 +683,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const newInput = (modal.querySelector('#modal-new-passcode').value || '').trim();
             const confirmInput = (modal.querySelector('#modal-confirm-passcode').value || '').trim();
 
-            const storedPasscode = (window.TeaFactoryStore.getAdminPasscode() || 'admin').trim();
+            const storedPasscode = (window.TeaFactoryStore.getAdminPasscode() || 'hasi@123').trim();
 
-            if (currInput.toLowerCase() !== storedPasscode.toLowerCase()) {
+            if (currInput !== storedPasscode) {
                 showToast("Verification Error", "Current passcode is incorrect.", "error");
                 modal.querySelector('#modal-curr-passcode').value = '';
                 modal.querySelector('#modal-curr-passcode').focus();
