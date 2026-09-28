@@ -1386,7 +1386,7 @@
                     category: "ORIGIN",
                     iconKey: "leaf",
                     question: "What makes Rock One Wild Tea unique & single-estate?",
-                    answer: "Rock One Wild Tea is single-estate Ceylon tea nurtured on 1,200m+ high-elevation slopes in Wallawela, Ettampitiya. We hand-pluck tender two-leaves-and-a-bud and process in small batches using traditional orthodox techniques with zero chemical additives.",
+                    answer: "Rock One Wild Tea is single-estate Ceylon tea nurtured on 1,200m+ high-elevation slopes in Wellawela, Ettampitiya. We hand-pluck tender two-leaves-and-a-bud and process in small batches using traditional orthodox techniques with zero chemical additives.",
                     actions: [
                         { label: "Explore Product Catalog", tab: "catalog" }
                     ],
@@ -1452,7 +1452,7 @@
                     category: "ESTATE",
                     iconKey: "pin",
                     question: "Where is the estate located and how can I visit?",
-                    answer: "Our sanctuary is located at **No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka**, at 1,200m+ elevation. You can view our interactive estate map or contact our concierge for driving directions.",
+                    answer: "Our sanctuary is located at **Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka**, at 1,200m+ elevation. You can view our interactive estate map or contact our concierge for driving directions.",
                     actions: [
                         { label: "View Estate Map", tab: "home" },
                         { label: "Get Directions on WhatsApp", href: "https://wa.me/94771757556?text=Hello%2C%20please%20send%20estate%20location%20directions." }
@@ -1475,7 +1475,7 @@
                     category: "CONCIERGE",
                     iconKey: "phone",
                     question: "How can I speak directly with the master tea maker?",
-                    answer: "You can reach our Master Tea Concierge directly by phone at **+94 77 175 7556** / **+94 (11) 234-5678**, email at **axentrat@gmail.com**, or directly via WhatsApp.",
+                    answer: "You can reach our Master Tea Concierge directly by phone at **+94 77 175 7556**, email at **rockonewild@gmail.com**, or directly via WhatsApp.",
                     actions: [
                         { label: "Open WhatsApp Chat", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],
@@ -1608,7 +1608,7 @@
                     category: "සේවා කවුළුව",
                     iconKey: "phone",
                     question: "ප්‍රධාන තේ විශේෂඥයා සමග සෘජුව සම්බන්ධ වන්නේ කෙසේද?",
-                    answer: "අපගේ ප්‍රධාන තේ සේවා කවුළුව **+94 77 175 7556**, විද්‍යුත් තැපෑල **axentrat@gmail.com** හෝ WhatsApp මගින් සෘජුවම සම්බන්ධ කරගත හැක.",
+                    answer: "අපගේ ප්‍රධාන තේ සේවා කවුළුව **+94 77 175 7556**, විද්‍යුත් තැපෑල **rockonewild@gmail.com** හෝ WhatsApp මගින් සෘජුවම සම්බන්ධ කරගත හැක.",
                     actions: [
                         { label: "WhatsApp විවෘත කරන්න", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],
@@ -1741,7 +1741,7 @@
                     category: "உதவி மையம்",
                     iconKey: "phone",
                     question: "முதன்மை தேயிலை தயாரிப்பாளரை எவ்வாறு தொடர்புகொள்வது?",
-                    answer: "எமது உதவி மையத்தை **+94 77 175 7556** தொலைபேசி, **axentrat@gmail.com** மின்னஞ்சல் அல்லது WhatsApp மூலம் நேரடியாகத் தொடர்பு கொள்ளலாம்.",
+                    answer: "எமது உதவி மையத்தை **+94 77 175 7556** தொலைபேசி, **rockonewild@gmail.com** மின்னஞ்சல் அல்லது WhatsApp மூலம் நேரடியாகத் தொடர்பு கொள்ளலாம்.",
                     actions: [
                         { label: "WhatsApp தொடர்பு", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],
@@ -1851,7 +1851,7 @@
                     category: "所在地",
                     iconKey: "pin",
                     question: "茶園の所在地と訪問アクセス方法は？",
-                    answer: "当園はスリランカ・エッതംピティヤの標高1,200m（No: 54 Gannilawattha, Wallawela, Ettampitiya）に位置します。インタラクティブ地図の閲覧や、WhatsAppによる送迎・道案内をご利用いただけます。",
+                    answer: "当園はスリランカ・エッതംピティヤの標高1,200m（Gannilawaththa, Wellawela, Ettampitiya 90140）に位置します。インタラクティブ地図の閲覧や、WhatsAppによる送迎・道案内をご利用いただけます。",
                     actions: [
                         { label: "農園マップを見る", tab: "home" },
                         { label: "WhatsAppで道案内", href: "https://wa.me/94771757556?text=Hello%2C%20please%20send%20estate%20location%20directions." }
@@ -1874,7 +1874,7 @@
                     category: "コンシェルジュ",
                     iconKey: "phone",
                     question: "マスター・ティーメーカーに直接問い合わせるには？",
-                    answer: "専属コンシェルジュデスクへのお電話（**+94 77 175 7556**）、Eメール（**axentrat@gmail.com**）、または公式WhatsAppより直接お問い合わせいただけます。",
+                    answer: "専属コンシェルジュデスクへのお電話（**+94 77 175 7556**）、Eメール（**rockonewild@gmail.com**）、または公式WhatsAppより直接お問い合わせいただけます。",
                     actions: [
                         { label: "WhatsAppを開く", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],
@@ -1984,7 +1984,7 @@
                     category: "地理位置",
                     iconKey: "pin",
                     question: "庄园具体地理位置在哪里，如何前往参观？",
-                    answer: "庄园坐落于**斯里兰卡埃坦皮蒂亚加尼拉瓦塔54号（No: 54 Gannilawattha, Wallawela, Ettampitiya）**，海拔1200米以上。您可查看互动地图或联系礼宾部获取路线导航。",
+                    answer: "庄园坐落于**斯里兰卡埃坦皮蒂亚加尼拉瓦塔（Gannilawaththa, Wellawela, Ettampitiya 90140）**，海拔1200米以上。您可查看互动地图或联系礼宾部获取路线导航。",
                     actions: [
                         { label: "查阅庄园地图", tab: "home" },
                         { label: "WhatsApp获取导航", href: "https://wa.me/94771757556?text=Hello%2C%20please%20send%20estate%20location%20directions." }
@@ -2007,7 +2007,7 @@
                     category: "礼宾专席",
                     iconKey: "phone",
                     question: "如何直接联系庄园首席侍茶大师与总监？",
-                    answer: "您可通过专属热线 **+94 77 175 7556** / **+94 (11) 234-5678**、官方电邮 **axentrat@gmail.com** 或直接在 WhatsApp 上向礼宾大师咨询。",
+                    answer: "您可通过专属热线 **+94 77 175 7556**、官方电邮 **rockonewild@gmail.com** 或直接在 WhatsApp 上向礼宾大师咨询。",
                     actions: [
                         { label: "开启WhatsApp咨询", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],
@@ -2140,7 +2140,7 @@
                     category: "الكونسيرج",
                     iconKey: "phone",
                     question: "كيف أتواصل مباشرة مع خبير صناعة الشاي في المزرعة؟",
-                    answer: "يمكنك التواصل مع مكتب الكونسيرج عبر الهاتف **+94 77 175 7556** أو البريد الإلكتروني **axentrat@gmail.com** أو مباشرة عبر الواتساب.",
+                    answer: "يمكنك التواصل مع مكتب الكونسيرج عبر الهاتف **+94 77 175 7556** أو البريد الإلكتروني **rockonewild@gmail.com** أو مباشرة عبر الواتساب.",
                     actions: [
                         { label: "محادثة عبر واتساب", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],

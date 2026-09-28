@@ -238,7 +238,7 @@ function seedInitialData() {
                 type: 'Black Tea',
                 season: 'Equinox 2026',
                 grade: 'Orange Pekoe 1 (OP1)',
-                elevation: '1,200m Wallawela Slopes',
+                elevation: '1,200m Wellawela Slopes',
                 price_usd: 85.0,
                 stock: 45,
                 image: 'images/luxury_tea_tin.jpg',
@@ -363,7 +363,7 @@ function seedInitialData() {
                 location: 'Kyoto, Japan',
                 rating: 5,
                 title: 'Exceptional liquor clarity and zero bitterness',
-                content: 'Visited No: 54 Wallawela for a private cupping flight. The wood-kiln roasting method developed by Master Bandara produces an orthodox black tea that rivals ancient Fujian mountain reserves.',
+                content: 'Visited the Wellawela sanctuary for a private cupping flight. The wood-kiln roasting method developed by Master Bandara produces an orthodox black tea that rivals ancient Fujian mountain reserves.',
                 date_str: 'August 22, 2026'
             },
             {

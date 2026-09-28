@@ -3036,7 +3036,7 @@ const UIComponents = {
                         </div>
                         <div>
                             <strong>Direct Concierge Email</strong>
-                            <a href="mailto:axentrat@gmail.com">axentrat@gmail.com</a>
+                            <a href="mailto:rockonewild@gmail.com">rockonewild@gmail.com</a>
                         </div>
                     </div>
                     <div class="direct-contact-item">
@@ -3054,7 +3054,7 @@ const UIComponents = {
                         </div>
                         <div>
                             <strong>Highlands Sanctuary</strong>
-                            <span>Wallawela, Ettampitiya, Sri Lanka</span>
+                            <span>Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka</span>
                         </div>
                     </div>
                 </div>
@@ -3077,7 +3077,7 @@ const UIComponents = {
                 title: "Montane Mist & Wild Terroir",
                 sub: "1,200m+ Cloud Rainforest Sanctuary",
                 iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.8"><path d="M2 22s5-11 18-18c0 0-3 15-14 18l-4 0z"></path><path d="M6 18c3-3 7-7 12-12"></path></svg>`,
-                desc: "Dawn breaks over Wallawela ridges where wild, uncultivated tea trees thrive in mineral mountain soil."
+                desc: "Dawn breaks over Wellawela ridges where wild, uncultivated tea trees thrive in mineral mountain soil."
             },
             {
                 id: 2,
@@ -3206,8 +3206,8 @@ const UIComponents = {
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        const addressText = "No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka";
-        const mapEmbedUrl = "https://maps.google.com/maps?q=Rock+One+Wild+Tea,+54+Gannilawattha,+Wallawela,+Ettampitiya,+Sri+Lanka&t=&z=15&ie=UTF8&iwloc=&output=embed";
+        const addressText = "Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka";
+        const mapEmbedUrl = "https://maps.google.com/maps?q=Rock+One+Wild+Tea,+Gannilawaththa,+Wellawela,+Ettampitiya,+Sri+Lanka&t=&z=15&ie=UTF8&iwloc=&output=embed";
         const googleMapsDirectUrl = "https://maps.google.com?ftid=0x3ae4630013bcccbb:0x453d082c477ea3bf";
         const directionsUrl = "https://www.google.com/maps/dir/?api=1&destination=Rock+One+Wild+Tea+(Pvt)+Limited&destination_place_id=0x3ae4630013bcccbb:0x453d082c477ea3bf";
 
@@ -3290,7 +3290,7 @@ const UIComponents = {
                             <span class="section-tag" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--color-gold); font-weight: 600; margin-bottom: 0.75rem; display: block;">Estate Sanctuary & Terroir</span>
                             <h3 class="home-section-title" style="font-size: 2rem; margin-bottom: 1.25rem; line-height: 1.2;">Visit Our Highlands Sanctuary</h3>
                             <p style="color: var(--color-text-muted); font-size: 0.92rem; line-height: 1.7; margin-bottom: 1.75rem;">
-                                Perched at over 1,200 meters amidst misty mountain amphitheaters in Wallawela, Ettampitiya, our single-estate sanctuary invites connoisseurs and world travelers for private tea cuppings, orthodox factory tours, and alpine terroir walks.
+                                Perched at over 1,200 meters amidst misty mountain amphitheaters in Wellawela, Ettampitiya, our single-estate sanctuary invites connoisseurs and world travelers for private tea cuppings, orthodox factory tours, and alpine terroir walks.
                             </p>
 
                             <!-- Address & Hours Detail Box -->
@@ -3354,7 +3354,7 @@ const UIComponents = {
                         </div>
                         <span style="font-size: 0.75rem; color: var(--color-text-muted); background: rgba(255,255,255,0.05); padding: 0.35rem 0.85rem; border-radius: 20px; border: 1px solid rgba(212,175,55,0.25); display: inline-flex; align-items: center; gap: 0.35rem;">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            <span>Wallawela Sanctuary Proximity</span>
+                            <span>Wellawela Sanctuary Proximity</span>
                         </span>
                     </div>
 
@@ -4018,7 +4018,7 @@ const UIComponents = {
                                 Your factory tour reservation is officially authorized. Please present this screen or your email boarding pass upon arrival at the estate security gate.
                             </p>
                             <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; font-size: 0.8rem; color: #d1d5db; line-height: 1.6;">
-                                <strong style="color: var(--color-gold);">Estate Location:</strong> No: 54 Gannilawattha, Wallawela in Ettampitiya, Badulla District (Elevation 1,240m)<br>
+                                <strong style="color: var(--color-gold);">Estate Location:</strong> Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District (Elevation 1,240m)<br>
                                 <strong style="color: var(--color-gold);">Arrival Recommendation:</strong> Please arrive 10–15 minutes prior to ${timeSlot}.
                             </div>
                             <div style="text-align: center; margin-top: 1.25rem;">

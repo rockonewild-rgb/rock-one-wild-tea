@@ -1480,7 +1480,7 @@ class TeaFactoryStore {
             type: productData.type || 'Specialty Tea',
             season: productData.season || '2026 Flush',
             grade: productData.leafGrade || productData.grade || 'OP1',
-            elevation: productData.elevation || '1,200m Wallawela',
+            elevation: productData.elevation || '1,200m Wellawela Slopes',
             price: priceVal,
             price_usd: priceVal,
             weight: productData.weight || '100g Vintage Tin',
@@ -1921,7 +1921,7 @@ Rock One Wild Tea Concierge Team
     logMockInquiryEmail(inquiry) {
         const emailContent = `
 To: ${inquiry.email}
-Cc: axentrat@gmail.com
+Cc: rockonewild@gmail.com
 Subject: Private Reserve Club Allocation Dossier [${inquiry.id}] - Rock One Wild Tea
 
 Dear ${inquiry.fullName},
@@ -1948,14 +1948,14 @@ Our Master Tea Sommelier & Private Ledger Registrar will review your request and
 
 With distinguished regards,
 Rock One Wild Tea Estate Sanctuary
-Wallawela, Ettampitiya, Sri Lanka
-Direct Desk: +94 77 175 7556 | axentrat@gmail.com
+Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
+Direct Desk: +94 77 175 7556 | rockonewild@gmail.com
         `.trim();
 
         this.state.emailLogs.unshift({
             id: `EMAIL-INQ-${Date.now().toString().slice(-6)}`,
             timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-            to: `${inquiry.email}, axentrat@gmail.com`,
+            to: `${inquiry.email}, rockonewild@gmail.com`,
             subject: `Private Reserve Inquiry Dossier [${inquiry.id}]`,
             body: emailContent
         });

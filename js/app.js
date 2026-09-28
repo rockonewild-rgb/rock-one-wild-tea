@@ -782,7 +782,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3b. Interactive Email Service Provider Chooser Modal
     function showEmailServiceChooserModal({
-        to = 'axentrat@gmail.com',
+        to = 'rockonewild@gmail.com',
         subject = 'Enquiry: Ceylon Artisanal Tea Allocation',
         body = '',
         title = 'Select Preferred Email Service',
@@ -1776,7 +1776,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     showToast("Loading Email Dispatcher", "Opening email service selector...", "success");
                     setTimeout(() => {
                         showEmailServiceChooserModal({
-                            to: 'axentrat@gmail.com',
+                            to: 'rockonewild@gmail.com',
                             subject: `Enquiry: ${booking.boxName} (${booking.seasonName})`,
                             body: baseText,
                             title: 'Select Preferred Email Service',
@@ -3949,8 +3949,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     <!-- Footer -->
     <div class="cert-footer">
-        <p>Rock One Wild Tea (Pvt) Ltd · No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka</p>
-        <p>axentrat@gmail.com · +94 77 175 7556 · rockonewildtea.com</p>
+        <p>Rock One Wild Tea (Pvt) Ltd · Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka</p>
+        <p>rockonewild@gmail.com · +94 77 175 7556 · rockonewildtea.com</p>
         <p style="margin-top: 3px; font-style: italic; font-size: 8px; color: #b09040;">
             This certificate is an official allocation record issued by Rock One Wild Tea Estate. It does not constitute a final receipt until payment is fully confirmed.
         </p>
@@ -6286,7 +6286,7 @@ PROJECT DETAILS & REQUIREMENTS:
 ============================================================
 Sent from Rock One Wild Tea Official Portal
 Direct Inbox: rockonewild@gmail.com | WhatsApp: +94 77 175 7556
-Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
+Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             `.trim();
 
             // 1. Direct Estate API & Resend Email Delivery

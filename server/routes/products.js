@@ -136,7 +136,7 @@ router.post('/', async (req, res) => {
     try {
         const {
             name, category = 'artisan', type = 'Specialty Tea',
-            season = '2026 Flush', grade = 'OP1', elevation = '1,200m Wallawela',
+            season = '2026 Flush', grade = 'OP1', elevation = '1,200m Wellawela Slopes',
             price_usd, price, stock = 10, image = 'images/Product.jpeg',
             description = '', flavor_notes = [], brewing_guide = null,
             is_reserve = false

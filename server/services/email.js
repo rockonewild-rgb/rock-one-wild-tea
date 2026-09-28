@@ -84,7 +84,7 @@ async function sendInquiryEmails(inquiry) {
 
                     <!-- Footer -->
                     <div style="text-align: center; margin-top: 30px; color: #888; font-size: 11px; line-height: 1.5;">
-                        <p>Rock One Wild Tea Estate &bull; No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka<br>Direct WhatsApp Desk: +94 77 175 7556</p>
+                        <p>Rock One Wild Tea Estate &bull; Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka<br>Direct WhatsApp Desk: +94 77 175 7556</p>
                     </div>
                 </div>
             `
@@ -130,7 +130,7 @@ async function sendInquiryEmails(inquiry) {
                     <!-- Footer -->
                     <div style="text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #888; font-size: 11px; line-height: 1.6;">
                         <p style="color: #d4af37; font-weight: bold; margin-bottom: 4px;">ROCK ONE WILD TEA ESTATE</p>
-                        <p>No: 54 Gannilawattha, Wallawela in Ettampitiya, Badulla District, Sri Lanka<br>Highlands Elevation 1,240m</p>
+                        <p>Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Sri Lanka<br>Highlands Elevation 1,240m</p>
                     </div>
                 </div>
             `
@@ -267,7 +267,7 @@ async function sendOrderConfirmationEmails(order) {
 
                     <!-- Footer -->
                     <div style="text-align: center; margin-top: 30px; color: #888; font-size: 11px;">
-                        <p>Rock One Wild Tea Estate &bull; No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka</p>
+                        <p>Rock One Wild Tea Estate &bull; Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka</p>
                     </div>
                 </div>
             `
@@ -370,7 +370,7 @@ async function sendOrderConfirmationEmails(order) {
                         <!-- Footer -->
                         <div style="text-align: center; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #888; font-size: 11px; line-height: 1.6;">
                             <p style="color: #d4af37; font-weight: bold; margin-bottom: 4px;">ROCK ONE WILD TEA ESTATE</p>
-                            <p>No: 54 Gannilawattha, Wallawela in Ettampitiya, Badulla District, Sri Lanka<br>Direct WhatsApp Desk: +94 77 175 7556</p>
+                            <p>Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Sri Lanka<br>Direct WhatsApp Desk: +94 77 175 7556</p>
                         </div>
                     </div>
                 `
@@ -472,7 +472,7 @@ async function sendTourConfirmationEmails(booking) {
 
                     <!-- Footer -->
                     <div style="text-align: center; margin-top: 30px; color: #888; font-size: 11px;">
-                        <p>Rock One Wild Tea Estate &bull; No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka</p>
+                        <p>Rock One Wild Tea Estate &bull; Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka</p>
                     </div>
                 </div>
             `
@@ -558,7 +558,7 @@ async function sendTourConfirmationEmails(booking) {
                                 Estate Location &amp; Arrival Guidance
                             </h4>
                             <p style="font-size: 13px; color: #ffffff; margin: 0 0 6px 0;">
-                                <strong>Address:</strong> No: 54 Gannilawattha, Wallawela, Ettampitiya, Badulla District, Central Highlands, Sri Lanka
+                                <strong>Address:</strong> Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Central Highlands, Sri Lanka
                             </p>
                             <p style="font-size: 12px; color: #d1d5db; margin: 0; line-height: 1.6;">
                                 &bull; <strong>Arrival Time:</strong> Please arrive 10–15 minutes prior to your scheduled time slot.<br>
@@ -577,7 +577,7 @@ async function sendTourConfirmationEmails(booking) {
                         <!-- Footer -->
                         <div style="text-align: center; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #888; font-size: 11px; line-height: 1.6;">
                             <p style="color: #d4af37; font-weight: bold; margin-bottom: 4px;">ROCK ONE WILD TEA ESTATE</p>
-                            <p>No: 54 Gannilawattha, Wallawela in Ettampitiya, Badulla District, Sri Lanka<br>Direct WhatsApp Concierge: +94 77 175 7556</p>
+                            <p>Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Sri Lanka<br>Direct WhatsApp Concierge: +94 77 175 7556</p>
                         </div>
                     </div>
                 `
