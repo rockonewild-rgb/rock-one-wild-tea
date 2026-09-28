@@ -43,7 +43,7 @@ app.use(express.static(path.join(__dirname, '..'), {
         } else if (filePath.match(/\.(jpg|jpeg|png|webp|svg|gif|ico|mp3|wav|ogg)$/i)) {
             res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
         } else if (filePath.match(/\.(css|js)$/i)) {
-            res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+            res.setHeader('Cache-Control', 'no-cache, must-revalidate');
         }
     }
 }));
