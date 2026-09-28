@@ -232,7 +232,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png?v=1.26.0">
 
     <!-- Main Style Sheet -->
-    <link rel="stylesheet" href="css/style.css?v=2.18.0">
+    <link rel="stylesheet" href="css/style.css?v=2.26.0">
     
     <!-- Remote Debugging global error catcher -->
     <script>
@@ -1031,24 +1031,24 @@
         </div>
     </button>
 
-    <!-- Floating Luxury Bulletins / Daily Updates & Offers Button (Left Screen Side) -->
+    <!-- Floating Luxury Bulletins / Daily Updates & Offers Button (Right Screen Side) -->
     <button id="floating-bulletins-btn" 
             class="floating-bulletins-btn" 
             onclick="window.appSwitchTab ? window.appSwitchTab('announcements') : (document.getElementById('nav-announcements') &amp;&amp; document.getElementById('nav-announcements').click())"
             aria-label="Estate Bulletins, Daily Updates &amp; Special Offers" 
             title="Daily Bulletins • Latest Estate News &amp; Offers">
-        <div class="bulletins-btn-pulse-ring"></div>
+        <div class="bulletins-btn-pulse-ring" id="floating-bulletins-pulse"></div>
         <div class="bulletins-shine-sheen"></div>
         <div class="bulletins-icon-box">
-            <!-- Luxury Newspaper / Bulletin Icon -->
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Universal Luxury Estate Bulletin / Megaphone / Broadcast News Icon -->
+            <svg class="bulletins-floating-svg" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                 <line x1="8" y1="7" x2="16" y2="7"></line>
                 <line x1="8" y1="11" x2="14" y2="11"></line>
             </svg>
+            <span class="floating-bulletins-badge" id="floating-bulletins-badge" style="display: none;">0</span>
         </div>
-        <span class="floating-bulletins-badge" id="floating-bulletins-badge">News</span>
     </button>
 
     <!-- Luxury FAQ Chatbot Window -->
@@ -1571,9 +1571,9 @@
     </button>
 
     <!-- Script Loads (Execution dependency order: i18n -> store -> components -> app) -->
-    <script defer src="js/i18n.js?v=2.25.0"></script>
-    <script defer src="js/store.js?v=2.25.0"></script>
-    <script defer src="js/components.js?v=2.25.0"></script>
-    <script defer src="js/app.js?v=2.25.0"></script>
+    <script defer src="js/i18n.js?v=2.26.0"></script>
+    <script defer src="js/store.js?v=2.26.0"></script>
+    <script defer src="js/components.js?v=2.26.0"></script>
+    <script defer src="js/app.js?v=2.26.0"></script>
 </body>
 </html>

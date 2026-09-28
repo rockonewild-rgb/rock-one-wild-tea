@@ -380,6 +380,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 bindCinemaEvents();
                 break;
             case 'announcements':
+                if (window.TeaFactoryStore && typeof window.TeaFactoryStore.markAnnouncementsAsRead === 'function') {
+                    window.TeaFactoryStore.markAnnouncementsAsRead();
+                }
+                if (typeof window.updateBulletinsBadge === 'function') {
+                    window.updateBulletinsBadge();
+                }
                 window.UIComponents.renderAnnouncementsPage('announcements-full-container');
                 bindAnnouncementsPageEvents();
                 break;
@@ -972,13 +978,23 @@ document.addEventListener('DOMContentLoaded', () => {
     window.showEmailServiceChooserModal = showEmailServiceChooserModal;
 
     // 4. Toast Notification System
-    function showToast(title, message, type = 'success') {
+    function showToast(title, message, type = 'success', duration = 4000, onClick = null) {
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
+        if (onClick) {
+            toast.style.cursor = 'pointer';
+            toast.addEventListener('click', (e) => {
+                onClick(e);
+                toast.remove();
+            });
+        }
         
-        const icon = type === 'success' ? 
-            `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="toast-icon"><polyline points="20 6 9 17 4 12"></polyline></svg>` : 
-            `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="toast-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+        let icon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="toast-icon"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        if (type === 'error') {
+            icon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="toast-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+        } else if (type === 'info' || type === 'bulletin') {
+            icon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2" class="toast-icon"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><line x1="8" y1="7" x2="16" y2="7"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>`;
+        }
 
         toast.innerHTML = `
             ${icon}
@@ -986,15 +1002,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="toast-title">${title}</div>
                 <div class="toast-msg">${message}</div>
             </div>
+            ${onClick ? `<div style="font-size:0.72rem; color:var(--color-gold); font-weight:700; margin-left:auto; flex-shrink:0; text-transform:uppercase; letter-spacing:0.5px;">Read &rarr;</div>` : ''}
         `;
         
         toastContainer.appendChild(toast);
         
-        // Remove toast after 4s
+        // Auto remove toast after duration
         setTimeout(() => {
             toast.style.animation = 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) reverse forwards';
             setTimeout(() => toast.remove(), 400);
-        }, 4000);
+        }, duration);
     }
 
     // 5. Drawer Controls
@@ -4894,8 +4911,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const premium = document.getElementById('ann-premium-input').checked;
                 const image = selectedAnnImageBase64;
 
-                window.TeaFactoryStore.addAnnouncement({ title, tag, content, premium, image });
-                showToast("Bulletin Published", `"${title}" has been added to our live announcements timeline.`, "success");
+                const res = window.TeaFactoryStore.addAnnouncement({ title, tag, content, premium, image });
+                const count = (res && res.notifiedCount) ? res.notifiedCount : 0;
+                
+                showToast(
+                    "📢 Bulletin Published & Dispatched", 
+                    `"${title}" is now live on the timeline and dispatch notification sent to ${count > 0 ? count + ' registered customers/subscribers' : 'all clients'}.`, 
+                    "success",
+                    5000
+                );
                 
                 selectedAnnImageBase64 = '';
                 annForm.reset();
@@ -7655,12 +7679,100 @@ Sanctuary: No: 54 Gannilawattha, Wallawela, Ettampitiya, Sri Lanka
         });
     }
 
+    // ── Floating Bulletins & Realtime Customer Notification System ──
+    function initBulletinsNotificationSystem() {
+        const floatingBulletinsBtn = document.getElementById('floating-bulletins-btn');
+        const floatingBulletinsBadge = document.getElementById('floating-bulletins-badge');
+        const floatingBulletinsPulse = document.getElementById('floating-bulletins-pulse');
+
+        function updateBulletinsBadge() {
+            if (!window.TeaFactoryStore) return;
+            const unreadCount = typeof window.TeaFactoryStore.getUnreadAnnouncementsCount === 'function'
+                ? window.TeaFactoryStore.getUnreadAnnouncementsCount()
+                : 0;
+
+            if (floatingBulletinsBadge) {
+                if (unreadCount > 0) {
+                    floatingBulletinsBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+                    floatingBulletinsBadge.style.display = 'flex';
+                    floatingBulletinsBadge.classList.remove('cart-badge-bump');
+                    void floatingBulletinsBadge.offsetWidth; // trigger reflow
+                    floatingBulletinsBadge.classList.add('cart-badge-bump');
+                    if (floatingBulletinsPulse) floatingBulletinsPulse.style.display = 'block';
+                } else {
+                    floatingBulletinsBadge.style.display = 'none';
+                    if (floatingBulletinsPulse) floatingBulletinsPulse.style.display = 'none';
+                }
+            }
+        }
+        window.updateBulletinsBadge = updateBulletinsBadge;
+
+        // Handle live announcements broadcast
+        function handleIncomingAnnouncement(annData) {
+            const ann = annData.announcement || annData;
+            if (!ann || !ann.title) return;
+
+            updateBulletinsBadge();
+
+            // Show real-time notification toast to customer
+            showToast(
+                "📢 New Estate Bulletin Published",
+                `"${ann.title}" • Tap to view latest harvest updates & offers.`,
+                "bulletin",
+                7000,
+                () => {
+                    if (typeof switchTab === 'function') switchTab('announcements');
+                }
+            );
+        }
+
+        // 1. Same-window custom event
+        window.addEventListener('tea_new_announcement', (e) => {
+            if (e.detail) handleIncomingAnnouncement(e.detail);
+        });
+
+        // 2. Announcements read event
+        window.addEventListener('tea_announcements_read', () => {
+            updateBulletinsBadge();
+        });
+
+        // 3. Multi-tab BroadcastChannel
+        if ('BroadcastChannel' in window) {
+            try {
+                const bc = new BroadcastChannel('rock_one_tea_events');
+                bc.onmessage = (e) => {
+                    if (e.data && e.data.type === 'NEW_ANNOUNCEMENT') {
+                        handleIncomingAnnouncement(e.data);
+                    }
+                };
+            } catch (err) {
+                console.warn('BroadcastChannel error:', err);
+            }
+        }
+
+        // 4. Multi-tab localStorage storage event fallback
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'tea_announcement_broadcast' && e.newValue) {
+                try {
+                    const data = JSON.parse(e.newValue);
+                    handleIncomingAnnouncement(data);
+                } catch (err) {}
+            } else if (e.key === 'tea_last_read_announcements_time' || e.key === 'tea_last_read_announcement_id') {
+                updateBulletinsBadge();
+            }
+        });
+
+        // Initial check on load
+        updateBulletinsBadge();
+    }
+
     // 9. Initial Load Orchestration
     initCustomCursor();
     initLanguageSwitchers();
     initCurrencySwitchers();
     initFloatingGlobalPreferences();
     initCartSystem();
+    initBulletinsNotificationSystem();
     initAboutUsModal();
     initLookbookModal();
     initFaqChatbot();

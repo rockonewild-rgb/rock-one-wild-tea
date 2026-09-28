@@ -8322,11 +8322,11 @@ mark.search-match-highlight {
     }
 }
 
-/* ── Floating Luxury Bulletins / Daily Updates & Offers Button (Left Screen Side) ─── */
+/* ── Floating Luxury Bulletins / Daily Updates & Offers Button (Right Screen Side) ─── */
 .floating-bulletins-btn {
     position: fixed;
-    bottom: 2.5rem;
-    left: 2rem;
+    bottom: 17rem;
+    right: 2rem;
     z-index: 1200;
     width: 54px;
     height: 54px;
@@ -8337,20 +8337,20 @@ mark.search-match-highlight {
     border: 1.5px solid var(--color-gold);
     color: var(--color-gold) !important;
     border-radius: 50%;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), 0 0 22px rgba(212, 175, 55, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.35);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.75), 0 0 22px rgba(212, 175, 55, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.35);
     cursor: pointer;
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease, background 0.35s ease;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     padding: 0;
-    overflow: visible;
+    overflow: visible !important;
 }
 
 .floating-bulletins-btn:hover {
     transform: translateY(-4px) scale(1.08);
     border-color: #ffe89e;
     color: #ffe89e !important;
-    box-shadow: 0 12px 38px rgba(0, 0, 0, 0.9), 0 0 32px rgba(212, 175, 55, 0.8);
+    box-shadow: 0 12px 38px rgba(0, 0, 0, 0.9), 0 0 32px rgba(212, 175, 55, 0.85);
     background: linear-gradient(135deg, #4d380b 0%, #291d06 100%);
 }
 
@@ -8378,40 +8378,78 @@ mark.search-match-highlight {
 
 .bulletins-shine-sheen {
     position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.bulletins-shine-sheen::after {
+    content: '';
+    position: absolute;
     top: -50%;
     left: -130%;
     width: 70%;
     height: 200%;
-    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.5) 50%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.55) 50%, transparent 100%);
     transform: rotate(25deg);
-    animation: bulletinsShineSweep 3.6s infinite ease-in-out;
-    pointer-events: none;
-    z-index: 2;
-    border-radius: 50%;
+    animation: bulletinsShineSweep 3.4s infinite ease-in-out;
 }
 
 @keyframes bulletinsShineSweep {
-    0% { left: -130%; }
-    35% { left: 160%; }
-    100% { left: 160%; }
+    0%, 25% { left: -130%; opacity: 0; }
+    45% { opacity: 0.9; }
+    70%, 100% { left: 190%; opacity: 0; }
+}
+
+.bulletins-icon-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    overflow: visible;
+}
+
+.bulletins-floating-svg {
+    color: var(--color-gold);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    transition: transform 0.3s ease;
+}
+
+.floating-bulletins-btn:hover .bulletins-floating-svg {
+    transform: rotate(-8deg) scale(1.1);
+    color: #fff2b2;
 }
 
 .floating-bulletins-badge {
     position: absolute;
-    top: -4px;
-    right: -4px;
-    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
-    color: #ffffff;
-    font-size: 0.62rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 0.15rem 0.45rem;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    top: -6px;
+    right: -6px;
+    z-index: 50;
+    background: linear-gradient(135deg, #ffd700 0%, #d4af37 100%) !important;
+    color: #040e08 !important;
+    font-size: 0.76rem !important;
+    font-weight: 900 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.35rem;
+    border: 2px solid #231804 !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.9), 0 0 12px rgba(255, 215, 0, 0.85) !important;
     line-height: 1;
     pointer-events: none;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ─── Luxury About Us Modal Popup ─── */
@@ -8575,17 +8613,26 @@ mark.search-match-highlight {
     }
 
     .floating-bulletins-btn {
-        bottom: 2rem !important;
-        left: 1rem !important;
-        width: 44px !important;
-        height: 44px !important;
+        bottom: 13rem !important;
+        right: 1rem !important;
+        left: auto !important;
+        width: 42px !important;
+        height: 42px !important;
     }
     .floating-bulletins-btn svg {
-        width: 20px !important;
-        height: 20px !important;
+        width: 18px !important;
+        height: 18px !important;
+    }
+    .floating-bulletins-badge {
+        min-width: 18px !important;
+        height: 18px !important;
+        font-size: 0.68rem !important;
+        top: -4px !important;
+        right: -4px !important;
+        padding: 0 0.25rem !important;
     }
 
-    /* Scroll to top positioned cleanly above About Us button */
+    /* Scroll to top positioned cleanly above floating button stack */
     #scroll-to-top-btn {
         bottom: 16.25rem !important;
         right: 1.15rem !important;

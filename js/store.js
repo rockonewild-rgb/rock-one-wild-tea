@@ -1552,7 +1552,7 @@ class TeaFactoryStore {
 
 
 
-    // Add new Announcement
+    // Add new Announcement & notify all customers/subscribers
     addAnnouncement(announcement) {
         const id = 'ann-' + Date.now().toString(36);
         const newAnn = {
@@ -1562,9 +1562,13 @@ class TeaFactoryStore {
             content: announcement.content,
             tag: announcement.tag || "Update",
             premium: !!announcement.premium,
-            image: announcement.image || "images/luxury_tea_announcement.jpg"
+            image: announcement.image || "images/luxury_tea_announcement.jpg",
+            createdAt: Date.now()
         };
         this.state.announcements.unshift(newAnn);
+        
+        // Notify all registered customers, subscribers, and leads
+        const notifiedCount = this.notifyCustomersOfAnnouncement(newAnn);
         this.saveState();
 
         if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.createAnnouncement === 'function') {
@@ -1579,7 +1583,187 @@ class TeaFactoryStore {
             }).catch(e => console.warn('Supabase sync notice:', e));
         }
 
-        return newAnn;
+        // Broadcast to local tab and across open browser tabs
+        try {
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('tea_new_announcement', { 
+                    detail: { announcement: newAnn, notifiedCount } 
+                }));
+                localStorage.setItem('tea_announcement_broadcast', JSON.stringify({ 
+                    announcement: newAnn, 
+                    notifiedCount,
+                    timestamp: Date.now() 
+                }));
+                if ('BroadcastChannel' in window) {
+                    const bc = new BroadcastChannel('rock_one_tea_events');
+                    bc.postMessage({ type: 'NEW_ANNOUNCEMENT', announcement: newAnn, notifiedCount });
+                    bc.close();
+                }
+            }
+        } catch (e) {
+            console.warn('Announcement broadcast notification warning:', e);
+        }
+
+        return { ...newAnn, notifiedCount };
+    }
+
+    // Customer Notification System: Broadcast new bulletin to all customer emails
+    notifyCustomersOfAnnouncement(ann) {
+        if (!this.state.emailLogs) this.state.emailLogs = [];
+
+        // Collect all distinct customer emails and names across orders, bookings, and inquiries
+        const recipientMap = new Map();
+
+        // 1. From Bookings
+        if (Array.isArray(this.state.bookings)) {
+            this.state.bookings.forEach(b => {
+                if (b.email && b.email.includes('@')) {
+                    const cleanEmail = b.email.trim().toLowerCase();
+                    if (!recipientMap.has(cleanEmail)) {
+                        recipientMap.set(cleanEmail, b.customerName || b.name || 'Valued Connoisseur');
+                    }
+                }
+            });
+        }
+
+        // 2. From Orders
+        if (Array.isArray(this.state.orders)) {
+            this.state.orders.forEach(o => {
+                if (o.email && o.email.includes('@')) {
+                    const cleanEmail = o.email.trim().toLowerCase();
+                    if (!recipientMap.has(cleanEmail)) {
+                        recipientMap.set(cleanEmail, o.customerName || 'Esteemed Patron');
+                    }
+                }
+            });
+        }
+
+        // 3. From Inquiries
+        if (Array.isArray(this.state.inquiries)) {
+            this.state.inquiries.forEach(inq => {
+                if (inq.email && inq.email.includes('@')) {
+                    const cleanEmail = inq.email.trim().toLowerCase();
+                    if (!recipientMap.has(cleanEmail)) {
+                        recipientMap.set(cleanEmail, inq.name || 'Estate Guest');
+                    }
+                }
+            });
+        }
+
+        // 4. Default VIP Subscribers List
+        const defaultSubscribers = [
+            { email: 'guest.collector@rockonewildtea.com', name: 'Artisanal Tea Collector' },
+            { email: 'connoisseur@ceylontea.org', name: 'Ceylon Tea Connoisseur' },
+            { email: 'vip.member@artisantreasures.lk', name: 'Estate Circle Member' }
+        ];
+
+        defaultSubscribers.forEach(sub => {
+            const cleanEmail = sub.email.toLowerCase();
+            if (!recipientMap.has(cleanEmail)) {
+                recipientMap.set(cleanEmail, sub.name);
+            }
+        });
+
+        // Generate and log mock email notification for each recipient
+        let count = 0;
+        recipientMap.forEach((customerName, email) => {
+            this.logMockAnnouncementEmail(ann, email, customerName);
+            count++;
+        });
+
+        return count;
+    }
+
+    // Log announcement broadcast email
+    logMockAnnouncementEmail(ann, recipientEmail, customerName = 'Valued Connoisseur') {
+        if (!this.state.emailLogs) this.state.emailLogs = [];
+
+        const emailContent = `
+To: ${recipientEmail}
+Subject: 📢 New Estate Bulletin: ${ann.title} - Rock One Wild Tea (Pvt) Limited
+
+Dear ${customerName},
+
+We are pleased to share an official estate bulletin and harvest update from Rock One Wild Tea (Pvt) Limited:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📰 [${(ann.tag || 'UPDATE').toUpperCase()}] ${ann.title}
+📅 Date: ${ann.date}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${ann.content}
+
+${ann.premium ? '✨ This is an Exclusive Connoisseur Edition bulletin reserved for our estate patrons.\n' : ''}
+To explore our complete collection of single-estate handcrafted orthodox teas, reserve bespoke gift boxes, or book an immersive private estate tour, visit our boutique portal:
+https://rockonewildtea.com
+
+Hand made with Care, Crafted from Ceylon.
+
+Warm regards,
+Rock One Wild Tea (Pvt) Limited
+Family Tea Garden & Boutique Factory
+Uva Medium Region, Sri Lanka
+WhatsApp Concierge: +94 77 175 7556
+`.trim();
+
+        this.state.emailLogs.unshift({
+            id: `EMAIL-ANN-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000)}`,
+            date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+            to: recipientEmail,
+            subject: `📢 Bulletin Broadcast: ${ann.title}`,
+            body: emailContent,
+            type: 'bulletin_broadcast'
+        });
+    }
+
+    // Get unread announcements count for floating badge
+    getUnreadAnnouncementsCount() {
+        const announcements = this.getAnnouncements();
+        if (!announcements || announcements.length === 0) return 0;
+
+        try {
+            if (typeof window === 'undefined' || !window.localStorage) return 0;
+            const lastReadTime = parseInt(localStorage.getItem('tea_last_read_announcements_time') || '0', 10);
+            const lastReadId = localStorage.getItem('tea_last_read_announcement_id');
+
+            if (!lastReadTime && !lastReadId) {
+                // First time user: show 1 or total active bulletins count
+                return Math.min(announcements.length, 2);
+            }
+
+            if (lastReadId) {
+                const readIndex = announcements.findIndex(a => String(a.id) === String(lastReadId));
+                if (readIndex > 0) return readIndex; // announcements before the read one are new
+                if (readIndex === 0) return 0; // latest announcement has been read
+            }
+
+            if (lastReadTime > 0) {
+                const unreadCount = announcements.filter(a => {
+                    const itemTime = a.createdAt || 0;
+                    return itemTime > lastReadTime;
+                }).length;
+                return unreadCount;
+            }
+        } catch (e) {
+            console.warn('Error computing unread announcements count:', e);
+        }
+
+        return 0;
+    }
+
+    // Mark all announcements as read
+    markAnnouncementsAsRead() {
+        try {
+            if (typeof window === 'undefined' || !window.localStorage) return;
+            const announcements = this.getAnnouncements();
+            localStorage.setItem('tea_last_read_announcements_time', Date.now().toString());
+            if (announcements.length > 0) {
+                localStorage.setItem('tea_last_read_announcement_id', String(announcements[0].id));
+            }
+            window.dispatchEvent(new CustomEvent('tea_announcements_read'));
+        } catch (e) {
+            console.warn('Error marking announcements as read:', e);
+        }
     }
 
     // Delete Announcement
