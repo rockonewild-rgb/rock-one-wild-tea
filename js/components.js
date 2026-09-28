@@ -2746,14 +2746,6 @@ const UIComponents = {
                     <button class="heritage-slider-btn heritage-next" id="heritage-next-btn" aria-label="Next Gallery Photo">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
-
-                    <!-- Bottom Bar with Dot Indicators & Counter -->
-                    <div class="heritage-slider-footer">
-                        <div class="heritage-dots-bar" id="heritage-dots-bar">
-                            ${galleryImages.slice(0, Math.min(galleryImages.length, 8)).map((_, i) => `<span class="heritage-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`).join('')}
-                        </div>
-                        <span class="heritage-counter" id="heritage-counter">01 / ${String(Math.max(galleryImages.length, 1)).padStart(2, '0')}</span>
-                    </div>
                 </div>
             </div>
 
