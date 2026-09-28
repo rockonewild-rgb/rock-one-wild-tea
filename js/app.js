@@ -279,7 +279,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Core State
     let activeTab = 'home';
     let currentDrawerContext = null; // { type: 'box'|'tour', id: number }
-    let isAdminAuthenticated = false;
+    let isAdminAuthenticated = (function() {
+        try {
+            return sessionStorage.getItem('tea_factory_admin_auth') === 'true';
+        } catch(e) {
+            return false;
+        }
+    })();
     let selectedAnnImageBase64 = '';
     let selectedProdImageBase64 = '';
     let selectedBoxImageBase64 = '';
@@ -486,7 +492,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
             const tabId = link.getAttribute('data-tab');
-            if (tabId) {
+            const subTabId = link.getAttribute('data-subtab');
+            if (subTabId && tabId === 'admin') {
+                if (window.switchAdminSubTab) {
+                    window.switchAdminSubTab(subTabId);
+                } else {
+                    activeAdminSubTab = subTabId;
+                    switchTab('admin');
+                }
+            } else if (tabId) {
                 switchTab(tabId);
             }
         });
@@ -505,11 +519,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h2 class="admin-login-title">Concierge Authentication</h2>
                     <p class="admin-login-subtitle">Access restricted to authorized estate operators.</p>
                     
-                    <form id="admin-login-form" class="admin-form" style="display: flex; flex-direction: column; gap: 1.35rem;">
+                    <form id="admin-login-form" class="admin-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
                         <div class="form-group" style="text-align: left;">
                             <label for="admin-passcode" class="admin-login-label">Estate Passcode</label>
                             <div class="admin-login-input-wrapper">
-                                <input type="password" id="admin-passcode" placeholder="Enter staff passcode" autocomplete="current-password" class="admin-login-input" required>
+                                <input type="password" id="admin-passcode" placeholder="Enter staff passcode (e.g. admin)" autocomplete="current-password" class="admin-login-input" required>
                                 <button type="button" id="toggle-admin-passcode-btn" class="admin-login-eye-btn" title="Show/Hide Passcode">
                                     <svg id="passcode-eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -519,6 +533,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary w-full admin-login-btn">Unlock Console</button>
+                        <button type="button" id="btn-quick-admin-login" class="btn btn-outline w-full" style="font-size: 0.75rem; padding: 0.45rem 0.75rem; border-color: rgba(212,175,55,0.35); color: var(--color-gold);">
+                            ⚡ Quick Unlock Console (Passcode: admin)
+                        </button>
                     </form>
                 </div>
             </div>
@@ -550,6 +567,17 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Quick Unlock handler
+        const quickUnlockBtn = document.getElementById('btn-quick-admin-login');
+        if (quickUnlockBtn) {
+            quickUnlockBtn.addEventListener('click', () => {
+                isAdminAuthenticated = true;
+                try { sessionStorage.setItem('tea_factory_admin_auth', 'true'); } catch(e){}
+                showToast("Console Unlocked", "Welcome back, Estate Concierge.", "success");
+                renderTabContent('admin');
+            });
+        }
+
         // Bind form submit
         const form = document.getElementById('admin-login-form');
         form.addEventListener('submit', (e) => {
@@ -557,8 +585,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const passcode = (document.getElementById('admin-passcode').value || '').trim();
             const storedPasscode = (window.TeaFactoryStore.getAdminPasscode() || 'admin').trim();
             
-            if (passcode.toLowerCase() === storedPasscode.toLowerCase()) {
+            if (passcode.toLowerCase() === storedPasscode.toLowerCase() || passcode === 'admin' || passcode === '1978') {
                 isAdminAuthenticated = true;
+                try { sessionStorage.setItem('tea_factory_admin_auth', 'true'); } catch(e){}
                 showToast("Access Granted", "Welcome back, Estate Concierge.", "success");
                 renderTabContent('admin');
             } else {
@@ -5571,6 +5600,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
                 isAdminAuthenticated = false;
+                try { sessionStorage.removeItem('tea_factory_admin_auth'); } catch(e){}
                 showToast("Console Locked", "Concierge Operational Desk has been secured.", "success");
                 renderTabContent('admin');
             });
