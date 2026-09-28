@@ -2435,16 +2435,15 @@ const UIComponents = {
 
         const galleryImages = window.TeaFactoryStore.getGalleryImages();
         const totalPhotos = galleryImages.length;
-        const estateCount = galleryImages.filter(g => (g.tag || '').includes('Estate')).length;
-        const landmarkCount = galleryImages.filter(g => (g.tag || '').includes('Landmarks') || (g.tag || '').includes('Terroir')).length;
-        const packagingCount = galleryImages.filter(g => (g.tag || '').includes('Packaging')).length;
+        const estateCount = galleryImages.filter(g => (g.tag || '').includes('Estate') || (g.tag || '').includes('Harvest')).length;
+        const packagingCount = galleryImages.filter(g => (g.tag || '').includes('Packaging') || (g.tag || '').includes('Reserve')).length;
 
         let html = `
             <div class="gallery-header-block" style="margin-bottom: 2.5rem; text-align: center;">
                 <span class="section-tag">Visual Terroir &amp; Craft</span>
                 <h2 class="view-title">Rock One Wild Tea Photographic Gallery</h2>
                 <p class="view-subtitle" style="max-width: 780px; margin: 0 auto 1.75rem auto;">
-                    Immerse yourself in authentic visuals from our family tea garden in Ettampitiya (elevation 1,240m), artisanal hand-harvesting, orthodox wood-firing, and surrounding landmark waterfalls.
+                    Immerse yourself in authentic visuals from our family tea garden in Ettampitiya (elevation 1,240m), artisanal hand-harvesting, orthodox brass rolling, and wood-fired curing.
                 </p>
 
                 <!-- Category Filter Pills -->
@@ -2453,10 +2452,7 @@ const UIComponents = {
                         All Photos (${totalPhotos})
                     </button>
                     <button type="button" class="gallery-filter-btn" data-filter="Estate & Harvest" style="padding: 0.5rem 1.1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.25s ease; background: rgba(0,0,0,0.5); color: #e2e8f0; border: 1px solid rgba(212,175,55,0.35);">
-                        🌱 Estate &amp; Hand-Plucking (${estateCount})
-                    </button>
-                    <button type="button" class="gallery-filter-btn" data-filter="Landmarks & Terroir" style="padding: 0.5rem 1.1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.25s ease; background: rgba(0,0,0,0.5); color: #e2e8f0; border: 1px solid rgba(212,175,55,0.35);">
-                        ⛰️ Landmark Waterfalls &amp; Mountains (${landmarkCount})
+                        🌱 Estate &amp; Harvest (${estateCount})
                     </button>
                     <button type="button" class="gallery-filter-btn" data-filter="Packaging & Reserves" style="padding: 0.5rem 1.1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.25s ease; background: rgba(0,0,0,0.5); color: #e2e8f0; border: 1px solid rgba(212,175,55,0.35);">
                         📦 Teak Chests &amp; Packaging (${packagingCount})

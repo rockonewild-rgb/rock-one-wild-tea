@@ -6848,9 +6848,9 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
     let currentHeroIndex = 0;
 
     function getHeroSlideMetadata(imgObj, index) {
-        const src = imgObj.src || '';
-        const caption = imgObj.caption || '';
-        const tag = imgObj.tag || 'Estate & Harvest';
+        const src = (imgObj && imgObj.src) ? imgObj.src : '';
+        const caption = (imgObj && imgObj.caption) ? imgObj.caption : '';
+        const tag = (imgObj && imgObj.tag) ? imgObj.tag : 'Estate & Harvest';
 
         if (src.includes('tea_garden_hand_plucking') || index === 0) {
             return {
@@ -6858,83 +6858,179 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 title: 'From Our Wild Forest Garden <span>to Your Cup.</span>',
                 description: 'Rock One Wild Tea is a family-owned tea business born from our own tea garden in Sri Lanka’s Uva Medium region, nestled in a forested environment at the foot of a large rock formation. Hand made with Care, Crafted from Ceylon — from selecting the tea leaves to small-batch processing in our family factory.'
             };
-        } else if (src.includes('mana_ella')) {
+        } else if (src.includes('1%20(1).') || src.includes('1 (1).')) {
             return {
-                subtitle: 'Lunuwatta Valley Terroir • 15 km from Estate',
-                title: 'Mana Ella Cascade. <span>Pure Mountain Terroir.</span>',
-                description: 'Flowing through the pristine Lunuwatta valley near our family tea garden, natural mountain mist and clean alpine breezes nurture our wild arbor tea trees.'
+                subtitle: 'Forested Rock Formation Terroir • 1,240m Elevation',
+                title: 'Wild Arbor Garden. <span>Mountain Foothill Heritage.</span>',
+                description: 'Grown naturally amidst virgin mountain forest and ancient flora at the foot of our iconic rock formation in Ettampitiya, free from synthetic chemicals.'
             };
-        } else if (src.includes('sthreepura_cave')) {
+        } else if (src.includes('1%20(2).') || src.includes('1 (2).')) {
             return {
-                subtitle: 'Ettampitiya Mountain Sanctuary • Ancient Cavern',
-                title: 'Ancient Sthreepura. <span>Legendary Mist Foothills.</span>',
-                description: 'Set against legendary rock caverns and misted peaks, our wild tea garden thrives in untouched biodiversity free from synthetic chemicals.'
+                subtitle: '1,240m Elevation Highlands • Ettampitiya Sanctuary',
+                title: 'Highland Terroir. <span>Pure Mountain Ecology.</span>',
+                description: 'Our tea garden thrives in clean alpine air, rich mineral mountain soil, and dense natural cloud cover in Sri Lanka’s renowned Uva Medium region.'
             };
-        } else if (src.includes('bomburu_ella')) {
+        } else if (src.includes('1%20(3).') || src.includes('1 (3).')) {
             return {
-                subtitle: 'Perawella Highland Falls • Widest Waterfall in Sri Lanka',
-                title: 'Bomburu Ella. <span>Highland Waterfall Mist.</span>',
-                description: 'The cool spray of Perawella feeds the high-altitude cloud cover that gives Uva teas their world-renowned brisk, golden character.'
+                subtitle: 'Family-Owned Tea Garden • Hand-Built With Vision',
+                title: 'Generational Craft. <span>From Garden to Factory.</span>',
+                description: 'What started as a small family effort during COVID has blossomed into an artisanal Ceylon Tea brand dedicated to purity and small-batch craftsmanship.'
             };
-        } else if (src.includes('seetha_amman')) {
+        } else if (src.includes('1%20(4).') || src.includes('1 (4).')) {
             return {
-                subtitle: 'Ashoka Vatika Foothills • Sacred Hill Country',
-                title: 'Highland Sanctuaries. <span>Timeless Ceylon Heritage.</span>',
-                description: 'Surrounded by historic cloud-forest sanctuaries and highland peaks, crafting Ceylon\'s purest orthodox loose-leaf teas.'
+                subtitle: 'Boutique Family Factory • Working Sanctuary',
+                title: 'Artisanal Facility. <span>Small-Batch Dedication.</span>',
+                description: 'Every stage of tea production is monitored by hand in our small family factory to ensure uncompromised quality in every single batch.'
             };
-        } else if (src.includes('liptons_seat')) {
+        } else if (src.includes('1%20(5).') || src.includes('1 (5).')) {
             return {
-                subtitle: '1,970m Panoramic Cloud Peak • Historic Vantage',
-                title: 'Lipton\'s Seat Panorama. <span>Crown of Ceylon Tea.</span>',
-                description: 'Gaze across 7 provinces from the historic vantage point overlooking the southern hills, where Ceylon\'s timeless tea legacy was born.'
+                subtitle: 'Generational Artisans • Selective Two Leaves & A Bud',
+                title: 'Dawn Hand-Plucking. <span>Artisanal Purity.</span>',
+                description: 'Every tender shoot is hand-harvested at first light by skilled generational pluckers to preserve precious silver tips and volatile aromatics.'
             };
-        } else if (src.includes('dunhinda_falls')) {
+        } else if (src.includes('1%20(7).') || src.includes('1 (7).')) {
             return {
-                subtitle: 'Badulla Valley • Mist-Enriched Microclimate',
-                title: 'Dunhinda Falls. <span>Smoky Mist & Mountain Power.</span>',
-                description: 'The famous smoky mist cataract sweeps humidity through the valleys, creating perfect slow-growth conditions for artisanal tea flushes.'
+                subtitle: 'Natural Mountain Air-Withering • Gentle Aeration',
+                title: 'Slow Air-Withering. <span>Enzymatic Balance.</span>',
+                description: 'Harvested leaves rest on air-troughs as cool mountain breezes gently reduce moisture, preparing the leaves for orthodox rolling.'
             };
-        } else if (src.includes('ravana_falls')) {
+        } else if (src.includes('1%20(8).') || src.includes('1 (8).')) {
             return {
-                subtitle: 'Ella Mountain Pass • Southern Hill Country',
-                title: 'Ravana Falls & Ella Rock. <span>Wild Highland Beauty.</span>',
-                description: 'Dramatic gorges and tropical montane flora surround our growing region, imparting floral aroma and amber liquor notes.'
+                subtitle: 'Forest Canopy Habitat • Native Biodiversity',
+                title: 'Wild Botanical Forest. <span>Natural Equilibrium.</span>',
+                description: 'Our tea trees share the canopy with mountain cinnamon and wild fern trees, creating a living ecosystem that enriches tea leaf flavor.'
             };
-        } else if (src.includes('little_adams_peak')) {
+        } else if (src.includes('1%20(9).') || src.includes('1 (9).')) {
             return {
-                subtitle: 'Punchi Sri Pada • Morning Sun & Cool Winds',
-                title: 'Little Adam\'s Peak. <span>Sunrise Over Wild Ridges.</span>',
-                description: 'Golden dawn rays warm the high ridges each morning as our generational pluckers select tender silver two leaves and a bud.'
+                subtitle: 'Cedar Trough Withering Room • Estate Craft',
+                title: 'Fragrant Withering. <span>Artisanal Care.</span>',
+                description: 'Traditional cedar troughs provide the perfect microclimate for slow, calibrated withering without artificial heat.'
             };
-        } else if (src.includes('nine_arches')) {
+        } else if (src.includes('1%20(10).') || src.includes('1 (10).')) {
             return {
-                subtitle: 'Historic Colonial Line • Forest Canopy Rail',
-                title: 'Nine Arches Viaduct. <span>Highland Heritage Trail.</span>',
-                description: 'A testament to century-old hill-country history, nestled amidst verdant tea hills just beyond our factory boundary.'
+                subtitle: 'Time-Honored Orthodox Methods • Brass Rolling Tables',
+                title: 'Orthodox Brass Rolling. <span>Unlocking Flavor.</span>',
+                description: 'Gentle brass rolling twists the tender leaves to release natural juices and initiate controlled orthodox oxidation.'
             };
-        } else if (src.includes('hakgala_gardens')) {
+        } else if (src.includes('1%20(12).') || src.includes('1 (12).')) {
             return {
-                subtitle: 'Hakgala Strict Nature Reserve • Alpine Climate',
-                title: 'Hakgala Botanical Haven. <span>Subtropical Highlands.</span>',
-                description: 'Sri Lanka\'s highest botanical sanctuary nurtures endemic micro-ecology, reflecting the wild biodiversity of our forest tea garden.'
+                subtitle: 'Calibrated Wood-Fired Curing • Essential Oil Locking',
+                title: 'Historic Wood-Firing. <span>Flavor Perfection.</span>',
+                description: 'Inside our heritage facility, calibrated wood-fired curing locks in volatile aromatics and creates multi-layered liquor notes.'
             };
-        } else if (src.includes('Gift%20box') || src.includes('Gift box') || src.includes('1%20(16)') || src.includes('1 (16)')) {
+        } else if (src.includes('1%20(13).') || src.includes('1 (13).')) {
             return {
-                subtitle: 'Solid Light-Wood Cedar Chests • Individually Numbered (1 to 10)',
-                title: 'Handcrafted Teak Chests. <span>Collector\'s Masterpieces.</span>',
-                description: 'Each seasonal equinox release yields strictly 10 individually numbered collector cedar chests, hand-sealed with private estate gold bullion wax.'
+                subtitle: 'Artisanal Sorting & Sifting • Visual Inspection',
+                title: 'Hand-Graded Quality. <span>Strict Standards.</span>',
+                description: 'Finished whole loose leaves are meticulously inspected and sorted by hand to guarantee flawless grading and appearance.'
             };
-        } else if (src.includes('1%20(12)') || src.includes('1 (12)')) {
+        } else if (src.includes('1%20(14).') || src.includes('1 (14).')) {
             return {
-                subtitle: 'Time-Honored Orthodox Methods • Fragrant Cedar Troughs',
-                title: 'Historic Craft. <span>Precision Wood-Firing.</span>',
-                description: 'Inside our heritage facility, leaves undergo natural mountain air-withering on fragrant cedar troughs, gentle orthodox brass rolling, and wood-fired curing.'
+                subtitle: 'Factory Tours (Mon–Sat) • Max 10 Guests Per Group',
+                title: 'Visit Our Family Factory. <span>Guided Walkthroughs.</span>',
+                description: 'Experience the story of Rock One Wild Tea first-hand with factory tours, leaf processing, and sommelier tastings (9:30 AM, 11:00 AM, 1:30 PM, 3:30 PM).'
             };
-        } else if (src.includes('luxury_tea_tour')) {
+        } else if (src.includes('1%20(15).') || src.includes('1 (15).')) {
             return {
-                subtitle: 'Small-Batch Family Factory • Max 10 Guests',
-                title: 'Experience the Tour. <span>Sommelier Cupping Flights.</span>',
-                description: 'Visit our working family factory at Ettampitiya (9:30 AM, 11:00 AM, 1:30 PM, 3:30 PM) for intimate walkthroughs, hand-rolling demonstrations, and guided tastings.'
+                subtitle: 'Sommelier Cupping Flights • Amber Liquor Evaluation',
+                title: 'Master Tea Tasting. <span>Cupping Excellence.</span>',
+                description: 'Evaluated for briskness, clarity, aroma, and delicate floral finish by professional tea tasters before allocation.'
+            };
+        } else if (src.includes('1%20(16).') || src.includes('1 (16).')) {
+            return {
+                subtitle: 'Solid Light-Wood Teak Chests • Individually Numbered (1 to 10)',
+                title: 'Numbered Collector Chests. <span>Limited Allocations.</span>',
+                description: 'Each equinox harvest yields strictly 10 individually numbered collector chests, hand-sealed with private estate gold bullion wax.'
+            };
+        } else if (src.includes('1%20(17).') || src.includes('1 (17).')) {
+            return {
+                subtitle: 'Orthodox Whole Loose-Leaf • Signature Ceylon Harvest',
+                title: 'Signature Loose-Leaf. <span>Pure Orthodox Grade.</span>',
+                description: 'Intact, twisted whole leaves that unfurl beautifully in the teapot, delivering a rich amber cup with deep lingering sweetness.'
+            };
+        } else if (src.includes('1%20(18).') || src.includes('1 (18).')) {
+            return {
+                subtitle: 'Forested Rock Slope • Ettampitiya Terraces',
+                title: 'The Rock Formation. <span>The Inspiration of Our Name.</span>',
+                description: 'Nestled at the foot of a majestic rock monolith, our tea terraces capture dawn sunlight and afternoon mountain mist.'
+            };
+        } else if (src.includes('1%20(19).') || src.includes('1 (19).')) {
+            return {
+                subtitle: 'Fresh Morning Harvest • Handcrafted Bamboo Baskets',
+                title: 'Morning Dew Harvest. <span>Fresh From The Garden.</span>',
+                description: 'Freshly plucked leaves arrive at our factory within minutes of plucking to ensure absolute botanical freshness.'
+            };
+        } else if (src.includes('1%20(20).') || src.includes('1 (20).')) {
+            return {
+                subtitle: 'Small-Scale Boutique Operations • Family Pride',
+                title: 'Pure Artisanal Heritage. <span>Every Batch Counted.</span>',
+                description: 'We produce no mass-market tea. Every tin, pouch, and wooden chest represents our family’s direct passion and craft.'
+            };
+        } else if (src.includes('1%20(21).') || src.includes('1 (21).')) {
+            return {
+                subtitle: 'Uva Medium Character • Rich Color & Bright Aroma',
+                title: 'Brisk & Aromatic. <span>Signature Ceylon Character.</span>',
+                description: 'The unique seasonal winds of the Uva Medium district infuse our tea with a lively briskness prized by international connoisseurs.'
+            };
+        } else if (src.includes('1%20(22).') || src.includes('1 (22).')) {
+            return {
+                subtitle: 'Wellawela Mountain Vistas • 1,240m Elevation',
+                title: 'Panoramic Horizons. <span>Mountain Terroir View.</span>',
+                description: 'Overlooking sweeping ridges and mist-filled valleys, our sanctuary offers an unforgettable encounter with Ceylon tea origins.'
+            };
+        } else if (src.includes('1%20(23).') || src.includes('1 (23).')) {
+            return {
+                subtitle: 'Artisanal Hand-Rolling • Traditional Technique',
+                title: 'Hand-Twisted Leaves. <span>Master Craftsmanship.</span>',
+                description: 'Demonstrating the historic methods of Ceylon tea masters, gently pressing and curling leaves by hand for premium specialty lots.'
+            };
+        } else if (src.includes('1%20(24).') || src.includes('1 (24).')) {
+            return {
+                subtitle: 'Golden Tips & Silver Needles • Reserve Quality',
+                title: 'Precious Silver Tips. <span>Pure White Tea Luxury.</span>',
+                description: 'Unopened silvery terminal buds, naturally sun-cured to produce our rarest, most delicate, and antioxidant-rich white tea flights.'
+            };
+        } else if (src.includes('1%20(25).') || src.includes('1 (25).')) {
+            return {
+                subtitle: 'Natural Sun-Drying • Gentle Thermal Processing',
+                title: 'Highland Sun-Drying. <span>Natural Solar Curing.</span>',
+                description: 'Harnessing the high-altitude equatorial sun for gentle dehydration of our artisanal green and white specialty teas.'
+            };
+        } else if (src.includes('1%20(26).') || src.includes('1 (26).')) {
+            return {
+                subtitle: 'Botanical Ecology • Ettampitiya Nature Reserve',
+                title: 'Biodiversity In Every Cup. <span>Eco-Harmonious.</span>',
+                description: 'Protected native trees, birds, and alpine flowers flourish alongside our tea bushes, ensuring sustainable estate stewardship.'
+            };
+        } else if (src.includes('1%20(27).') || src.includes('1 (27).')) {
+            return {
+                subtitle: 'Master Roasting & Aroma Development • Artisanal Batch',
+                title: 'Delicate Roasting. <span>Artisanal Finishing.</span>',
+                description: 'Careful temperature tuning imparts a subtle toasted honey note and long-lasting floral fragrance to our black teas.'
+            };
+        } else if (src.includes('1%20(28).') || src.includes('1 (28).')) {
+            return {
+                subtitle: 'Signature Whole Leaf Reserve • Ceylon Black & Green',
+                title: 'Signature Collection. <span>Pure Whole Leaf.</span>',
+                description: 'Crafted without dust or fannings — only pure whole leaves that yield a smooth, complex, and full-bodied infusion.'
+            };
+        } else if (src.includes('1%20(29).') || src.includes('1 (29).')) {
+            return {
+                subtitle: 'Tea Tasting Garden Pavilion • Sanctuary Grounds',
+                title: 'Open-Air Cupping. <span>Sanctuary Experience.</span>',
+                description: 'Relax in our outdoor garden pavilion overlooking the tea terraces while savoring freshly brewed single-estate infusions.'
+            };
+        } else if (src.includes('Gift%20box') || src.includes('Gift box')) {
+            return {
+                subtitle: 'Artisanal Packaging • Handcrafted Solid Teak Wood',
+                title: 'Handcrafted Teak Chests. <span>The Perfect Gift.</span>',
+                description: 'Solid Sri Lankan teak gift chests carved by local craftsmen, containing numbered selections of our finest whole-leaf Ceylon teas.'
+            };
+        } else if (src.includes('WhatsApp')) {
+            return {
+                subtitle: 'Family Forest Garden • Ettampitiya Highlands',
+                title: 'Rock One Wild Tea. <span>From Garden to Cup.</span>',
+                description: 'Hand made with Care, Crafted from Ceylon — born from our own tea garden in Sri Lanka’s Uva Medium region.'
             };
         } else {
             return {

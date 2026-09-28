@@ -18,7 +18,7 @@ const DEFAULT_ANNOUNCEMENTS = [
         content: "Discover our premium Gold-tipped black tea, harvested under the full moon from our highest estate slopes. Exclusively available in Series 3.",
         tag: "New Release",
         premium: true,
-        image: "images/luxury_tea_tin.jpg"
+        image: "images/1 (28).jpeg"
     },
     {
         id: 2,
@@ -27,16 +27,16 @@ const DEFAULT_ANNOUNCEMENTS = [
         content: "We are hosting an exclusive private tasting session for tea connoisseurs. Learn the art of tea brewing from our Master Tea Sommelier. Limited slots available.",
         tag: "Event",
         premium: false,
-        image: "images/luxury_tea_estate.jpg"
+        image: "images/tea_garden_hand_plucking.jpg"
     },
     {
         id: 3,
         title: "Factory Estate Tour Bookings Open",
         date: "Ongoing",
-        content: "Take a step back in time. Explore the historical 1890 Tea Factory, walk through the organic gardens, and witness the artisanal processing first-hand.",
+        content: "Take a step back in time. Explore our family boutique tea factory, walk through our wild forest garden, and witness handcrafted orthodox processing first-hand.",
         tag: "Announcement",
         premium: true,
-        image: "images/luxury_tea_tour.jpg"
+        image: "images/1 (14).jpeg"
     }
 ];
 
@@ -220,66 +220,6 @@ const DEFAULT_GALLERY_IMAGES = [
         src: "images/WhatsApp Image 2026-08-13 at 10.50.29 AM.jpeg",
         caption: "Rock One Wild Tea Family Estate & Forest Garden",
         tag: "Estate & Harvest"
-    },
-    {
-        id: "g_landmark_mana",
-        src: "images/landmark_mana_ella.jpg",
-        caption: "Mana Ella Waterfall — 15–18 km from Estate (Lunuwatta Valley)",
-        tag: "Landmarks & Terroir"
-    },
-    {
-        id: "g_landmark_sthreepura",
-        src: "images/landmark_sthreepura_cave.jpg",
-        caption: "Sthreepura Cave & Mountain Temple — 10–12 km from Rock One Wild Tea",
-        tag: "Landmarks & Terroir"
-    },
-    {
-        id: "g_landmark_bomburu",
-        src: "images/landmark_bomburu_ella.jpg",
-        caption: "Bomburu Ella (Perawella Falls) — Widest Waterfall in Sri Lanka (22–26 km)",
-        tag: "Landmarks & Terroir"
-    },
-    {
-        id: "g_landmark_seetha",
-        src: "images/landmark_seetha_amman_temple.jpg",
-        caption: "Seetha Amman Temple & Ashoka Vatika — 28–32 km Scenic Drive",
-        tag: "Landmarks & Terroir"
-    },
-    {
-        id: "g_landmark_lipton",
-        src: "images/landmark_liptons_seat.jpg",
-        caption: "Lipton's Seat Panoramic Lookout — 24 km from Sanctuary",
-        tag: "Landmarks & Terroir"
-    },
-    {
-        id: "g_landmark_dunhinda",
-        src: "images/landmark_dunhinda_falls.jpg",
-        caption: "Dunhinda Waterfall Mist Gorge — 28 km from Estate",
-        tag: "Landmarks & Terroir"
-    },
-    {
-        id: "g_landmark_ravana",
-        src: "images/landmark_ravana_falls.jpg",
-        caption: "Ravana Falls & Ella Mountain Gap — 20 km from Factory",
-        tag: "Landmarks & Terroir"
-    },
-    {
-        id: "g_landmark_adams_peak",
-        src: "images/landmark_little_adams_peak.jpg",
-        caption: "Little Adam's Peak (Punchi Sri Pada) — 18 km Trekking Terroir",
-        tag: "Landmarks & Terroir"
-    },
-    {
-        id: "g_landmark_nine_arches",
-        src: "images/landmark_nine_arches.jpg",
-        caption: "Nine Arches Bridge Viaduct — 20 km from Factory",
-        tag: "Landmarks & Terroir"
-    },
-    {
-        id: "g_landmark_hakgala",
-        src: "images/landmark_hakgala_gardens.jpg",
-        caption: "Hakgala Botanical Gardens & Subtropical Highlands — 28 km",
-        tag: "Landmarks & Terroir"
     }
 ];
 
