@@ -30,12 +30,12 @@
 
             // Brand
             brand_name: "ROCK ONE WILD TEA",
-            brand_tagline: "CEYLON ARTISANAL ESTATE",
+            brand_tagline: "Hand made with Care, Crafted from Ceylon",
 
             // Hero Section
-            hero_tag: "Single Estate High-Altitude Harvest",
-            hero_title: "Pure Mountain Ceylon Artisan Teas",
-            hero_subtitle: "Hand-crafted micro-batches harvested at 1,200m+ peak elevation in the mist-veiled sanctuary of Ettampitiya, Sri Lanka.",
+            hero_tag: "Rock One Wild Tea (Pvt) Limited • Uva Medium Region",
+            hero_title: "From Our Wild Forest Garden to Your Cup",
+            hero_subtitle: "From the Wild, Crafted by Our Hands. Family-owned small-batch Ceylon Tea, nurtured at the foot of a natural rock formation.",
             btn_explore_harvest: "Explore Tea Catalog",
             btn_book_tour: "Book Estate Tour",
             btn_reserve_box: "Reserve Numbered Chest",

@@ -2147,14 +2147,19 @@ const UIComponents = {
             <!-- Top Heritage Story Showcase -->
             <div class="heritage-container-layout" style="margin-bottom: 3.5rem;">
                 <div class="story-section" style="padding-right: 1rem;">
-                    <span class="section-tag">THE ETTAMPITIYA TERROIR & HERITAGE</span>
-                    <h3 class="home-section-title" style="font-size: 2.2rem; line-height: 1.25; margin-bottom: 1.25rem;">Born from the Wild Misty Slopes of Wallawela</h3>
+                    <span class="section-tag">ROCK ONE WILD TEA (PVT) LIMITED • UVA MEDIUM REGION</span>
+                    <h3 class="home-section-title" style="font-size: 2.2rem; line-height: 1.25; margin-bottom: 1.25rem;">From Our Wild Forest Garden to Your Cup</h3>
                     <p class="story-text" style="color: var(--color-text-primary); font-size: 0.98rem; line-height: 1.8; margin-bottom: 1.25rem;">
-                        Perched at over 1,200 meters above sea level at <strong>No: 54 Gannilawattha, Wallawela in Ettampitiya</strong>, Rock One Wild Tea represents Ceylon’s purest private-reserve tea enterprise. Unlike commercial monoculture plantations, our tea trees grow wild and unpruned amidst untouched montane forest biodiversity, drawing deep nutrients from centuries-old mineral soils.
+                        <strong>Rock One Wild Tea</strong> is a family-owned tea business born from our own tea garden in Sri Lanka’s Uva Medium region, nestled in a forested environment at the foot of a large rock formation. During the COVID period, my wife and I began our journey by developing this tea garden with our own hands. Today, we continue to personally handle much of the process in our small family factory — from selecting the tea leaves to processing and packaging our teas.
                     </p>
                     <p class="story-text" style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 2rem;">
-                        The microclimate of Ettampitiya — characterized by dramatic diurnal temperature swings, morning cloud inversions, and fresh mountain winds — slows leaf growth to concentrate rich amino acids and natural floral honey aromatics found nowhere else in Sri Lanka.
+                        Rather than producing tea on a large scale, we focus on small-batch production, careful attention to detail, and traditional handcrafted methods to create high-quality Ceylon Tea. Our teas carry the natural character of the environment where they grow, together with the care and craftsmanship of our family.
                     </p>
+                    <div style="background: rgba(212, 175, 55, 0.08); border-left: 3px solid var(--color-gold); padding: 1rem 1.25rem; border-radius: 0 10px 10px 0; margin-bottom: 1.75rem;">
+                        <p style="font-style: italic; color: #ffd875; font-size: 0.92rem; margin: 0; line-height: 1.5;">
+                            "Rock One Wild Tea — From the wild, crafted by our hands, to your cup."
+                        </p>
+                    </div>
                     <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                         <span class="btn btn-primary" onclick="document.getElementById('nav-tours').click()">
                             <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
@@ -2162,12 +2167,12 @@ const UIComponents = {
                         </span>
                         <span class="btn btn-outline" onclick="document.getElementById('nav-catalog').click()">
                             <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                            Explore Pure Reserves
+                            Explore Handcrafted Teas
                         </span>
                     </div>
                 </div>
                 <div class="heritage-visual-wrapper">
-                    <img src="images/luxury_tea_estate.jpg" alt="Ceylon Wild Tea Estate Slopes in Wallawela, Ettampitiya" onerror="window.handleImageError && window.handleImageError(this, 'gallery')" loading="lazy" decoding="async">
+                    <img src="images/luxury_tea_estate.jpg" alt="Rock One Wild Tea Estate - Forested Rock Formation Terroir" onerror="window.handleImageError && window.handleImageError(this, 'gallery')" loading="lazy" decoding="async">
                     <div class="card-image-overlay"></div>
                 </div>
             </div>
@@ -2175,9 +2180,9 @@ const UIComponents = {
             <!-- 3 Core Business Pillars & Terroir Highlights -->
             <div style="margin-bottom: 4rem;">
                 <div style="text-align: center; max-width: 650px; margin: 0 auto 2.5rem auto;">
-                    <span class="section-tag">WHY ROCK ONE IS DIFFERENT</span>
-                    <h4 style="font-size: 1.8rem; font-family: var(--font-serif); color: var(--color-white); margin-bottom: 0.5rem;">The Three Pillars of Our Artisanal Enterprise</h4>
-                    <p style="color: var(--color-text-muted); font-size: 0.88rem; line-height: 1.6;">Our zero-compromise approach to single-estate wild tea crafting from cultivation to collector delivery.</p>
+                    <span class="section-tag">OUR ARTISANAL COMMITMENT</span>
+                    <h4 style="font-size: 1.8rem; font-family: var(--font-serif); color: var(--color-white); margin-bottom: 0.5rem;">Hand Made with Care, Crafted from Ceylon</h4>
+                    <p style="color: var(--color-text-muted); font-size: 0.88rem; line-height: 1.6;">Our family-owned approach to small-batch production and traditional handcrafted Ceylon Tea.</p>
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.75rem;">
@@ -2186,9 +2191,9 @@ const UIComponents = {
                         <div style="margin-bottom: 1rem; color: var(--color-gold);">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L5 9h4l-5 7h6l-3 6 10-10h-4l5-6h-4l4-6z"></path></svg>
                         </div>
-                        <h5 style="font-size: 1.15rem; color: var(--color-gold); margin-bottom: 0.75rem; font-family: var(--font-serif);">1. 100% Wild Forest Ecology</h5>
+                        <h5 style="font-size: 1.15rem; color: var(--color-gold); margin-bottom: 0.75rem; font-family: var(--font-serif);">1. Forest Garden Terroir</h5>
                         <p style="font-size: 0.84rem; color: var(--color-text-muted); line-height: 1.7;">
-                            Our tea bushes grow as natural arbor trees alongside wild cinnamon, mountain moss, and indigenous ferns. Free from artificial chemical fertilizers and mechanical pruning, each tree drinks from subterranean mountain springs.
+                            Nestled in a forested environment at the foot of a large rock formation in Sri Lanka's Uva Medium region. Our teas carry the pure, uncultivated character of their natural surroundings.
                         </p>
                     </div>
 
@@ -2197,9 +2202,9 @@ const UIComponents = {
                         <div style="margin-bottom: 1rem; color: var(--color-gold);">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11V7a5 5 0 0 1 9.9-1"></path><path d="M18 10a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V7"></path><path d="M12 15v5"></path><path d="M8 20h8"></path></svg>
                         </div>
-                        <h5 style="font-size: 1.15rem; color: var(--color-gold); margin-bottom: 0.75rem; font-family: var(--font-serif);">2. Dawn Orthodox Craftsmanship</h5>
+                        <h5 style="font-size: 1.15rem; color: var(--color-gold); margin-bottom: 0.75rem; font-family: var(--font-serif);">2. Handcrafted Family Care</h5>
                         <p style="font-size: 0.84rem; color: var(--color-text-muted); line-height: 1.7;">
-                            Every single leaf is selectively hand-plucked at dawn by generational estate artisans. Leaves are withered naturally on cedar racks and gently rolled to preserve delicate silver tips and golden liquor character.
+                            We personally handle each stage in our small family factory — from carefully selecting the freshest tea leaves to precise orthodox rolling, curing, and packaging.
                         </p>
                     </div>
 
@@ -2208,9 +2213,9 @@ const UIComponents = {
                         <div style="margin-bottom: 1rem; color: var(--color-gold);">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
                         </div>
-                        <h5 style="font-size: 1.15rem; color: var(--color-gold); margin-bottom: 0.75rem; font-family: var(--font-serif);">3. Strictly Limited Allocations</h5>
+                        <h5 style="font-size: 1.15rem; color: var(--color-gold); margin-bottom: 0.75rem; font-family: var(--font-serif);">3. Small-Batch Excellence</h5>
                         <p style="font-size: 0.84rem; color: var(--color-text-muted); line-height: 1.7;">
-                            We do not mass produce. Each harvest season yields only 10 individually numbered collector cedar chests, hand-sealed with private estate gold stamps and registered in our central allocation ledger.
+                            Rather than producing tea on a large scale, we dedicate ourselves to small batches, unmatched attention to detail, and authentic single-origin purity.
                         </p>
                     </div>
                 </div>
@@ -2229,32 +2234,35 @@ const UIComponents = {
                 <!-- 1. Editorial Hero Header -->
                 <div class="about-hero-editorial" style="text-align: center; max-width: 860px; margin: 0 auto 3.5rem auto;">
                     <span class="section-tag" style="font-size: 0.82rem; letter-spacing: 2.5px; color: var(--color-gold); font-weight: 700; display: inline-block; margin-bottom: 0.75rem;">
-                        THE ETTAMPITIYA HERITAGE &amp; LIVING PHILOSOPHY
+                        ROCK ONE WILD TEA (PVT) LIMITED • UVA MEDIUM REGION
                     </span>
                     <h2 style="font-family: var(--font-serif); font-size: 2.8rem; line-height: 1.2; color: var(--color-white); margin-bottom: 1.25rem;">
-                        Where Wild Mountain Nature Meets Centuries of Pure Ceylon Craft
+                        From the Wild, Crafted by Our Hands
                     </h2>
+                    <p style="font-size: 1.08rem; color: var(--color-gold); font-family: var(--font-serif); margin-bottom: 1rem; letter-spacing: 0.5px;">
+                        From Our Wild Forest Garden to Your Cup
+                    </p>
                     <p style="font-size: 1.02rem; color: var(--color-text-primary); line-height: 1.85; margin-bottom: 1.5rem;">
-                        Perched at over <strong>1,200 meters above sea level</strong> in <strong>Wallawela, Ettampitiya</strong>, Rock One Wild Tea was founded to preserve the ancient, uncultivated terroir of Sri Lanka’s central montane rainforests. We reject commercial monoculture plantations to harvest single-estate teas of unparalleled floral purity.
+                        <strong>Rock One Wild Tea</strong> is a family-owned tea business born from our own tea garden in Sri Lanka’s Uva Medium region, nestled in a forested environment at the foot of a large rock formation. Hand made with Care, Crafted from Ceylon.
                     </p>
 
                     <!-- Terroir Core Trust Badges with SVG Icons -->
                     <div style="display: flex; align-items: center; justify-content: center; gap: 0.85rem; flex-wrap: wrap;">
                         <span style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #86efac; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.3); padding: 0.45rem 0.95rem; border-radius: 20px; font-weight: 600;">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
-                            100% Pesticide &amp; Glyphosate-Free
+                            Small-Batch Handcrafted
                         </span>
                         <span style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--color-gold); background: rgba(212, 175, 55, 0.12); border: 1px solid rgba(212, 175, 55, 0.3); padding: 0.45rem 0.95rem; border-radius: 20px; font-weight: 600;">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3l4 8 5-5 5 15H2L8 3z"></path></svg>
-                            1,240m+ Cloud Forest Terroir
+                            Uva Medium Forest Garden
                         </span>
                         <span style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #93c5fd; background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.3); padding: 0.45rem 0.95rem; border-radius: 20px; font-weight: 600;">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                            Traditional Orthodox Kiln Firing
+                            Traditional Family Factory
                         </span>
                         <span style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #fbcfe8; background: rgba(244, 114, 182, 0.12); border: 1px solid rgba(244, 114, 182, 0.3); padding: 0.45rem 0.95rem; border-radius: 20px; font-weight: 600;">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
-                            Strict Dawn Dew Harvesting
+                            Handmade With Care
                         </span>
                     </div>
                 </div>
@@ -2265,77 +2273,77 @@ const UIComponents = {
                         <div style="color: var(--color-gold); margin-bottom: 0.5rem;">
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3l4 8 5-5 5 15H2L8 3z"></path></svg>
                         </div>
-                        <strong style="display: block; color: var(--color-white); font-size: 1.15rem; font-family: var(--font-serif);">1,240m</strong>
-                        <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px;">Sanctuary Altitude</span>
+                        <strong style="display: block; color: var(--color-white); font-size: 1.15rem; font-family: var(--font-serif);">Uva Medium</strong>
+                        <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px;">Ceylon Tea Terroir</span>
                     </div>
 
                     <div class="panel-card" style="padding: 1.5rem 1.25rem; text-align: center; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 0;">
                         <div style="color: #60a5fa; margin-bottom: 0.5rem;">
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 16.2A4.5 4.5 0 0 0 21.5 12 4.5 4.5 0 0 0 17 7.5c-.3 0-.6 0-.9.1A6 6 0 0 0 5 10a5 5 0 0 0 .5 9.9h14.5z"></path><line x1="8" y1="19" x2="8" y2="21"></line><line x1="12" y1="19" x2="12" y2="21"></line><line x1="16" y1="19" x2="16" y2="21"></line></svg>
                         </div>
-                        <strong style="display: block; color: var(--color-white); font-size: 1.15rem; font-family: var(--font-serif);">2,800 mm</strong>
-                        <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px;">Mountain Mist Rainfall</span>
+                        <strong style="display: block; color: var(--color-white); font-size: 1.15rem; font-family: var(--font-serif);">Rock Formation</strong>
+                        <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px;">Forest Environment</span>
                     </div>
 
                     <div class="panel-card" style="padding: 1.5rem 1.25rem; text-align: center; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 0;">
                         <div style="color: #fb923c; margin-bottom: 0.5rem;">
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg>
                         </div>
-                        <strong style="display: block; color: var(--color-white); font-size: 1.15rem; font-family: var(--font-serif);">14°C - 24°C</strong>
-                        <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px;">Diurnal Fluctuation</span>
+                        <strong style="display: block; color: var(--color-white); font-size: 1.15rem; font-family: var(--font-serif);">COVID Journey</strong>
+                        <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px;">Family Founded</span>
                     </div>
 
                     <div class="panel-card" style="padding: 1.5rem 1.25rem; text-align: center; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 0;">
                         <div style="color: #c084fc; margin-bottom: 0.5rem;">
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
                         </div>
-                        <strong style="display: block; color: var(--color-white); font-size: 1.15rem; font-family: var(--font-serif);">Mineral Granite</strong>
-                        <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px;">Ancient Sub-Soil</span>
+                        <strong style="display: block; color: var(--color-white); font-size: 1.15rem; font-family: var(--font-serif);">Small-Batch</strong>
+                        <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px;">Handcrafted Quality</span>
                     </div>
 
                     <div class="panel-card" style="padding: 1.5rem 1.25rem; text-align: center; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 0;">
                         <div style="color: #4ade80; margin-bottom: 0.5rem;">
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-7"></path><path d="M9 15c-3.5 0-6-2.5-6-6 0-4 4-7 9-7s9 3 9 7c0 3.5-2.5 6-6 6"></path><path d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path></svg>
                         </div>
-                        <strong style="display: block; color: var(--color-white); font-size: 1.15rem; font-family: var(--font-serif);">Unpruned Arbor</strong>
-                        <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px;">Natural Tree Growth</span>
+                        <strong style="display: block; color: var(--color-white); font-size: 1.15rem; font-family: var(--font-serif);">Careful Plucking</strong>
+                        <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px;">Selective Harvest</span>
                     </div>
 
                     <div class="panel-card" style="padding: 1.5rem 1.25rem; text-align: center; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 0;">
                         <div style="color: var(--color-gold); margin-bottom: 0.5rem;">
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
                         </div>
-                        <strong style="display: block; color: var(--color-white); font-size: 1.15rem; font-family: var(--font-serif);">Single Estate</strong>
-                        <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px;">No: 54 Wallawela</span>
+                        <strong style="display: block; color: var(--color-white); font-size: 1.15rem; font-family: var(--font-serif);">Family Factory</strong>
+                        <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px;">In-House Processing</span>
                     </div>
                 </div>
 
                 <!-- 3. Dual-Column Story & Terroir Panorama -->
                 <div class="about-story-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: center; margin-bottom: 5rem;">
                     <div>
-                        <span class="section-tag" style="font-size: 0.75rem;">THE UNPRUNED ARBOR PHILOSOPHY</span>
+                        <span class="section-tag" style="font-size: 0.75rem;">OUR FOUNDING JOURNEY</span>
                         <h3 style="font-family: var(--font-serif); font-size: 2.1rem; color: var(--color-white); margin-bottom: 1.25rem; line-height: 1.3;">
-                            Why Wild Tea Trees Yield Exceptional Amino Acids
+                            Developed with Our Own Hands
                         </h3>
                         <p style="color: var(--color-text-primary); font-size: 0.95rem; line-height: 1.8; margin-bottom: 1.25rem;">
-                            Conventional commercial tea estates aggressively prune bushes every three years and saturate soils with synthetic nitrogen. At Rock One, our Camellia sinensis trees grow <strong>tall and wild</strong> alongside native hardwood trees, wild ferns, and mountain streams.
+                            During the COVID period, my wife and I began our journey by developing this tea garden with our own hands. Today, we continue to personally handle much of the process in our small family factory — from selecting the tea leaves to processing and packaging our teas.
                         </p>
                         <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.75; margin-bottom: 1.5rem;">
-                            Deep taproots descend meters into ancient mineral granite strata, absorbing natural subterranean potassium and magnesium. Combined with freezing nighttime mountain winds and morning cloud inversions, leaf growth is naturally slowed — concentrating delicate floral honey notes with zero tannic bitterness.
+                            Rather than producing tea on a large scale, we focus on small-batch production, careful attention to detail, and traditional handcrafted methods to create high-quality Ceylon Tea. Our teas carry the natural character of the environment where they grow, together with the care and craftsmanship of our family.
                         </p>
                         <div style="background: rgba(212, 175, 55, 0.08); border-left: 3px solid var(--color-gold); padding: 1.15rem 1.35rem; border-radius: 0 10px 10px 0;">
-                            <p style="font-style: italic; color: #ffd875; font-size: 0.9rem; margin: 0; line-height: 1.6;">
-                                "We don't cultivate tea; we steward a living high-altitude ecosystem and harvest its seasonal whisper."
+                            <p style="font-style: italic; color: #ffd875; font-size: 0.95rem; margin: 0; line-height: 1.6; font-weight: 500;">
+                                "Rock One Wild Tea — From the wild, crafted by our hands, to your cup."
                             </p>
-                            <span style="display: block; font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.4rem;">— The Rock One Estate Founders</span>
+                            <span style="display: block; font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.4rem;">— Rock One Wild Tea (Pvt) Limited</span>
                         </div>
                     </div>
                     <div style="position: relative;">
                         <div style="position: relative; border-radius: 16px; overflow: hidden; border: 1.5px solid rgba(212,175,55,0.4); box-shadow: 0 16px 40px rgba(0,0,0,0.7), 0 0 25px rgba(212,175,55,0.15);">
-                            <img src="images/luxury_tea_estate.jpg" alt="Misty Slopes of Rock One Wild Tea Estate in Ettampitiya" style="width: 100%; height: auto; display: block; aspect-ratio: 4/3; object-fit: cover;" onerror="window.handleImageError && window.handleImageError(this, 'gallery')" loading="lazy" decoding="async">
+                            <img src="images/luxury_tea_estate.jpg" alt="Rock One Wild Tea Garden - Uva Medium Region" style="width: 100%; height: auto; display: block; aspect-ratio: 4/3; object-fit: cover;" onerror="window.handleImageError && window.handleImageError(this, 'gallery')" loading="lazy" decoding="async">
                             <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1.25rem; background: linear-gradient(0deg, rgba(2, 10, 5, 0.95) 0%, transparent 100%);">
-                                <span style="display: block; color: var(--color-white); font-size: 0.9rem; font-weight: 600;">Wallawela High-Altitude Ridge</span>
-                                <span style="color: var(--color-gold); font-size: 0.75rem;">1,240m Elevation • Badulla District, Sri Lanka</span>
+                                <span style="display: block; color: var(--color-white); font-size: 0.9rem; font-weight: 600;">Forested Rock Formation Tea Garden</span>
+                                <span style="color: var(--color-gold); font-size: 0.75rem;">Uva Medium Region • Sri Lanka</span>
                             </div>
                         </div>
                     </div>
