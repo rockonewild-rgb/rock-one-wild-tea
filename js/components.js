@@ -2731,18 +2731,10 @@ const UIComponents = {
                         ${galleryImages.length === 0 ? `
                             <div class="heritage-slide active" style="background-image: url('images/1 (1).jpeg');" data-src="images/1 (1).jpeg" data-caption="Rock One Wild Tea Estate Garden">
                                 <div class="heritage-slide-overlay"></div>
-                                <div class="heritage-slide-info">
-                                    <span class="heritage-slide-tag">Estate Garden</span>
-                                    <h5 class="heritage-slide-caption">Forested Rock Formation Terroir</h5>
-                                </div>
                             </div>
                         ` : galleryImages.map((img, idx) => `
                             <div class="heritage-slide ${idx === 0 ? 'active' : ''}" style="background-image: url('${img.src}');" data-src="${img.src}" data-caption="${(img.caption || '').replace(/"/g, '&quot;')}">
                                 <div class="heritage-slide-overlay"></div>
-                                <div class="heritage-slide-info">
-                                    <span class="heritage-slide-tag">${img.tag || 'Estate Photography'}</span>
-                                    <h5 class="heritage-slide-caption">${img.caption || 'Artisanal Ceylon Heritage'}</h5>
-                                </div>
                             </div>
                         `).join('')}
                     </div>
