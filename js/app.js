@@ -5074,6 +5074,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
             });
+        });
+
         // ─── Hero Slideshow Desk Bindings ─────────────────────────────
         const slideGalleryPicker = document.getElementById('slide-gallery-picker');
         const slidePreviewImg = document.getElementById('slide-preview-img');
