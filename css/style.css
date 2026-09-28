@@ -9143,3 +9143,573 @@ mark.search-match-highlight {
     border-radius: 12px;
 }
 
+/* ══════════════════════════════════════════════════════════════════════════════
+   MASTER MOBILE-FIRST RESPONSIVE ENGINE (320px, 375px, 480px, 600px, 768px, 1024px)
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Global Mobile Guard */
+html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.main-content, .view-section {
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+}
+
+img, video, canvas, svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Prevent iOS Auto-Zoom on Form Input Focus */
+input, select, textarea, button {
+    font-size: 16px;
+    touch-action: manipulation;
+}
+
+/* ---- 1. TABLETS & SMALL LAPTOPS (<= 1024px) ---- */
+@media (max-width: 1024px) {
+    .header-container {
+        padding: 0.6rem 1.25rem;
+    }
+    .packages-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    .footer-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 2.5rem;
+    }
+    .footer-brand-col {
+        grid-column: 1 / -1;
+    }
+}
+
+/* ---- 2. LARGE PHONES & TABLETS (<= 768px) ---- */
+@media (max-width: 768px) {
+    .view-section {
+        padding: 1.75rem 1rem !important;
+    }
+
+    /* Hero Section Mobile Optimization */
+    .hero-section,
+    #hero-slider-container {
+        height: auto !important;
+        min-height: clamp(500px, 82vh, 660px) !important;
+        max-height: none !important;
+        border-radius: 16px !important;
+        margin-bottom: 2rem !important;
+    }
+    .hero-slide {
+        height: 100% !important;
+        min-height: clamp(500px, 82vh, 660px) !important;
+        padding: clamp(1.25rem, 3.5vh, 2.25rem) clamp(0.85rem, 3vw, 1.5rem) !important;
+        justify-content: center !important;
+    }
+    .hero-logo-gold {
+        height: clamp(44px, 6.5vh, 58px) !important;
+        max-width: 140px !important;
+        margin-bottom: 0.5rem !important;
+    }
+    .hero-subtitle {
+        font-size: clamp(0.65rem, 2.4vw, 0.74rem) !important;
+        letter-spacing: 1.2px !important;
+        padding: 0.22rem 0.75rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    .hero-subtitle::before, .hero-subtitle::after {
+        display: none !important;
+    }
+    .hero-title {
+        font-size: clamp(1.5rem, 5.8vw, 2.2rem) !important;
+        line-height: 1.2 !important;
+        margin-bottom: 0.55rem !important;
+        max-width: 100% !important;
+    }
+    .hero-description {
+        font-size: clamp(0.78rem, 2.6vw, 0.86rem) !important;
+        line-height: 1.5 !important;
+        max-width: 96% !important;
+        margin: 0 auto 1.15rem auto !important;
+        -webkit-line-clamp: 3 !important;
+        line-clamp: 3 !important;
+        padding: 0.35rem 0.75rem !important;
+    }
+    .hero-cta {
+        flex-direction: column !important;
+        width: 100% !important;
+        align-items: center !important;
+        gap: 0.55rem !important;
+        margin-top: 0.2rem !important;
+    }
+    .hero-cta .btn {
+        width: 100% !important;
+        max-width: 290px !important;
+        justify-content: center !important;
+        padding: 0.72rem 1.25rem !important;
+        font-size: 0.82rem !important;
+    }
+
+    /* Hero Floating Side Nav Arrows (Compact & Non-Obstructing) */
+    .hero-side-nav {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 1.2rem !important;
+        z-index: 12 !important;
+    }
+    .hero-side-prev {
+        left: 0.45rem !important;
+    }
+    .hero-side-next {
+        right: 0.45rem !important;
+    }
+
+    /* Right-Side Floating Action Buttons (Clean Vertical Stack) */
+    .floating-whatsapp-btn {
+        bottom: 1rem !important;
+        right: 0.85rem !important;
+        width: 42px !important;
+        height: 42px !important;
+        z-index: 1060 !important;
+    }
+    .floating-whatsapp-btn .whatsapp-btn-icon svg {
+        width: 22px !important;
+        height: 22px !important;
+    }
+    .floating-global-prefs-btn {
+        bottom: 3.95rem !important;
+        right: 0.85rem !important;
+        width: 42px !important;
+        height: 42px !important;
+        z-index: 1060 !important;
+    }
+    .faq-chatbot-launcher {
+        bottom: 6.9rem !important;
+        right: 0.85rem !important;
+        width: 42px !important;
+        height: 42px !important;
+        z-index: 1060 !important;
+    }
+    .faq-chatbot-launcher .chatbot-launcher-icon svg {
+        width: 20px !important;
+        height: 20px !important;
+    }
+    .floating-cart-btn {
+        bottom: 9.85rem !important;
+        right: 0.85rem !important;
+        width: 42px !important;
+        height: 42px !important;
+        z-index: 1060 !important;
+    }
+    .floating-cart-btn .cart-floating-svg {
+        width: 18px !important;
+        height: 18px !important;
+    }
+    .floating-bulletins-btn {
+        bottom: 12.8rem !important;
+        right: 0.85rem !important;
+        left: auto !important;
+        width: 42px !important;
+        height: 42px !important;
+        z-index: 1060 !important;
+    }
+    .floating-bulletins-btn svg {
+        width: 18px !important;
+        height: 18px !important;
+    }
+    #scroll-to-top-btn {
+        bottom: 15.75rem !important;
+        right: 1rem !important;
+        width: 36px !important;
+        height: 36px !important;
+        z-index: 1050 !important;
+    }
+
+    /* Left-Side Social Hub Mobile Optimization */
+    .side-social-dock {
+        left: 0.35rem !important;
+        bottom: 1rem !important;
+        top: auto !important;
+        transform: none !important;
+        gap: 0.35rem !important;
+        z-index: 1060 !important;
+    }
+    .side-social-pill {
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 0 18px 18px 0 !important;
+    }
+    .pill-icon {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+    }
+    .pill-icon svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+    .side-social-pill.touch-active {
+        width: 165px !important;
+    }
+
+    /* Cards & Container Layouts */
+    .heritage-container-layout {
+        grid-template-columns: 1fr !important;
+        gap: 1.75rem !important;
+    }
+    .heritage-visual-wrapper {
+        height: 240px !important;
+        width: 100% !important;
+        border-radius: 14px !important;
+    }
+    .panel-card {
+        padding: 1.5rem 1.15rem !important;
+        border-radius: 14px !important;
+    }
+    .estate-cinema-card {
+        padding: 1.5rem 1rem !important;
+    }
+    .estate-location-card {
+        padding: 1.5rem 1rem !important;
+    }
+    .location-grid-layout {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
+    }
+    .landmark-photo-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem !important;
+    }
+    .testimonial-card-item {
+        padding: 1.5rem 1.15rem !important;
+    }
+    .testimonials-grid-layout {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem !important;
+    }
+    .gallery-grid-layout {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem !important;
+    }
+}
+
+/* ---- 3. STANDARD SMARTPHONES (<= 600px) ---- */
+@media (max-width: 600px) {
+    .view-title {
+        font-size: 1.85rem !important;
+    }
+    .view-subtitle {
+        font-size: 0.9rem !important;
+    }
+    .home-section-title {
+        font-size: 1.5rem !important;
+    }
+
+    /* Gift Catalog 10 Collector Boxes Grid */
+    .boxes-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.65rem !important;
+    }
+    .box-card {
+        padding: 1.25rem 0.85rem !important;
+        border-radius: 12px !important;
+        min-height: 250px !important;
+    }
+    .box-number-display {
+        font-size: 2.4rem !important;
+        right: 0.65rem !important;
+        top: 2.75rem !important;
+    }
+    .box-title {
+        font-size: 0.95rem !important;
+    }
+    .box-details {
+        font-size: 0.76rem !important;
+    }
+    .box-footer button {
+        font-size: 0.78rem !important;
+        padding: 0.6rem 0.5rem !important;
+    }
+
+    /* Product Catalog Controls & Grid */
+    .catalog-controls-bar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.85rem !important;
+    }
+    .filter-tabs-group {
+        display: flex !important;
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        gap: 0.45rem !important;
+        padding-bottom: 6px !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    .filter-tab {
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+        font-size: 0.76rem !important;
+        padding: 0.45rem 0.85rem !important;
+    }
+    .search-input-wrapper {
+        width: 100% !important;
+        min-width: unset !important;
+    }
+    .products-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.35rem !important;
+    }
+
+    /* Factory Tours Timeline & Slots */
+    .packages-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    .slots-timeline::before {
+        left: 14px !important;
+    }
+    .timeline-item {
+        padding-left: 2.2rem !important;
+        padding-right: 0 !important;
+    }
+    .timeline-item.left-aligned::after,
+    .timeline-item.right-aligned::after {
+        left: 14px !important;
+        width: calc(2.2rem - 14px) !important;
+    }
+    .timeline-item.left-aligned .timeline-dot,
+    .timeline-item.right-aligned .timeline-dot {
+        left: 8px !important;
+    }
+    .slot-card {
+        padding: 1.15rem 1rem !important;
+    }
+
+    /* Brewing Ritual Section */
+    .brewing-ritual-tabs {
+        display: flex !important;
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        gap: 0.45rem !important;
+        padding-bottom: 6px !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    .brewing-tab-btn {
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+        font-size: 0.76rem !important;
+        padding: 0.5rem 0.85rem !important;
+    }
+    .home-brewing-timer-wrapper {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem !important;
+    }
+    .brewing-stats-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.65rem !important;
+    }
+    .brewing-stat-value {
+        font-size: 1.2rem !important;
+    }
+
+    /* Order Lookup & Payment Slip Page */
+    #order-lookup-card {
+        padding: 1.5rem 1rem !important;
+    }
+    #order-lookup-form {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+        width: 100% !important;
+    }
+    #order-lookup-form .form-group {
+        width: 100% !important;
+        min-width: unset !important;
+    }
+    #order-lookup-form button {
+        width: 100% !important;
+        padding: 0.85rem !important;
+        justify-content: center !important;
+    }
+    .recent-orders-panel {
+        padding: 1.25rem 1rem !important;
+    }
+    .recent-orders-cards-scroll {
+        gap: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+    }
+    .recent-order-card {
+        width: 200px !important;
+        padding: 0.85rem 0.95rem !important;
+    }
+
+    /* Admin / Concierge Desk */
+    .admin-login-viewport {
+        min-height: calc(100vh - 140px) !important;
+        padding: 1rem 0.5rem !important;
+    }
+    .admin-login-card {
+        padding: 1.5rem 1.15rem !important;
+        border-radius: 14px !important;
+    }
+    .admin-stats-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.65rem !important;
+        margin-bottom: 1.75rem !important;
+    }
+    .admin-stat-card {
+        padding: 1rem 0.85rem !important;
+        border-radius: 10px !important;
+    }
+    .stat-value {
+        font-size: 1.8rem !important;
+    }
+    .admin-tab-bar {
+        display: flex !important;
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        gap: 0.35rem !important;
+        padding-bottom: 6px !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    .admin-tab-btn {
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+        font-size: 0.72rem !important;
+        padding: 0.5rem 0.75rem !important;
+    }
+    .slide-edit-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.75rem !important;
+        padding: 0.85rem !important;
+    }
+    .slide-edit-preview {
+        width: 100% !important;
+        height: 120px !important;
+    }
+    .slide-edit-actions {
+        width: 100% !important;
+        justify-content: flex-end !important;
+    }
+
+    /* Drawers, Modals & Floating Popovers */
+    .drawer-container,
+    .cart-drawer-container,
+    .about-modal-dialog,
+    .lookbook-modal-container,
+    .admin-modal,
+    .payment-approval-dialog,
+    .payment-rejection-dialog,
+    .email-provider-dialog,
+    #review-modal .modal-dialog {
+        width: 95vw !important;
+        max-width: 95vw !important;
+        max-height: 90vh !important;
+        border-radius: 16px !important;
+        margin: auto !important;
+    }
+    .drawer-header,
+    .cart-drawer-header,
+    .about-modal-header {
+        padding: 1rem 1.15rem !important;
+    }
+    .drawer-body,
+    .cart-drawer-body,
+    .about-modal-body {
+        padding: 1rem 1.15rem !important;
+        max-height: calc(90vh - 125px) !important;
+    }
+    .drawer-footer,
+    .cart-drawer-footer {
+        padding: 1rem 1.15rem !important;
+    }
+    #faq-chatbot-window {
+        width: 94vw !important;
+        max-width: 94vw !important;
+        height: 80vh !important;
+        max-height: 80vh !important;
+        right: 3vw !important;
+        bottom: 4.5rem !important;
+        border-radius: 16px !important;
+    }
+    .global-prefs-popup {
+        width: 94vw !important;
+        max-width: 94vw !important;
+        right: 3vw !important;
+        left: auto !important;
+        bottom: 4.5rem !important;
+        border-radius: 16px !important;
+        max-height: 82vh !important;
+    }
+
+    /* Footer Responsive */
+    .footer-container {
+        grid-template-columns: 1fr !important;
+        gap: 2rem !important;
+    }
+    .footer-bottom {
+        flex-direction: column !important;
+        text-align: center !important;
+        gap: 0.75rem !important;
+    }
+    .footer-social-links {
+        justify-content: center !important;
+    }
+}
+
+/* ---- 4. COMPACT SMARTPHONES (<= 380px) ---- */
+@media (max-width: 380px) {
+    .hero-section,
+    #hero-slider-container {
+        min-height: 480px !important;
+    }
+    .hero-title {
+        font-size: 1.35rem !important;
+    }
+    .hero-subtitle {
+        font-size: 0.62rem !important;
+        padding: 0.18rem 0.55rem !important;
+    }
+    .hero-side-nav {
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 1rem !important;
+    }
+    .hero-side-prev { left: 0.25rem !important; }
+    .hero-side-next { right: 0.25rem !important; }
+
+    .boxes-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+    .admin-stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .brewing-stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .floating-whatsapp-btn,
+    .floating-global-prefs-btn,
+    .faq-chatbot-launcher,
+    .floating-cart-btn,
+    .floating-bulletins-btn {
+        width: 38px !important;
+        height: 38px !important;
+        right: 0.5rem !important;
+    }
+    .side-social-dock {
+        left: 0.2rem !important;
+    }
+    #scroll-to-top-btn {
+        right: 0.65rem !important;
+        width: 34px !important;
+        height: 34px !important;
+    }
+}
+
+
