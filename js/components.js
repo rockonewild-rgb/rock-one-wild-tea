@@ -3222,58 +3222,100 @@ const UIComponents = {
 
         const nearbyLandmarks = [
             { 
-                name: "Nine Arches Bridge", 
-                category: "Colonial Viaduct", 
-                dist: "26 km", 
-                time: "45 min", 
-                image: "images/landmark_nine_arches.jpg",
-                desc: "Iconic stone railway arch bridge enveloped by mist & emerald tea fields.",
-                routeQuery: "Nine Arches Bridge, Demodara" 
+                id: 1,
+                name: "1. Mana Ella Waterfall", 
+                altName: "Manawala Ella / Manawela Ella",
+                category: "Cascading Waterfall", 
+                dist: "15–18 km", 
+                time: "35–45 minutes", 
+                image: "images/landmark_mana_ella.jpg",
+                desc: "Mana Ella, also known as Manawala Ella or Manawela Ella, is a scenic waterfall near Lunuwatta surrounded by lush tea plantations. The waterfall features multiple cascades and is closely connected to the natural landscape and history of the Welimada area. Reaching the waterfall involves a short walk from the nearby road.",
+                routeQuery: "Mana Ella Waterfall, Lunuwatta, Sri Lanka",
+                mapSearchQuery: "Mana Ella Waterfall, Sri Lanka"
             },
             { 
-                name: "Little Adam's Peak & Ella Rock", 
-                category: "Mountain Hiking", 
-                dist: "25 km", 
-                time: "45 min", 
-                image: "images/landmark_little_adams_peak.jpg",
-                desc: "Panoramic sunrise peak trails with sweeping views over the Ella Gap.",
-                routeQuery: "Little Adam's Peak, Ella" 
+                id: 2,
+                name: "2. Sthreepura Cave", 
+                altName: "King Ravana & Princess Sita Legendary Site",
+                category: "Natural & Cultural Cave System", 
+                dist: "18–20 km", 
+                time: "40–50 minutes", 
+                image: "images/landmark_sthreepura_cave.jpg",
+                desc: "Sthreepura Cave is a fascinating natural and cultural attraction near Welimada. The cave system is associated with local legends connected with King Ravana and Princess Sita. The Uva Paranagama local authority notes that parts of the cave system can be difficult to access because of landslide conditions, so visitors should check local access conditions before travelling.",
+                routeQuery: "Sthreepura Cave, Welimada, Sri Lanka",
+                mapSearchQuery: "Sthreepura Cave, Welimada"
             },
             { 
-                name: "Dunhinda Falls", 
-                category: "Plume Waterfall (64m)", 
-                dist: "26 km", 
-                time: "45 min", 
-                image: "images/landmark_dunhinda_falls.jpg",
-                desc: "Dramatic misty canyon waterfall spray surrounded by virgin cloud forest.",
-                routeQuery: "Dunhinda Falls, Badulla" 
+                id: 3,
+                name: "3. Bomburu Ella Waterfall", 
+                altName: "Perawella Falls (50m High)",
+                category: "Plume Waterfall (50m)", 
+                dist: "20–22 km", 
+                time: "40–50 minutes", 
+                image: "images/landmark_bomburu_ella.jpg",
+                desc: "Also known as Perawella Falls, Bomburu Ella is a spectacular group of cascades located near the boundary of the Badulla and Nuwara Eliya districts. The waterfall is about 50 metres high and is surrounded by forest and highland scenery. The final approach involves a walking trail, making it a good option for visitors who enjoy nature and light trekking.",
+                routeQuery: "Bomburu Ella Waterfall, Sri Lanka",
+                mapSearchQuery: "Bomburu Ella Waterfall, Sri Lanka"
             },
             { 
-                name: "Ravana Falls & Cave", 
-                category: "Natural Cascade", 
-                dist: "28 km", 
-                time: "50 min", 
-                image: "images/landmark_ravana_falls.jpg",
-                desc: "Spectacular multi-tiered cascade with historic ancient cave lore.",
-                routeQuery: "Ravana Falls, Ella" 
-            },
-            { 
-                name: "Lipton's Seat (Dambatenne)", 
-                category: "Historic 360° Viewpoint", 
-                dist: "35 km", 
-                time: "1h 10m", 
-                image: "images/landmark_liptons_seat.jpg",
-                desc: "Famous vantage point where Sir Thomas Lipton surveyed Ceylon tea estates.",
-                routeQuery: "Lipton's Seat, Haputale" 
-            },
-            { 
-                name: "Hakgala Botanical Gardens", 
-                category: "Alpine Cloud Reserve", 
-                dist: "38 km", 
-                time: "1h 05m", 
+                id: 4,
+                name: "4. Hakgala Botanic Gardens", 
+                altName: "Est. 1861 Montane Flora Haven",
+                category: "Historic Botanic Garden", 
+                dist: "20–25 km", 
+                time: "45–55 minutes", 
                 image: "images/landmark_hakgala_gardens.jpg",
-                desc: "High-elevation botanical haven of ferns, roses, and montane conifers.",
-                routeQuery: "Hakgala Botanical Gardens" 
+                desc: "Hakgala Botanic Gardens is a historic highland garden established in 1861. Located beneath Hakgala Rock, the garden contains extensive collections of flowers, orchids, roses, ferns and other plants, with views toward the surrounding Uva mountains. The gardens are managed by Sri Lanka’s Department of National Botanic Gardens and are open throughout the year.",
+                routeQuery: "Hakgala Botanical Garden, Sri Lanka",
+                mapSearchQuery: "Hakgala Botanical Garden"
+            },
+            { 
+                id: 5,
+                name: "5. Seetha Amman Temple", 
+                altName: "Ramayana Heritage Site, Seetha Eliya",
+                category: "Cultural & Heritage Site", 
+                dist: "20–25 km", 
+                time: "45–60 minutes", 
+                image: "images/landmark_seetha_amman_temple.jpg",
+                desc: "Located in the Seetha Eliya area near Nuwara Eliya, Seetha Amman Temple is an important cultural and religious site associated with the Ramayana traditions of Sri Lanka. Its colourful architecture and surrounding mountain landscape make it an interesting stop for visitors exploring the central highlands.",
+                routeQuery: "Seetha Amman Temple, Seetha Eliya, Sri Lanka",
+                mapSearchQuery: "Seetha Amman Temple, Seetha Eliya"
+            },
+            { 
+                id: 6,
+                name: "6. Nine Arch Bridge – Ella", 
+                altName: "Colonial Railway Viaduct",
+                category: "Historic Railway Viaduct", 
+                dist: "20–25 km", 
+                time: "45–55 minutes", 
+                image: "images/landmark_nine_arches.jpg",
+                desc: "One of the most recognisable landmarks in the hill country, Nine Arch Bridge is a historic railway viaduct between Ella and Demodara. The stone-and-brick bridge has nine arches and sits dramatically among dense greenery and tea-country landscapes. It was completed in the early 20th century and remains one of the signature sights around Ella.",
+                routeQuery: "Nine Arches Bridge, Demodara, Sri Lanka",
+                mapSearchQuery: "Nine Arches Bridge, Demodara"
+            },
+            { 
+                id: 7,
+                name: "7. Little Adam’s Peak – Ella", 
+                altName: "Panoramic Ella Gap Viewpoint",
+                category: "Mountain Viewpoint & Trek", 
+                dist: "20–25 km", 
+                time: "45–55 minutes", 
+                image: "images/landmark_little_adams_peak.jpg",
+                desc: "Little Adam’s Peak is one of Ella’s most accessible viewpoints. The relatively short uphill walk leads to wide panoramic views of the surrounding mountains, valleys and tea-covered landscapes. It is a popular choice for visitors looking for a scenic walk without a long mountain trek.",
+                routeQuery: "Little Adam's Peak, Ella, Sri Lanka",
+                mapSearchQuery: "Little Adam's Peak, Ella"
+            },
+            { 
+                id: 8,
+                name: "8. Ravana Falls", 
+                altName: "Iconic Multi-Level Mountain Cascade",
+                category: "Multi-Tiered Cascade", 
+                dist: "22–25 km", 
+                time: "50–60 minutes", 
+                image: "images/landmark_ravana_falls.jpg",
+                desc: "Ravana Falls is one of the best-known waterfalls in the Ella area, located beside the Ella–Wellawaya road. The multi-level cascade becomes particularly impressive when water flow is high, and the surrounding area is closely associated with local Ravana and Ramayana traditions.",
+                routeQuery: "Ravana Falls, Ella, Sri Lanka",
+                mapSearchQuery: "Ravana Falls, Ella"
             }
         ];
 
@@ -3345,50 +3387,65 @@ const UIComponents = {
                     </div>
                 </div>
 
-                <!-- Middle Section: Top Visited Landmarks Photographic Cards -->
-                <div style="border-top: 1px solid rgba(212, 175, 55, 0.2); padding-top: 2.5rem; margin-bottom: 2.5rem;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
-                        <div>
-                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; color: var(--color-gold); font-weight: 700; display: block; margin-bottom: 0.35rem;">Scenic Montane Circuits</span>
-                            <h4 style="font-size: 1.35rem; font-family: var(--font-serif); color: var(--color-white); letter-spacing: 0.5px; margin: 0;">Top Visited Landmarks with Actual Terroir Photos</h4>
-                        </div>
-                        <span style="font-size: 0.75rem; color: var(--color-text-muted); background: rgba(255,255,255,0.05); padding: 0.35rem 0.85rem; border-radius: 20px; border: 1px solid rgba(212,175,55,0.25); display: inline-flex; align-items: center; gap: 0.35rem;">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            <span>Wellawela Sanctuary Proximity</span>
-                        </span>
+                <!-- Middle Section: Tourist Attractions Near Rock One Wild Tea -->
+                <div style="border-top: 1px solid rgba(212, 175, 55, 0.2); padding-top: 2.75rem; margin-bottom: 2.75rem;">
+                    <div style="margin-bottom: 2rem;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2.5px; color: var(--color-gold); font-weight: 700; display: block; margin-bottom: 0.45rem;">Scenic Highlands Surroundings</span>
+                        <h4 style="font-size: 1.65rem; font-family: var(--font-serif); color: var(--color-white); letter-spacing: 0.5px; margin: 0 0 0.85rem 0;">Tourist Attractions Near Rock One Wild Tea</h4>
+                        <p style="color: var(--color-text-muted); font-size: 0.94rem; line-height: 1.75; max-width: 960px; margin: 0;">
+                            Located in the scenic highlands of Sri Lanka, Rock One Wild Tea is surrounded by waterfalls, mountains, tea-growing landscapes, cultural sites and some of the island’s best-known hill-country attractions. After experiencing our handmade tea factory, visitors can easily combine their tea experience with a tour of the beautiful surroundings.
+                        </p>
                     </div>
 
-                    <!-- 3-Column Photographic Grid -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 1.35rem;" class="landmark-photo-grid">
+                    <!-- 3/4-Column Photographic Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.4rem;" class="landmark-photo-grid">
                         ${nearbyLandmarks.map(place => `
-                            <div class="landmark-photo-card" style="background: rgba(4, 14, 8, 0.75); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                            <div class="landmark-photo-card" style="background: rgba(4, 14, 8, 0.85); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
                                 <!-- Photo Container -->
-                                <div style="position: relative; height: 180px; overflow: hidden; background: #030805;">
+                                <div style="position: relative; height: 195px; overflow: hidden; background: #030805;">
                                     <img src="${place.image}" alt="${place.name}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;" class="landmark-img" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
-                                    <div style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(4, 14, 8, 0.95) 100%);"></div>
-                                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(4, 14, 8, 0.85); backdrop-filter: blur(8px); border: 1px solid rgba(212, 175, 55, 0.45); color: #ffd875; font-size: 0.72rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.6);">
-                                        ${place.dist} • ~${place.time}
+                                    <div style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(4, 14, 8, 0.95) 100%);"></div>
+                                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(4, 14, 8, 0.88); backdrop-filter: blur(8px); border: 1px solid rgba(212, 175, 55, 0.45); color: #ffd875; font-size: 0.72rem; font-weight: 700; padding: 0.28rem 0.65rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.6);">
+                                        Approx. ${place.dist} • ~${place.time}
                                     </div>
-                                    <div style="position: absolute; bottom: 8px; left: 12px;">
-                                        <span style="font-size: 0.68rem; color: #86efac; background: rgba(74, 222, 128, 0.18); border: 1px solid rgba(74, 222, 128, 0.35); padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                    <div style="position: absolute; bottom: 10px; left: 12px;">
+                                        <span style="font-size: 0.68rem; color: #86efac; background: rgba(74, 222, 128, 0.18); border: 1px solid rgba(74, 222, 128, 0.35); padding: 0.18rem 0.55rem; border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
                                             ${place.category}
                                         </span>
                                     </div>
                                 </div>
 
                                 <!-- Card Content -->
-                                <div style="padding: 1.15rem 1.25rem; display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1;">
+                                <div style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1;">
                                     <div>
-                                        <h5 style="color: var(--color-white); font-size: 1rem; font-family: var(--font-serif); margin: 0 0 0.4rem 0; letter-spacing: 0.5px;">${place.name}</h5>
-                                        <p style="color: var(--color-text-muted); font-size: 0.78rem; line-height: 1.5; margin: 0 0 1rem 0;">${place.desc}</p>
+                                        <h5 style="color: var(--color-white); font-size: 1.08rem; font-family: var(--font-serif); margin: 0 0 0.45rem 0; letter-spacing: 0.5px; line-height: 1.3;">${place.name}</h5>
+                                        <p style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.6; margin: 0 0 1.2rem 0;">${place.desc}</p>
                                     </div>
-                                    <a href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(place.routeQuery)}&destination=Rock+One+Wild+Tea+(Pvt)+Limited&destination_place_id=0x3ae4630013bcccbb:0x453d082c477ea3bf" target="_blank" rel="noopener noreferrer" class="landmark-directions-btn" style="display: flex; align-items: center; justify-content: center; gap: 0.45rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,55,0.3); color: var(--color-gold); text-decoration: none; padding: 0.55rem 0.9rem; border-radius: 8px; font-size: 0.76rem; font-weight: 600; transition: all 0.25s ease;">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
-                                        Driving Route to Estate
-                                    </a>
+                                    <div style="display: flex; gap: 0.6rem; align-items: center;">
+                                        <a href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent("Rock One Wild Tea, Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka")}&destination=${encodeURIComponent(place.routeQuery)}&destination_place_id=0x3ae4630013bcccbb:0x453d082c477ea3bf" target="_blank" rel="noopener noreferrer" class="landmark-directions-btn" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.45rem; background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); color: var(--color-gold); text-decoration: none; padding: 0.65rem 0.9rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600; transition: all 0.25s ease;">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                                            View Route in Google Maps
+                                        </a>
+                                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.mapSearchQuery)}" target="_blank" rel="noopener noreferrer" title="View ${place.name} on Google Maps" style="display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: var(--color-gold); text-decoration: none; transition: all 0.2s ease; flex-shrink: 0;">
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         `).join('')}
+                    </div>
+
+                    <!-- Outro Exploration Banner -->
+                    <div style="margin-top: 2rem; background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 14px; padding: 1.5rem 1.75rem; display: flex; align-items: center; gap: 1.25rem;">
+                        <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(212, 175, 55, 0.2); display: flex; align-items: center; justify-content: center; color: var(--color-gold); flex-shrink: 0;">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                        </div>
+                        <div>
+                            <h5 style="color: var(--color-gold); font-family: var(--font-serif); font-size: 1.08rem; margin: 0 0 0.35rem 0; letter-spacing: 0.5px;">Explore the Highlands After Your Tea Experience</h5>
+                            <p style="color: #d1d5db; font-size: 0.86rem; line-height: 1.6; margin: 0;">
+                                A visit to Rock One Wild Tea can easily be combined with a day of exploring the surrounding highlands. Visitors can experience our handmade tea production, enjoy the scenery of the Uva tea country, and continue on to waterfalls, mountain viewpoints, botanical gardens and cultural landmarks.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
