@@ -2793,7 +2793,7 @@ const UIComponents = {
                     </div>
                     <div style="position: relative;">
                         <div style="position: relative; border-radius: 16px; overflow: hidden; border: 1.5px solid rgba(212,175,55,0.4); box-shadow: 0 16px 40px rgba(0,0,0,0.7), 0 0 25px rgba(212,175,55,0.15);">
-                            <img src="images/luxury_tea_estate.jpg" alt="Rock One Wild Tea Garden - Forested Rock Formation Terroir" style="width: 100%; height: auto; display: block; aspect-ratio: 4/3; object-fit: cover;" onerror="window.handleImageError && window.handleImageError(this, 'gallery')" loading="lazy" decoding="async">
+                            <img src="images/tea_garden_hand_plucking.jpg" alt="Rock One Wild Tea Garden - Forested Rock Formation Terroir" style="width: 100%; height: auto; display: block; aspect-ratio: 4/3; object-fit: cover;" onerror="window.handleImageError && window.handleImageError(this, 'gallery')" loading="lazy" decoding="async">
                             <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1.25rem; background: linear-gradient(0deg, rgba(2, 10, 5, 0.95) 0%, transparent 100%);">
                                 <span style="display: block; color: var(--color-white); font-size: 0.9rem; font-weight: 600;">Forested Rock Formation Tea Garden</span>
                                 <span style="color: var(--color-gold); font-size: 0.75rem;">Uva Medium Region • Hand-Built by Family</span>
@@ -3477,7 +3477,7 @@ const UIComponents = {
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        const posterImg = "images/luxury_tea_estate.jpg";
+        const posterImg = "images/tea_garden_hand_plucking.jpg";
 
         const chapters = [
             {

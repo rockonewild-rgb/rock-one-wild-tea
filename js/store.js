@@ -48,6 +48,180 @@ const DEFAULT_GALLERY_IMAGES = [
         tag: "Estate & Harvest"
     },
     {
+        id: "g_est_01",
+        src: "images/1 (1).jpeg",
+        caption: "Wild Arbor Tea Garden Nestled Under Large Rock Formation in Ettampitiya",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_02",
+        src: "images/1 (2).jpeg",
+        caption: "Forested Mountain Terroir at 1,240m Elevation — Uva Medium Region",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_03",
+        src: "images/1 (3).jpeg",
+        caption: "Generational Family Estate Tea Cultivation & Hand Care",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_04",
+        src: "images/1 (4).jpeg",
+        caption: "Traditional Boutique Family Factory Production Sanctuary",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_05",
+        src: "images/1 (5).jpeg",
+        caption: "Tender Green Shoot Selection & Fresh Morning Dew Harvest",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_07",
+        src: "images/1 (7).jpeg",
+        caption: "Artisanal Ceylon Tea Leaf Withering & Gentle Handling",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_08",
+        src: "images/1 (8).jpeg",
+        caption: "Highland Forest Canopy & Native Mountain Biodiversity",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_09",
+        src: "images/1 (9).jpeg",
+        caption: "Fragrant Cedar Trough Mountain Air-Withering Room",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_10",
+        src: "images/1 (10).jpeg",
+        caption: "Traditional Brass Table Orthodox Rolling Process",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_12",
+        src: "images/1 (12).jpeg",
+        caption: "Calibrated Wood-Fired Curing & Essential Oil Locking",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_13",
+        src: "images/1 (13).jpeg",
+        caption: "Artisanal Loose Leaf Sorting, Sifting & Visual Grading",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_14",
+        src: "images/1 (14).jpeg",
+        caption: "Working Family Tea Factory Machinery & Orthodox Craft",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_15",
+        src: "images/1 (15).jpeg",
+        caption: "Sommelier Cupping & Amber Tea Liquor Evaluation",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_16",
+        src: "images/1 (16).jpeg",
+        caption: "Numbered Solid Teak Wood Collector Gift Chests (1 to 10)",
+        tag: "Packaging & Reserves"
+    },
+    {
+        id: "g_est_17",
+        src: "images/1 (17).jpeg",
+        caption: "Pure Ceylon Orthodox Whole Loose-Leaf Finished Grade",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_18",
+        src: "images/1 (18).jpeg",
+        caption: "Forested Rock Formation Slope & Wild Tea Terraces",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_19",
+        src: "images/1 (19).jpeg",
+        caption: "Freshly Harvested Wild Tea Leaves in Handcrafted Bamboo Baskets",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_20",
+        src: "images/1 (20).jpeg",
+        caption: "Small-Batch Handcrafted Production in Family Factory",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_21",
+        src: "images/1 (21).jpeg",
+        caption: "Uva Medium Region Signature Whole-Leaf Liquor Character",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_22",
+        src: "images/1 (22).jpeg",
+        caption: "Panoramic View of the Wellawela Mountain Ridges at Dawn",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_23",
+        src: "images/1 (23).jpeg",
+        caption: "Artisanal Hand-Rolling & Leaf Twisting Demonstration",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_24",
+        src: "images/1 (24).jpeg",
+        caption: "Golden Tips & Silver Needles Reserve Quality Inspection",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_25",
+        src: "images/1 (25).jpeg",
+        caption: "Natural Highland Sun-Drying & Gentle Air Curing",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_26",
+        src: "images/1 (26).jpeg",
+        caption: "Wild Botanical Forest Micro-Ecosystem in Ettampitiya",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_27",
+        src: "images/1 (27).jpeg",
+        caption: "Small-Batch Master Roasting & Aroma Development",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_28",
+        src: "images/1 (28).jpeg",
+        caption: "Signature Ceylon Black & Green Tea Whole Leaf Reserve",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_est_29",
+        src: "images/1 (29).jpeg",
+        caption: "Estate Factory Grounds & Tea Tasting Garden Pavilion",
+        tag: "Estate & Harvest"
+    },
+    {
+        id: "g_box_02",
+        src: "images/Gift box 2.jpeg",
+        caption: "Handcrafted Solid Teak Wood Gift Chest Packaging",
+        tag: "Packaging & Reserves"
+    },
+    {
+        id: "g_wa_01",
+        src: "images/WhatsApp Image 2026-08-13 at 10.50.29 AM.jpeg",
+        caption: "Rock One Wild Tea Family Estate & Forest Garden",
+        tag: "Estate & Harvest"
+    },
+    {
         id: "g_landmark_mana",
         src: "images/landmark_mana_ella.jpg",
         caption: "Mana Ella Waterfall — 15–18 km from Estate (Lunuwatta Valley)",
@@ -106,20 +280,7 @@ const DEFAULT_GALLERY_IMAGES = [
         src: "images/landmark_hakgala_gardens.jpg",
         caption: "Hakgala Botanical Gardens & Subtropical Highlands — 28 km",
         tag: "Landmarks & Terroir"
-    },
-    ...[
-        "1 (1).jpeg", "1 (2).jpeg", "1 (3).jpeg", "1 (4).jpeg", "1 (5).jpeg",
-        "1 (7).jpeg", "1 (8).jpeg", "1 (9).jpeg", "1 (10).jpeg",
-        "1 (12).jpeg", "1 (13).jpeg", "1 (14).jpeg", "1 (15).jpeg", "1 (16).jpeg",
-        "1 (17).jpeg", "1 (18).jpeg", "1 (19).jpeg", "1 (20).jpeg", "1 (21).jpeg",
-        "1 (22).jpeg", "1 (23).jpeg", "1 (24).jpeg", "1 (25).jpeg", "1 (26).jpeg",
-        "1 (27).jpeg", "1 (28).jpeg", "1 (29).jpeg", "Gift box 2.jpeg", "WhatsApp Image 2026-08-13 at 10.50.29 AM.jpeg"
-    ].map((img, i) => ({
-        id: `g_est_${i + 1}`,
-        src: `images/${encodeURIComponent(img)}`,
-        caption: img.includes('Gift box') ? 'Artisanal Teak Wood Gift Chest Packaging' : `Wild Tea Plantation & Factory Moment #${i + 1}`,
-        tag: img.includes('Gift box') ? 'Packaging & Reserves' : 'Estate & Harvest'
-    }))
+    }
 ];
 
 const CURRENCIES = {
@@ -801,16 +962,10 @@ class TeaFactoryStore {
             this.state.gallery = [...DEFAULT_GALLERY_IMAGES];
             this.saveState();
         } else {
-            // Merge in any missing default gallery photos (e.g. g_featured_01)
-            let hasNew = false;
-            DEFAULT_GALLERY_IMAGES.forEach((defImg, idx) => {
-                const exists = this.state.gallery.some(g => g.id === defImg.id || g.src === defImg.src);
-                if (!exists) {
-                    this.state.gallery.splice(idx, 0, defImg);
-                    hasNew = true;
-                }
-            });
-            if (hasNew) this.saveState();
+            // Keep custom user-added photos, but ensure default gallery order starts with authentic Estate photos
+            const customPhotos = this.state.gallery.filter(g => g && g.id && !DEFAULT_GALLERY_IMAGES.some(d => d.id === g.id || d.src === g.src));
+            this.state.gallery = [...DEFAULT_GALLERY_IMAGES, ...customPhotos];
+            this.saveState();
         }
         return this.state.gallery;
     }
