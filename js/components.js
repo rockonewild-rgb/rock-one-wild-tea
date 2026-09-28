@@ -840,6 +840,8 @@ const UIComponents = {
         const boxes = window.TeaFactoryStore.getBoxes();
         const tourSlots = window.TeaFactoryStore.getTourSlots();
         const galleryImages = window.TeaFactoryStore.getGalleryImages();
+        const heroSlides = window.TeaFactoryStore.getHeroSlides ? window.TeaFactoryStore.getHeroSlides() : [];
+        const activeHeroSlidesCount = heroSlides.filter(s => s && s.enabled !== false).length;
 
         let html = `
             <div class="admin-header-block" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap;">
@@ -865,7 +867,7 @@ const UIComponents = {
             </div>
 
             <!-- KPI Metric Summary Grid (Always visible for CRM context) -->
-            <div class="admin-stats-grid">
+            <div class="admin-stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
                 <div class="admin-stat-card">
                     <span class="stat-label">Total Revenue</span>
                     <span class="stat-value">$${(stats.revenue + stats.tourRevenue).toFixed(2)}</span>
@@ -886,6 +888,14 @@ const UIComponents = {
                     <span class="stat-value">${stats.tourBookingsCount}</span>
                     <span class="stat-desc">Factory visit reservations</span>
                 </div>
+                <div class="admin-stat-card" style="cursor: pointer; border: 1px solid rgba(212,175,55,0.4); background: linear-gradient(135deg, rgba(14,35,20,0.9), rgba(4,14,8,0.95)); transition: all 0.3s ease;" onclick="window.switchAdminSubTab ? window.switchAdminSubTab('slides') : null" title="Click to manage Home Landing Screen Hero Slideshow">
+                    <span class="stat-label" style="color: var(--color-gold); display: flex; align-items: center; justify-content: space-between;">
+                        <span>Hero Slideshow</span>
+                        <span class="box-badge status-available" style="font-size: 0.6rem; padding: 0.1rem 0.4rem;">${activeHeroSlidesCount} Live</span>
+                    </span>
+                    <span class="stat-value" style="color: #ffffff;">${heroSlides.length} <span style="font-size: 0.85rem; font-weight: 500; color: #94a3b8;">Slides</span></span>
+                    <span class="stat-desc" style="color: var(--color-gold); font-weight: 600;">Manage Landing Slides →</span>
+                </div>
             </div>
 
             <!-- Sub Navigation Tabs for Admin Console -->
@@ -899,8 +909,10 @@ const UIComponents = {
                 <button class="admin-tab-btn ${activeSubTab === 'gallery' ? 'active' : ''}" data-subtab="gallery" style="display: flex; align-items: center; gap: 0.5rem;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> Gallery Desk
                 </button>
-                <button class="admin-tab-btn ${activeSubTab === 'slides' ? 'active' : ''}" data-subtab="slides" style="display: flex; align-items: center; gap: 0.5rem;">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg> Hero Slideshow Desk
+                <button class="admin-tab-btn ${activeSubTab === 'slides' ? 'active' : ''}" data-subtab="slides" style="display: flex; align-items: center; gap: 0.5rem; ${activeSubTab === 'slides' ? '' : 'border-color: rgba(212,175,55,0.45); background: rgba(212,175,55,0.08);'}">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    <span>Hero Slideshow Desk</span>
+                    <span class="box-badge ${activeHeroSlidesCount > 0 ? 'status-available' : 'status-booked'}" style="font-size: 0.6rem; padding: 0.1rem 0.35rem; margin-left: 0.2rem;">${activeHeroSlidesCount} Live</span>
                 </button>
                 <button class="admin-tab-btn ${activeSubTab === 'tours' ? 'active' : ''}" data-subtab="tours" style="display: flex; align-items: center; gap: 0.5rem;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg> Tour Slots Desk
@@ -1266,6 +1278,20 @@ const UIComponents = {
             `;
         } else if (activeSubTab === 'gallery') {
             html += `
+                <!-- Quick Navigation Banner to Hero Slideshow Desk -->
+                <div style="background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(4,14,8,0.85)); border: 1px solid rgba(212,175,55,0.35); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <span style="font-size: 1.4rem;">🖼️</span>
+                        <div>
+                            <div style="font-weight: 700; color: var(--color-gold); font-size: 0.92rem;">Looking to select photos for the Home Landing Screen Slideshow?</div>
+                            <div style="font-size: 0.78rem; color: #cbd5e1;">Pick photos from this estate gallery to rotate on the main landing banner.</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="window.switchAdminSubTab ? window.switchAdminSubTab('slides') : null" style="font-size: 0.75rem; padding: 0.45rem 1rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+                        Open Hero Slideshow Desk →
+                    </button>
+                </div>
+
                 <div class="admin-columns">
                     <!-- Active Gallery Photos Card -->
                     <div class="panel-card" style="margin-bottom: 0;">

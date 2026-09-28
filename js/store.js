@@ -1026,14 +1026,14 @@ class TeaFactoryStore {
     }
 
     toggleHeroSlide(id) {
-        if (!this.state.heroSlides) return false;
+        if (!this.state.heroSlides) return null;
         const slide = this.state.heroSlides.find(s => s.id === id);
         if (slide) {
             slide.enabled = !slide.enabled;
             this.saveState();
-            return slide.enabled;
+            return slide;
         }
-        return false;
+        return null;
     }
 
     moveHeroSlide(id, direction) {

@@ -356,8 +356,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Expose switchTab globally for internal CTA buttons
+    // Expose switchTab and switchAdminSubTab globally for internal CTA buttons
     window.appSwitchTab = switchTab;
+    window.switchAdminSubTab = function(subTab) {
+        activeAdminSubTab = subTab || 'audits';
+        if (currentActiveTab !== 'admin') {
+            switchTab('admin');
+        } else {
+            renderTabContent('admin');
+        }
+    };
 
     function renderTabContent(tabId) {
         switch (tabId) {
