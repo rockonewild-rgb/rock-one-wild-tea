@@ -1435,7 +1435,7 @@ class TeaFactoryStore {
 
     // Admin Passcode Management
     getAdminPasscode() {
-        return this.state.adminPasscode || localStorage.getItem('tea_factory_admin_passcode') || 'admin';
+        return this.state.adminPasscode || localStorage.getItem('tea_factory_admin_passcode') || 'hasi@123';
     }
 
     setAdminPasscode(newPasscode) {

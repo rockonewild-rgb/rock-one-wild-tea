@@ -900,6 +900,11 @@ const UIComponents = {
 
             <!-- Sub Navigation Tabs for Admin Console -->
             <div class="admin-tabs" style="display: flex; gap: 0.75rem; margin-bottom: 2.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 1.25rem; flex-wrap: wrap;">
+                <button class="admin-tab-btn ${activeSubTab === 'slides' ? 'active' : ''}" data-subtab="slides" style="display: flex; align-items: center; gap: 0.5rem; ${activeSubTab === 'slides' ? '' : 'border-color: rgba(212,175,55,0.45); background: rgba(212,175,55,0.08);'}">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    <span>Hero Slideshow Desk</span>
+                    <span class="box-badge ${activeHeroSlidesCount > 0 ? 'status-available' : 'status-booked'}" style="font-size: 0.6rem; padding: 0.1rem 0.35rem; margin-left: 0.2rem;">${activeHeroSlidesCount} Live</span>
+                </button>
                 <button class="admin-tab-btn ${activeSubTab === 'audits' ? 'active' : ''}" data-subtab="audits" style="display: flex; align-items: center; gap: 0.5rem;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Active Reservations Log
                 </button>
@@ -908,11 +913,6 @@ const UIComponents = {
                 </button>
                 <button class="admin-tab-btn ${activeSubTab === 'gallery' ? 'active' : ''}" data-subtab="gallery" style="display: flex; align-items: center; gap: 0.5rem;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> Gallery Desk
-                </button>
-                <button class="admin-tab-btn ${activeSubTab === 'slides' ? 'active' : ''}" data-subtab="slides" style="display: flex; align-items: center; gap: 0.5rem; ${activeSubTab === 'slides' ? '' : 'border-color: rgba(212,175,55,0.45); background: rgba(212,175,55,0.08);'}">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                    <span>Hero Slideshow Desk</span>
-                    <span class="box-badge ${activeHeroSlidesCount > 0 ? 'status-available' : 'status-booked'}" style="font-size: 0.6rem; padding: 0.1rem 0.35rem; margin-left: 0.2rem;">${activeHeroSlidesCount} Live</span>
                 </button>
                 <button class="admin-tab-btn ${activeSubTab === 'tours' ? 'active' : ''}" data-subtab="tours" style="display: flex; align-items: center; gap: 0.5rem;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg> Tour Slots Desk
