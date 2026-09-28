@@ -2177,82 +2177,147 @@ const UIComponents = {
                 </div>
             </div>
 
-            <!-- Main Business Activity & Strengths Highlights -->
-            <div style="margin-bottom: 4rem;">
-                <div style="text-align: center; max-width: 780px; margin: 0 auto 2.5rem auto;">
-                    <span class="section-tag">OUR CORE STRENGTHS & PHILOSOPHY</span>
-                    <h4 style="font-size: 1.8rem; font-family: var(--font-serif); color: var(--color-white); margin-bottom: 0.75rem;">Hand Made with Care, Crafted from Ceylon</h4>
-                    <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7;">
-                        Our main activities include cultivating, producing and packaging handcrafted Ceylon Tea in small batches, creating premium tea blends and gift collections, offering authentic tea experiences, and developing international markets for our teas.
+            <!-- Why Rock One Is Different Section -->
+            <div style="margin-bottom: 4.5rem; background: linear-gradient(135deg, rgba(20, 16, 6, 0.75) 0%, rgba(4, 16, 8, 0.92) 100%); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 20px; padding: 3rem 2.25rem; box-shadow: 0 16px 45px rgba(0, 0, 0, 0.75);">
+                <div style="text-align: center; max-width: 860px; margin: 0 auto 3rem auto;">
+                    <span class="section-tag" style="font-size: 0.82rem; letter-spacing: 2px;">WHY ROCK ONE IS DIFFERENT</span>
+                    <h3 style="font-family: var(--font-serif); font-size: 2.3rem; color: var(--color-white); margin-bottom: 1rem; line-height: 1.25;">
+                        A Different Approach to Ceylon Tea
+                    </h3>
+                    <p style="color: var(--color-text-primary); font-size: 1rem; line-height: 1.85; margin-bottom: 0;">
+                        At <strong>Rock One Wild Tea</strong>, we believe that the true character of Ceylon Tea comes from its origin, the quality of the leaves, and the care given during production. Our approach is simple — <em>produce less, pay more attention, and keep the human touch in every batch</em>.
                     </p>
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-                    <!-- Strength 1 -->
-                    <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem;">
-                        <div style="margin-bottom: 0.85rem; color: var(--color-gold);">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3l4 8 5-5 5 15H2L8 3z"></path></svg>
+                <!-- 9 Distinct Pillars of Difference Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+                    <!-- 1. Our Own Tea Garden -->
+                    <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid var(--color-gold);">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(212, 175, 55, 0.15); border: 1px solid var(--color-gold); color: var(--color-gold); flex-shrink: 0;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3l4 8 5-5 5 15H2L8 3z"></path></svg>
+                            </span>
+                            <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">Our Own Tea Garden</h4>
                         </div>
-                        <h5 style="font-size: 1.1rem; color: var(--color-gold); margin-bottom: 0.5rem; font-family: var(--font-serif);">Unique Uva Medium Origin</h5>
-                        <p style="font-size: 0.84rem; color: var(--color-text-muted); line-height: 1.65; margin: 0;">
-                            Rooted in Sri Lanka's renowned Uva Medium region, where mountain microclimates yield unmatched seasonal flavor nuances and delicate floral aromatics.
+                        <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                            Our teas begin in our own tea garden in Sri Lanka’s Uva Medium region, surrounded by a natural forest environment at the foot of a distinctive rock formation. This unique setting is part of the identity and story behind Rock One Wild Tea.
                         </p>
                     </div>
 
-                    <!-- Strength 2 -->
-                    <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem;">
-                        <div style="margin-bottom: 0.85rem; color: #86efac;">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <!-- 2. Carefully Selected Tea Leaves -->
+                    <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid #86efac;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(34, 197, 94, 0.15); border: 1px solid #86efac; color: #86efac; flex-shrink: 0;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            </span>
+                            <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">Carefully Selected Tea Leaves</h4>
                         </div>
-                        <h5 style="font-size: 1.1rem; color: var(--color-gold); margin-bottom: 0.5rem; font-family: var(--font-serif);">Forest-Grown Tea Environment</h5>
-                        <p style="font-size: 0.84rem; color: var(--color-text-muted); line-height: 1.65; margin: 0;">
-                            Surrounded by a natural forest ecosystem at the foot of a large rock formation, infusing our tea leaves with pure natural terroir.
+                        <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                            We carefully select the leaves used for our teas rather than treating all leaves as the same. Different leaf selections allow us to create teas with different characters, aromas and tasting experiences.
                         </p>
                     </div>
 
-                    <!-- Strength 3 -->
-                    <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem;">
-                        <div style="margin-bottom: 0.85rem; color: #93c5fd;">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    <!-- 3. Small-Batch Handcrafted Production -->
+                    <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid #93c5fd;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); border: 1px solid #93c5fd; color: #93c5fd; flex-shrink: 0;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            </span>
+                            <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">Small-Batch Handcrafted Production</h4>
                         </div>
-                        <h5 style="font-size: 1.1rem; color: var(--color-gold); margin-bottom: 0.5rem; font-family: var(--font-serif);">Small-Batch Production</h5>
-                        <p style="font-size: 0.84rem; color: var(--color-text-muted); line-height: 1.65; margin: 0;">
-                            We intentionally avoid mass production to give supreme attention to every single batch, preserving consistent excellence and authenticity.
+                        <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                            We do not focus on mass production. Our teas are produced in small batches, allowing us to personally monitor the process and give each batch the attention it deserves. Our black teas are carefully processed through withering, hand-rolling, oxidation and drying, while our specialty teas are prepared according to their individual characteristics.
                         </p>
                     </div>
 
-                    <!-- Strength 4 -->
-                    <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem;">
-                        <div style="margin-bottom: 0.85rem; color: #fbcfe8;">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                    <!-- 4. Quality Over Quantity -->
+                    <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid #fbcfe8;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(244, 114, 182, 0.15); border: 1px solid #fbcfe8; color: #fbcfe8; flex-shrink: 0;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                            </span>
+                            <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">Quality Over Quantity</h4>
                         </div>
-                        <h5 style="font-size: 1.1rem; color: var(--color-gold); margin-bottom: 0.5rem; font-family: var(--font-serif);">Handcrafted Methods</h5>
-                        <p style="font-size: 0.84rem; color: var(--color-text-muted); line-height: 1.65; margin: 0;">
-                            Traditional orthodox withering, hand-rolling, oxidation, and curing techniques that preserve the artisanal human touch in every leaf.
+                        <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                            Because our production is intentionally limited, we can concentrate on the quality and character of each batch. Every stage — from the tea garden to the finished package — is handled with care by our family.
                         </p>
                     </div>
 
-                    <!-- Strength 5 -->
-                    <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem;">
-                        <div style="margin-bottom: 0.85rem; color: #fb923c;">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <!-- 5. A Family Behind Every Batch -->
+                    <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid #fb923c;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(251, 146, 60, 0.15); border: 1px solid #fb923c; color: #fb923c; flex-shrink: 0;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            </span>
+                            <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">A Family Behind Every Batch</h4>
                         </div>
-                        <h5 style="font-size: 1.1rem; color: var(--color-gold); margin-bottom: 0.5rem; font-family: var(--font-serif);">Family Involvement</h5>
-                        <p style="font-size: 0.84rem; color: var(--color-text-muted); line-height: 1.65; margin: 0;">
-                            Our family personally oversees and handles each phase in our small family factory — from leaf selection to packaging and shipping.
+                        <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                            Rock One Wild Tea is not a large industrial tea factory. It is a family business where we remain personally involved in the garden, tea production and packaging. This personal involvement allows us to know where our tea comes from and how each batch is made.
                         </p>
                     </div>
 
-                    <!-- Strength 6 -->
-                    <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem;">
-                        <div style="margin-bottom: 0.85rem; color: var(--color-gold);">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                    <!-- 6. Respect for Nature -->
+                    <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid #4ade80;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(74, 222, 128, 0.15); border: 1px solid #4ade80; color: #4ade80; flex-shrink: 0;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"></path><path d="M12 6v6l4 2"></path></svg>
+                            </span>
+                            <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">Respect for Nature</h4>
                         </div>
-                        <h5 style="font-size: 1.1rem; color: var(--color-gold); margin-bottom: 0.5rem; font-family: var(--font-serif);">Quality Over Quantity</h5>
-                        <p style="font-size: 0.84rem; color: var(--color-text-muted); line-height: 1.65; margin: 0;">
-                            Guided by genuine devotion to craft, producing pure Ceylon Tea that carries the honest care and responsibility of our makers.
+                        <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                            Our tea garden is maintained with respect for its natural surroundings. We do not fence the garden to keep wildlife out, and we avoid bringing polythene and unnecessary plastic into the tea garden. We do not use insecticides or weed killers in the garden. Larger weeds are removed by hand, while smaller vegetation remains part of the garden environment and can provide food for herbivorous wildlife.
                         </p>
                     </div>
+
+                    <!-- 7. More Than Just Tea -->
+                    <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid #c084fc;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(192, 132, 252, 0.15); border: 1px solid #c084fc; color: #c084fc; flex-shrink: 0;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                            </span>
+                            <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">More Than Just Tea</h4>
+                        </div>
+                        <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                            We are developing our family factory into a place where visitors can experience more than a cup of tea. Guests can learn about our tea garden, discover how our teas are made, experience traditional tea processing and enjoy tea tasting in an environment closely connected to nature.
+                        </p>
+                    </div>
+
+                    <!-- 8. Specialty Tea Collection -->
+                    <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid #38bdf8;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; flex-shrink: 0;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            </span>
+                            <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">Specialty Tea Collection</h4>
+                        </div>
+                        <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                            Alongside our handcrafted black teas, we create a range of specialty teas and blends, including Golden Curl Black Tea, White Peony, Silver Tips, pan-roasted Green Tea, Cinnamon Tea and selected botanical blends. Each tea is developed to offer a different experience while retaining the identity of Ceylon Tea.
+                        </p>
+                    </div>
+
+                    <!-- 9. Sri Lanka Tea Board Certified -->
+                    <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid var(--color-gold);">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(212, 175, 55, 0.15); border: 1px solid var(--color-gold); color: var(--color-gold); flex-shrink: 0;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+                            </span>
+                            <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">Sri Lanka Tea Board Certified</h4>
+                        </div>
+                        <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                            Rock One Wild Tea (Pvt) Ltd has received approval and certification from the Sri Lanka Tea Board, supporting our commitment to operating as a recognized Sri Lankan tea business.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Closing Distinction Banner -->
+                <div style="background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 12px; padding: 1.5rem 2rem; text-align: center;">
+                    <h5 style="font-family: var(--font-serif); font-size: 1.25rem; color: var(--color-gold); margin-bottom: 0.5rem;">Our Difference</h5>
+                    <p style="color: var(--color-text-primary); font-size: 0.94rem; line-height: 1.75; max-width: 800px; margin: 0 auto 0.75rem auto;">
+                        Our difference is not simply in the tea. It is in the way we grow it, select it, make it and share it. From our own Uva Medium tea garden to our family factory, every Rock One Wild Tea carries a story of nature, craftsmanship, family and small-batch Ceylon Tea.
+                    </p>
+                    <p style="font-style: italic; color: #ffd875; font-size: 1rem; font-family: var(--font-serif); margin: 0;">
+                        "Rock One Wild Tea — From the wild, crafted by our hands, to your cup."
+                    </p>
                 </div>
             </div>
         `;
@@ -2336,66 +2401,149 @@ const UIComponents = {
                     </div>
                 </div>
 
-                <!-- 3. Key Strengths Data Grid (6 Cards) -->
-                <div style="margin-bottom: 4.5rem;">
-                    <div style="text-align: center; max-width: 680px; margin: 0 auto 2.5rem auto;">
-                        <span class="section-tag">KEY STRENGTHS</span>
-                        <h3 style="font-family: var(--font-serif); font-size: 2.1rem; color: var(--color-white); margin-bottom: 0.5rem;">
-                            Why Our Tea Is Distinctive
-                        </h3>
-                        <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.6;">
-                            Our strengths lie in our unique Uva Medium origin, forest-grown tea environment, small-batch production, handcrafted methods, family involvement, and our commitment to quality over quantity.
+                <!-- 3. Why Rock One Is Different (9 Core Distinction Pillars) -->
+                <div style="margin-bottom: 4.5rem; background: linear-gradient(135deg, rgba(20, 16, 6, 0.75) 0%, rgba(4, 16, 8, 0.92) 100%); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 20px; padding: 3rem 2.25rem; box-shadow: 0 16px 45px rgba(0, 0, 0, 0.75);">
+                    <div style="text-align: center; max-width: 860px; margin: 0 auto 3rem auto;">
+                        <span class="section-tag" style="font-size: 0.82rem; letter-spacing: 2px;">OUR PHILOSOPHY</span>
+                        <h2 style="font-family: var(--font-serif); font-size: 2.3rem; color: var(--color-white); margin-bottom: 0.75rem; line-height: 1.25;">
+                            Why Rock One Is Different
+                        </h2>
+                        <h4 style="font-family: var(--font-serif); font-size: 1.25rem; color: var(--color-gold); margin-bottom: 1rem; font-weight: 500;">
+                            A Different Approach to Ceylon Tea
+                        </h4>
+                        <p style="color: var(--color-text-primary); font-size: 1rem; line-height: 1.85; margin: 0;">
+                            At <strong>Rock One Wild Tea</strong>, we believe that the true character of Ceylon Tea comes from its origin, the quality of the leaves, and the care given during production. Our approach is simple — <em>produce less, pay more attention, and keep the human touch in every batch</em>.
                         </p>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
-                        <div class="panel-card" style="padding: 1.5rem 1.25rem; text-align: center; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 0;">
-                            <div style="color: var(--color-gold); margin-bottom: 0.5rem;">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3l4 8 5-5 5 15H2L8 3z"></path></svg>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+                        <!-- 1. Our Own Tea Garden -->
+                        <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid var(--color-gold);">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(212, 175, 55, 0.15); border: 1px solid var(--color-gold); color: var(--color-gold); flex-shrink: 0;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3l4 8 5-5 5 15H2L8 3z"></path></svg>
+                                </span>
+                                <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">Our Own Tea Garden</h4>
                             </div>
-                            <strong style="display: block; color: var(--color-white); font-size: 1.1rem; font-family: var(--font-serif); margin-bottom: 0.25rem;">Uva Medium Origin</strong>
-                            <span style="font-size: 0.78rem; color: var(--color-text-muted); line-height: 1.5;">World-famous climatic seasonal character and honey-toned liquor.</span>
+                            <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                                Our teas begin in our own tea garden in Sri Lanka’s Uva Medium region, surrounded by a natural forest environment at the foot of a distinctive rock formation. This unique setting is part of the identity and story behind Rock One Wild Tea.
+                            </p>
                         </div>
 
-                        <div class="panel-card" style="padding: 1.5rem 1.25rem; text-align: center; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 0;">
-                            <div style="color: #4ade80; margin-bottom: 0.5rem;">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <!-- 2. Carefully Selected Tea Leaves -->
+                        <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid #86efac;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(34, 197, 94, 0.15); border: 1px solid #86efac; color: #86efac; flex-shrink: 0;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                </span>
+                                <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">Carefully Selected Tea Leaves</h4>
                             </div>
-                            <strong style="display: block; color: var(--color-white); font-size: 1.1rem; font-family: var(--font-serif); margin-bottom: 0.25rem;">Forest-Grown Garden</strong>
-                            <span style="font-size: 0.78rem; color: var(--color-text-muted); line-height: 1.5;">Surrounded by natural forest at the foot of a rock formation.</span>
+                            <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                                We carefully select the leaves used for our teas rather than treating all leaves as the same. Different leaf selections allow us to create teas with different characters, aromas and tasting experiences.
+                            </p>
                         </div>
 
-                        <div class="panel-card" style="padding: 1.5rem 1.25rem; text-align: center; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 0;">
-                            <div style="color: #60a5fa; margin-bottom: 0.5rem;">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        <!-- 3. Small-Batch Handcrafted Production -->
+                        <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid #93c5fd;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); border: 1px solid #93c5fd; color: #93c5fd; flex-shrink: 0;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                </span>
+                                <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">Small-Batch Handcrafted Production</h4>
                             </div>
-                            <strong style="display: block; color: var(--color-white); font-size: 1.1rem; font-family: var(--font-serif); margin-bottom: 0.25rem;">Small-Batch Production</strong>
-                            <span style="font-size: 0.78rem; color: var(--color-text-muted); line-height: 1.5;">Limited runs allowing deep focus and exceptional consistency.</span>
+                            <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                                We do not focus on mass production. Our teas are produced in small batches, allowing us to personally monitor the process and give each batch the attention it deserves. Our black teas are carefully processed through withering, hand-rolling, oxidation and drying, while our specialty teas are prepared according to their individual characteristics.
+                            </p>
                         </div>
 
-                        <div class="panel-card" style="padding: 1.5rem 1.25rem; text-align: center; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 0;">
-                            <div style="color: #f472b6; margin-bottom: 0.5rem;">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                        <!-- 4. Quality Over Quantity -->
+                        <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid #fbcfe8;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(244, 114, 182, 0.15); border: 1px solid #fbcfe8; color: #fbcfe8; flex-shrink: 0;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                                </span>
+                                <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">Quality Over Quantity</h4>
                             </div>
-                            <strong style="display: block; color: var(--color-white); font-size: 1.1rem; font-family: var(--font-serif); margin-bottom: 0.25rem;">Handcrafted Methods</strong>
-                            <span style="font-size: 0.78rem; color: var(--color-text-muted); line-height: 1.5;">Traditional withering, rolling, oxidation, and wood curing.</span>
+                            <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                                Because our production is intentionally limited, we can concentrate on the quality and character of each batch. Every stage — from the tea garden to the finished package — is handled with care by our family.
+                            </p>
                         </div>
 
-                        <div class="panel-card" style="padding: 1.5rem 1.25rem; text-align: center; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 0;">
-                            <div style="color: #fb923c; margin-bottom: 0.5rem;">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                        <!-- 5. A Family Behind Every Batch -->
+                        <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid #fb923c;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(251, 146, 60, 0.15); border: 1px solid #fb923c; color: #fb923c; flex-shrink: 0;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                </span>
+                                <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">A Family Behind Every Batch</h4>
                             </div>
-                            <strong style="display: block; color: var(--color-white); font-size: 1.1rem; font-family: var(--font-serif); margin-bottom: 0.25rem;">Family Involvement</strong>
-                            <span style="font-size: 0.78rem; color: var(--color-text-muted); line-height: 1.5;">Direct personal care from garden soil to final packaged tin.</span>
+                            <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                                Rock One Wild Tea is not a large industrial tea factory. It is a family business where we remain personally involved in the garden, tea production and packaging. This personal involvement allows us to know where our tea comes from and how each batch is made.
+                            </p>
                         </div>
 
-                        <div class="panel-card" style="padding: 1.5rem 1.25rem; text-align: center; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 0;">
-                            <div style="color: #c084fc; margin-bottom: 0.5rem;">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                        <!-- 6. Respect for Nature -->
+                        <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid #4ade80;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(74, 222, 128, 0.15); border: 1px solid #4ade80; color: #4ade80; flex-shrink: 0;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"></path><path d="M12 6v6l4 2"></path></svg>
+                                </span>
+                                <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">Respect for Nature</h4>
                             </div>
-                            <strong style="display: block; color: var(--color-white); font-size: 1.1rem; font-family: var(--font-serif); margin-bottom: 0.25rem;">Quality Over Quantity</strong>
-                            <span style="font-size: 0.78rem; color: var(--color-text-muted); line-height: 1.5;">Preserving genuine craftsmanship and artisanal integrity.</span>
+                            <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                                Our tea garden is maintained with respect for its natural surroundings. We do not fence the garden to keep wildlife out, and we avoid bringing polythene and unnecessary plastic into the tea garden. We do not use insecticides or weed killers in the garden. Larger weeds are removed by hand, while smaller vegetation remains part of the garden environment and can provide food for herbivorous wildlife.
+                            </p>
                         </div>
+
+                        <!-- 7. More Than Just Tea -->
+                        <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid #c084fc;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(192, 132, 252, 0.15); border: 1px solid #c084fc; color: #c084fc; flex-shrink: 0;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                                </span>
+                                <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">More Than Just Tea</h4>
+                            </div>
+                            <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                                We are developing our family factory into a place where visitors can experience more than a cup of tea. Guests can learn about our tea garden, discover how our teas are made, experience traditional tea processing and enjoy tea tasting in an environment closely connected to nature.
+                            </p>
+                        </div>
+
+                        <!-- 8. Specialty Tea Collection -->
+                        <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid #38bdf8;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; flex-shrink: 0;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                </span>
+                                <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">Specialty Tea Collection</h4>
+                            </div>
+                            <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                                Alongside our handcrafted black teas, we create a range of specialty teas and blends, including Golden Curl Black Tea, White Peony, Silver Tips, pan-roasted Green Tea, Cinnamon Tea and selected botanical blends. Each tea is developed to offer a different experience while retaining the identity of Ceylon Tea.
+                            </p>
+                        </div>
+
+                        <!-- 9. Sri Lanka Tea Board Certified -->
+                        <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid var(--color-gold);">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(212, 175, 55, 0.15); border: 1px solid var(--color-gold); color: var(--color-gold); flex-shrink: 0;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+                                </span>
+                                <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">Sri Lanka Tea Board Certified</h4>
+                            </div>
+                            <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
+                                Rock One Wild Tea (Pvt) Ltd has received approval and certification from the Sri Lanka Tea Board, supporting our commitment to operating as a recognized Sri Lankan tea business.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Closing Distinction Banner -->
+                    <div style="background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 12px; padding: 1.5rem 2rem; text-align: center;">
+                        <h5 style="font-family: var(--font-serif); font-size: 1.25rem; color: var(--color-gold); margin-bottom: 0.5rem;">Our Difference</h5>
+                        <p style="color: var(--color-text-primary); font-size: 0.94rem; line-height: 1.75; max-width: 800px; margin: 0 auto 0.75rem auto;">
+                            Our difference is not simply in the tea. It is in the way we grow it, select it, make it and share it. From our own Uva Medium tea garden to our family factory, every Rock One Wild Tea carries a story of nature, craftsmanship, family and small-batch Ceylon Tea.
+                        </p>
+                        <p style="font-style: italic; color: #ffd875; font-size: 1rem; font-family: var(--font-serif); margin: 0;">
+                            "Rock One Wild Tea — From the wild, crafted by our hands, to your cup."
+                        </p>
                     </div>
                 </div>
 
