@@ -2694,6 +2694,10 @@ const UIComponents = {
         const container = document.getElementById(containerId);
         if (!container) return;
 
+        const galleryImages = (window.TeaFactoryStore && window.TeaFactoryStore.getGalleryImages) 
+            ? window.TeaFactoryStore.getGalleryImages() 
+            : [];
+
         container.innerHTML = `
             <!-- Top Heritage Story Showcase -->
             <div class="heritage-container-layout" style="margin-bottom: 3.5rem;">
@@ -2722,9 +2726,42 @@ const UIComponents = {
                         </span>
                     </div>
                 </div>
-                <div class="heritage-visual-wrapper">
-                    <img src="images/1 (1).jpeg" alt="Rock One Wild Tea Garden - Forested Rock Formation Terroir" onerror="window.handleImageError && window.handleImageError(this, 'gallery')" loading="lazy" decoding="async">
-                    <div class="card-image-overlay"></div>
+                <div class="heritage-visual-wrapper" id="heritage-gallery-slider" title="Click any photo to view in high resolution">
+                    <div class="heritage-slides-track" id="heritage-slides-track">
+                        ${galleryImages.length === 0 ? `
+                            <div class="heritage-slide active" style="background-image: url('images/1 (1).jpeg');" data-src="images/1 (1).jpeg" data-caption="Rock One Wild Tea Estate Garden">
+                                <div class="heritage-slide-overlay"></div>
+                                <div class="heritage-slide-info">
+                                    <span class="heritage-slide-tag">Estate Garden</span>
+                                    <h5 class="heritage-slide-caption">Forested Rock Formation Terroir</h5>
+                                </div>
+                            </div>
+                        ` : galleryImages.map((img, idx) => `
+                            <div class="heritage-slide ${idx === 0 ? 'active' : ''}" style="background-image: url('${img.src}');" data-src="${img.src}" data-caption="${(img.caption || '').replace(/"/g, '&quot;')}">
+                                <div class="heritage-slide-overlay"></div>
+                                <div class="heritage-slide-info">
+                                    <span class="heritage-slide-tag">${img.tag || 'Estate Photography'}</span>
+                                    <h5 class="heritage-slide-caption">${img.caption || 'Artisanal Ceylon Heritage'}</h5>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Floating Navigation Controls -->
+                    <button class="heritage-slider-btn heritage-prev" id="heritage-prev-btn" aria-label="Previous Gallery Photo">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
+                    <button class="heritage-slider-btn heritage-next" id="heritage-next-btn" aria-label="Next Gallery Photo">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+
+                    <!-- Bottom Bar with Dot Indicators & Counter -->
+                    <div class="heritage-slider-footer">
+                        <div class="heritage-dots-bar" id="heritage-dots-bar">
+                            ${galleryImages.slice(0, Math.min(galleryImages.length, 8)).map((_, i) => `<span class="heritage-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`).join('')}
+                        </div>
+                        <span class="heritage-counter" id="heritage-counter">01 / ${String(Math.max(galleryImages.length, 1)).padStart(2, '0')}</span>
+                    </div>
                 </div>
             </div>
 

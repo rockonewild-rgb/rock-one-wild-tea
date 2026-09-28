@@ -413,6 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 bindCatalogEvents('catalog-widget-container');
                 renderHomeAnnouncementsPreview();
                 window.UIComponents.renderHeritageShowcase('home-heritage-container');
+                initHeritageGallerySlider();
                 window.UIComponents.renderCinemaShowcase('home-cinema-container');
                 bindCinemaEvents();
                 window.UIComponents.renderTestimonials('home-testimonials-container');
@@ -7491,6 +7492,121 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 description: 'Hand made with Care, Crafted from Ceylon — from selecting the tea leaves to small-batch processing in our family factory in Sri Lanka’s Uva Medium region.'
             };
         }
+    }
+
+    // ─── Heritage Our Story Gallery Slideshow ──────────────────────────────
+    let heritageGalleryTimer = null;
+    let currentHeritageIndex = 0;
+
+    function initHeritageGallerySlider() {
+        const slider = document.getElementById('heritage-gallery-slider');
+        if (!slider) return;
+
+        const slides = slider.querySelectorAll('.heritage-slide');
+        if (slides.length <= 1) return;
+
+        const dots = slider.querySelectorAll('.heritage-dot');
+        const counter = document.getElementById('heritage-counter');
+        const prevBtn = document.getElementById('heritage-prev-btn');
+        const nextBtn = document.getElementById('heritage-next-btn');
+
+        function updateHeritageSlide(idx) {
+            slides.forEach(s => s.classList.remove('active'));
+            dots.forEach(d => d.classList.remove('active'));
+
+            currentHeritageIndex = (idx + slides.length) % slides.length;
+            slides[currentHeritageIndex].classList.add('active');
+
+            const maxDots = Math.min(slides.length, 8);
+            const activeDotIdx = currentHeritageIndex % maxDots;
+            if (dots[activeDotIdx]) {
+                dots[activeDotIdx].classList.add('active');
+            }
+
+            if (counter) {
+                counter.innerText = `${String(currentHeritageIndex + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+            }
+        }
+
+        function nextHeritageSlide() {
+            updateHeritageSlide(currentHeritageIndex + 1);
+        }
+
+        function prevHeritageSlide() {
+            updateHeritageSlide(currentHeritageIndex - 1);
+        }
+
+        function startHeritageAutoplay() {
+            stopHeritageAutoplay();
+            heritageGalleryTimer = setInterval(nextHeritageSlide, 4500);
+        }
+
+        function stopHeritageAutoplay() {
+            if (heritageGalleryTimer) {
+                clearInterval(heritageGalleryTimer);
+                heritageGalleryTimer = null;
+            }
+        }
+
+        if (prevBtn) {
+            prevBtn.onclick = (e) => {
+                e.stopPropagation();
+                prevHeritageSlide();
+                startHeritageAutoplay();
+            };
+        }
+
+        if (nextBtn) {
+            nextBtn.onclick = (e) => {
+                e.stopPropagation();
+                nextHeritageSlide();
+                startHeritageAutoplay();
+            };
+        }
+
+        dots.forEach(dot => {
+            dot.onclick = (e) => {
+                e.stopPropagation();
+                const i = parseInt(dot.getAttribute('data-index'), 10);
+                if (!isNaN(i)) {
+                    updateHeritageSlide(i);
+                    startHeritageAutoplay();
+                }
+            };
+        });
+
+        // Click slide to open lightbox
+        slides.forEach(slide => {
+            slide.onclick = () => {
+                const src = slide.getAttribute('data-src');
+                const caption = slide.getAttribute('data-caption');
+                if (typeof openLightbox === 'function') {
+                    openLightbox(src, caption);
+                }
+            };
+        });
+
+        // Touch Swipe Support for Mobile screens
+        let touchStartX = 0;
+        let touchEndX = 0;
+        slider.ontouchstart = (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        };
+        slider.ontouchend = (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 40) {
+                nextHeritageSlide();
+                startHeritageAutoplay();
+            } else if (touchEndX - touchStartX > 40) {
+                prevHeritageSlide();
+                startHeritageAutoplay();
+            }
+        };
+
+        slider.onmouseenter = stopHeritageAutoplay;
+        slider.onmouseleave = startHeritageAutoplay;
+
+        startHeritageAutoplay();
     }
 
     function initHeroSlider() {

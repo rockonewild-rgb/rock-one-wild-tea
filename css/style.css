@@ -4043,20 +4043,173 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
+/* Heritage Gallery SlideShow */
 .heritage-visual-wrapper {
     position: relative;
-    border-radius: 14px;
+    border-radius: 18px;
     overflow: hidden;
-    border: var(--glass-border);
+    border: 1.5px solid rgba(212, 175, 55, 0.4);
     aspect-ratio: 4/3;
-    box-shadow: var(--glass-shadow);
+    min-height: 380px;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.15);
+    background: #020a05;
 }
 
-.heritage-visual-wrapper img {
+.heritage-slides-track {
+    position: relative;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    display: block;
+}
+
+.heritage-slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.04);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.9s;
+    cursor: pointer;
+}
+
+.heritage-slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    z-index: 2;
+}
+
+.heritage-slide-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(2, 10, 5, 0.08) 0%, rgba(2, 10, 5, 0.35) 55%, rgba(2, 10, 5, 0.92) 100%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.heritage-slide-info {
+    position: absolute;
+    bottom: 3.25rem;
+    left: 1.25rem;
+    right: 1.25rem;
+    z-index: 3;
+    pointer-events: none;
+    animation: fadeInSlideUp 0.6s ease-out;
+}
+
+.heritage-slide-tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--color-gold);
+    font-weight: 700;
+    background: rgba(3, 14, 8, 0.85);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: 50px;
+    padding: 0.2rem 0.75rem;
+    margin-bottom: 0.35rem;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.heritage-slide-caption {
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.3;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.heritage-slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(2, 10, 5, 0.7);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    color: var(--color-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0.85;
+}
+
+.heritage-slider-btn:hover {
+    opacity: 1;
+    background: rgba(6, 22, 12, 0.95);
+    border-color: var(--color-gold);
+    color: #ffffff;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}
+
+.heritage-prev {
+    left: 0.85rem;
+}
+
+.heritage-next {
+    right: 0.85rem;
+}
+
+.heritage-slider-footer {
+    position: absolute;
+    bottom: 0.85rem;
+    left: 1.25rem;
+    right: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    background: rgba(3, 14, 8, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 0.35rem 0.85rem;
+    border-radius: 30px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.heritage-dots-bar {
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+}
+
+.heritage-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.heritage-dot.active {
+    width: 18px;
+    border-radius: 8px;
+    background: var(--color-gold);
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.8);
+}
+
+.heritage-counter {
+    font-family: monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--color-gold);
+    letter-spacing: 1px;
 }
 
 /* Testimonial slider layouts */
