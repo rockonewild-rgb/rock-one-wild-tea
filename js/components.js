@@ -811,9 +811,9 @@ const UIComponents = {
                             <em>Notice:</em> The factory may be closed on Sundays, public holidays, and selected days for family or tea-production activities. Please contact us before travelling to confirm availability.
                         </p>
                         <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-                            <a href="https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20Factory%20Tour%20and%20Gongfu%20Brewing%20Experience." target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="border-color: #25D366; color: #25D366; font-size: 0.82rem; padding: 0.55rem 1.15rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                            <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20Factory%20Tour%20and%20Gongfu%20Brewing%20Experience." target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="border-color: #25D366; color: #25D366; font-size: 0.82rem; padding: 0.55rem 1.15rem; display: inline-flex; align-items: center; gap: 0.4rem;">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-                                WhatsApp Concierge (+94 77 175 7556)
+                                WhatsApp Concierge (+94 77 320 9950)
                             </a>
                             <span style="font-size: 0.8rem; color: var(--color-text-muted);">
                                 We look forward to welcoming you to Rock One Wild Tea and sharing our tea, our story and our way of life with you.
@@ -3233,7 +3233,7 @@ const UIComponents = {
                         <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         Apply for Private Reserve Allocation
                     </button>
-                    <a href="https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20inquire%20about%20the%20Private%20Reserve%20Club%20allocation." target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="color: #25d366; border-color: rgba(37, 211, 102, 0.4); text-decoration: none;">
+                    <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20inquire%20about%20the%20Private%20Reserve%20Club%20allocation." target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="color: #25d366; border-color: rgba(37, 211, 102, 0.4); text-decoration: none;">
                         <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.247 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.992-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.443-4.436-9.884-9.888-9.884-5.447 0-9.885 4.437-9.889 9.885-.001 2.016.52 3.49 1.37 4.975l-.997 3.641 3.731-.978z"/></svg>
                         Direct WhatsApp Concierge Desk
                     </a>
@@ -3364,7 +3364,7 @@ const UIComponents = {
                         </div>
                         <div>
                             <strong>WhatsApp Priority Line</strong>
-                            <a href="https://wa.me/94771757556" target="_blank" rel="noopener noreferrer">+94 77 175 7556</a>
+                            <a href="https://wa.me/94773209950" target="_blank" rel="noopener noreferrer">+94 77 320 9950</a>
                         </div>
                     </div>
                     <div class="direct-contact-item">
@@ -4081,7 +4081,7 @@ const UIComponents = {
                             ${_t('btn_quick_order', 'Quick Order')}
                         </button>
                     </div>
-                    <a href="https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20am%20interested%20in%20learning%20more%20about%20${encodeURIComponent(product.name)}." target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="color:#25d366; border-color:rgba(37,211,102,0.4); text-decoration:none; display:flex; align-items:center; gap:0.4rem; font-size:0.88rem; padding:0.85rem 1.35rem;">
+                    <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20am%20interested%20in%20learning%20more%20about%20${encodeURIComponent(product.name)}." target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="color:#25d366; border-color:rgba(37,211,102,0.4); text-decoration:none; display:flex; align-items:center; gap:0.4rem; font-size:0.88rem; padding:0.85rem 1.35rem;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.247 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.992-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.443-4.436-9.884-9.888-9.884-5.447 0-9.885 4.437-9.889 9.885-.001 2.016.52 3.49 1.37 4.975l-.997 3.641 3.731-.978z"/></svg>
                         Ask Sommelier on WhatsApp
                     </a>
@@ -4398,8 +4398,8 @@ const UIComponents = {
                                 <strong style="color: var(--color-gold);">Arrival Recommendation:</strong> Please arrive 10–15 minutes prior to ${timeSlot}.
                             </div>
                             <div style="text-align: center; margin-top: 1.25rem;">
-                                <a href="https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20Authorized%20Tour%20Pass%20${order.id}%20for%20${tourDate}.%20Please%20guide%20our%20chauffeur." target="_blank" style="background: #25D366; color: #ffffff; text-decoration: none; padding: 10px 22px; border-radius: 25px; font-weight: bold; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem;">
-                                    Message Concierge on WhatsApp (+94 77 175 7556)
+                                <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20Authorized%20Tour%20Pass%20${order.id}%20for%20${tourDate}.%20Please%20guide%20our%20chauffeur." target="_blank" style="background: #25D366; color: #ffffff; text-decoration: none; padding: 10px 22px; border-radius: 25px; font-weight: bold; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                    Message Concierge on WhatsApp (+94 77 320 9950)
                                 </a>
                             </div>
                         </div>
@@ -4428,7 +4428,7 @@ const UIComponents = {
                                 </div>
                             ` : ''}
                             <div style="text-align: center; margin-top: 1.25rem;">
-                                <a href="https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20submitted%20slip%20for%20Tour%20Booking%20${order.id}%20(${tourDate}).%20Please%20authorize%20my%20pass." target="_blank" style="background: #25D366; color: #ffffff; text-decoration: none; padding: 10px 22px; border-radius: 25px; font-weight: bold; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20submitted%20slip%20for%20Tour%20Booking%20${order.id}%20(${tourDate}).%20Please%20authorize%20my%20pass." target="_blank" style="background: #25D366; color: #ffffff; text-decoration: none; padding: 10px 22px; border-radius: 25px; font-weight: bold; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem;">
                                     Inquire with Concierge on WhatsApp
                                 </a>
                             </div>

@@ -1797,7 +1797,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     showToast("Connecting via WhatsApp", "Opening WhatsApp chat support channel...", "success");
                     setTimeout(() => {
                         const encodedMsg = encodeURIComponent(baseText);
-                        window.open(`https://api.whatsapp.com/send?phone=94771757556&text=${encodedMsg}`, '_blank');
+                        window.open(`https://api.whatsapp.com/send?phone=94773209950&text=${encodedMsg}`, '_blank');
                     }, 1000);
                 } else {
                     showToast("Loading Email Dispatcher", "Opening email service selector...", "success");
@@ -1925,7 +1925,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (socialChannel === 'WhatsApp' || !socialChannel) {
                     showToast("Connecting to Concierge", "Opening WhatsApp concierge desk...", "info");
                     setTimeout(() => {
-                        window.open(`https://api.whatsapp.com/send?phone=94771757556&text=${encodedMsg}`, '_blank');
+                        window.open(`https://api.whatsapp.com/send?phone=94773209950&text=${encodedMsg}`, '_blank');
                     }, 1200);
                 } else {
                     showToast("Loading Email Dispatcher", "Opening email service selector...", "info");
@@ -2031,7 +2031,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (socialChannel === 'WhatsApp') {
                     showToast("Connecting to Concierge", "Redirecting to WhatsApp to complete your order...", "success");
                     setTimeout(() => {
-                        window.open(`https://api.whatsapp.com/send?phone=94771757556&text=${encodedMsg}`, '_blank');
+                        window.open(`https://api.whatsapp.com/send?phone=94773209950&text=${encodedMsg}`, '_blank');
                     }, 1500);
                 } else {
                     navigator.clipboard.writeText(message).then(() => {
@@ -3978,7 +3978,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <!-- Footer -->
     <div class="cert-footer">
         <p>Rock One Wild Tea (Pvt) Ltd · Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka</p>
-        <p>rockonewild@gmail.com · +94 77 175 7556 · rockonewildtea.com</p>
+        <p>rockonewild@gmail.com · +94 77 320 9950 · rockonewildtea.com</p>
         <p style="margin-top: 3px; font-style: italic; font-size: 8px; color: #b09040;">
             This certificate is an official allocation record issued by Rock One Wild Tea Estate. It does not constitute a final receipt until payment is fully confirmed.
         </p>
@@ -6337,7 +6337,7 @@ PROJECT DETAILS & REQUIREMENTS:
 
 ============================================================
 Sent from Rock One Wild Tea Official Portal
-Direct Inbox: rockonewild@gmail.com | WhatsApp: +94 77 175 7556
+Direct Inbox: rockonewild@gmail.com | WhatsApp: +94 77 320 9950
 Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             `.trim();
 
@@ -6436,7 +6436,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         if (existing) existing.remove();
 
         const waText = encodeURIComponent(`Hello Rock One Wild Tea Concierge, I have sent an enquiry [Ref: ${inquiry.id}] regarding "${inquiry.service || 'Artisanal Teas'}" for ${inquiry.fullName}.`);
-        const waUrl = `https://wa.me/94771757556?text=${waText}`;
+        const waUrl = `https://wa.me/94773209950?text=${waText}`;
 
         const modal = document.createElement('div');
         modal.id = 'inquiry-success-modal';
@@ -7309,7 +7309,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             if (/lookbook|brochure|pdf|dossier|wholesale|b2b|export|නාමාවලිය|පොත|விவரக்குறிப்பு|カタログ|白皮书|画册|كتالوج/.test(lower)) {
                 addBotMessage(cfg.lookbookResponse || "You can view and download our complete **2026 Estate Lookbook & Wholesale Technical Dossier (PDF)** right now.", [
                     { label: cfg.btnOpenLookbook || "Open Estate Lookbook (PDF)", onclick: "if(window.appOpenLookbook){window.appOpenLookbook()}" },
-                    { label: cfg.btnTradeDesk || "WhatsApp Trade Desk", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%2C%20I%20would%20like%20to%20receive%20the%202026%20B2B%20Wholesale%20Lookbook%20and%20Price%20List." }
+                    { label: cfg.btnTradeDesk || "WhatsApp Trade Desk", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%2C%20I%20would%20like%20to%20receive%20the%202026%20B2B%20Wholesale%20Lookbook%20and%20Price%20List." }
                 ]);
                 return;
             }
@@ -7323,7 +7323,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
 
             // Default intelligent fallback in user's active language
             addBotMessage(cfg.fallback || "Thank you for your inquiry! Our master tea sommelier is available to assist you.", [
-                { label: cfg.btnWhatsappDesk || "Chat on WhatsApp Desk", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20a%20question%3A%20" + encodeURIComponent(query) },
+                { label: cfg.btnWhatsappDesk || "Chat on WhatsApp Desk", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20a%20question%3A%20" + encodeURIComponent(query) },
                 { label: cfg.btnExploreCatalog || "Explore Catalog", tab: "catalog" }
             ]);
             renderFaqMenu(cfg.menuTitle || "Or select an inquiry topic:");
@@ -7634,7 +7634,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                                 </div>
 
                                 <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                                    <a href="https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge%2C%20I%20have%20placed%20Order%20${order.id}%20for%20${encodeURIComponent(order.formattedPrice)}.%20Please%20confirm%20my%20dispatch." target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; font-weight: 700;">
+                                    <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge%2C%20I%20have%20placed%20Order%20${order.id}%20for%20${encodeURIComponent(order.formattedPrice)}.%20Please%20confirm%20my%20dispatch." target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; font-weight: 700;">
                                         <span>Notify Concierge on WhatsApp</span>
                                     </a>
                                     <button type="button" class="btn btn-outline" onclick="if(window.appCloseCart){window.appCloseCart()} window.appSwitchTab ? window.appSwitchTab('order') : (document.getElementById('nav-order') &amp;&amp; document.getElementById('nav-order').click())" style="padding: 0.8rem; font-size: 0.85rem; border-color: rgba(255,255,255,0.25); color: #fff;">

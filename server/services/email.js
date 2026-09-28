@@ -22,7 +22,7 @@ async function sendInquiryEmails(inquiry) {
     // 1. Notification Email to Tea Factory Concierge Desk
     try {
         const cleanPhone = (inquiry.phone || '').replace(/[^0-9+]/g, '');
-        const waLink = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}?text=Hello%20${encodeURIComponent(inquiry.full_name)},%20thank%20you%20for%20contacting%20Rock%20One%20Wild%20Tea%20Estate%20[Ref:%20${inquiry.id}].` : 'https://wa.me/94771757556';
+        const waLink = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}?text=Hello%20${encodeURIComponent(inquiry.full_name)},%20thank%20you%20for%20contacting%20Rock%20One%20Wild%20Tea%20Estate%20[Ref:%20${inquiry.id}].` : 'https://wa.me/94773209950';
 
         const adminEmail = await resend.emails.send({
             from: SENDER_EMAIL,
@@ -84,7 +84,7 @@ async function sendInquiryEmails(inquiry) {
 
                     <!-- Footer -->
                     <div style="text-align: center; margin-top: 30px; color: #888; font-size: 11px; line-height: 1.5;">
-                        <p>Rock One Wild Tea Estate &bull; Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka<br>Direct WhatsApp Desk: +94 77 175 7556</p>
+                        <p>Rock One Wild Tea Estate &bull; Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka<br>Direct WhatsApp Desk: +94 77 320 9950</p>
                     </div>
                 </div>
             `
@@ -123,7 +123,7 @@ async function sendInquiryEmails(inquiry) {
                         <div style="background: rgba(37, 211, 102, 0.1); border: 1px solid rgba(37, 211, 102, 0.3); border-radius: 8px; padding: 16px; margin: 25px 0; text-align: center;">
                             <p style="margin: 0 0 8px 0; font-size: 13px; color: #4ade80; font-weight: bold;">Need Immediate Concierge Assistance?</p>
                             <p style="margin: 0; font-size: 12px; color: #d1d5db;">You can message our direct WhatsApp allocation line at:</p>
-                            <p style="margin: 8px 0 0 0; font-size: 15px; font-weight: bold; color: #ffffff;">+94 77 175 7556</p>
+                            <p style="margin: 8px 0 0 0; font-size: 15px; font-weight: bold; color: #ffffff;">+94 77 320 9950</p>
                         </div>
                     </div>
 
@@ -341,7 +341,7 @@ async function sendOrderConfirmationEmails(order) {
                                     <tr><td style="padding: 4px 0; color: #9ca3af;"><strong>Payment Reference:</strong></td><td style="font-family: monospace; color: #86efac; font-weight: bold;">${order.id}</td></tr>
                                 </table>
                                 <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed rgba(212,175,55,0.3); font-size: 12px; color: #d1d5db;">
-                                    <strong>Slip Verification:</strong> Please WhatsApp a photo or screenshot of your deposit slip to <strong style="color:#ffffff;">+94 77 175 7556</strong> for instant priority dispatch approval.
+                                    <strong>Slip Verification:</strong> Please WhatsApp a photo or screenshot of your deposit slip to <strong style="color:#ffffff;">+94 77 320 9950</strong> for instant priority dispatch approval.
                                 </div>
                             </div>
                         ` : `
@@ -362,7 +362,7 @@ async function sendOrderConfirmationEmails(order) {
 
                         <!-- Direct WhatsApp Concierge Button -->
                         <div style="text-align: center; margin: 30px 0 10px 0;">
-                            <a href="https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20placed%20Order%20${order.id}.%20Please%20confirm%20my%20order." style="background: #25D366; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 25px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 4px 15px rgba(37,211,102,0.3);">
+                            <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20placed%20Order%20${order.id}.%20Please%20confirm%20my%20order." style="background: #25D366; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 25px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 4px 15px rgba(37,211,102,0.3);">
                                 Contact Concierge Desk on WhatsApp
                             </a>
                         </div>
@@ -370,7 +370,7 @@ async function sendOrderConfirmationEmails(order) {
                         <!-- Footer -->
                         <div style="text-align: center; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #888; font-size: 11px; line-height: 1.6;">
                             <p style="color: #d4af37; font-weight: bold; margin-bottom: 4px;">ROCK ONE WILD TEA ESTATE</p>
-                            <p>Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Sri Lanka<br>Direct WhatsApp Desk: +94 77 175 7556</p>
+                            <p>Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Sri Lanka<br>Direct WhatsApp Desk: +94 77 320 9950</p>
                         </div>
                     </div>
                 `
@@ -569,15 +569,15 @@ async function sendTourConfirmationEmails(booking) {
 
                         <!-- Direct WhatsApp Concierge Button -->
                         <div style="text-align: center; margin: 30px 0 10px 0;">
-                            <a href="https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20Tour%20Booking%20Pass%20${booking.id}%20for%20${tourDate}.%20Please%20assist%20with%20arrival." style="background: #25D366; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 25px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 4px 15px rgba(37,211,102,0.3);">
-                                Contact Concierge on WhatsApp (+94 77 175 7556)
+                            <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20Tour%20Booking%20Pass%20${booking.id}%20for%20${tourDate}.%20Please%20assist%20with%20arrival." style="background: #25D366; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 25px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 4px 15px rgba(37,211,102,0.3);">
+                                Contact Concierge on WhatsApp (+94 77 320 9950)
                             </a>
                         </div>
 
                         <!-- Footer -->
                         <div style="text-align: center; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #888; font-size: 11px; line-height: 1.6;">
                             <p style="color: #d4af37; font-weight: bold; margin-bottom: 4px;">ROCK ONE WILD TEA ESTATE</p>
-                            <p>Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Sri Lanka<br>Direct WhatsApp Concierge: +94 77 175 7556</p>
+                            <p>Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Sri Lanka<br>Direct WhatsApp Concierge: +94 77 320 9950</p>
                         </div>
                     </div>
                 `

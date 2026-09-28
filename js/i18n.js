@@ -1377,7 +1377,7 @@
                     answer: "Our numbered **Collector Gift Boxes (Series 01–10)** are handcrafted in artisanal teak wood chests with 100g of Golden Tips wild tea. You can reserve directly from the **Gift Catalog** by selecting an available numbered box, or instantly via our direct WhatsApp concierge desk.",
                     actions: [
                         { label: "View Gift Catalog", tab: "gifts" },
-                        { label: "Reserve on WhatsApp", href: "https://wa.me/94771757556?text=Hello%2C%20I%20would%20like%20to%20reserve%20a%20numbered%20Gift%20Box." }
+                        { label: "Reserve on WhatsApp", href: "https://wa.me/94773209950?text=Hello%2C%20I%20would%20like%20to%20reserve%20a%20numbered%20Gift%20Box." }
                     ],
                     followUps: [1, 2, 3]
                 },
@@ -1421,7 +1421,7 @@
                     question: "What are the domestic & international shipping options?",
                     answer: "We provide islandwide delivery across Sri Lanka (2–3 business days) and **Worldwide Express Courier Shipping** (DHL / FedEx) to UK, Europe, USA, UAE, Japan, and Singapore in airtight luxury tins.",
                     actions: [
-                        { label: "Contact Shipping Desk", href: "https://wa.me/94771757556?text=Hello%2C%20I%20have%20an%20international%20shipping%20inquiry." }
+                        { label: "Contact Shipping Desk", href: "https://wa.me/94773209950?text=Hello%2C%20I%20have%20an%20international%20shipping%20inquiry." }
                     ],
                     followUps: [0, 3, 9]
                 },
@@ -1455,7 +1455,7 @@
                     answer: "Our sanctuary is located at **Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka**, at 1,200m+ elevation. You can view our interactive estate map or contact our concierge for driving directions.",
                     actions: [
                         { label: "View Estate Map", tab: "home" },
-                        { label: "Get Directions on WhatsApp", href: "https://wa.me/94771757556?text=Hello%2C%20please%20send%20estate%20location%20directions." }
+                        { label: "Get Directions on WhatsApp", href: "https://wa.me/94773209950?text=Hello%2C%20please%20send%20estate%20location%20directions." }
                     ],
                     followUps: [2, 9, 0]
                 },
@@ -1475,9 +1475,9 @@
                     category: "CONCIERGE",
                     iconKey: "phone",
                     question: "How can I speak directly with the master tea maker?",
-                    answer: "You can reach our Master Tea Concierge directly by phone at **+94 77 175 7556**, email at **rockonewild@gmail.com**, or directly via WhatsApp.",
+                    answer: "You can reach our Master Tea Concierge directly by phone at **+94 77 320 9950**, email at **rockonewild@gmail.com**, or directly via WhatsApp.",
                     actions: [
-                        { label: "Open WhatsApp Chat", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
+                        { label: "Open WhatsApp Chat", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],
                     followUps: [0, 2, 4]
                 }
@@ -1510,7 +1510,7 @@
                     answer: "අපගේ අංකනය කරන ලද **එකතුකරන්නන්ගේ තෑගි පෙට්ටි (Series 01–10)** පාරම්පරික තේක්ක ලීයෙන් නිමවා ඇති අතර ගෝල්ඩන් ටිප්ස් තේ 100g අඩංගු වේ. **තෑගි එකතුවෙන්** අංකයක් තෝරා හෝ WhatsApp සේවා කවුළුව හරහා ක්ෂණිකව වෙන්කරවා ගත හැක.",
                     actions: [
                         { label: "තෑගි එකතුව බලන්න", tab: "gifts" },
-                        { label: "WhatsApp මගින් විමසන්න", href: "https://wa.me/94771757556?text=Hello%2C%20I%20would%20like%20to%20reserve%20a%20numbered%20Gift%20Box." }
+                        { label: "WhatsApp මගින් විමසන්න", href: "https://wa.me/94773209950?text=Hello%2C%20I%20would%20like%20to%20reserve%20a%20numbered%20Gift%20Box." }
                     ],
                     followUps: [1, 2, 3]
                 },
@@ -1554,7 +1554,7 @@
                     question: "දේශීය සහ ජාත්‍යන්තර ප්‍රවාහන පහසුකම් මොනවාද?",
                     answer: "අපි ශ්‍රී ලංකාව පුරා දින 2-3ක් ඇතුළත බෙදාහැරීම සහ එක්සත් රාජධානිය, යුරෝපය, ඇමරිකාව, එක්සත් අරාබි එමීර් රාජ්‍යය, ජපානය සහ සිංගප්පූරුව වෙත **DHL / FedEx ජාත්‍යන්තර කූරියර් සේවාව** සපයන්නෙමු.",
                     actions: [
-                        { label: "ප්‍රවාහන සේවය අමතන්න", href: "https://wa.me/94771757556?text=Hello%2C%20I%20have%20an%20international%20shipping%20inquiry." }
+                        { label: "ප්‍රවාහන සේවය අමතන්න", href: "https://wa.me/94773209950?text=Hello%2C%20I%20have%20an%20international%20shipping%20inquiry." }
                     ],
                     followUps: [0, 3, 9]
                 },
@@ -1588,7 +1588,7 @@
                     answer: "අපගේ තේ වතුයාය **අංක 54, ගන්නිලවත්ත, වල්ලවෙල, ඇට්ටම්පිටිය, ශ්‍රී ලංකාව** (මීටර් 1,200+ උසින්) පිහිටා ඇත. සිතියම බැලීමට හෝ මගපෙන්වීම් සඳහා WhatsApp මගින් සම්බන්ධ වන්න.",
                     actions: [
                         { label: "වතු සිතියම බලන්න", tab: "home" },
-                        { label: "WhatsApp මගින් මගපෙන්වීම්", href: "https://wa.me/94771757556?text=Hello%2C%20please%20send%20estate%20location%20directions." }
+                        { label: "WhatsApp මගින් මගපෙන්වීම්", href: "https://wa.me/94773209950?text=Hello%2C%20please%20send%20estate%20location%20directions." }
                     ],
                     followUps: [2, 9, 0]
                 },
@@ -1608,9 +1608,9 @@
                     category: "සේවා කවුළුව",
                     iconKey: "phone",
                     question: "ප්‍රධාන තේ විශේෂඥයා සමග සෘජුව සම්බන්ධ වන්නේ කෙසේද?",
-                    answer: "අපගේ ප්‍රධාන තේ සේවා කවුළුව **+94 77 175 7556**, විද්‍යුත් තැපෑල **rockonewild@gmail.com** හෝ WhatsApp මගින් සෘජුවම සම්බන්ධ කරගත හැක.",
+                    answer: "අපගේ ප්‍රධාන තේ සේවා කවුළුව **+94 77 320 9950**, විද්‍යුත් තැපෑල **rockonewild@gmail.com** හෝ WhatsApp මගින් සෘජුවම සම්බන්ධ කරගත හැක.",
                     actions: [
-                        { label: "WhatsApp විවෘත කරන්න", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
+                        { label: "WhatsApp විවෘත කරන්න", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],
                     followUps: [0, 2, 4]
                 }
@@ -1643,7 +1643,7 @@
                     answer: "எங்களின் **சேகரிப்பாளர் பரிசுப் பெட்டிகள் (Series 01–10)** பாரம்பரிய தேக்கு மரப் பெட்டிகளில் 100g கோல்டன் டிப்ஸ் தேயிலையுடன் தயாரிக்கப்படுகின்றன. **பரிசுத் தொகுப்பு** பக்கத்தில் பெட்டியைத் தேர்வு செய்து அல்லது WhatsApp மூலம் நேரடியாகப் பதிவு செய்யலாம்.",
                     actions: [
                         { label: "பரிசுத் தொகுப்பு காண்க", tab: "gifts" },
-                        { label: "WhatsApp இல் பதிவு செய்", href: "https://wa.me/94771757556?text=Hello%2C%20I%20would%20like%20to%20reserve%20a%20numbered%20Gift%20Box." }
+                        { label: "WhatsApp இல் பதிவு செய்", href: "https://wa.me/94773209950?text=Hello%2C%20I%20would%20like%20to%20reserve%20a%20numbered%20Gift%20Box." }
                     ],
                     followUps: [1, 2, 3]
                 },
@@ -1687,7 +1687,7 @@
                     question: "உள்நாட்டு மற்றும் சர்வதேச விநியோக வசதிகள் என்ன?",
                     answer: "இலங்கை முழுவதும் (2–3 நாட்கள்) மற்றும் இங்கிலாந்து, ஐரோப்பா, அமெரிக்கா, ஐக்கிய அரபு எமிரேட்ஸ், ஜப்பான், சிங்கப்பூருக்கு **DHL / FedEx சர்வதேச கூரியர்** மூலம் அனுப்பி வைக்கிறோம்.",
                     actions: [
-                        { label: "விநியோக உதவி மையம்", href: "https://wa.me/94771757556?text=Hello%2C%20I%20have%20an%20international%20shipping%20inquiry." }
+                        { label: "விநியோக உதவி மையம்", href: "https://wa.me/94773209950?text=Hello%2C%20I%20have%20an%20international%20shipping%20inquiry." }
                     ],
                     followUps: [0, 3, 9]
                 },
@@ -1721,7 +1721,7 @@
                     answer: "எமது தோட்டம் **எண்: 54 கன்னிலவத்த, வல்லவெல, எட்டம்பிட்டியை, இலங்கை** இல் 1,200 மீற்றர் உயரத்தில் அமைந்துள்ளது. வழிகாட்டலுக்கு WhatsApp ஐப் பயன்படுத்தலாம்.",
                     actions: [
                         { label: "தோட்ட வரைபடம் காண்க", tab: "home" },
-                        { label: "WhatsApp வழிகாட்டல்", href: "https://wa.me/94771757556?text=Hello%2C%20please%20send%20estate%20location%20directions." }
+                        { label: "WhatsApp வழிகாட்டல்", href: "https://wa.me/94773209950?text=Hello%2C%20please%20send%20estate%20location%20directions." }
                     ],
                     followUps: [2, 9, 0]
                 },
@@ -1741,9 +1741,9 @@
                     category: "உதவி மையம்",
                     iconKey: "phone",
                     question: "முதன்மை தேயிலை தயாரிப்பாளரை எவ்வாறு தொடர்புகொள்வது?",
-                    answer: "எமது உதவி மையத்தை **+94 77 175 7556** தொலைபேசி, **rockonewild@gmail.com** மின்னஞ்சல் அல்லது WhatsApp மூலம் நேரடியாகத் தொடர்பு கொள்ளலாம்.",
+                    answer: "எமது உதவி மையத்தை **+94 77 320 9950** தொலைபேசி, **rockonewild@gmail.com** மின்னஞ்சல் அல்லது WhatsApp மூலம் நேரடியாகத் தொடர்பு கொள்ளலாம்.",
                     actions: [
-                        { label: "WhatsApp தொடர்பு", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
+                        { label: "WhatsApp தொடர்பு", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],
                     followUps: [0, 2, 4]
                 }
@@ -1776,7 +1776,7 @@
                     answer: "当園の**限定ナンバー入り木箱ギフト（Series 01〜10）**は、手作りのチーク無垢材のチェストに100gの希少なゴールデン・チップス野生茶葉を封入しております。**木箱ギフト**ページからお好きな番号を選択するか、公式WhatsAppコンシェルジュより直接ご予約いただけます。",
                     actions: [
                         { label: "木箱ギフトを見る", tab: "gifts" },
-                        { label: "WhatsAppで予約する", href: "https://wa.me/94771757556?text=Hello%2C%20I%20would%20like%20to%20reserve%20a%20numbered%20Gift%20Box." }
+                        { label: "WhatsAppで予約する", href: "https://wa.me/94773209950?text=Hello%2C%20I%20would%20like%20to%20reserve%20a%20numbered%20Gift%20Box." }
                     ],
                     followUps: [1, 2, 3]
                 },
@@ -1820,7 +1820,7 @@
                     question: "日本国内および国際配送のオプションについて",
                     answer: "スリランカ国内配送（2〜3営業日）のほか、日本、アメリカ、イギリス、EU、UAE、シンガポールへの**DHL/FedEx国際特急航空便**に対応しております。気密性の高い高級缶でお届けします。",
                     actions: [
-                        { label: "配送デスクに問い合わせ", href: "https://wa.me/94771757556?text=Hello%2C%20I%20have%20an%20international%20shipping%20inquiry." }
+                        { label: "配送デスクに問い合わせ", href: "https://wa.me/94773209950?text=Hello%2C%20I%20have%20an%20international%20shipping%20inquiry." }
                     ],
                     followUps: [0, 3, 9]
                 },
@@ -1854,7 +1854,7 @@
                     answer: "当園はスリランカ・エッതംピティヤの標高1,200m（Gannilawaththa, Wellawela, Ettampitiya 90140）に位置します。インタラクティブ地図の閲覧や、WhatsAppによる送迎・道案内をご利用いただけます。",
                     actions: [
                         { label: "農園マップを見る", tab: "home" },
-                        { label: "WhatsAppで道案内", href: "https://wa.me/94771757556?text=Hello%2C%20please%20send%20estate%20location%20directions." }
+                        { label: "WhatsAppで道案内", href: "https://wa.me/94773209950?text=Hello%2C%20please%20send%20estate%20location%20directions." }
                     ],
                     followUps: [2, 9, 0]
                 },
@@ -1874,9 +1874,9 @@
                     category: "コンシェルジュ",
                     iconKey: "phone",
                     question: "マスター・ティーメーカーに直接問い合わせるには？",
-                    answer: "専属コンシェルジュデスクへのお電話（**+94 77 175 7556**）、Eメール（**rockonewild@gmail.com**）、または公式WhatsAppより直接お問い合わせいただけます。",
+                    answer: "専属コンシェルジュデスクへのお電話（**+94 77 320 9950**）、Eメール（**rockonewild@gmail.com**）、または公式WhatsAppより直接お問い合わせいただけます。",
                     actions: [
-                        { label: "WhatsAppを開く", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
+                        { label: "WhatsAppを開く", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],
                     followUps: [0, 2, 4]
                 }
@@ -1909,7 +1909,7 @@
                     answer: "我们的**限量编号珍藏木盒礼赞（第01–10号）**采用手工柚木茶匣精制，内封100克金尖古树野生茶。您可直接在**木盒礼赞目录**中选择可用编号，或通过WhatsApp礼宾专席即时预订。",
                     actions: [
                         { label: "查阅木盒礼赞", tab: "gifts" },
-                        { label: "WhatsApp礼宾预订", href: "https://wa.me/94771757556?text=Hello%2C%20I%20would%20like%20to%20reserve%20a%20numbered%20Gift%20Box." }
+                        { label: "WhatsApp礼宾预订", href: "https://wa.me/94773209950?text=Hello%2C%20I%20would%20like%20to%20reserve%20a%20numbered%20Gift%20Box." }
                     ],
                     followUps: [1, 2, 3]
                 },
@@ -1953,7 +1953,7 @@
                     question: "国内与全球跨国配送时效与方式？",
                     answer: "我们提供斯里兰卡全境极速送达（2-3个工作日），并支持通过**DHL / FedEx 全球特快专递**直邮中国、美国、英国、欧洲、阿联酋、日本及新加坡，采用特制避光密封茶罐锁鲜。",
                     actions: [
-                        { label: "联系国际物流专席", href: "https://wa.me/94771757556?text=Hello%2C%20I%20have%20an%20international%20shipping%20inquiry." }
+                        { label: "联系国际物流专席", href: "https://wa.me/94773209950?text=Hello%2C%20I%20have%20an%20international%20shipping%20inquiry." }
                     ],
                     followUps: [0, 3, 9]
                 },
@@ -1987,7 +1987,7 @@
                     answer: "庄园坐落于**斯里兰卡埃坦皮蒂亚加尼拉瓦塔（Gannilawaththa, Wellawela, Ettampitiya 90140）**，海拔1200米以上。您可查看互动地图或联系礼宾部获取路线导航。",
                     actions: [
                         { label: "查阅庄园地图", tab: "home" },
-                        { label: "WhatsApp获取导航", href: "https://wa.me/94771757556?text=Hello%2C%20please%20send%20estate%20location%20directions." }
+                        { label: "WhatsApp获取导航", href: "https://wa.me/94773209950?text=Hello%2C%20please%20send%20estate%20location%20directions." }
                     ],
                     followUps: [2, 9, 0]
                 },
@@ -2007,9 +2007,9 @@
                     category: "礼宾专席",
                     iconKey: "phone",
                     question: "如何直接联系庄园首席侍茶大师与总监？",
-                    answer: "您可通过专属热线 **+94 77 175 7556**、官方电邮 **rockonewild@gmail.com** 或直接在 WhatsApp 上向礼宾大师咨询。",
+                    answer: "您可通过专属热线 **+94 77 320 9950**、官方电邮 **rockonewild@gmail.com** 或直接在 WhatsApp 上向礼宾大师咨询。",
                     actions: [
-                        { label: "开启WhatsApp咨询", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
+                        { label: "开启WhatsApp咨询", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],
                     followUps: [0, 2, 4]
                 }
@@ -2042,7 +2042,7 @@
                     answer: "صناديق **الهدايا الخشبية المرقمة (الإصدار 01–10)** مصنوعة يدوياً من خشب الساج الفاخر وتحتوي على 100 غرام من شاي جولدن تيبس البري. يمكنك الحجز مباشرة من **صناديق الهدايا** أو عبر واتساب.",
                     actions: [
                         { label: "عرض صناديق الهدايا", tab: "gifts" },
-                        { label: "الحجز عبر واتساب", href: "https://wa.me/94771757556?text=Hello%2C%20I%20would%20like%20to%20reserve%20a%20numbered%20Gift%20Box." }
+                        { label: "الحجز عبر واتساب", href: "https://wa.me/94773209950?text=Hello%2C%20I%20would%20like%20to%20reserve%20a%20numbered%20Gift%20Box." }
                     ],
                     followUps: [1, 2, 3]
                 },
@@ -2086,7 +2086,7 @@
                     question: "ما هي خيارات الشحن المحلي والدولي المتاحة؟",
                     answer: "نوفر التوصيل المحلي داخل سريلانكا وشحناً دولياً سريعاً عبر **DHL / FedEx** إلى دول الخليج العربي، أوروبا، أمريكا، واليابان في عبوات محكمة وفاخرة.",
                     actions: [
-                        { label: "التواصل مع مكتب الشحن", href: "https://wa.me/94771757556?text=Hello%2C%20I%20have%20an%20international%20shipping%20inquiry." }
+                        { label: "التواصل مع مكتب الشحن", href: "https://wa.me/94773209950?text=Hello%2C%20I%20have%20an%20international%20shipping%20inquiry." }
                     ],
                     followUps: [0, 3, 9]
                 },
@@ -2120,7 +2120,7 @@
                     answer: "تقع المزرعة في **إيتامبيتيا، سريلانكا** على ارتفاع 1,200+ متر. يمكنك استعراض الخريطة أو التواصل مع الكونسيرج للحصول على تفاصيل الطريق.",
                     actions: [
                         { label: "عرض خريطة المزرعة", tab: "home" },
-                        { label: "إرشادات الطريق عبر واتساب", href: "https://wa.me/94771757556?text=Hello%2C%20please%20send%20estate%20location%20directions." }
+                        { label: "إرشادات الطريق عبر واتساب", href: "https://wa.me/94773209950?text=Hello%2C%20please%20send%20estate%20location%20directions." }
                     ],
                     followUps: [2, 9, 0]
                 },
@@ -2140,9 +2140,9 @@
                     category: "الكونسيرج",
                     iconKey: "phone",
                     question: "كيف أتواصل مباشرة مع خبير صناعة الشاي في المزرعة؟",
-                    answer: "يمكنك التواصل مع مكتب الكونسيرج عبر الهاتف **+94 77 175 7556** أو البريد الإلكتروني **rockonewild@gmail.com** أو مباشرة عبر الواتساب.",
+                    answer: "يمكنك التواصل مع مكتب الكونسيرج عبر الهاتف **+94 77 320 9950** أو البريد الإلكتروني **rockonewild@gmail.com** أو مباشرة عبر الواتساب.",
                     actions: [
-                        { label: "محادثة عبر واتساب", href: "https://wa.me/94771757556?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
+                        { label: "محادثة عبر واتساب", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%20Concierge." }
                     ],
                     followUps: [0, 2, 4]
                 }
