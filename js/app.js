@@ -2003,14 +2003,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (socialChannel === 'WhatsApp') {
                     showToast("Connecting to Concierge", "Redirecting to WhatsApp to complete your order...", "success");
                     setTimeout(() => {
-                        window.open(`https://api.whatsapp.com/send?phone=94770000000&text=${encodedMsg}`, '_blank');
+                        window.open(`https://api.whatsapp.com/send?phone=94771757556&text=${encodedMsg}`, '_blank');
                     }, 1500);
                 } else {
                     navigator.clipboard.writeText(message).then(() => {
                         showToast("Order Details Copied", "Booking info copied to clipboard. Redirecting to Instagram...", "success");
                     }).catch(() => {});
                     setTimeout(() => {
-                        window.open('https://instagram.com/rock_one_wild_tea', '_blank');
+                        window.open('https://www.instagram.com/rockonewild?stkn=MTA3dW52OTYyZzV5NA==', '_blank');
                     }, 2000);
                 }
             }, 800);
