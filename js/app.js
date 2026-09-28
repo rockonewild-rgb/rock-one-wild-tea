@@ -322,11 +322,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update visibility of staff-only navigation items
     function updateNavStaffVisibility() {
         const staffNavItems = document.querySelectorAll('.staff-only-nav');
+        if (isAdminAuthenticated) {
+            document.body.classList.add('staff-authenticated');
+        } else {
+            document.body.classList.remove('staff-authenticated');
+        }
         staffNavItems.forEach(el => {
             if (isAdminAuthenticated) {
-                el.style.display = el.classList.contains('mobile-nav-item') ? 'flex' : 'inline-flex';
+                el.style.setProperty('display', el.classList.contains('mobile-nav-item') ? 'flex' : 'inline-flex', 'important');
             } else {
-                el.style.display = 'none';
+                el.style.setProperty('display', 'none', 'important');
             }
         });
     }

@@ -555,46 +555,63 @@ html[lang="ar"] .nav-btn {
 }
 
 .mobile-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    width: 100%;
+    padding: 0.85rem 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 12px;
+    text-align: left;
+    cursor: pointer;
+    text-decoration: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+/* Staff-Only Navigation Protection (Completely hidden from public visitors by default) */
+.staff-only-nav {
+    display: none !important;
+}
+
+body.staff-authenticated .staff-only-nav {
+    display: inline-flex !important;
+}
+
+body.staff-authenticated li.staff-only-nav {
+    display: inline-flex !important;
+}
+
+body.staff-authenticated .staff-only-nav.mobile-nav-item {
     display: flex !important;
-    align-items: center !important;
-    gap: 0.85rem !important;
-    width: 100% !important;
-    padding: 0.85rem 1rem !important;
-    background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(212, 175, 55, 0.2) !important;
-    border-radius: 12px !important;
-    text-align: left !important;
-    cursor: pointer !important;
-    text-decoration: none !important;
-    box-sizing: border-box !important;
-    transition: all 0.2s ease !important;
-    outline: none !important;
 }
 
 .mobile-nav-item:hover,
 .mobile-nav-item:active {
-    background: rgba(212, 175, 55, 0.15) !important;
-    border-color: var(--color-gold) !important;
-    transform: translateX(4px) !important;
+    background: rgba(212, 175, 55, 0.15);
+    border-color: var(--color-gold);
+    transform: translateX(4px);
 }
 
 .mobile-nav-item.active {
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.08)) !important;
-    border-color: var(--color-gold) !important;
-    box-shadow: 0 4px 18px rgba(212, 175, 55, 0.3) !important;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.08));
+    border-color: var(--color-gold);
+    box-shadow: 0 4px 18px rgba(212, 175, 55, 0.3);
 }
 
 .mobile-nav-item.active .m-title {
-    color: var(--color-gold) !important;
+    color: var(--color-gold);
 }
 
 .mobile-order-item {
-    background: rgba(212, 175, 55, 0.08) !important;
-    border-color: rgba(212, 175, 55, 0.4) !important;
+    background: rgba(212, 175, 55, 0.08);
+    border-color: rgba(212, 175, 55, 0.4);
 }
 
 .mobile-admin-item {
-    background: rgba(0, 0, 0, 0.5) !important;
+    background: rgba(0, 0, 0, 0.5);
 }
 
 .m-icon-box {
