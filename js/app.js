@@ -714,6 +714,222 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ─── Edit Landing Screen Hero Slide Modal ─────────────────────────────────
+    function showEditHeroSlideModal(slideId) {
+        const existing = document.getElementById('edit-hero-slide-modal');
+        if (existing) existing.remove();
+
+        const heroSlides = window.TeaFactoryStore.getHeroSlides();
+        const slide = heroSlides.find(s => s.id === slideId);
+        if (!slide) {
+            showToast("Slide Not Found", "Could not locate this slide in the database.", "error");
+            return;
+        }
+
+        const galleryImages = window.TeaFactoryStore.getGalleryImages();
+
+        const modal = document.createElement('div');
+        modal.id = 'edit-hero-slide-modal';
+        modal.style.cssText = `
+            position: fixed; inset: 0; z-index: 10000;
+            background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            display: flex; align-items: center; justify-content: center; padding: 1rem;
+            animation: fadeInModal 0.25s ease-out; box-sizing: border-box;
+        `;
+
+        modal.innerHTML = `
+            <div style="
+                background: linear-gradient(135deg, rgba(8, 22, 14, 0.98) 0%, rgba(4, 12, 7, 0.99) 100%);
+                border: 1.5px solid rgba(212, 175, 55, 0.55);
+                box-shadow: 0 25px 80px rgba(0,0,0,0.95), 0 0 35px rgba(212, 175, 55, 0.2);
+                border-radius: 20px; max-width: 560px; width: 100%; max-height: 92vh; overflow-y: auto;
+                padding: clamp(1.5rem, 3vh, 2rem); color: #ffffff; position: relative; box-sizing: border-box;
+            ">
+                <!-- Close Button -->
+                <button type="button" class="btn-modal-close" style="
+                    position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.06);
+                    border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 34px; height: 34px; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center; cursor: pointer;
+                ">&times;</button>
+
+                <!-- Header -->
+                <div style="display: flex; align-items: center; gap: 0.85rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(212,175,55,0.25);">
+                    <div style="
+                        width: 44px; height: 44px; border-radius: 50%; background: rgba(212, 175, 55, 0.15);
+                        border: 1.5px solid var(--color-gold); display: flex; align-items: center; justify-content: center;
+                        color: var(--color-gold); flex-shrink: 0; box-shadow: 0 0 15px rgba(212, 175, 55, 0.25);
+                    ">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 20h9"></path>
+                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 style="font-family: var(--font-serif); font-size: 1.35rem; margin: 0; color: #ffffff;">Edit Landing Screen Slide</h3>
+                        <p style="font-size: 0.75rem; color: var(--color-gold); margin: 0.2rem 0 0 0;">Update image, headline, or narrative story</p>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <form id="edit-hero-slide-form" style="display: flex; flex-direction: column; gap: 1.15rem;">
+                    <!-- Image Selection / Change -->
+                    <div class="form-group">
+                        <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase; color: var(--color-gold); font-weight: 700; letter-spacing: 0.5px;">
+                            1. Slide Image Source
+                        </label>
+                        <select class="form-input" id="edit-slide-gallery-picker" style="font-size: 0.85rem; margin-bottom: 0.5rem;">
+                            <option value="">-- Choose from Estate Gallery --</option>
+                            ${galleryImages.map(img => `
+                                <option value="${img.src}" ${slide.image === img.src ? 'selected' : ''} data-caption="${(img.caption || '').replace(/"/g, '&quot;')}" data-tag="${(img.tag || '').replace(/"/g, '&quot;')}">
+                                    ${img.caption || img.src}
+                                </option>
+                            `).join('')}
+                        </select>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <button type="button" id="btn-edit-slide-upload" class="btn btn-outline" style="font-size: 0.75rem; padding: 0.4rem 0.85rem; flex: 1;">
+                                📁 Or Upload Replacement Image File
+                            </button>
+                            <input type="file" id="edit-slide-file-input" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+
+                    <!-- Live Image Preview -->
+                    <div class="form-group">
+                        <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase; color: var(--color-gold); font-weight: 700; letter-spacing: 0.5px;">
+                            2. Image Preview
+                        </label>
+                        <div style="width: 100%; aspect-ratio: 16/9; max-height: 160px; border-radius: 8px; overflow: hidden; border: 1.5px solid rgba(212,175,55,0.4); background: #000; position: relative;">
+                            <img id="edit-slide-preview-img" src="${slide.image}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="window.handleImageError && window.handleImageError(this, 'gallery')">
+                            <input type="hidden" id="edit-slide-image-src" value="${slide.image}">
+                        </div>
+                    </div>
+
+                    <!-- Headline / Title -->
+                    <div class="form-group">
+                        <label class="form-label" for="edit-slide-title" style="font-size: 0.75rem; text-transform: uppercase; color: var(--color-gold); font-weight: 700; letter-spacing: 0.5px;">
+                            3. Slide Main Headline *
+                        </label>
+                        <input class="form-input" type="text" id="edit-slide-title" required value="${(slide.title || '').replace(/"/g, '&quot;')}" style="font-size: 0.9rem;">
+                    </div>
+
+                    <!-- Subtitle / Tag -->
+                    <div class="form-group">
+                        <label class="form-label" for="edit-slide-subtitle" style="font-size: 0.75rem; text-transform: uppercase; color: var(--color-gold); font-weight: 700; letter-spacing: 0.5px;">
+                            4. Subtitle / Region Tag *
+                        </label>
+                        <input class="form-input" type="text" id="edit-slide-subtitle" required value="${(slide.subtitle || '').replace(/"/g, '&quot;')}" style="font-size: 0.9rem;">
+                    </div>
+
+                    <!-- Narrative Story / Description -->
+                    <div class="form-group">
+                        <label class="form-label" for="edit-slide-desc" style="font-size: 0.75rem; text-transform: uppercase; color: var(--color-gold); font-weight: 700; letter-spacing: 0.5px;">
+                            5. Narrative Story / Description *
+                        </label>
+                        <textarea class="form-input" id="edit-slide-desc" rows="3" required style="font-size: 0.85rem; line-height: 1.5;">${slide.description || ''}</textarea>
+                    </div>
+
+                    <!-- Enabled Toggle Checkbox -->
+                    <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0;">
+                        <input type="checkbox" id="edit-slide-enabled" ${slide.enabled !== false ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: var(--color-gold); cursor: pointer;">
+                        <label for="edit-slide-enabled" style="font-size: 0.85rem; color: #ffffff; cursor: pointer; font-weight: 500;">
+                            Show this slide in public Home Landing Slideshow
+                        </label>
+                    </div>
+
+                    <!-- Actions -->
+                    <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 0.75rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <button type="button" class="btn btn-outline btn-modal-cancel" style="padding: 0.65rem 1.25rem; font-size: 0.82rem;">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.5rem; font-size: 0.85rem; font-weight: 700;">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const closeModal = () => {
+            modal.style.opacity = '0';
+            modal.style.transition = 'opacity 0.2s ease-out';
+            setTimeout(() => modal.remove(), 200);
+        };
+
+        modal.querySelector('.btn-modal-close').addEventListener('click', closeModal);
+        modal.querySelector('.btn-modal-cancel').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        const editPicker = modal.querySelector('#edit-slide-gallery-picker');
+        const editPreview = modal.querySelector('#edit-slide-preview-img');
+        const editHiddenSrc = modal.querySelector('#edit-slide-image-src');
+        const editUploadBtn = modal.querySelector('#btn-edit-slide-upload');
+        const editFileInput = modal.querySelector('#edit-slide-file-input');
+
+        if (editPicker && editPreview && editHiddenSrc) {
+            editPicker.addEventListener('change', () => {
+                const sel = editPicker.value;
+                if (sel) {
+                    editHiddenSrc.value = sel;
+                    editPreview.src = sel;
+                }
+            });
+        }
+
+        if (editUploadBtn && editFileInput) {
+            editUploadBtn.addEventListener('click', () => editFileInput.click());
+            editFileInput.addEventListener('change', () => {
+                if (editFileInput.files && editFileInput.files[0]) {
+                    const file = editFileInput.files[0];
+                    if (file.size > 5 * 1024 * 1024) {
+                        showToast('File Too Large', 'Please upload a photo under 5MB.', 'error');
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const base64 = e.target.result;
+                        editHiddenSrc.value = base64;
+                        editPreview.src = base64;
+                        if (editPicker) editPicker.value = '';
+                        showToast('Photo Loaded', 'New image ready to save.', 'info');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        const form = modal.querySelector('#edit-hero-slide-form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const image = editHiddenSrc.value.trim();
+            const title = (modal.querySelector('#edit-slide-title').value || '').trim();
+            const subtitle = (modal.querySelector('#edit-slide-subtitle').value || '').trim();
+            const description = (modal.querySelector('#edit-slide-desc').value || '').trim();
+            const enabled = modal.querySelector('#edit-slide-enabled').checked;
+
+            if (!image) {
+                showToast("Photo Required", "Please provide a valid image for this slide.", "error");
+                return;
+            }
+
+            const updated = window.TeaFactoryStore.updateHeroSlide(slideId, {
+                image,
+                title,
+                subtitle,
+                description,
+                enabled
+            });
+
+            if (updated) {
+                closeModal();
+                showToast("Slide Updated", "Hero slide modifications saved successfully.", "success");
+                renderTabContent('admin');
+                if (typeof initHeroSlider === 'function') {
+                    initHeroSlider();
+                }
+            } else {
+                showToast("Update Failed", "Could not update the hero slide.", "error");
+            }
+        });
+    }
+
     // ─── Luxury Universal Deletion & Removal Confirmation Modal ───────────────
     function showDeleteConfirmModal({ title = 'Confirm Deletion', subtitle = 'Estate Concierge Operations', itemName = '', message = 'Are you sure you want to delete this record? This action cannot be undone.', confirmText = 'Delete & Remove', onConfirm }) {
         const existing = document.getElementById('universal-delete-modal');
@@ -5147,6 +5363,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Edit Hero Slide modal click binding
+        document.querySelectorAll('.btn-edit-hero-slide').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const slideId = btn.getAttribute('data-id');
+                if (slideId) {
+                    showEditHeroSlideModal(slideId);
+                }
+            });
+        });
+
         // Toggle Hero Slide visibility
         document.querySelectorAll('.btn-toggle-hero-slide').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -7334,6 +7560,21 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         const dots = dotsContainer ? dotsContainer.querySelectorAll('.hero-dot') : [];
         const prevBtn = document.getElementById('hero-prev-btn');
         const nextBtn = document.getElementById('hero-next-btn');
+        const sidePrevBtn = document.getElementById('hero-prev-arrow');
+        const sideNextBtn = document.getElementById('hero-next-arrow');
+        const progressFill = document.getElementById('hero-progress-fill');
+
+        function triggerProgressBar() {
+            if (!progressFill) return;
+            progressFill.style.transition = 'none';
+            progressFill.style.width = '0%';
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    progressFill.style.transition = 'width 5.5s linear';
+                    progressFill.style.width = '100%';
+                });
+            });
+        }
 
         function updateSlideDisplay(idx) {
             slides.forEach(s => s.classList.remove('active'));
@@ -7352,6 +7593,8 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             if (counter) {
                 counter.innerText = `${String(currentHeroIndex + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
             }
+
+            triggerProgressBar();
         }
 
         function nextSlide() {
@@ -7364,6 +7607,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
 
         function startAutoPlay() {
             stopAutoPlay();
+            triggerProgressBar();
             heroSliderTimer = setInterval(nextSlide, 5500);
         }
 
@@ -7371,6 +7615,9 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             if (heroSliderTimer) {
                 clearInterval(heroSliderTimer);
                 heroSliderTimer = null;
+            }
+            if (progressFill) {
+                progressFill.style.transition = 'none';
             }
         }
 
@@ -7396,6 +7643,22 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
 
         if (nextBtn) {
             nextBtn.onclick = (e) => {
+                e.stopPropagation();
+                nextSlide();
+                startAutoPlay();
+            };
+        }
+
+        if (sidePrevBtn) {
+            sidePrevBtn.onclick = (e) => {
+                e.stopPropagation();
+                prevSlide();
+                startAutoPlay();
+            };
+        }
+
+        if (sideNextBtn) {
+            sideNextBtn.onclick = (e) => {
                 e.stopPropagation();
                 nextSlide();
                 startAutoPlay();

@@ -1418,6 +1418,10 @@ const UIComponents = {
 
                                     <!-- Slide Actions -->
                                     <div style="display: flex; gap: 0.35rem; align-items: center; flex-shrink: 0;">
+                                        <button class="btn-edit-hero-slide" data-id="${slide.id}" style="background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.45); color: var(--color-gold); padding: 0.3rem 0.55rem; font-size: 0.68rem; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem;" title="Edit this slide image, headline, and story">
+                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                            Edit
+                                        </button>
                                         <button class="btn-toggle-hero-slide" data-id="${slide.id}" style="background: ${slide.enabled !== false ? 'rgba(5, 150, 105, 0.2)' : 'rgba(100, 116, 139, 0.2)'}; border: 1px solid ${slide.enabled !== false ? 'rgba(5, 150, 105, 0.5)' : 'rgba(100, 116, 139, 0.4)'}; color: ${slide.enabled !== false ? '#34d399' : '#94a3b8'}; padding: 0.3rem 0.55rem; font-size: 0.68rem; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.2rem;" title="${slide.enabled !== false ? 'Click to hide from home landing screen' : 'Click to show on home landing screen'}">
                                             ${slide.enabled !== false ? '👁️ On' : '🚫 Off'}
                                         </button>
