@@ -5130,16 +5130,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!targetThemeId) return;
 
                 const targetTheme = (window.TeaFactoryStore.getSeasonalThemes ? window.TeaFactoryStore.getSeasonalThemes() : []).find(t => t.id === targetThemeId);
-                const bannerInput = document.getElementById('theme-custom-banner-input');
-                let customMsg = bannerInput ? bannerInput.value.trim() : '';
-
-                // If user didn't type a custom message or had an old default, auto-populate with the newly chosen theme's celebratory greeting
-                const allThemes = window.TeaFactoryStore.getSeasonalThemes ? window.TeaFactoryStore.getSeasonalThemes() : [];
-                const isDefaultOrEmpty = !customMsg || allThemes.some(t => t.bannerText === customMsg);
-                if (targetTheme && isDefaultOrEmpty) {
-                    customMsg = targetTheme.bannerText;
-                    if (bannerInput) bannerInput.value = customMsg;
-                }
+                if (!targetTheme) return;
 
                 const showBanner = document.getElementById('theme-banner-toggle')?.checked ?? true;
                 const showEffects = document.getElementById('theme-effects-toggle')?.checked ?? true;
@@ -5147,10 +5138,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Clear any dismissal for the chosen theme
                 try { sessionStorage.removeItem(`tea_banner_dismissed_${targetThemeId}`); } catch(e){}
 
+                // When activating a theme, automatically assign that theme's official celebratory greeting
                 window.TeaFactoryStore.updateThemeSettings({
                     activeThemeId: targetThemeId,
                     bannerEnabled: showBanner,
-                    customBannerText: customMsg,
+                    customBannerText: targetTheme.bannerText,
                     effectsEnabled: showEffects
                 });
 
@@ -5158,10 +5150,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.appApplyTheme(targetThemeId);
                 }
 
-                const activeThemeObj = window.TeaFactoryStore.getActiveTheme();
                 showToast(
                     "Seasonal Theme Activated",
-                    `${activeThemeObj.icon} "${activeThemeObj.name}" is now live! Header greeting & visual effects updated.`,
+                    `${targetTheme.icon} "${targetTheme.name}" is now live! Header greeting & visual effects updated.`,
                     "success"
                 );
 
@@ -5172,21 +5163,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const saveThemeBannerBtn = document.getElementById('btn-save-theme-banner');
         if (saveThemeBannerBtn) {
             saveThemeBannerBtn.addEventListener('click', () => {
-                const customMsg = document.getElementById('theme-custom-banner-input')?.value || '';
+                const bannerInput = document.getElementById('theme-custom-banner-input');
+                const customMsg = bannerInput ? bannerInput.value.trim() : '';
                 const showBanner = document.getElementById('theme-banner-toggle')?.checked ?? true;
                 const showEffects = document.getElementById('theme-effects-toggle')?.checked ?? true;
 
                 const currentThemeId = window.TeaFactoryStore.getActiveThemeId();
+                const currentTheme = window.TeaFactoryStore.getActiveTheme();
                 try { sessionStorage.removeItem(`tea_banner_dismissed_${currentThemeId}`); } catch(e){}
 
                 window.TeaFactoryStore.updateThemeSettings({
+                    activeThemeId: currentThemeId,
                     bannerEnabled: showBanner,
-                    customBannerText: customMsg,
+                    customBannerText: customMsg || (currentTheme ? currentTheme.bannerText : ''),
                     effectsEnabled: showEffects
                 });
 
                 if (window.appApplyTheme) {
-                    window.appApplyTheme();
+                    window.appApplyTheme(currentThemeId);
                 }
 
                 showToast("Theme Settings Saved", "Festive greeting bar and ambience controls updated successfully.", "success");
@@ -9253,8 +9247,11 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
     window.appApplyTheme = function(themeId) {
         if (!window.TeaFactoryStore) return;
         const currentThemeId = themeId || window.TeaFactoryStore.getActiveThemeId() || 'classic';
-        const theme = window.TeaFactoryStore.getActiveTheme();
-        const settings = window.TeaFactoryStore.getThemeSettings();
+        const allThemes = window.TeaFactoryStore.getSeasonalThemes ? window.TeaFactoryStore.getSeasonalThemes() : [];
+        const theme = allThemes.find(t => t.id === currentThemeId) || (window.TeaFactoryStore.getActiveTheme ? window.TeaFactoryStore.getActiveTheme() : allThemes[0]);
+        if (!theme) return;
+
+        const settings = window.TeaFactoryStore.getThemeSettings ? window.TeaFactoryStore.getThemeSettings() : { bannerEnabled: true, effectsEnabled: true };
 
         // 1. Set HTML data-theme attribute for CSS variable switching
         document.documentElement.setAttribute('data-theme', currentThemeId);
@@ -9268,7 +9265,16 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             const isDismissed = sessionStorage.getItem(`tea_banner_dismissed_${currentThemeId}`);
             if (currentThemeId !== 'classic' && settings.bannerEnabled !== false && !isDismissed) {
                 bannerIcon.textContent = theme.icon || '🌿';
-                bannerText.textContent = settings.customBannerText || theme.bannerText || 'Welcome to Rock One Wild Tea';
+
+                // Determine celebratory message: prefer theme's celebratory greeting unless explicitly customized
+                let activeGreeting = theme.bannerText;
+                if (settings.customBannerText && settings.customBannerText.trim() !== '') {
+                    const isOtherThemeDefault = allThemes.some(t => t.id !== currentThemeId && t.bannerText === settings.customBannerText.trim());
+                    if (!isOtherThemeDefault) {
+                        activeGreeting = settings.customBannerText.trim();
+                    }
+                }
+                bannerText.textContent = activeGreeting || theme.bannerText || 'Welcome to Rock One Wild Tea';
                 bannerEl.style.display = 'block';
             } else {
                 bannerEl.style.display = 'none';

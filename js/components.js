@@ -2757,6 +2757,11 @@ const UIComponents = {
                                                 <span title="Deep Tint" style="width: 18px; height: 18px; border-radius: 50%; background: ${t.bgDeep}; display: inline-block; border: 1px solid rgba(255,255,255,0.3);"></span>
                                             </div>
                                         </div>
+                                        <!-- Theme Celebratory Greeting / Banner Preview -->
+                                        <div style="background: rgba(0,0,0,0.35); border-left: 3px solid var(--color-gold); padding: 0.55rem 0.8rem; border-radius: 6px; margin-bottom: 1.15rem; font-size: 0.78rem; color: #fef08a; line-height: 1.45;">
+                                            <span style="color: var(--color-text-muted); display: block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 0.25rem; font-weight: 700;">Live Celebratory Greeting:</span>
+                                            ${t.bannerText}
+                                        </div>
                                     </div>
 
                                     <div>

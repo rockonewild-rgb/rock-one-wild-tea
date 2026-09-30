@@ -1100,11 +1100,12 @@ class TeaFactoryStore {
     }
 
     getThemeSettings() {
+        const currentTheme = this.getActiveTheme();
         if (!this.state.themeSettings) {
             this.state.themeSettings = {
-                activeThemeId: this.getActiveThemeId(),
+                activeThemeId: currentTheme.id,
                 bannerEnabled: true,
-                customBannerText: "",
+                customBannerText: currentTheme.bannerText,
                 effectsEnabled: true
             };
         }
@@ -1117,12 +1118,10 @@ class TeaFactoryStore {
 
         this.state.activeTheme = themeId;
         if (!this.state.themeSettings) {
-            this.state.themeSettings = { activeThemeId: themeId, bannerEnabled: true, customBannerText: "", effectsEnabled: true };
+            this.state.themeSettings = { activeThemeId: themeId, bannerEnabled: true, customBannerText: found.bannerText, effectsEnabled: true };
         }
         this.state.themeSettings.activeThemeId = themeId;
-        if (customBannerText !== null) {
-            this.state.themeSettings.customBannerText = customBannerText;
-        }
+        this.state.themeSettings.customBannerText = (customBannerText !== null) ? customBannerText : found.bannerText;
         if (enableEffects !== undefined) {
             this.state.themeSettings.effectsEnabled = enableEffects;
         }
@@ -1138,12 +1137,22 @@ class TeaFactoryStore {
 
     updateThemeSettings(settings) {
         if (!this.state.themeSettings) {
-            this.state.themeSettings = { activeThemeId: 'classic', bannerEnabled: true, customBannerText: "", effectsEnabled: true };
+            const currentTheme = this.getActiveTheme();
+            this.state.themeSettings = { activeThemeId: currentTheme.id, bannerEnabled: true, customBannerText: currentTheme.bannerText, effectsEnabled: true };
         }
+        const prevThemeId = this.state.activeTheme || 'classic';
         this.state.themeSettings = { ...this.state.themeSettings, ...settings };
         if (settings.activeThemeId) {
             this.state.activeTheme = settings.activeThemeId;
             localStorage.setItem('tea_factory_active_theme', settings.activeThemeId);
+
+            // If theme changed and no customBannerText was specifically provided, sync to new theme's celebratory greeting
+            if (settings.activeThemeId !== prevThemeId && !settings.customBannerText) {
+                const targetTheme = DEFAULT_SEASONAL_THEMES.find(t => t.id === settings.activeThemeId);
+                if (targetTheme) {
+                    this.state.themeSettings.customBannerText = targetTheme.bannerText;
+                }
+            }
         }
         this.saveState();
 
