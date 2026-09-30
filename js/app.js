@@ -9281,18 +9281,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             }
         }
 
-        // 3. Manage Header Brand Ribbon / Seasonal Badge
-        const headerBadgeEl = document.getElementById('seasonal-header-badge');
-        if (headerBadgeEl) {
-            if (currentThemeId !== 'classic') {
-                headerBadgeEl.innerHTML = `${theme.icon || '✨'} <span>${theme.headerBadge || theme.name}</span>`;
-                headerBadgeEl.style.display = 'inline-flex';
-            } else {
-                headerBadgeEl.style.display = 'none';
-            }
-        }
-
-        // 4. Update Hero Slideshow Subtitle
+        // 3. Update Hero Slideshow Subtitle
         const heroSubtitles = document.querySelectorAll('.hero-subtitle');
         if (heroSubtitles && heroSubtitles.length > 0) {
             if (currentThemeId !== 'classic' && theme.heroSubtitle) {
