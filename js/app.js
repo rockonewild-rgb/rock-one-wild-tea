@@ -5129,9 +5129,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const targetThemeId = btn.getAttribute('data-theme-id');
                 if (!targetThemeId) return;
 
-                const customMsg = document.getElementById('theme-custom-banner-input')?.value || null;
+                const targetTheme = (window.TeaFactoryStore.getSeasonalThemes ? window.TeaFactoryStore.getSeasonalThemes() : []).find(t => t.id === targetThemeId);
+                const bannerInput = document.getElementById('theme-custom-banner-input');
+                let customMsg = bannerInput ? bannerInput.value.trim() : '';
+
+                // If user didn't type a custom message or had an old default, auto-populate with the newly chosen theme's celebratory greeting
+                const allThemes = window.TeaFactoryStore.getSeasonalThemes ? window.TeaFactoryStore.getSeasonalThemes() : [];
+                const isDefaultOrEmpty = !customMsg || allThemes.some(t => t.bannerText === customMsg);
+                if (targetTheme && isDefaultOrEmpty) {
+                    customMsg = targetTheme.bannerText;
+                    if (bannerInput) bannerInput.value = customMsg;
+                }
+
                 const showBanner = document.getElementById('theme-banner-toggle')?.checked ?? true;
                 const showEffects = document.getElementById('theme-effects-toggle')?.checked ?? true;
+
+                // Clear any dismissal for the chosen theme
+                try { sessionStorage.removeItem(`tea_banner_dismissed_${targetThemeId}`); } catch(e){}
 
                 window.TeaFactoryStore.updateThemeSettings({
                     activeThemeId: targetThemeId,
@@ -5140,10 +5154,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     effectsEnabled: showEffects
                 });
 
+                if (window.appApplyTheme) {
+                    window.appApplyTheme(targetThemeId);
+                }
+
                 const activeThemeObj = window.TeaFactoryStore.getActiveTheme();
                 showToast(
                     "Seasonal Theme Activated",
-                    `${activeThemeObj.icon} "${activeThemeObj.name}" is now live across the website!`,
+                    `${activeThemeObj.icon} "${activeThemeObj.name}" is now live! Header greeting & visual effects updated.`,
                     "success"
                 );
 
@@ -5158,11 +5176,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const showBanner = document.getElementById('theme-banner-toggle')?.checked ?? true;
                 const showEffects = document.getElementById('theme-effects-toggle')?.checked ?? true;
 
+                const currentThemeId = window.TeaFactoryStore.getActiveThemeId();
+                try { sessionStorage.removeItem(`tea_banner_dismissed_${currentThemeId}`); } catch(e){}
+
                 window.TeaFactoryStore.updateThemeSettings({
                     bannerEnabled: showBanner,
                     customBannerText: customMsg,
                     effectsEnabled: showEffects
                 });
+
+                if (window.appApplyTheme) {
+                    window.appApplyTheme();
+                }
 
                 showToast("Theme Settings Saved", "Festive greeting bar and ambience controls updated successfully.", "success");
                 renderTabContent('admin');
@@ -8144,7 +8169,14 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         // Render initial greeting and interactive FAQ menu
         function renderWelcomeMessage() {
             const cfg = getConfig();
-            addBotMessage(cfg.greeting || "Greetings! Welcome to **Rock One Wild Tea Estate**.");
+            let welcomeGreeting = cfg.greeting || "Greetings! Welcome to **Rock One Wild Tea Estate**.";
+            if (window.TeaFactoryStore) {
+                const activeTheme = window.TeaFactoryStore.getActiveTheme();
+                if (activeTheme && activeTheme.id !== 'classic' && activeTheme.sommelierGreeting) {
+                    welcomeGreeting = activeTheme.sommelierGreeting;
+                }
+            }
+            addBotMessage(welcomeGreeting);
             renderFaqMenu(cfg.menuTitle || "Select an Inquiry Topic:");
         }
 
@@ -9006,6 +9038,102 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
     let ambientAnimationId = null;
     let particles = [];
 
+    function drawSnowflake(ctx, size) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.88)';
+        ctx.lineWidth = 1.2;
+        ctx.lineCap = 'round';
+        for (let i = 0; i < 6; i++) {
+            ctx.save();
+            ctx.rotate((i * 60 * Math.PI) / 180);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, -size);
+            // Branchlets
+            if (size > 3) {
+                ctx.moveTo(0, -size * 0.55);
+                ctx.lineTo(-size * 0.28, -size * 0.75);
+                ctx.moveTo(0, -size * 0.55);
+                ctx.lineTo(size * 0.28, -size * 0.75);
+            }
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    function drawTeaLeaf(ctx, size, color) {
+        ctx.fillStyle = color || '#f59e0b';
+        ctx.beginPath();
+        ctx.moveTo(0, -size * 1.5);
+        ctx.bezierCurveTo(size * 0.9, -size * 0.8, size * 0.9, size * 0.8, 0, size * 1.5);
+        ctx.bezierCurveTo(-size * 0.9, size * 0.8, -size * 0.9, -size * 0.8, 0, -size * 1.5);
+        ctx.fill();
+
+        // Leaf spine / vein
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(0, -size * 1.3);
+        ctx.lineTo(0, size * 1.3);
+        ctx.stroke();
+    }
+
+    function drawLantern(ctx, size) {
+        // Lantern Body
+        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 1.3);
+        grad.addColorStop(0, 'rgba(255, 215, 0, 0.95)');
+        grad.addColorStop(0.5, 'rgba(239, 68, 68, 0.85)');
+        grad.addColorStop(1, 'rgba(185, 28, 28, 0.9)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, size * 1.1, size * 1.4, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Gold Top & Bottom Caps
+        ctx.fillStyle = '#facc15';
+        ctx.fillRect(-size * 0.6, -size * 1.5, size * 1.2, size * 0.28);
+        ctx.fillRect(-size * 0.6, size * 1.25, size * 1.2, size * 0.28);
+
+        // Hanging Tassel
+        ctx.strokeStyle = '#fef08a';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, size * 1.5);
+        ctx.lineTo(0, size * 2.3);
+        ctx.stroke();
+    }
+
+    function drawDiamondStar(ctx, size, color) {
+        ctx.fillStyle = color || '#fde047';
+        ctx.beginPath();
+        ctx.moveTo(0, -size * 1.6);
+        ctx.quadraticCurveTo(0, 0, size * 1.6, 0);
+        ctx.quadraticCurveTo(0, 0, 0, size * 1.6);
+        ctx.quadraticCurveTo(0, 0, -size * 1.6, 0);
+        ctx.quadraticCurveTo(0, 0, 0, -size * 1.6);
+        ctx.fill();
+    }
+
+    function drawHeart(ctx, size) {
+        ctx.fillStyle = 'rgba(251, 113, 133, 0.85)';
+        ctx.beginPath();
+        const topY = -size * 0.6;
+        ctx.moveTo(0, topY + size * 0.6);
+        ctx.bezierCurveTo(-size * 1.2, topY - size * 0.4, -size * 1.4, topY + size * 0.8, 0, topY + size * 1.6);
+        ctx.bezierCurveTo(size * 1.4, topY + size * 0.8, size * 1.2, topY - size * 0.4, 0, topY + size * 0.6);
+        ctx.fill();
+    }
+
+    function drawFireworkSpark(ctx, size, color) {
+        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 1.8);
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(0.3, color || '#facc15');
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(0, 0, size * 1.8, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
     function initAmbientCanvas(effectType) {
         const canvas = document.getElementById('seasonal-ambient-canvas');
         if (!canvas) return;
@@ -9034,19 +9162,25 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         window.addEventListener('resize', resizeCanvas, { passive: true });
 
         // Particle configuration based on occasion
-        const particleCount = window.innerWidth < 768 ? 22 : 42;
+        const particleCount = window.innerWidth < 768 ? 20 : 38;
         particles = [];
 
+        const fireworkColors = ['#facc15', '#60a5fa', '#f43f5e', '#a855f7', '#34d399', '#fbbf24'];
+        const leafColors = ['#f59e0b', '#d97706', '#10b981', '#059669', '#b45309', '#ca8a04'];
+
         for (let i = 0; i < particleCount; i++) {
+            const isRising = (effectType === 'lanterns' || effectType === 'hearts');
             particles.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
-                radius: Math.random() * (effectType === 'snow' ? 3.2 : (effectType === 'leaves' ? 5.5 : 2.5)) + 1,
-                speedY: Math.random() * (effectType === 'snow' ? 1.2 : 0.85) + 0.35,
-                speedX: (Math.random() - 0.5) * 0.8,
-                opacity: Math.random() * 0.7 + 0.3,
+                radius: Math.random() * (effectType === 'snow' ? 3.5 : (effectType === 'lanterns' ? 4.5 : (effectType === 'leaves' ? 4.2 : 3))) + 1.5,
+                speedY: isRising ? -(Math.random() * 0.75 + 0.3) : (Math.random() * (effectType === 'snow' ? 1.2 : 0.9) + 0.35),
+                speedX: (Math.random() - 0.5) * 0.75,
+                opacity: Math.random() * 0.65 + 0.35,
                 rotation: Math.random() * 360,
-                rotationSpeed: (Math.random() - 0.5) * 2,
+                rotationSpeed: (Math.random() - 0.5) * 1.8,
+                shapeVariant: Math.floor(Math.random() * 2),
+                color: effectType === 'fireworks' ? fireworkColors[i % fireworkColors.length] : leafColors[i % leafColors.length],
                 type: effectType
             });
         }
@@ -9062,32 +9196,32 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 ctx.globalAlpha = p.opacity;
 
                 if (p.type === 'snow') {
-                    // Soft glowing snowflake circle
-                    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.radius);
-                    grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-                    grad.addColorStop(1, 'rgba(230, 245, 255, 0)');
-                    ctx.fillStyle = grad;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
-                    ctx.fill();
+                    if (p.shapeVariant === 1 && p.radius > 2.5) {
+                        drawSnowflake(ctx, p.radius * 1.4);
+                    } else {
+                        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.radius);
+                        grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+                        grad.addColorStop(1, 'rgba(220, 240, 255, 0)');
+                        ctx.fillStyle = grad;
+                        ctx.beginPath();
+                        ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
                 } else if (p.type === 'leaves') {
-                    // Golden tea / autumn leaf shape
-                    ctx.fillStyle = 'rgba(245, 158, 11, 0.65)';
-                    ctx.beginPath();
-                    ctx.ellipse(0, 0, p.radius * 1.6, p.radius * 0.8, 0, 0, Math.PI * 2);
-                    ctx.fill();
+                    drawTeaLeaf(ctx, p.radius, p.color);
                 } else if (p.type === 'lanterns') {
-                    // Warm golden lantern glow
-                    ctx.fillStyle = 'rgba(245, 158, 11, 0.8)';
-                    ctx.beginPath();
-                    ctx.arc(0, 0, p.radius * 1.2, 0, Math.PI * 2);
-                    ctx.fill();
+                    drawLantern(ctx, p.radius);
+                } else if (p.type === 'fireworks') {
+                    if (p.shapeVariant === 1) {
+                        drawDiamondStar(ctx, p.radius * 1.1, p.color);
+                    } else {
+                        drawFireworkSpark(ctx, p.radius, p.color);
+                    }
+                } else if (p.type === 'hearts') {
+                    drawHeart(ctx, p.radius);
                 } else {
-                    // Twinkling sparkle / star
-                    ctx.fillStyle = 'rgba(250, 204, 21, 0.85)';
-                    ctx.beginPath();
-                    ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
-                    ctx.fill();
+                    // Sparkles (Avurudu / Diwali)
+                    drawDiamondStar(ctx, p.radius, '#facc15');
                 }
 
                 ctx.restore();
@@ -9097,12 +9231,17 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 p.x += Math.sin(p.y * 0.015) * p.speedX;
                 p.rotation += p.rotationSpeed;
 
-                if (p.y > canvas.height + 10) {
-                    p.y = -10;
+                // Screen wrapping
+                if (p.speedY > 0 && p.y > canvas.height + 15) {
+                    p.y = -15;
+                    p.x = Math.random() * canvas.width;
+                } else if (p.speedY < 0 && p.y < -20) {
+                    p.y = canvas.height + 15;
                     p.x = Math.random() * canvas.width;
                 }
-                if (p.x > canvas.width + 10) p.x = -10;
-                else if (p.x < -10) p.x = canvas.width + 10;
+
+                if (p.x > canvas.width + 15) p.x = -15;
+                else if (p.x < -15) p.x = canvas.width + 15;
             }
 
             ambientAnimationId = requestAnimationFrame(drawParticles);
@@ -9120,7 +9259,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         // 1. Set HTML data-theme attribute for CSS variable switching
         document.documentElement.setAttribute('data-theme', currentThemeId);
 
-        // 2. Manage Top Festive Banner
+        // 2. Manage Top Festive Greeting Banner
         const bannerEl = document.getElementById('seasonal-theme-banner-strip');
         const bannerIcon = document.getElementById('seasonal-banner-icon');
         const bannerText = document.getElementById('seasonal-banner-text');
@@ -9136,7 +9275,28 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             }
         }
 
-        // 3. Ambient Visual Effects (Snow, Leaves, Sparkles, Lanterns)
+        // 3. Manage Header Brand Ribbon / Seasonal Badge
+        const headerBadgeEl = document.getElementById('seasonal-header-badge');
+        if (headerBadgeEl) {
+            if (currentThemeId !== 'classic') {
+                headerBadgeEl.innerHTML = `${theme.icon || '✨'} <span>${theme.headerBadge || theme.name}</span>`;
+                headerBadgeEl.style.display = 'inline-flex';
+            } else {
+                headerBadgeEl.style.display = 'none';
+            }
+        }
+
+        // 4. Update Hero Slideshow Subtitle
+        const heroSubtitles = document.querySelectorAll('.hero-subtitle');
+        if (heroSubtitles && heroSubtitles.length > 0) {
+            if (currentThemeId !== 'classic' && theme.heroSubtitle) {
+                heroSubtitles[0].textContent = theme.heroSubtitle;
+            } else {
+                heroSubtitles[0].textContent = 'Rock One Wild Tea (Pvt) Limited • Uva Medium Region';
+            }
+        }
+
+        // 5. Ambient Visual Effects (Snow, Leaves, Sparkles, Lanterns, Fireworks, Hearts)
         if (settings.effectsEnabled !== false && theme.effects && theme.effects !== 'none') {
             initAmbientCanvas(theme.effects);
         } else {
