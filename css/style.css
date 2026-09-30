@@ -667,15 +667,19 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     line-height: 1.2 !important;
 }
 
-/* Page content Layout container */
+/* Page content Layout container (With Dedicated Left & Right Safe Inset Gutters) */
 .main-content {
-    max-width: 1280px;
+    max-width: 1440px;
     margin: 0 auto;
-    padding: 3rem 2rem 5rem 2rem;
+    padding: 2.5rem clamp(72px, 6vw, 92px) 5rem clamp(58px, 5vw, 76px);
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .view-section {
     display: none;
+    width: 100%;
+    box-sizing: border-box;
     animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -3504,7 +3508,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     }
     
     .main-content {
-        padding: 2rem 1rem;
+        padding: 1.25rem 58px 3.5rem 48px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
     }
 }
 
@@ -9250,6 +9256,9 @@ input, select, textarea, button {
 
 /* ---- 1. TABLETS & SMALL LAPTOPS (<= 1024px) ---- */
 @media (max-width: 1024px) {
+    .main-content {
+        padding: 2.25rem 74px 4.5rem 60px !important;
+    }
     .header-container {
         padding: 0.6rem 1.25rem;
     }
@@ -9268,8 +9277,15 @@ input, select, textarea, button {
 
 /* ---- 2. LARGE PHONES & TABLETS (<= 768px) ---- */
 @media (max-width: 768px) {
+    .main-content {
+        padding: 1.5rem 64px 4rem 52px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
     .view-section {
-        padding: 1.5rem 0.85rem !important;
+        padding: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     /* Header & Mobile Hamburger Menu Bar (Always Visible on Mobile) */
@@ -9757,6 +9773,11 @@ input, select, textarea, button {
 
 /* ---- 3. STANDARD SMARTPHONES (<= 600px) ---- */
 @media (max-width: 600px) {
+    .main-content {
+        padding: 1.25rem 58px 3.5rem 48px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
     .view-title {
         font-size: 1.85rem !important;
     }
@@ -10019,8 +10040,31 @@ input, select, textarea, button {
     }
 }
 
+/* ---- 3.5. SMALL PHONES (<= 480px) ---- */
+@media (max-width: 480px) {
+    .main-content {
+        padding: 1rem 54px 3.5rem 44px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .catalog-info-panel,
+    .minimal-box-selector-layout,
+    .private-reserve-home-banner,
+    .panel-card,
+    .estate-cinema-card,
+    .estate-location-card,
+    .testimonial-card-item {
+        padding: 1.15rem 0.85rem !important;
+    }
+}
+
 /* ---- 4. COMPACT SMARTPHONES (<= 380px) ---- */
 @media (max-width: 380px) {
+    .main-content {
+        padding: 0.85rem 46px 3rem 40px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
     .hero-section,
     #hero-slider-container {
         min-height: 480px !important;
