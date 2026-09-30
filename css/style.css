@@ -277,6 +277,10 @@
     height: 100vh;
     pointer-events: none;
     z-index: 99;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    contain: strict;
 }
 
 /* Seasonal Hero Slide Subtitle Glow */
