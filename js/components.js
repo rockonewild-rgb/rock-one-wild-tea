@@ -114,7 +114,14 @@ const UIComponents = {
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        const products = window.TeaFactoryStore.getProducts();
+        const products = window.TeaFactoryStore.getProducts() || [];
+        const boxes = window.TeaFactoryStore.getBoxes() || [];
+
+        const allCount = products.length;
+        const blackCount = products.filter(p => p.category === 'Black Tea').length;
+        const greenWhiteCount = products.filter(p => p.category === 'Green & White Tea').length;
+        const oolongCount = products.filter(p => p.category === 'Oolongs').length;
+        const collectorCount = boxes.length;
 
         let html = `
             <div class="tour-header-block">
@@ -123,35 +130,66 @@ const UIComponents = {
                 <p class="view-subtitle">${_t('catalog_subtitle', 'Select from our artisanal standard tins harvested from our high-elevation organic slopes.')}</p>
             </div>
 
-            <!-- Search, Filter & B2B Lookbook Controls -->
-            <div class="catalog-controls-bar" style="margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
-                <div class="filter-tabs-group" style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
-                    <button class="btn btn-outline filter-tab-btn active" data-category="all">${_t('filter_all', 'All Reserves')}</button>
-                    <button class="btn btn-outline filter-tab-btn" data-category="Black Tea">${_t('filter_black', 'Black Tea')}</button>
-                    <button class="btn btn-outline filter-tab-btn" data-category="Green & White Tea">${_t('filter_green_white', 'Green & White Tea')}</button>
-                    <button class="btn btn-outline filter-tab-btn" data-category="Oolongs">${_t('filter_oolongs', 'Oolongs')}</button>
+            <!-- Search, Filter & B2B Lookbook Controls Bar -->
+            <div class="catalog-controls-bar">
+                <div class="filter-tabs-group">
+                    <button class="btn btn-outline filter-tab-btn active" data-category="all">
+                        <span>${_t('filter_all', 'All Reserves')}</span>
+                        <span class="filter-tab-count">${allCount}</span>
+                    </button>
+                    <button class="btn btn-outline filter-tab-btn" data-category="Black Tea">
+                        <span>${_t('filter_black', 'Black Tea')}</span>
+                        <span class="filter-tab-count">${blackCount}</span>
+                    </button>
+                    <button class="btn btn-outline filter-tab-btn" data-category="Green & White Tea">
+                        <span>${_t('filter_green_white', 'Green & White Tea')}</span>
+                        <span class="filter-tab-count">${greenWhiteCount}</span>
+                    </button>
+                    <button class="btn btn-outline filter-tab-btn" data-category="Oolongs">
+                        <span>${_t('filter_oolongs', 'Oolongs')}</span>
+                        <span class="filter-tab-count">${oolongCount}</span>
+                    </button>
+                    <button class="btn btn-outline filter-tab-btn" data-category="collector">
+                        <span>${_t('filter_collector', 'Collector Chests')}</span>
+                        <span class="filter-tab-count">${collectorCount}</span>
+                    </button>
                 </div>
                 
-                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                    <button type="button" id="btn-catalog-open-lookbook" class="btn btn-primary btn-lookbook-cta" style="font-size: 0.78rem; padding: 0.65rem 1.25rem; display: inline-flex; align-items: center; gap: 0.5rem; border-radius: 20px;">
+                <div class="catalog-utility-controls">
+                    <!-- Sort Dropdown -->
+                    <select id="catalog-sort-select" class="catalog-sort-select" aria-label="${_t('label_sort_catalog', 'Sort tea reserves')}">
+                        <option value="featured">${_t('sort_featured', 'Featured Selection')}</option>
+                        <option value="price-asc">${_t('sort_price_asc', 'Price: Low to High')}</option>
+                        <option value="price-desc">${_t('sort_price_desc', 'Price: High to Low')}</option>
+                        <option value="aroma-desc">${_t('sort_aroma', 'Highest Aroma Score')}</option>
+                        <option value="grade">${_t('sort_grade', 'Leaf Grade (A-Z)')}</option>
+                    </select>
+
+                    <!-- Lookbook CTA Button -->
+                    <button type="button" id="btn-catalog-open-lookbook" class="btn btn-primary btn-lookbook-cta">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                             <polyline points="14 2 14 8 20 8"></polyline>
                             <line x1="12" y1="18" x2="12" y2="12"></line>
                             <line x1="9" y1="15" x2="15" y2="15"></line>
                         </svg>
-                        <span>${_t('btn_estate_lookbook', 'Estate Lookbook (PDF)')}</span>
-                        <span style="background: rgba(0,0,0,0.35); color: var(--color-gold-light); font-size: 0.62rem; font-weight: 700; padding: 0.15rem 0.4rem; border-radius: 4px; border: 1px solid rgba(212,175,55,0.4);">2026</span>
+                        <span>${_t('btn_estate_lookbook', 'Estate Lookbook')}</span>
+                        <span class="lookbook-year-tag">2026</span>
                     </button>
 
-                    <div class="search-input-wrapper" style="position: relative; min-width: 240px;">
-                        <input type="text" id="catalog-search-input" placeholder="${_t('placeholder_search_reserves', 'Search reserves...')}" style="width: 100%; padding: 0.65rem 1rem 0.65rem 2.5rem; background: rgba(4,10,6,0.8); border: 1px solid rgba(255,255,255,0.1); color: var(--color-white); outline: none; border-radius: 20px; font-size: 0.82rem; transition: var(--transition-smooth);">
-                        <span style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); display: flex; align-items: center;">
+                    <!-- Search Input with Instant Clear Button -->
+                    <div class="search-input-wrapper">
+                        <span class="search-input-icon">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </span>
+                        <input type="text" id="catalog-search-input" placeholder="${_t('placeholder_search_reserves', 'Search reserves, leaf grades...')}" autocomplete="off">
+                        <button type="button" id="catalog-search-clear" class="search-clear-btn" aria-label="Clear Search" style="display: none;">&times;</button>
                     </div>
                 </div>
             </div>
+
+            <!-- Live Results Feedback Bar -->
+            <div id="catalog-results-summary" class="catalog-results-summary" style="display: none;"></div>
 
             <!-- Dynamic Catalog Grid Containers -->
             <div id="catalog-items-grid-container">
@@ -165,7 +203,7 @@ const UIComponents = {
         container.innerHTML = html;
         
         // Render all by default
-        this.renderCatalogItems('all', '');
+        this.renderCatalogItems('all', '', 'featured');
         this.renderBrewingGuide('catalog-brewing-container');
     },
 
@@ -179,29 +217,44 @@ const UIComponents = {
         return String(text).replace(regex, '<mark class="search-match-highlight">$1</mark>');
     },
 
-    renderCatalogItems(categoryFilter = 'all', searchFilter = '') {
+    renderCatalogItems(categoryFilter = 'all', searchFilter = '', sortBy = 'featured') {
         const gridContainer = document.getElementById('catalog-items-grid-container');
         if (!gridContainer) return;
 
-        searchFilter = searchFilter.toLowerCase().trim();
+        searchFilter = (searchFilter || '').toLowerCase().trim();
+        const summaryEl = document.getElementById('catalog-results-summary');
 
         // If category is "collector", render the 1-10 boxes grid
         if (categoryFilter === 'collector') {
-            const boxes = window.TeaFactoryStore.getBoxes();
-            // Filter boxes by search if any
-            const filteredBoxes = searchFilter ? boxes.filter(b => b.name.toLowerCase().includes(searchFilter)) : boxes;
+            const boxes = window.TeaFactoryStore.getBoxes() || [];
+            const filteredBoxes = searchFilter ? boxes.filter(b => (b.name || '').toLowerCase().includes(searchFilter)) : boxes;
+
+            if (summaryEl) {
+                summaryEl.style.display = 'flex';
+                summaryEl.innerHTML = `
+                    <span>Showing <strong>${filteredBoxes.length}</strong> of ${boxes.length} numbered collector chests ${searchFilter ? `matching "<em>${searchFilter}</em>"` : ''}</span>
+                    ${searchFilter ? `<button type="button" id="catalog-reset-filters-btn" class="catalog-reset-link" style="background:none; border:none; color:var(--color-gold); font-size:0.75rem; text-decoration:underline; cursor:pointer; padding:0; margin-left:auto;">Reset search</button>` : ''}
+                `;
+            }
 
             if (filteredBoxes.length === 0) {
-                gridContainer.innerHTML = `<div class="empty-state" style="text-align: center; padding: 4rem; color: var(--color-text-muted);">${_t('collector_no_boxes', 'No matching collector boxes found.')}</div>`;
+                gridContainer.innerHTML = `
+                    <div class="empty-state" style="text-align: center; padding: 3.5rem 1.5rem; background: rgba(14,26,18,0.4); border: 1px dashed rgba(212,175,55,0.25); border-radius: 12px; margin: 1.5rem 0;">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.5" style="margin-bottom: 0.75rem; opacity: 0.85;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                        <h4 style="font-size: 1.15rem; color: #fff; margin-bottom: 0.4rem;">${_t('collector_no_boxes', 'No matching collector boxes found.')}</h4>
+                        <p style="font-size: 0.82rem; color: var(--color-text-muted); margin-bottom: 1rem;">Try clearing your search query to view all available numbered chests.</p>
+                        <button type="button" id="catalog-empty-reset-btn" class="btn btn-outline" style="border-color: var(--color-gold); color: var(--color-gold); font-size: 0.78rem; padding: 0.5rem 1.25rem;">Clear Search</button>
+                    </div>
+                `;
                 return;
             }
 
-            const season = window.TeaFactoryStore.getCurrentSeason();
+            const season = window.TeaFactoryStore.getCurrentSeason() || { seriesNumber: 1, name: "Royal Emerald Reserve" };
             let boxHtml = `
                 <div class="season-branding" style="margin-bottom: 2rem; border-left: 2px solid var(--color-gold); padding-left: 1.5rem;">
                     <span class="season-badge">${_t('season_branding_badge', 'Series Release')} ${season.seriesNumber || 1}</span>
-                    <h3 class="season-title" style="font-size: 2rem; margin-bottom: 0.5rem;">${season.name}</h3>
-                    <p class="season-description" style="font-size: 0.9rem; color: var(--color-text-muted); max-width: 700px;">
+                    <h3 class="season-title" style="font-size: 1.8rem; margin-bottom: 0.4rem; color: var(--color-gold-light);">${season.name}</h3>
+                    <p class="season-description" style="font-size: 0.88rem; color: var(--color-text-muted); max-width: 700px; line-height: 1.6;">
                         ${_t('season_branding_sub', 'Select a box number from 1 to 10 below to secure your numbered luxury tea chest. Once booked, it instantly locks for other collectors.')}
                     </p>
                 </div>
@@ -235,7 +288,7 @@ const UIComponents = {
                             <div class="box-body">
                                 <div class="box-number-display">${String(box.id).padStart(2, '0')}</div>
                                 <h4 class="box-title">${displayName}</h4>
-                                <p class="box-details">${_t('box_seal_note', 'Individually numbered wood chest seal.')}</p>
+                                <p class="box-details">${_t('box_seal_note', 'Individually numbered solid teak chest seal.')}</p>
                             </div>
                             <div class="box-footer">
                                 ${buttonHtml}
@@ -250,29 +303,62 @@ const UIComponents = {
             return;
         }
 
-        // Render standard products
-        const products = window.TeaFactoryStore.getProducts();
-        const filteredProducts = products.filter(p => {
+        // Standard products filtering and sorting
+        const products = window.TeaFactoryStore.getProducts() || [];
+        let filteredProducts = products.filter(p => {
             if (!p) return false;
             const category = p.category || '';
             const name = p.name || '';
             const desc = p.desc || '';
             const leafGrade = p.leafGrade || '';
+            const elevation = p.elevation || '';
             const matchesCategory = categoryFilter === 'all' || category === categoryFilter;
             const matchesSearch = !searchFilter || 
                 name.toLowerCase().includes(searchFilter) || 
                 desc.toLowerCase().includes(searchFilter) ||
                 leafGrade.toLowerCase().includes(searchFilter) ||
+                elevation.toLowerCase().includes(searchFilter) ||
                 (p.tastingNotes && p.tastingNotes.some(t => t.toLowerCase().includes(searchFilter)));
             return matchesCategory && matchesSearch;
         });
 
+        // Apply Sorting
+        if (sortBy === 'price-asc') {
+            filteredProducts.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+        } else if (sortBy === 'price-desc') {
+            filteredProducts.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+        } else if (sortBy === 'aroma-desc') {
+            filteredProducts.sort((a, b) => ((b.sensoryRadar && b.sensoryRadar.aroma) || 0) - ((a.sensoryRadar && a.sensoryRadar.aroma) || 0));
+        } else if (sortBy === 'grade') {
+            filteredProducts.sort((a, b) => (a.leafGrade || '').localeCompare(b.leafGrade || ''));
+        }
+
+        // Update live results summary feedback strip
+        if (summaryEl) {
+            if (searchFilter || categoryFilter !== 'all' || sortBy !== 'featured') {
+                summaryEl.style.display = 'flex';
+                summaryEl.innerHTML = `
+                    <span>Showing <strong>${filteredProducts.length}</strong> of ${products.length} signature reserves ${searchFilter ? `matching "<em>${searchFilter}</em>"` : ''} ${categoryFilter !== 'all' ? `in <em>${categoryFilter}</em>` : ''}</span>
+                    <button type="button" id="catalog-reset-filters-btn" class="catalog-reset-link" style="background:none; border:none; color:var(--color-gold); font-size:0.75rem; text-decoration:underline; cursor:pointer; padding:0; margin-left:auto;">Reset filters</button>
+                `;
+            } else {
+                summaryEl.style.display = 'none';
+            }
+        }
+
         if (filteredProducts.length === 0) {
-            gridContainer.innerHTML = `<div class="empty-state" style="text-align: center; padding: 4rem; color: var(--color-text-muted);">${_t('catalog_no_reserves', 'No tea reserves matching your filters were found.')}</div>`;
+            gridContainer.innerHTML = `
+                <div class="empty-state" style="text-align: center; padding: 4rem 1.5rem; background: rgba(14,26,18,0.4); border: 1px dashed rgba(212,175,55,0.25); border-radius: 12px; margin: 1.5rem 0;">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.5" style="margin-bottom: 1rem; opacity: 0.85;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                    <h4 style="font-size: 1.2rem; color: #fff; margin-bottom: 0.4rem;">${_t('catalog_no_reserves', 'No tea reserves matching your filters were found.')}</h4>
+                    <p style="font-size: 0.85rem; color: var(--color-text-muted); max-width: 480px; margin: 0 auto 1.25rem;">Try refining your search keyword, choosing a different category, or resetting all active filters.</p>
+                    <button type="button" id="catalog-empty-reset-btn" class="btn btn-outline" style="border-color: var(--color-gold); color: var(--color-gold); font-size: 0.8rem; padding: 0.6rem 1.5rem;">Clear Filters & Show All</button>
+                </div>
+            `;
             return;
         }
 
-        let prodHtml = `<div class="boxes-grid">`;
+        let prodHtml = `<div class="products-grid">`;
         prodHtml += filteredProducts.map(p => {
             const tastingChips = (p.tastingNotes || []).slice(0, 3).map(n => 
                 `<span class="tasting-chip">${this.highlightText(n, searchFilter)}</span>`
@@ -284,46 +370,64 @@ const UIComponents = {
             const displayGrade = this.highlightText(p.leafGrade || _t('leaf_grade_default', 'Single-Estate Reserve'), searchFilter);
 
             return `
-                <div class="box-card product-connoisseur-card status-available">
-                    <div class="card-image-wrapper" style="height: auto !important; aspect-ratio: 4/3; background: rgba(0,0,0,0.35); position: relative;">
-                        <img src="${p.image || 'images/Product.jpeg'}" class="card-image" alt="${p.name}" style="object-fit: contain; width: 100%; height: 100%;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
-                        <div class="card-image-overlay"></div>
-                        <span class="box-badge status-available" style="border-radius: 20px; font-size: 0.72rem;">${p.stock || _t('stock_available', 'Available')}</span>
-                        ${p.elevation ? `<span class="elevation-badge">${p.elevation}</span>` : ''}
+                <div class="product-luxury-card status-available">
+                    <div class="product-card-visual-box">
+                        <img src="${p.image || 'images/Product.jpeg'}" class="product-card-image" alt="${p.name}" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
+                        <div class="product-card-overlay"></div>
+                        <div class="product-card-badge-cluster">
+                            <span class="product-stock-tag ${p.stock === 'Low Stock' ? 'tag-warning' : 'tag-available'}">${p.stock || _t('stock_available', 'In Stock')}</span>
+                            ${p.elevation ? `<span class="product-elevation-tag"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg> ${p.elevation}</span>` : ''}
+                        </div>
+                        ${p.weight ? `<div class="product-weight-chip">${p.weight}</div>` : ''}
                     </div>
-                    <div class="box-inner-content">
-                        <div class="box-body" style="padding-bottom: 0.5rem;">
-                            <div class="product-leaf-grade-tag">${displayGrade}</div>
-                            <div class="box-title-row" style="margin-bottom: 0.4rem;">
-                                <h4 class="box-title" style="font-size: 1.25rem;">${displayName}</h4>
-                                <span class="box-price">${window.TeaFactoryStore.formatCurrency(p.price)} <small style="font-size: 0.65rem; color: var(--color-text-muted);">/ ${p.weight}</small></span>
-                            </div>
-                            <p class="box-details" style="line-height: 1.5; font-size: 0.82rem; height: 60px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; margin-bottom: 0.75rem;">${displayDesc}</p>
-                            
-                            <!-- Tasting Notes Micro Chips -->
-                            <div class="product-tasting-chips-row">
-                                ${tastingChips}
-                            </div>
-
-                            <!-- Steeping Quick Indicators -->
-                            <div class="product-steep-micro-strip">
-                                <span title="${_t('stat_water_temp', 'Water Temperature')}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg> ${p.steepTemp || '90°C'}</span>
-                                <span title="${_t('stat_steep_duration', 'Steeping Duration')}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${p.steepTime || '3 Min'}</span>
-                                <span title="${_t('stat_aroma', 'Aroma Score')}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> ${_t('stat_aroma', 'Aroma')} ${radar.aroma || 85}%</span>
+                    <div class="product-card-content">
+                        <div class="product-leaf-grade-banner">
+                            <span class="leaf-grade-badge">${displayGrade}</span>
+                            <span class="product-category-crumb">${p.category || 'Pure Ceylon'}</span>
+                        </div>
+                        <div class="product-title-pricing-row">
+                            <h3 class="product-card-title">${displayName}</h3>
+                            <div class="product-price-block">
+                                <span class="product-price-val">${window.TeaFactoryStore.formatCurrency(p.price)}</span>
                             </div>
                         </div>
-                        <div class="box-footer" style="display: flex; flex-direction: column; gap: 0.5rem;">
-                            <button class="btn btn-outline btn-view-connoisseur" data-id="${p.id}" style="width: 100%; border-color: rgba(212,175,55,0.4); color: var(--color-gold); font-size: 0.78rem; padding: 0.6rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="12 6 12 12 16 14"></polygon></svg>
-                                ${_t('btn_tasting_radar', 'Tasting Radar & Steep Timer')}
+                        <p class="product-card-description">${displayDesc}</p>
+                        
+                        <!-- Tasting Notes Chords -->
+                        <div class="product-tasting-chips-row">
+                            ${tastingChips}
+                        </div>
+
+                        <!-- Steeping Quick Indicators -->
+                        <div class="product-brewing-specs-row">
+                            <div class="spec-cell" title="${_t('stat_water_temp', 'Water Temperature')}">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+                                <span>${p.steepTemp || '90°C'}</span>
+                            </div>
+                            <div class="spec-cell" title="${_t('stat_steep_duration', 'Steeping Duration')}">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <span>${p.steepTime || '3 Min'}</span>
+                            </div>
+                            <div class="spec-cell" title="${_t('stat_aroma', 'Aroma Score')}">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                <span>${_t('stat_aroma', 'Aroma')} ${radar.aroma || 85}%</span>
+                            </div>
+                        </div>
+
+                        <!-- Card Action Buttons -->
+                        <div class="product-card-actions-stack">
+                            <button type="button" class="btn btn-outline btn-view-connoisseur" data-id="${p.id}" aria-label="View Sensory Radar & Steep Timer">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="12 6 12 12 16 14"/></svg>
+                                <span>${_t('btn_tasting_radar', 'Sensory Radar & Steep Timer')}</span>
                             </button>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                                <button type="button" class="btn btn-primary btn-add-to-cart" data-id="${p.id}" data-type="product" style="font-size: 0.78rem; padding: 0.65rem 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-                                    ${_t('btn_add_to_bag', 'Add to Bag')}
+                            <div class="product-cta-button-group">
+                                <button type="button" class="btn btn-primary btn-add-to-cart" data-id="${p.id}" data-type="product" aria-label="Add to Bag">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                                    <span>${_t('btn_add_to_bag', 'Add to Bag')}</span>
                                 </button>
-                                <button type="button" class="btn btn-outline btn-book-prod" data-id="${p.id}" style="font-size: 0.78rem; padding: 0.65rem 0.5rem; color: #ffffff; border-color: rgba(255,255,255,0.25);">
-                                    ${_t('btn_quick_order', 'Quick Order')}
+                                <button type="button" class="btn btn-outline btn-book-prod" data-id="${p.id}" aria-label="Reserve Product">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                    <span>${_t('btn_quick_order', 'Reserve')}</span>
                                 </button>
                             </div>
                         </div>

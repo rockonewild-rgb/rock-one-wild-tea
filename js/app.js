@@ -2828,8 +2828,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Bind Product Catalog filter, search, and purchase buttons
+    // Bind Product Catalog filter, search, sort, and purchase buttons
     let currentCatalogCategory = 'all';
+    let currentCatalogSort = 'featured';
 
     function bindProductCatalogEvents() {
         // Filter tab buttons
@@ -2840,32 +2841,88 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.classList.add('active');
                 currentCatalogCategory = btn.getAttribute('data-category');
                 const searchVal = document.getElementById('catalog-search-input')?.value || '';
-                window.UIComponents.renderCatalogItems(currentCatalogCategory, searchVal);
+                window.UIComponents.renderCatalogItems(currentCatalogCategory, searchVal, currentCatalogSort);
                 bindCatalogGridButtons();
             });
         });
 
-        // Live search
+        // Sort dropdown selector
+        const sortSelect = document.getElementById('catalog-sort-select');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', () => {
+                currentCatalogSort = sortSelect.value;
+                const searchVal = document.getElementById('catalog-search-input')?.value || '';
+                window.UIComponents.renderCatalogItems(currentCatalogCategory, searchVal, currentCatalogSort);
+                bindCatalogGridButtons();
+            });
+        }
+
+        // Live search input and instant clear button
         const searchInput = document.getElementById('catalog-search-input');
+        const searchClear = document.getElementById('catalog-search-clear');
         if (searchInput) {
             searchInput.addEventListener('input', () => {
-                window.UIComponents.renderCatalogItems(currentCatalogCategory, searchInput.value);
+                const query = searchInput.value;
+                if (searchClear) {
+                    searchClear.style.display = query.trim().length > 0 ? 'block' : 'none';
+                }
+                window.UIComponents.renderCatalogItems(currentCatalogCategory, query, currentCatalogSort);
                 bindCatalogGridButtons();
             });
             // Gold focus glow
             searchInput.addEventListener('focus', () => {
                 searchInput.style.borderColor = 'var(--color-gold)';
-                searchInput.style.boxShadow = '0 0 10px rgba(212,175,55,0.15)';
+                searchInput.style.boxShadow = '0 0 10px rgba(212,175,55,0.2)';
             });
             searchInput.addEventListener('blur', () => {
-                searchInput.style.borderColor = 'rgba(255,255,255,0.1)';
+                searchInput.style.borderColor = 'rgba(255,255,255,0.12)';
                 searchInput.style.boxShadow = 'none';
+            });
+        }
+
+        if (searchClear) {
+            searchClear.addEventListener('click', () => {
+                if (searchInput) {
+                    searchInput.value = '';
+                    searchClear.style.display = 'none';
+                    searchInput.focus();
+                }
+                window.UIComponents.renderCatalogItems(currentCatalogCategory, '', currentCatalogSort);
+                bindCatalogGridButtons();
             });
         }
 
         // Bind initial item buttons
         bindCatalogGridButtons();
     }
+
+    // Reset filters helper
+    document.addEventListener('click', (e) => {
+        const resetBtn = e.target.closest('#catalog-reset-filters-btn, #catalog-empty-reset-btn');
+        if (resetBtn) {
+            e.preventDefault();
+            currentCatalogCategory = 'all';
+            currentCatalogSort = 'featured';
+            
+            const filterBtns = document.querySelectorAll('.filter-tab-btn');
+            filterBtns.forEach(b => {
+                if (b.getAttribute('data-category') === 'all') b.classList.add('active');
+                else b.classList.remove('active');
+            });
+
+            const searchInput = document.getElementById('catalog-search-input');
+            if (searchInput) searchInput.value = '';
+
+            const searchClear = document.getElementById('catalog-search-clear');
+            if (searchClear) searchClear.style.display = 'none';
+
+            const sortSelect = document.getElementById('catalog-sort-select');
+            if (sortSelect) sortSelect.value = 'featured';
+
+            window.UIComponents.renderCatalogItems('all', '', 'featured');
+            bindCatalogGridButtons();
+        }
+    });
 
     function bindCatalogGridButtons() {
         // Connoisseur Sensory Dossier & Tasting Radar buttons

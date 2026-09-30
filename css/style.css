@@ -3573,6 +3573,413 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     backdrop-filter: blur(8px);
 }
 
+/* ── Product Catalog Enhanced Luxury UI/UX ─────────────────────────── */
+.catalog-controls-bar {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    background: rgba(4, 14, 8, 0.65);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 20px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.filter-tabs-group {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    padding: 0.65rem 1.15rem;
+    letter-spacing: 0.5px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-text-muted);
+    transition: var(--transition-smooth);
+    cursor: pointer;
+}
+
+.filter-tab-count {
+    background: rgba(0, 0, 0, 0.35);
+    color: var(--color-gold);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.1rem 0.45rem;
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.filter-tab-btn.active .filter-tab-count {
+    background: rgba(0, 0, 0, 0.6);
+    color: #ffd875;
+    border-color: rgba(0, 0, 0, 0.4);
+}
+
+.catalog-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    margin-left: auto;
+}
+
+.catalog-sort-wrapper {
+    position: relative;
+}
+
+.catalog-sort-select {
+    background: rgba(4, 10, 6, 0.85);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #e2ede5;
+    font-size: 0.78rem;
+    padding: 0.6rem 1rem 0.6rem 0.85rem;
+    border-radius: 18px;
+    outline: none;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.catalog-sort-select:focus {
+    border-color: var(--color-gold);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.25);
+}
+
+.search-input-wrapper {
+    position: relative;
+    min-width: 220px;
+}
+
+.search-input-wrapper input {
+    width: 100%;
+    padding: 0.65rem 2.2rem 0.65rem 2.4rem;
+    background: rgba(4, 10, 6, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--color-white);
+    outline: none;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    transition: var(--transition-smooth);
+}
+
+.search-input-wrapper .search-icon-left {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-gold);
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+}
+
+.search-clear-btn {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+
+.search-clear-btn:hover {
+    color: var(--color-gold);
+}
+
+.catalog-results-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+}
+
+.catalog-reset-btn {
+    background: transparent;
+    border: 1px dashed rgba(212, 175, 55, 0.4);
+    color: var(--color-gold);
+    font-size: 0.72rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.catalog-reset-btn:hover {
+    background: rgba(212, 175, 55, 0.15);
+}
+
+/* Products Grid Layout */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
+    gap: 1.75rem;
+    margin-bottom: 4rem;
+}
+
+/* Luxury Product Card Enhancement */
+.product-luxury-card {
+    background: linear-gradient(145deg, rgba(8, 22, 14, 0.95) 0%, rgba(4, 12, 8, 0.98) 100%) !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    border-radius: 18px !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+.product-luxury-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--color-gold) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.2) !important;
+}
+
+.product-card-visual-box {
+    position: relative;
+    aspect-ratio: 16/10;
+    width: 100%;
+    background: #020704;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.product-card-visual-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.5s ease;
+}
+
+.product-luxury-card:hover .product-card-visual-box img {
+    transform: scale(1.06);
+}
+
+.product-card-top-tags {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    right: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.product-stock-tag {
+    background: rgba(4, 14, 8, 0.88);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--color-gold);
+    color: var(--color-gold);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
+}
+
+.product-elevation-tag {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e2ede5;
+    font-size: 0.65rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 12px;
+}
+
+.product-quick-inspect-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(2, 8, 4, 0.85) 100%);
+    display: flex;
+    align-items: flex-end;
+    padding: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.product-card-visual-box:hover .product-quick-inspect-overlay {
+    opacity: 1;
+}
+
+.product-inspect-hint {
+    color: #ffd875;
+    font-size: 0.72rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+}
+
+.product-luxury-body {
+    padding: 1.25rem 1.25rem 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.product-leaf-grade-banner {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    margin-bottom: 0.4rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.product-card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-luxury-title {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    line-height: 1.25;
+    color: #ffffff;
+    margin: 0;
+}
+
+.product-luxury-price-box {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.product-luxury-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-gold);
+    display: block;
+    line-height: 1.1;
+}
+
+.product-luxury-unit {
+    font-size: 0.65rem;
+    color: var(--color-text-muted);
+}
+
+.product-luxury-desc {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: #c0cfc5;
+    margin-bottom: 0.75rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.product-tasting-chips-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.85rem;
+}
+
+.product-brewing-specs-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    border-radius: 10px;
+    padding: 0.55rem 0.65rem;
+    margin-bottom: 1.15rem;
+}
+
+.brewing-spec-cell {
+    text-align: center;
+}
+
+.brewing-spec-label {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 0.15rem;
+}
+
+.brewing-spec-val {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+}
+
+.product-luxury-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    margin-top: auto;
+}
+
+.product-primary-cart-btn {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 12px;
+}
+
+.product-secondary-actions-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.product-secondary-btn {
+    padding: 0.65rem 0.5rem;
+    font-size: 0.74rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    border-radius: 10px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 /* ============================================================
    PAYMENT METHOD UI — Tabs, Bank Details, File Upload Zone
    ============================================================ */
