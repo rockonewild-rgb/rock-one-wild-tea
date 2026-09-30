@@ -42,6 +42,240 @@
     --shadow-luxury: var(--glass-shadow);
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   SEASONAL THEMES & INTERNATIONAL OCCASIONS SYSTEM
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* 1. Estate Classic (Default) */
+[data-theme="classic"], :root {
+    --theme-primary: #d4af37;
+    --theme-gold-light: #ffd875;
+    --theme-accent: #1a4d2e;
+    --theme-banner-bg: linear-gradient(90deg, #040e08 0%, #0d2616 50%, #040e08 100%);
+    --theme-banner-border: rgba(212, 175, 55, 0.4);
+    --theme-glow: rgba(212, 175, 55, 0.25);
+}
+
+/* 2. Christmas & Festive Winter Holidays */
+[data-theme="christmas"] {
+    --color-gold: #f3ce72 !important;
+    --color-gold-hover: #ffe494 !important;
+    --color-gold-light: #ffe8a1 !important;
+    --color-emerald-glow: rgba(185, 28, 52, 0.6) !important;
+    --theme-primary: #f3ce72;
+    --theme-gold-light: #ffe8a1;
+    --theme-accent: #8b182b;
+    --theme-banner-bg: linear-gradient(90deg, #1f0408 0%, #580d19 50%, #1f0408 100%) !important;
+    --theme-banner-border: rgba(243, 206, 114, 0.6) !important;
+    --theme-glow: rgba(220, 38, 38, 0.35);
+}
+[data-theme="christmas"] .app-header {
+    background: rgba(26, 4, 8, 0.85) !important;
+    border-bottom: 1px solid rgba(243, 206, 114, 0.35) !important;
+}
+
+/* 3. Halloween & Autumn Harvest */
+[data-theme="halloween"] {
+    --color-gold: #f59e0b !important;
+    --color-gold-hover: #fbbf24 !important;
+    --color-gold-light: #fcd34d !important;
+    --color-emerald-glow: rgba(217, 119, 6, 0.6) !important;
+    --theme-primary: #f59e0b;
+    --theme-gold-light: #fcd34d;
+    --theme-accent: #c2410c;
+    --theme-banner-bg: linear-gradient(90deg, #1c0a02 0%, #451a03 50%, #1c0a02 100%) !important;
+    --theme-banner-border: rgba(245, 158, 11, 0.6) !important;
+    --theme-glow: rgba(234, 88, 12, 0.35);
+}
+[data-theme="halloween"] .app-header {
+    background: rgba(20, 8, 2, 0.85) !important;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.35) !important;
+}
+
+/* 4. New Year Gala Celebration */
+[data-theme="newyear"] {
+    --color-gold: #facc15 !important;
+    --color-gold-hover: #fef08a !important;
+    --color-gold-light: #fef9c3 !important;
+    --color-emerald-glow: rgba(37, 99, 235, 0.6) !important;
+    --theme-primary: #facc15;
+    --theme-gold-light: #fef08a;
+    --theme-accent: #2563eb;
+    --theme-banner-bg: linear-gradient(90deg, #050b18 0%, #112347 50%, #050b18 100%) !important;
+    --theme-banner-border: rgba(250, 204, 21, 0.6) !important;
+    --theme-glow: rgba(250, 204, 21, 0.35);
+}
+[data-theme="newyear"] .app-header {
+    background: rgba(5, 11, 24, 0.85) !important;
+    border-bottom: 1px solid rgba(250, 204, 21, 0.35) !important;
+}
+
+/* 5. Lunar New Year & Spring Festival */
+[data-theme="lunarnewyear"] {
+    --color-gold: #f59e0b !important;
+    --color-gold-hover: #fbbf24 !important;
+    --color-gold-light: #fde047 !important;
+    --color-emerald-glow: rgba(220, 38, 38, 0.6) !important;
+    --theme-primary: #f59e0b;
+    --theme-gold-light: #fde047;
+    --theme-accent: #dc2626;
+    --theme-banner-bg: linear-gradient(90deg, #240306 0%, #640d14 50%, #240306 100%) !important;
+    --theme-banner-border: rgba(245, 158, 11, 0.6) !important;
+    --theme-glow: rgba(220, 38, 38, 0.35);
+}
+[data-theme="lunarnewyear"] .app-header {
+    background: rgba(30, 4, 7, 0.85) !important;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.35) !important;
+}
+
+/* 6. Ceylon Sinhala & Tamil New Year (Avurudu) */
+[data-theme="avurudu"] {
+    --color-gold: #eab308 !important;
+    --color-gold-hover: #facc15 !important;
+    --color-gold-light: #fef08a !important;
+    --color-emerald-glow: rgba(234, 88, 12, 0.6) !important;
+    --theme-primary: #eab308;
+    --theme-gold-light: #fef08a;
+    --theme-accent: #ea580c;
+    --theme-banner-bg: linear-gradient(90deg, #1f1203 0%, #582a08 50%, #1f1203 100%) !important;
+    --theme-banner-border: rgba(234, 179, 8, 0.6) !important;
+    --theme-glow: rgba(234, 88, 12, 0.35);
+}
+[data-theme="avurudu"] .app-header {
+    background: rgba(24, 12, 3, 0.85) !important;
+    border-bottom: 1px solid rgba(234, 179, 8, 0.35) !important;
+}
+
+/* 7. Diwali Festival of Lights */
+[data-theme="diwali"] {
+    --color-gold: #f59e0b !important;
+    --color-gold-hover: #fbbf24 !important;
+    --color-gold-light: #fef08a !important;
+    --color-emerald-glow: rgba(249, 115, 22, 0.6) !important;
+    --theme-primary: #f59e0b;
+    --theme-gold-light: #fef08a;
+    --theme-accent: #f97316;
+    --theme-banner-bg: linear-gradient(90deg, #210c02 0%, #5c2406 50%, #210c02 100%) !important;
+    --theme-banner-border: rgba(245, 158, 11, 0.6) !important;
+    --theme-glow: rgba(249, 115, 22, 0.35);
+}
+[data-theme="diwali"] .app-header {
+    background: rgba(28, 10, 2, 0.85) !important;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.35) !important;
+}
+
+/* 8. Valentine's & Royal Romance */
+[data-theme="valentines"] {
+    --color-gold: #fb7185 !important;
+    --color-gold-hover: #fda4af !important;
+    --color-gold-light: #fecdd3 !important;
+    --color-emerald-glow: rgba(225, 29, 72, 0.6) !important;
+    --theme-primary: #fb7185;
+    --theme-gold-light: #fecdd3;
+    --theme-accent: #be123c;
+    --theme-banner-bg: linear-gradient(90deg, #240510 0%, #5e0d29 50%, #240510 100%) !important;
+    --theme-banner-border: rgba(251, 113, 133, 0.6) !important;
+    --theme-glow: rgba(225, 29, 72, 0.35);
+}
+[data-theme="valentines"] .app-header {
+    background: rgba(28, 4, 12, 0.85) !important;
+    border-bottom: 1px solid rgba(251, 113, 133, 0.35) !important;
+}
+
+/* 9. Earth Day & Rainforest Sanctuary */
+[data-theme="earthday"] {
+    --color-gold: #34d399 !important;
+    --color-gold-hover: #6ee7b7 !important;
+    --color-gold-light: #a7f3d0 !important;
+    --color-emerald-glow: rgba(5, 150, 105, 0.6) !important;
+    --theme-primary: #34d399;
+    --theme-gold-light: #a7f3d0;
+    --theme-accent: #059669;
+    --theme-banner-bg: linear-gradient(90deg, #021a0e 0%, #064e2e 50%, #021a0e 100%) !important;
+    --theme-banner-border: rgba(52, 211, 153, 0.6) !important;
+    --theme-glow: rgba(5, 150, 105, 0.35);
+}
+[data-theme="earthday"] .app-header {
+    background: rgba(2, 22, 12, 0.85) !important;
+    border-bottom: 1px solid rgba(52, 211, 153, 0.35) !important;
+}
+
+/* ── Seasonal Top Festive Header Banner ── */
+.seasonal-theme-banner {
+    position: relative;
+    z-index: 999;
+    width: 100%;
+    background: var(--theme-banner-bg, linear-gradient(90deg, #1f0408 0%, #580d19 50%, #1f0408 100%));
+    border-bottom: 1px solid var(--theme-banner-border, rgba(212, 175, 55, 0.4));
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    animation: bannerSlideDown 0.4s ease forwards;
+}
+
+@keyframes bannerSlideDown {
+    from { opacity: 0; transform: translateY(-100%); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.seasonal-banner-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0.55rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    text-align: center;
+    position: relative;
+}
+
+.seasonal-banner-icon {
+    font-size: 1.15rem;
+    animation: festiveBounce 2s infinite ease-in-out;
+}
+
+@keyframes festiveBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px) scale(1.1); }
+}
+
+.seasonal-banner-text {
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+.seasonal-banner-close {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.3rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0.2rem 0.5rem;
+    transition: color 0.2s;
+}
+
+.seasonal-banner-close:hover {
+    color: #ffffff;
+}
+
+/* ── Ambient Seasonal Particle Canvas ── */
+.seasonal-ambient-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 99;
+}
+
 /* Reset and base styles */
 * {
     box-sizing: border-box;

@@ -946,6 +946,9 @@ const UIComponents = {
         const galleryImages = window.TeaFactoryStore.getGalleryImages();
         const heroSlides = window.TeaFactoryStore.getHeroSlides ? window.TeaFactoryStore.getHeroSlides() : [];
         const activeHeroSlidesCount = heroSlides.filter(s => s && s.enabled !== false).length;
+        const activeTheme = window.TeaFactoryStore.getActiveTheme ? window.TeaFactoryStore.getActiveTheme() : { id: 'classic', name: 'Estate Heritage Gold', icon: '🌿' };
+        const seasonalThemes = window.TeaFactoryStore.getSeasonalThemes ? window.TeaFactoryStore.getSeasonalThemes() : [];
+        const themeSettings = window.TeaFactoryStore.getThemeSettings ? window.TeaFactoryStore.getThemeSettings() : { activeThemeId: 'classic', bannerEnabled: true, customBannerText: '', effectsEnabled: true };
 
         let html = `
             <div class="admin-header-block" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap;">
@@ -1000,6 +1003,11 @@ const UIComponents = {
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
                     <span>Hero Slideshow Desk</span>
                     <span class="box-badge ${activeHeroSlidesCount > 0 ? 'status-available' : 'status-booked'}" style="font-size: 0.6rem; padding: 0.1rem 0.35rem; margin-left: 0.2rem;">${activeHeroSlidesCount} Live</span>
+                </button>
+                <button class="admin-tab-btn ${activeSubTab === 'themes' ? 'active' : ''}" data-subtab="themes" style="display: flex; align-items: center; gap: 0.5rem; ${activeSubTab === 'themes' ? '' : 'border-color: rgba(212,175,55,0.45); background: rgba(212,175,55,0.08);'}">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path><path d="m9.17 14.83-4.24 4.24"></path><circle cx="12" cy="12" r="4"></circle></svg>
+                    <span>Seasonal Themes Desk</span>
+                    <span class="box-badge status-available" style="font-size: 0.6rem; padding: 0.1rem 0.35rem; margin-left: 0.2rem;">${activeTheme.icon} ${activeTheme.name}</span>
                 </button>
                 <button class="admin-tab-btn ${activeSubTab === 'audits' ? 'active' : ''}" data-subtab="audits" style="display: flex; align-items: center; gap: 0.5rem;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Active Reservations Log
@@ -2661,6 +2669,99 @@ const UIComponents = {
                                         <button class="btn btn-outline btn-delete-inquiry" data-id="${inq.id}" style="padding: 0.45rem 0.75rem; font-size: 0.75rem; color: #ff5e5e; border-color: rgba(255,94,94,0.3); cursor: pointer; background: rgba(255,94,94,0.06); border-radius: 6px; display: flex; align-items: center; gap: 0.3rem;" title="Delete Inquiry Dossier">
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                             <span>Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        if (activeSubTab === 'themes') {
+            html += `
+                <div class="panel-card" style="margin-bottom: 2rem;">
+                    <!-- Panel Header -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <span class="section-tag" style="margin-bottom: 0.35rem;">Seasonal Ambience & Global Occasions</span>
+                            <h3 class="panel-title" style="margin-bottom: 0.35rem;">Seasonal Themes & Holiday Occasions Desk</h3>
+                            <p class="panel-desc" style="margin-bottom: 0;">Switch the entire website's luxury color palette, top festive banner, and ambient atmosphere (snowfall, autumn foliage, celebratory sparkles) for international seasons and cultural holidays with 1-click.</p>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                            <span class="box-badge status-available" style="font-size: 0.82rem; padding: 0.35rem 0.85rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                                <span>${activeTheme.icon}</span> Active: <strong>${activeTheme.name}</strong>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Theme Banner & Atmosphere Configuration Bar -->
+                    <div style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 14px; padding: 1.5rem; margin-bottom: 2rem;">
+                        <h4 style="font-size: 0.95rem; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                            Live Festive Banner & Atmosphere Controls
+                        </h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; align-items: flex-end;">
+                            <div style="flex: 1;">
+                                <label style="display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--color-text-muted); margin-bottom: 0.4rem;">
+                                    Custom Festive Greeting / Announcement Bar Message:
+                                </label>
+                                <input type="text" id="theme-custom-banner-input" class="form-input" value="${themeSettings.customBannerText || activeTheme.bannerText || ''}" placeholder="Enter custom greeting for visitors..." style="width: 100%; font-size: 0.85rem;">
+                            </div>
+                            <div style="display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: #e2e8f0; cursor: pointer;">
+                                    <input type="checkbox" id="theme-banner-toggle" ${themeSettings.bannerEnabled !== false ? 'checked' : ''} style="accent-color: var(--color-gold); width: 16px; height: 16px;">
+                                    Show Top Banner
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: #e2e8f0; cursor: pointer;">
+                                    <input type="checkbox" id="theme-effects-toggle" ${themeSettings.effectsEnabled !== false ? 'checked' : ''} style="accent-color: var(--color-gold); width: 16px; height: 16px;">
+                                    Ambient Particle Atmosphere
+                                </label>
+                                <button type="button" id="btn-save-theme-banner" class="btn btn-primary" style="padding: 0.6rem 1.2rem; font-size: 0.82rem; font-weight: 700;">
+                                    Save Settings
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Available Themes Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 1.5rem;">
+                        ${seasonalThemes.map(t => {
+                            const isCurrent = t.id === activeTheme.id;
+                            return `
+                                <div class="theme-card ${isCurrent ? 'active-theme' : ''}" style="background: linear-gradient(145deg, rgba(8, 22, 14, 0.95) 0%, rgba(4, 12, 8, 0.98) 100%); border: ${isCurrent ? '2px solid var(--color-gold)' : '1px solid rgba(212,175,55,0.2)'}; border-radius: 14px; padding: 1.35rem; display: flex; flex-direction: column; justify-content: space-between; position: relative; transition: all 0.3s ease; box-shadow: ${isCurrent ? '0 0 25px rgba(212,175,55,0.25)' : 'none'};">
+                                    <div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                                            <div style="display: flex; align-items: center; gap: 0.6rem;">
+                                                <span style="font-size: 1.6rem; line-height: 1;">${t.icon}</span>
+                                                <div>
+                                                    <h4 style="font-size: 1.05rem; font-weight: 700; color: #ffffff; margin: 0;">${t.name}</h4>
+                                                    <span style="font-size: 0.7rem; color: var(--color-gold); font-weight: 600;">${t.occasion}</span>
+                                                </div>
+                                            </div>
+                                            <span class="box-badge ${isCurrent ? 'status-available' : 'status-pending'}" style="font-size: 0.65rem; padding: 0.15rem 0.5rem;">
+                                                ${isCurrent ? 'ACTIVE NOW' : t.badge}
+                                            </span>
+                                        </div>
+
+                                        <p style="font-size: 0.8rem; color: #cbd5e1; line-height: 1.45; margin-bottom: 1rem;">${t.tagline}</p>
+
+                                        <!-- Palette Swatch Circles -->
+                                        <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.55rem 0.85rem; margin-bottom: 1.15rem;">
+                                            <span style="font-size: 0.7rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.8px;">Palette:</span>
+                                            <div style="display: flex; gap: 0.4rem;">
+                                                <span title="Primary Accent" style="width: 18px; height: 18px; border-radius: 50%; background: ${t.primaryColor}; display: inline-block; border: 1px solid rgba(255,255,255,0.3);"></span>
+                                                <span title="Light Gold" style="width: 18px; height: 18px; border-radius: 50%; background: ${t.goldLight}; display: inline-block; border: 1px solid rgba(255,255,255,0.3);"></span>
+                                                <span title="Secondary Accent" style="width: 18px; height: 18px; border-radius: 50%; background: ${t.accentColor}; display: inline-block; border: 1px solid rgba(255,255,255,0.3);"></span>
+                                                <span title="Deep Tint" style="width: 18px; height: 18px; border-radius: 50%; background: ${t.bgDeep}; display: inline-block; border: 1px solid rgba(255,255,255,0.3);"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <button type="button" class="btn ${isCurrent ? 'btn-secondary' : 'btn-primary'} btn-activate-theme" data-theme-id="${t.id}" style="width: 100%; justify-content: center; padding: 0.65rem 1rem; font-size: 0.82rem; font-weight: 700; ${isCurrent ? 'opacity: 0.75; cursor: default;' : ''}">
+                                            ${isCurrent ? '✓ Theme Active' : `Activate ${t.name}`}
                                         </button>
                                     </div>
                                 </div>

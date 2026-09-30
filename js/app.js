@@ -5122,6 +5122,53 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // ─── Seasonal Themes & Occasions Activation ─────────────────────────
+        const themeCards = document.querySelectorAll('.btn-activate-theme');
+        themeCards.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetThemeId = btn.getAttribute('data-theme-id');
+                if (!targetThemeId) return;
+
+                const customMsg = document.getElementById('theme-custom-banner-input')?.value || null;
+                const showBanner = document.getElementById('theme-banner-toggle')?.checked ?? true;
+                const showEffects = document.getElementById('theme-effects-toggle')?.checked ?? true;
+
+                window.TeaFactoryStore.updateThemeSettings({
+                    activeThemeId: targetThemeId,
+                    bannerEnabled: showBanner,
+                    customBannerText: customMsg,
+                    effectsEnabled: showEffects
+                });
+
+                const activeThemeObj = window.TeaFactoryStore.getActiveTheme();
+                showToast(
+                    "Seasonal Theme Activated",
+                    `${activeThemeObj.icon} "${activeThemeObj.name}" is now live across the website!`,
+                    "success"
+                );
+
+                renderTabContent('admin');
+            });
+        });
+
+        const saveThemeBannerBtn = document.getElementById('btn-save-theme-banner');
+        if (saveThemeBannerBtn) {
+            saveThemeBannerBtn.addEventListener('click', () => {
+                const customMsg = document.getElementById('theme-custom-banner-input')?.value || '';
+                const showBanner = document.getElementById('theme-banner-toggle')?.checked ?? true;
+                const showEffects = document.getElementById('theme-effects-toggle')?.checked ?? true;
+
+                window.TeaFactoryStore.updateThemeSettings({
+                    bannerEnabled: showBanner,
+                    customBannerText: customMsg,
+                    effectsEnabled: showEffects
+                });
+
+                showToast("Theme Settings Saved", "Festive greeting bar and ambience controls updated successfully.", "success");
+                renderTabContent('admin');
+            });
+        }
+
         // Reset Tour Slots
         const resetToursBtn = document.getElementById('admin-reset-tours-btn');
         if (resetToursBtn) {
@@ -8945,4 +8992,170 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             }
         }, { passive: true });
     })();
+
+    // ─── Initialize Active Seasonal Theme on Startup ───
+    setTimeout(() => {
+        if (window.appApplyTheme) window.appApplyTheme();
+    }, 120);
 });
+
+// ════════════════════════════════════════════════════════════════════════
+// SEASONAL THEMES & INTERNATIONAL OCCASIONS ENGINE
+// ════════════════════════════════════════════════════════════════════════
+(function() {
+    let ambientAnimationId = null;
+    let particles = [];
+
+    function initAmbientCanvas(effectType) {
+        const canvas = document.getElementById('seasonal-ambient-canvas');
+        if (!canvas) return;
+
+        if (ambientAnimationId) {
+            cancelAnimationFrame(ambientAnimationId);
+            ambientAnimationId = null;
+        }
+
+        if (!effectType || effectType === 'none') {
+            canvas.style.display = 'none';
+            const ctx = canvas.getContext('2d');
+            if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+            return;
+        }
+
+        canvas.style.display = 'block';
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas, { passive: true });
+
+        // Particle configuration based on occasion
+        const particleCount = window.innerWidth < 768 ? 22 : 42;
+        particles = [];
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * (effectType === 'snow' ? 3.2 : (effectType === 'leaves' ? 5.5 : 2.5)) + 1,
+                speedY: Math.random() * (effectType === 'snow' ? 1.2 : 0.85) + 0.35,
+                speedX: (Math.random() - 0.5) * 0.8,
+                opacity: Math.random() * 0.7 + 0.3,
+                rotation: Math.random() * 360,
+                rotationSpeed: (Math.random() - 0.5) * 2,
+                type: effectType
+            });
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate((p.rotation * Math.PI) / 180);
+                ctx.globalAlpha = p.opacity;
+
+                if (p.type === 'snow') {
+                    // Soft glowing snowflake circle
+                    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.radius);
+                    grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+                    grad.addColorStop(1, 'rgba(230, 245, 255, 0)');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (p.type === 'leaves') {
+                    // Golden tea / autumn leaf shape
+                    ctx.fillStyle = 'rgba(245, 158, 11, 0.65)';
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, p.radius * 1.6, p.radius * 0.8, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (p.type === 'lanterns') {
+                    // Warm golden lantern glow
+                    ctx.fillStyle = 'rgba(245, 158, 11, 0.8)';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, p.radius * 1.2, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    // Twinkling sparkle / star
+                    ctx.fillStyle = 'rgba(250, 204, 21, 0.85)';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+
+                // Physics update
+                p.y += p.speedY;
+                p.x += Math.sin(p.y * 0.015) * p.speedX;
+                p.rotation += p.rotationSpeed;
+
+                if (p.y > canvas.height + 10) {
+                    p.y = -10;
+                    p.x = Math.random() * canvas.width;
+                }
+                if (p.x > canvas.width + 10) p.x = -10;
+                else if (p.x < -10) p.x = canvas.width + 10;
+            }
+
+            ambientAnimationId = requestAnimationFrame(drawParticles);
+        }
+
+        drawParticles();
+    }
+
+    window.appApplyTheme = function(themeId) {
+        if (!window.TeaFactoryStore) return;
+        const currentThemeId = themeId || window.TeaFactoryStore.getActiveThemeId() || 'classic';
+        const theme = window.TeaFactoryStore.getActiveTheme();
+        const settings = window.TeaFactoryStore.getThemeSettings();
+
+        // 1. Set HTML data-theme attribute for CSS variable switching
+        document.documentElement.setAttribute('data-theme', currentThemeId);
+
+        // 2. Manage Top Festive Banner
+        const bannerEl = document.getElementById('seasonal-theme-banner-strip');
+        const bannerIcon = document.getElementById('seasonal-banner-icon');
+        const bannerText = document.getElementById('seasonal-banner-text');
+
+        if (bannerEl && bannerIcon && bannerText) {
+            const isDismissed = sessionStorage.getItem(`tea_banner_dismissed_${currentThemeId}`);
+            if (currentThemeId !== 'classic' && settings.bannerEnabled !== false && !isDismissed) {
+                bannerIcon.textContent = theme.icon || '🌿';
+                bannerText.textContent = settings.customBannerText || theme.bannerText || 'Welcome to Rock One Wild Tea';
+                bannerEl.style.display = 'block';
+            } else {
+                bannerEl.style.display = 'none';
+            }
+        }
+
+        // 3. Ambient Visual Effects (Snow, Leaves, Sparkles, Lanterns)
+        if (settings.effectsEnabled !== false && theme.effects && theme.effects !== 'none') {
+            initAmbientCanvas(theme.effects);
+        } else {
+            initAmbientCanvas('none');
+        }
+    };
+
+    // Auto-bind seasonal banner dismiss button
+    document.addEventListener('DOMContentLoaded', function() {
+        const closeBtn = document.getElementById('seasonal-banner-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                const bannerEl = document.getElementById('seasonal-theme-banner-strip');
+                if (bannerEl) bannerEl.style.display = 'none';
+                if (window.TeaFactoryStore) {
+                    const themeId = window.TeaFactoryStore.getActiveThemeId();
+                    sessionStorage.setItem(`tea_banner_dismissed_${themeId}`, 'true');
+                }
+            });
+        }
+    });
+})();

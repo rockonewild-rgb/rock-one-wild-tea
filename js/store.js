@@ -10,6 +10,135 @@ const DEFAULT_SEASONS = [
     "Imperial Jasmine Blossom"
 ];
 
+const DEFAULT_SEASONAL_THEMES = [
+    {
+        id: "classic",
+        name: "Estate Heritage Gold",
+        occasion: "Signature Year-Round",
+        icon: "🌿",
+        tagline: "Timeless Ceylon wild mountain forest terroir with warm Imperial Gold accents.",
+        primaryColor: "#d4af37",
+        goldLight: "#ffd875",
+        bgDeep: "#040e08",
+        accentColor: "#1a4d2e",
+        bannerText: "Welcome to Rock One Wild Tea • Handcrafted Ceylon Mountain Harvest",
+        badge: "Estate Standard",
+        effects: "none"
+    },
+    {
+        id: "christmas",
+        name: "Christmas & Festive Winter",
+        occasion: "December • Year-End Festive Holidays",
+        icon: "🎄",
+        tagline: "Royal velvet ruby burgundy, sparkling festive gold, and celebratory winter cheer.",
+        primaryColor: "#f3ce72",
+        goldLight: "#ffe8a1",
+        bgDeep: "#140407",
+        accentColor: "#8b182b",
+        bannerText: "✨ Joyous Festive Holidays! Explore our Seasonal Limited Edition Teak Gift Chests 🎁",
+        badge: "Holiday Edition",
+        effects: "snow"
+    },
+    {
+        id: "halloween",
+        name: "Halloween & Autumn Harvest",
+        occasion: "October • Autumn Solstice & Harvest",
+        icon: "🎃",
+        tagline: "Spiced pumpkin amber, mysterious night obsidian, and glowing harvest embers.",
+        primaryColor: "#f59e0b",
+        goldLight: "#fcd34d",
+        bgDeep: "#0e0804",
+        accentColor: "#c2410c",
+        bannerText: "🍂 Autumn Harvest Special: Rare Wood-Fired Orthodox Tea Selections & Seasonal Chests 🍁",
+        badge: "Autumn Harvest",
+        effects: "leaves"
+    },
+    {
+        id: "newyear",
+        name: "New Year Celebration",
+        occasion: "January • Global New Year",
+        icon: "🎆",
+        tagline: "Radiant midnight champagne gold and sparkling celebratory gala accents.",
+        primaryColor: "#facc15",
+        goldLight: "#fef08a",
+        bgDeep: "#080914",
+        accentColor: "#2563eb",
+        bannerText: "✨ Happy New Year 2026! May this year brew tranquility, good health & prosperity 🥂",
+        badge: "New Year Edition",
+        effects: "sparkles"
+    },
+    {
+        id: "lunarnewyear",
+        name: "Lunar New Year & Spring Festival",
+        occasion: "Jan / Feb • Spring Festival & Lunar Holidays",
+        icon: "🏮",
+        tagline: "Auspicious imperial scarlet red, palace gold, and flourishing good fortune.",
+        primaryColor: "#f59e0b",
+        goldLight: "#fde047",
+        bgDeep: "#180406",
+        accentColor: "#dc2626",
+        bannerText: "🏮 Gong Xi Fa Cai! Auspicious Imperial Golden Tips Reserve for Prosperity & Health 🧧",
+        badge: "Spring Festival",
+        effects: "lanterns"
+    },
+    {
+        id: "avurudu",
+        name: "Ceylon Sinhala & Tamil New Year",
+        occasion: "April • Traditional Ceylon Harvest & Avurudu",
+        icon: "🌞",
+        tagline: "Radiant solar gold, warm clay terracotta, and auspicious new harvest joy.",
+        primaryColor: "#eab308",
+        goldLight: "#fef08a",
+        bgDeep: "#100c04",
+        accentColor: "#ea580c",
+        bannerText: "🌸 Subha Aluth Avuruddak Wewa / Iniya Puthandu Vazhthukkal! Fresh Spring Harvest Selections 🪔",
+        badge: "Ceylon Heritage",
+        effects: "sparkles"
+    },
+    {
+        id: "diwali",
+        name: "Diwali • Festival of Lights",
+        occasion: "Oct / Nov • Deepavali & Festival of Lights",
+        icon: "🪔",
+        tagline: "Luminous diya saffron, imperial warm gold, and radiant festive glow.",
+        primaryColor: "#f59e0b",
+        goldLight: "#fde047",
+        bgDeep: "#120804",
+        accentColor: "#f97316",
+        bannerText: "🪔 Happy Diwali! Illuminate your celebrations with our rarest single-estate teas ✨",
+        badge: "Festival of Lights",
+        effects: "sparkles"
+    },
+    {
+        id: "valentines",
+        name: "Valentine's & Royal Romance",
+        occasion: "February • Season of Romance",
+        icon: "🌹",
+        tagline: "Velvet ruby rose, delicate champagne blush, and exquisite romantic luxury.",
+        primaryColor: "#fb7185",
+        goldLight: "#fecdd3",
+        bgDeep: "#14040a",
+        accentColor: "#be123c",
+        bannerText: "🌹 The Gift of Rare Ceylon Romance: Handcrafted Teak Chests for Someone Special 💖",
+        badge: "Royal Romance",
+        effects: "sparkles"
+    },
+    {
+        id: "earthday",
+        name: "Earth Day & Rainforest Sanctuary",
+        occasion: "April / June • World Environment & Rainforest Day",
+        icon: "🌱",
+        tagline: "Vibrant virgin rainforest emerald, fresh mountain mist, and botanical harmony.",
+        primaryColor: "#34d399",
+        goldLight: "#a7f3d0",
+        bgDeep: "#03120a",
+        accentColor: "#059669",
+        bannerText: "🌿 Celebrating Virgin Terroir: 100% Pesticide-Free, Forest-Canopy Wild Tea Conservation 🍃",
+        badge: "Rainforest Eco",
+        effects: "leaves"
+    }
+];
+
 const DEFAULT_ANNOUNCEMENTS = [
     {
         id: 1,
@@ -918,6 +1047,74 @@ class TeaFactoryStore {
             });
         }
         return `${curr.symbol}${formattedVal}`;
+    }
+
+    // ─── Seasonal Themes & International Occasions Engine ─────────────────────
+    getSeasonalThemes() {
+        return DEFAULT_SEASONAL_THEMES;
+    }
+
+    getActiveThemeId() {
+        return (this.state && this.state.activeTheme) || localStorage.getItem('tea_factory_active_theme') || 'classic';
+    }
+
+    getActiveTheme() {
+        const themeId = this.getActiveThemeId();
+        return DEFAULT_SEASONAL_THEMES.find(t => t.id === themeId) || DEFAULT_SEASONAL_THEMES[0];
+    }
+
+    getThemeSettings() {
+        if (!this.state.themeSettings) {
+            this.state.themeSettings = {
+                activeThemeId: this.getActiveThemeId(),
+                bannerEnabled: true,
+                customBannerText: "",
+                effectsEnabled: true
+            };
+        }
+        return this.state.themeSettings;
+    }
+
+    setActiveTheme(themeId, customBannerText = null, enableEffects = true) {
+        const found = DEFAULT_SEASONAL_THEMES.find(t => t.id === themeId);
+        if (!found) return false;
+
+        this.state.activeTheme = themeId;
+        if (!this.state.themeSettings) {
+            this.state.themeSettings = { activeThemeId: themeId, bannerEnabled: true, customBannerText: "", effectsEnabled: true };
+        }
+        this.state.themeSettings.activeThemeId = themeId;
+        if (customBannerText !== null) {
+            this.state.themeSettings.customBannerText = customBannerText;
+        }
+        if (enableEffects !== undefined) {
+            this.state.themeSettings.effectsEnabled = enableEffects;
+        }
+
+        localStorage.setItem('tea_factory_active_theme', themeId);
+        this.saveState();
+
+        if (typeof window !== 'undefined' && window.appApplyTheme) {
+            window.appApplyTheme(themeId);
+        }
+        return true;
+    }
+
+    updateThemeSettings(settings) {
+        if (!this.state.themeSettings) {
+            this.state.themeSettings = { activeThemeId: 'classic', bannerEnabled: true, customBannerText: "", effectsEnabled: true };
+        }
+        this.state.themeSettings = { ...this.state.themeSettings, ...settings };
+        if (settings.activeThemeId) {
+            this.state.activeTheme = settings.activeThemeId;
+            localStorage.setItem('tea_factory_active_theme', settings.activeThemeId);
+        }
+        this.saveState();
+
+        if (typeof window !== 'undefined' && window.appApplyTheme) {
+            window.appApplyTheme(this.state.activeTheme || 'classic');
+        }
+        return this.state.themeSettings;
     }
 
     convertCurrency(usdAmount, targetCurrency = null) {
