@@ -5152,7 +5152,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 showToast(
                     "Seasonal Theme Activated",
-                    `${targetTheme.icon} "${targetTheme.name}" is now live! Header greeting & visual effects updated.`,
+                    `"${targetTheme.name}" is now live! Header greeting & visual effects updated.`,
                     "success"
                 );
 
@@ -9264,7 +9264,11 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         if (bannerEl && bannerIcon && bannerText) {
             const isDismissed = sessionStorage.getItem(`tea_banner_dismissed_${currentThemeId}`);
             if (currentThemeId !== 'classic' && settings.bannerEnabled !== false && !isDismissed) {
-                bannerIcon.textContent = theme.icon || '🌿';
+                if (window.getSeasonalThemeIconSvg) {
+                    bannerIcon.innerHTML = window.getSeasonalThemeIconSvg(currentThemeId, 16);
+                } else {
+                    bannerIcon.innerHTML = '';
+                }
 
                 // Determine celebratory message: prefer theme's celebratory greeting unless explicitly customized
                 let activeGreeting = theme.bannerText;

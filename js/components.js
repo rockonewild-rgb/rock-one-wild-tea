@@ -14,6 +14,33 @@ const SVG_ICONS = {
     trash: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`
 };
 
+// Global Theme Vector SVG Helper
+window.getSeasonalThemeIconSvg = function(themeId, size = 18, extraClass = '') {
+    const s = size;
+    const cls = extraClass ? ` class="${extraClass}"` : '';
+    switch (themeId) {
+        case 'christmas':
+            return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><polygon points="12 2 15 8 13.5 8 17 14 15 14 19 20 5 20 9 14 7 14 10.5 8 9 8 12 2"></polygon><line x1="12" y1="20" x2="12" y2="23"></line></svg>`;
+        case 'halloween':
+            return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><path d="M12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2Z"></path><path d="M7 10L9 12L7 14"></path><path d="M17 10L15 12L17 14"></path><path d="M9 17C10.5 18 13.5 18 15 17"></path><path d="M12 2V5"></path></svg>`;
+        case 'newyear':
+            return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+        case 'lunarnewyear':
+            return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><rect x="6" y="5" width="12" height="13" rx="4"></rect><line x1="12" y1="2" x2="12" y2="5"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="8" y1="5" x2="16" y2="5"></line><line x1="8" y1="18" x2="16" y2="18"></line><path d="M9 5C9 10 9 13 9 18"></path><path d="M15 5C15 10 15 13 15 18"></path></svg>`;
+        case 'avurudu':
+            return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>`;
+        case 'diwali':
+            return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><path d="M12 2C12 2 9 6 9 8.5C9 10.16 10.34 11.5 12 11.5C13.66 11.5 15 10.16 15 8.5C15 6 12 2 12 2Z"></path><path d="M3 14C3 18 7 21 12 21C17 21 21 18 21 14H3Z"></path><line x1="2" y1="14" x2="22" y2="14"></line></svg>`;
+        case 'valentines':
+            return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>`;
+        case 'earthday':
+            return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><path d="M7 20h10"></path><path d="M10 20c0-4 2-7 2-10"></path><path d="M12 10C10.5 7.5 8 6 5 6c0 4 2 7.5 5 8"></path><path d="M12 7c2-2 5-3 7-3 0 3.5-1.5 6-4 7"></path></svg>`;
+        case 'classic':
+        default:
+            return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><path d="M12 22V12"></path><path d="M12 12C12 7 7 4 2 4C2 9 5 14 12 14"></path><path d="M12 12C12 7 17 4 22 4C22 9 19 14 12 14"></path></svg>`;
+    }
+};
+
 // Multi-Language dynamic translation helper
 const _t = (key, fallback) => (window.TeaFactoryI18n ? window.TeaFactoryI18n.t(key, fallback) : (fallback !== undefined ? fallback : key));
 
@@ -1007,7 +1034,7 @@ const UIComponents = {
                 <button class="admin-tab-btn ${activeSubTab === 'themes' ? 'active' : ''}" data-subtab="themes" style="display: flex; align-items: center; gap: 0.5rem; ${activeSubTab === 'themes' ? '' : 'border-color: rgba(212,175,55,0.45); background: rgba(212,175,55,0.08);'}">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path><path d="m9.17 14.83-4.24 4.24"></path><circle cx="12" cy="12" r="4"></circle></svg>
                     <span>Seasonal Themes Desk</span>
-                    <span class="box-badge status-available" style="font-size: 0.6rem; padding: 0.1rem 0.35rem; margin-left: 0.2rem;">${activeTheme.icon} ${activeTheme.name}</span>
+                    <span class="box-badge status-available" style="font-size: 0.6rem; padding: 0.15rem 0.45rem; margin-left: 0.2rem; display: inline-flex; align-items: center; gap: 0.35rem;">${window.getSeasonalThemeIconSvg(activeTheme.id, 11)} ${activeTheme.name}</span>
                 </button>
                 <button class="admin-tab-btn ${activeSubTab === 'audits' ? 'active' : ''}" data-subtab="audits" style="display: flex; align-items: center; gap: 0.5rem;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Active Reservations Log
@@ -2690,8 +2717,8 @@ const UIComponents = {
                             <p class="panel-desc" style="margin-bottom: 0;">Switch the entire website's luxury color palette, top festive banner, and ambient atmosphere (snowfall, autumn foliage, celebratory sparkles) for international seasons and cultural holidays with 1-click.</p>
                         </div>
                         <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-                            <span class="box-badge status-available" style="font-size: 0.82rem; padding: 0.35rem 0.85rem; display: inline-flex; align-items: center; gap: 0.4rem;">
-                                <span>${activeTheme.icon}</span> Active: <strong>${activeTheme.name}</strong>
+                            <span class="box-badge status-available" style="font-size: 0.82rem; padding: 0.35rem 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                ${window.getSeasonalThemeIconSvg(activeTheme.id, 15)} Active: <strong>${activeTheme.name}</strong>
                             </span>
                         </div>
                     </div>
@@ -2733,8 +2760,10 @@ const UIComponents = {
                                 <div class="theme-card ${isCurrent ? 'active-theme' : ''}" style="background: linear-gradient(145deg, rgba(8, 22, 14, 0.95) 0%, rgba(4, 12, 8, 0.98) 100%); border: ${isCurrent ? '2px solid var(--color-gold)' : '1px solid rgba(212,175,55,0.2)'}; border-radius: 14px; padding: 1.35rem; display: flex; flex-direction: column; justify-content: space-between; position: relative; transition: all 0.3s ease; box-shadow: ${isCurrent ? '0 0 25px rgba(212,175,55,0.25)' : 'none'};">
                                     <div>
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                                            <div style="display: flex; align-items: center; gap: 0.6rem;">
-                                                <span style="font-size: 1.6rem; line-height: 1;">${t.icon}</span>
+                                            <div style="display: flex; align-items: center; gap: 0.65rem;">
+                                                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.3); display: flex; align-items: center; justify-content: center; color: var(--color-gold); flex-shrink: 0;">
+                                                    ${window.getSeasonalThemeIconSvg(t.id, 20)}
+                                                </div>
                                                 <div>
                                                     <h4 style="font-size: 1.05rem; font-weight: 700; color: #ffffff; margin: 0;">${t.name}</h4>
                                                     <span style="font-size: 0.7rem; color: var(--color-gold); font-weight: 600;">${t.occasion}</span>
