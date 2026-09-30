@@ -360,9 +360,9 @@ const UIComponents = {
 
         let prodHtml = `<div class="products-grid">`;
         prodHtml += filteredProducts.map(p => {
-            const tastingChips = (p.tastingNotes || []).slice(0, 3).map(n => 
-                `<span class="tasting-chip">${this.highlightText(n, searchFilter)}</span>`
-            ).join('');
+            const tastingChips = (p.tastingNotes && p.tastingNotes.length > 0)
+                ? p.tastingNotes.slice(0, 3).map(n => `<span class="tasting-chip">${this.highlightText(n, searchFilter)}</span>`).join('')
+                : `<span class="tasting-chip">${_t('terroir_pure_ceylon', 'Pure Ceylon')}</span><span class="tasting-chip">${_t('terroir_single_estate', 'Single Estate')}</span>`;
 
             const radar = p.sensoryRadar || { floral: 75, malty: 70, sweetness: 75, astringency: 40, body: 75, aroma: 85 };
             const displayName = this.highlightText(p.name, searchFilter);
