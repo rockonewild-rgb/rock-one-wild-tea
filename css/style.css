@@ -5071,8 +5071,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
     /* Hero section */
     .hero-section {
-        padding: 5rem 1.5rem 3rem;
+        padding: 0 !important;
         text-align: center;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
     .hero-title {
         font-size: clamp(2.2rem, 8vw, 3.5rem) !important;
@@ -5172,7 +5174,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
     /* Content padding */
     .view-section {
-        padding: 2rem 1.25rem;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     /* Boxes grid */
@@ -5282,7 +5287,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
     /* Reduce global view padding */
     .view-section {
-        padding: 1.75rem 1rem;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     /* Drawers & Centered Popups for Mobile */
@@ -9295,94 +9303,109 @@ mark.search-match-highlight {
    COMPREHENSIVE MOBILE OPTIMIZATION & FLOATING DOCK STACKING (< 768px / < 480px)
    ══════════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-    /* 1. Right-Side Floating Buttons (Compact 42px Stack - Zero Overlap) */
+    /* 1. Right-Side Floating Buttons (Ultra-Compact 38px Stack - Zero Content Overlap) */
     .floating-whatsapp-btn {
-        bottom: 1rem !important;
-        right: 1rem !important;
-        width: 42px !important;
-        height: 42px !important;
+        bottom: 0.75rem !important;
+        right: 6px !important;
+        width: 38px !important;
+        height: 38px !important;
+        z-index: 1000 !important;
     }
     .floating-whatsapp-btn .whatsapp-btn-icon svg {
-        width: 22px !important;
-        height: 22px !important;
-    }
-
-    .floating-global-prefs-btn {
-        bottom: 4rem !important;
-        right: 1rem !important;
-        width: 42px !important;
-        height: 42px !important;
-    }
-
-    .faq-chatbot-launcher {
-        bottom: 7rem !important;
-        right: 1rem !important;
-        width: 42px !important;
-        height: 42px !important;
-    }
-    .faq-chatbot-launcher .chatbot-launcher-icon svg {
         width: 20px !important;
         height: 20px !important;
     }
 
-    .floating-cart-btn {
-        bottom: 10rem !important;
-        right: 1rem !important;
-        width: 42px !important;
-        height: 42px !important;
+    .faq-chatbot-launcher {
+        bottom: 3.45rem !important;
+        right: 6px !important;
+        width: 38px !important;
+        height: 38px !important;
+        z-index: 1000 !important;
     }
-    .floating-cart-btn .cart-floating-svg {
+    .faq-chatbot-launcher .chatbot-launcher-icon svg {
         width: 18px !important;
         height: 18px !important;
     }
 
+    .floating-cart-btn {
+        bottom: 6.15rem !important;
+        right: 6px !important;
+        width: 38px !important;
+        height: 38px !important;
+        z-index: 1000 !important;
+    }
+    .floating-cart-btn .cart-floating-svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    .floating-global-prefs-btn {
+        bottom: 8.85rem !important;
+        right: 6px !important;
+        width: 38px !important;
+        height: 38px !important;
+        z-index: 1000 !important;
+    }
+    .floating-global-prefs-btn .prefs-flag {
+        font-size: 0.75rem !important;
+    }
+
     .floating-bulletins-btn {
-        bottom: 13rem !important;
-        right: 1rem !important;
+        bottom: 11.55rem !important;
+        right: 6px !important;
         left: auto !important;
-        width: 42px !important;
-        height: 42px !important;
+        width: 38px !important;
+        height: 38px !important;
+        z-index: 1000 !important;
     }
     .floating-bulletins-btn svg {
-        width: 18px !important;
-        height: 18px !important;
+        width: 16px !important;
+        height: 16px !important;
     }
     .floating-bulletins-badge {
-        min-width: 18px !important;
-        height: 18px !important;
-        font-size: 0.68rem !important;
-        top: -4px !important;
-        right: -4px !important;
-        padding: 0 0.25rem !important;
+        min-width: 16px !important;
+        height: 16px !important;
+        font-size: 0.62rem !important;
+        top: -3px !important;
+        right: -3px !important;
+        padding: 0 0.2rem !important;
     }
 
     /* Scroll to top positioned cleanly above floating button stack */
     #scroll-to-top-btn {
-        bottom: 16.25rem !important;
-        right: 1.15rem !important;
-        width: 36px !important;
-        height: 36px !important;
+        bottom: 14.25rem !important;
+        right: 6px !important;
+        width: 34px !important;
+        height: 34px !important;
+        z-index: 999 !important;
     }
 
-    /* 2. Left-Hand Side Social Dock Mobile Optimization */
+    /* 2. Left-Hand Side Social Dock Mobile Optimization (Tucked to Screen Edge) */
     .side-social-dock {
-        left: 0.65rem !important;
-        bottom: 1rem !important;
+        left: 4px !important;
+        bottom: 0.75rem !important;
         top: auto !important;
         transform: none !important;
-        gap: 0.45rem !important;
+        gap: 0.35rem !important;
+        z-index: 998 !important;
     }
     .side-social-pill {
-        width: 38px !important;
-        height: 38px !important;
+        width: 34px !important;
+        height: 34px !important;
+        border-radius: 8px !important;
     }
     .side-social-pill.touch-active {
-        width: 185px !important;
+        width: 155px !important;
         box-shadow: 0 8px 24px rgba(0,0,0,0.85) !important;
     }
+    .pill-icon {
+        width: 34px !important;
+        height: 34px !important;
+    }
     .pill-icon svg {
-        width: 17px !important;
-        height: 17px !important;
+        width: 16px !important;
+        height: 16px !important;
     }
 
     /* 3. Home Screen Cards Mobile Refinements */
@@ -9685,14 +9708,19 @@ input, select, textarea, button {
 /* ---- 2. LARGE PHONES & TABLETS (<= 768px) ---- */
 @media (max-width: 768px) {
     .main-content {
-        padding: 1.5rem 64px 4rem 52px !important;
+        padding: 1.25rem 52px 3.5rem 46px !important;
         width: 100% !important;
+        max-width: 100vw !important;
         box-sizing: border-box !important;
+        overflow-x: hidden !important;
     }
     .view-section {
         padding: 0 !important;
+        margin: 0 !important;
         width: 100% !important;
+        max-width: 100% !important;
         box-sizing: border-box !important;
+        overflow-x: hidden !important;
     }
 
     /* Header & Mobile Hamburger Menu Bar (Always Visible on Mobile) */
@@ -10245,9 +10273,11 @@ input, select, textarea, button {
 /* ---- 3. STANDARD SMARTPHONES (<= 600px) ---- */
 @media (max-width: 600px) {
     .main-content {
-        padding: 1.25rem 56px 4rem 46px !important;
+        padding: 1rem 50px 3.5rem 44px !important;
         width: 100% !important;
+        max-width: 100vw !important;
         box-sizing: border-box !important;
+        overflow-x: hidden !important;
     }
     .view-title {
         font-size: 1.85rem !important;
@@ -10257,6 +10287,20 @@ input, select, textarea, button {
     }
     .home-section-title {
         font-size: 1.5rem !important;
+    }
+
+    /* Why Rock One Is Different Section */
+    .why-different-card {
+        padding: 1.5rem 0.85rem !important;
+        border-radius: 14px !important;
+        margin-bottom: 2rem !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .why-different-grid,
+    .vision-mission-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
     }
 
     /* Announcements & Bulletins */
@@ -10523,9 +10567,11 @@ input, select, textarea, button {
 /* ---- 3.5. SMALL PHONES (<= 480px) ---- */
 @media (max-width: 480px) {
     .main-content {
-        padding: 1rem 50px 3.5rem 40px !important;
+        padding: 0.85rem 48px 3rem 42px !important;
         width: 100% !important;
+        max-width: 100vw !important;
         box-sizing: border-box !important;
+        overflow-x: hidden !important;
     }
     .catalog-info-panel,
     .minimal-box-selector-layout,
@@ -10538,7 +10584,8 @@ input, select, textarea, button {
         padding: 1.1rem 0.75rem !important;
     }
     .side-social-dock {
-        left: 0 !important;
+        left: 3px !important;
+        gap: 0.3rem !important;
     }
     .side-social-pill {
         width: 32px !important;
@@ -10549,25 +10596,32 @@ input, select, textarea, button {
         height: 32px !important;
     }
     .side-social-pill .pill-icon svg {
-        width: 15px !important;
-        height: 15px !important;
+        width: 14px !important;
+        height: 14px !important;
     }
     .floating-whatsapp-btn,
     .floating-global-prefs-btn,
     .faq-chatbot-launcher,
     .floating-cart-btn {
-        width: 38px !important;
-        height: 38px !important;
-        right: 0.5rem !important;
+        width: 36px !important;
+        height: 36px !important;
+        right: 4px !important;
+    }
+    #scroll-to-top-btn {
+        right: 4px !important;
+        width: 32px !important;
+        height: 32px !important;
     }
 }
 
 /* ---- 4. COMPACT SMARTPHONES (<= 380px) ---- */
 @media (max-width: 380px) {
     .main-content {
-        padding: 0.85rem 44px 3rem 36px !important;
+        padding: 0.75rem 44px 2.5rem 38px !important;
         width: 100% !important;
+        max-width: 100vw !important;
         box-sizing: border-box !important;
+        overflow-x: hidden !important;
     }
     .hero-section,
     #hero-slider-container {
@@ -10581,12 +10635,12 @@ input, select, textarea, button {
         padding: 0.18rem 0.55rem !important;
     }
     .hero-side-nav {
-        width: 32px !important;
-        height: 32px !important;
-        font-size: 1rem !important;
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 0.95rem !important;
     }
-    .hero-side-prev { left: 0.2rem !important; }
-    .hero-side-next { right: 0.2rem !important; }
+    .hero-side-prev { left: 0.15rem !important; }
+    .hero-side-next { right: 0.15rem !important; }
 
     .boxes-grid {
         grid-template-columns: 1fr !important;
@@ -10610,7 +10664,7 @@ input, select, textarea, button {
     }
 
     .side-social-dock {
-        left: 0 !important;
+        left: 2px !important;
     }
     .side-social-pill {
         width: 28px !important;
@@ -10629,14 +10683,14 @@ input, select, textarea, button {
     .floating-global-prefs-btn,
     .faq-chatbot-launcher,
     .floating-cart-btn {
-        width: 36px !important;
-        height: 36px !important;
-        right: 0.35rem !important;
+        width: 34px !important;
+        height: 34px !important;
+        right: 3px !important;
     }
     #scroll-to-top-btn {
-        right: 0.45rem !important;
-        width: 30px !important;
-        height: 30px !important;
+        right: 3px !important;
+        width: 28px !important;
+        height: 28px !important;
     }
 }
 

@@ -2854,7 +2854,7 @@ const UIComponents = {
             </div>
 
             <!-- Why Rock One Is Different Section -->
-            <div style="margin-bottom: 4.5rem; background: linear-gradient(135deg, rgba(20, 16, 6, 0.75) 0%, rgba(4, 16, 8, 0.92) 100%); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 20px; padding: 3rem 2.25rem; box-shadow: 0 16px 45px rgba(0, 0, 0, 0.75);">
+            <div class="why-different-card" style="margin-bottom: 4.5rem; background: linear-gradient(135deg, rgba(20, 16, 6, 0.75) 0%, rgba(4, 16, 8, 0.92) 100%); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 20px; padding: 3rem 2.25rem; box-shadow: 0 16px 45px rgba(0, 0, 0, 0.75);">
                 <div style="text-align: center; max-width: 860px; margin: 0 auto 3rem auto;">
                     <span class="section-tag" style="font-size: 0.82rem; letter-spacing: 2px;">WHY ROCK ONE IS DIFFERENT</span>
                     <h3 style="font-family: var(--font-serif); font-size: 2.3rem; color: var(--color-white); margin-bottom: 1rem; line-height: 1.25;">
@@ -2866,7 +2866,7 @@ const UIComponents = {
                 </div>
 
                 <!-- 9 Distinct Pillars of Difference Grid -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+                <div class="why-different-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
                     <!-- 1. Our Own Tea Garden -->
                     <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid var(--color-gold);">
                         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
@@ -3092,7 +3092,7 @@ const UIComponents = {
                         </p>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+                    <div class="why-different-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
                         <!-- 1. Our Own Tea Garden -->
                         <div class="panel-card" style="margin-bottom: 0; padding: 1.75rem; border-left: 3px solid var(--color-gold);">
                             <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
@@ -3224,7 +3224,7 @@ const UIComponents = {
                 </div>
 
                 <!-- 4. Vision & Mission (Side-by-Side Luxury Panels) -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin-bottom: 4.5rem;">
+                <div class="vision-mission-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 1.5rem; margin-bottom: 4.5rem;">
                     <!-- Vision Card -->
                     <div class="panel-card" style="padding: 2.25rem; border-top: 3px solid var(--color-gold); background: linear-gradient(145deg, rgba(212, 175, 55, 0.06) 0%, rgba(5, 20, 10, 0.8) 100%);">
                         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
