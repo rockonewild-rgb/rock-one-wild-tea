@@ -5096,54 +5096,101 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
     /* Hero Showcase Slider Mobile Polish */
     #hero-slider-container {
-        min-height: clamp(600px, 86vh, 760px) !important;
+        height: auto !important;
+        min-height: clamp(520px, 80vh, 660px) !important;
         border-radius: 16px !important;
-        margin: 0.5rem 0 2rem 0 !important;
+        margin: 0.25rem 0 2rem 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+        position: relative !important;
     }
     .hero-slide {
-        min-height: clamp(600px, 86vh, 760px) !important;
-        padding: 3rem 1.25rem 4rem 1.25rem !important;
+        height: 100% !important;
+        min-height: clamp(520px, 80vh, 660px) !important;
+        padding: 1.5rem 0 2.25rem 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .hero-slide-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 2.4rem !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
     }
     .hero-logo-gold {
-        max-height: 65px !important;
-        margin-bottom: 0.85rem !important;
+        max-height: 52px !important;
+        margin-bottom: 0.45rem !important;
     }
     .hero-subtitle {
-        font-size: 0.72rem !important;
-        letter-spacing: 1.5px !important;
-        margin-bottom: 0.75rem !important;
-        gap: 0.35rem !important;
+        font-size: clamp(0.62rem, 2.3vw, 0.72rem) !important;
+        letter-spacing: 1.1px !important;
+        padding: 0.2rem 0.65rem !important;
+        margin-bottom: 0.45rem !important;
     }
     .hero-subtitle::before, .hero-subtitle::after {
-        width: 20px !important;
+        display: none !important;
     }
     .hero-title {
-        font-size: clamp(1.8rem, 7.5vw, 2.4rem) !important;
-        line-height: 1.25 !important;
-        margin-bottom: 0.85rem !important;
+        font-size: clamp(1.45rem, 5.6vw, 2.1rem) !important;
+        line-height: 1.2 !important;
+        margin-bottom: 0.45rem !important;
     }
     .hero-description {
-        font-size: 0.88rem !important;
-        line-height: 1.65 !important;
-        margin-bottom: 1.75rem !important;
+        font-size: clamp(0.76rem, 2.5vw, 0.84rem) !important;
+        line-height: 1.5 !important;
         max-width: 100% !important;
+        margin: 0 auto 0.85rem auto !important;
+        -webkit-line-clamp: 3 !important;
+        line-clamp: 3 !important;
+        padding: 0.35rem 0.65rem !important;
     }
     .hero-cta {
         flex-direction: column !important;
         width: 100% !important;
-        gap: 0.75rem !important;
+        max-width: 290px !important;
+        align-items: center !important;
+        gap: 0.45rem !important;
+        margin: 0.2rem auto 0 auto !important;
     }
     .hero-cta .btn {
         width: 100% !important;
         justify-content: center !important;
-        padding: 0.85rem 1.25rem !important;
-        font-size: 0.82rem !important;
+        padding: 0.58rem 0.85rem !important;
+        font-size: 0.76rem !important;
+        border-radius: 20px !important;
+        min-height: 38px !important;
+    }
+    .hero-side-nav {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 1.1rem !important;
+        z-index: 12 !important;
+        top: 38% !important;
+        transform: translateY(-50%) !important;
+        background: rgba(3, 12, 6, 0.75) !important;
+        border: 1px solid rgba(212, 175, 55, 0.4) !important;
+    }
+    .hero-side-prev {
+        left: 5px !important;
+    }
+    .hero-side-next {
+        right: 5px !important;
     }
     .hero-slider-nav {
-        bottom: 1rem !important;
+        bottom: 0.75rem !important;
         right: 50% !important;
         transform: translateX(50%) !important;
-        padding: 0.35rem 0.85rem !important;
+        padding: 0.25rem 0.65rem !important;
     }
 
     /* Customer Reviews Section Header Stacking */
@@ -9895,23 +9942,39 @@ input, select, textarea, button {
     .hero-section,
     #hero-slider-container {
         height: auto !important;
-        min-height: clamp(480px, 80vh, 640px) !important;
+        min-height: clamp(520px, 80vh, 660px) !important;
         max-height: none !important;
         border-radius: 16px !important;
         margin-bottom: 2rem !important;
         width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+        position: relative !important;
     }
     .hero-slide {
         height: 100% !important;
-        min-height: clamp(480px, 80vh, 640px) !important;
-        padding: clamp(1.25rem, 3.5vh, 2rem) clamp(0.85rem, 3vw, 1.25rem) !important;
+        min-height: clamp(520px, 80vh, 660px) !important;
+        padding: 1.5rem 0 2.25rem 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
         justify-content: center !important;
+        align-items: center !important;
         width: 100% !important;
         box-sizing: border-box !important;
     }
+    .hero-slide-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 2.4rem !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
     .hero-logo-gold {
-        height: clamp(42px, 6vh, 56px) !important;
-        max-width: 135px !important;
+        max-height: 52px !important;
         margin-bottom: 0.45rem !important;
     }
     .hero-subtitle {
@@ -9926,14 +9989,14 @@ input, select, textarea, button {
     .hero-title {
         font-size: clamp(1.45rem, 5.6vw, 2.1rem) !important;
         line-height: 1.2 !important;
-        margin-bottom: 0.5rem !important;
+        margin-bottom: 0.45rem !important;
         max-width: 100% !important;
     }
     .hero-description {
         font-size: clamp(0.76rem, 2.5vw, 0.84rem) !important;
         line-height: 1.5 !important;
-        max-width: 98% !important;
-        margin: 0 auto 1.15rem auto !important;
+        max-width: 100% !important;
+        margin: 0 auto 0.85rem auto !important;
         -webkit-line-clamp: 3 !important;
         line-clamp: 3 !important;
         padding: 0.35rem 0.65rem !important;
@@ -9941,30 +10004,37 @@ input, select, textarea, button {
     .hero-cta {
         flex-direction: column !important;
         width: 100% !important;
+        max-width: 290px !important;
         align-items: center !important;
-        gap: 0.55rem !important;
-        margin-top: 0.2rem !important;
+        gap: 0.45rem !important;
+        margin: 0.2rem auto 0 auto !important;
     }
     .hero-cta .btn {
         width: 100% !important;
-        max-width: 280px !important;
         justify-content: center !important;
-        padding: 0.7rem 1.15rem !important;
-        font-size: 0.82rem !important;
+        padding: 0.58rem 0.85rem !important;
+        font-size: 0.76rem !important;
+        border-radius: 20px !important;
+        min-height: 38px !important;
     }
 
-    /* Hero Floating Side Nav Arrows (Compact & Non-Obstructing) */
+    /* Hero Floating Side Nav Arrows (Compact & Inset Away From Text) */
     .hero-side-nav {
-        width: 36px !important;
-        height: 36px !important;
+        width: 32px !important;
+        height: 32px !important;
         font-size: 1.1rem !important;
         z-index: 12 !important;
+        top: 38% !important;
+        transform: translateY(-50%) !important;
+        background: rgba(3, 12, 6, 0.75) !important;
+        border: 1px solid rgba(212, 175, 55, 0.4) !important;
+        color: var(--color-gold) !important;
     }
     .hero-side-prev {
-        left: 0.35rem !important;
+        left: 5px !important;
     }
     .hero-side-next {
-        right: 0.35rem !important;
+        right: 5px !important;
     }
 
     /* ── The Private Reserve Club & Allocation Registry (Mobile Refinement) ── */
