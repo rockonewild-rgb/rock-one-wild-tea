@@ -100,7 +100,7 @@
         },
 
         announcement: (title = '') => {
-            const cleanTitle = (title || 'Estate Bulletin').replace(/[<>&"]/g, '');
+            const cleanTitle = (title || 'Estate Announcement').replace(/[<>&"]/g, '');
             return generateSvgDataUri(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
     <defs>
@@ -119,7 +119,7 @@
         <path d="M-9 4 L 3 4" stroke-width="1.2" />
         <circle cx="0" cy="18" r="7" fill="#8b0000" stroke="#d4af37" stroke-width="1.5" />
     </g>
-    <text x="200" y="180" fill="#f6e27a" font-family="'Cinzel', Georgia, serif" font-size="12" font-weight="700" letter-spacing="2.5" text-anchor="middle">ESTATE HARVEST BULLETIN</text>
+    <text x="200" y="180" fill="#f6e27a" font-family="'Cinzel', Georgia, serif" font-size="12" font-weight="700" letter-spacing="2.5" text-anchor="middle">ESTATE HARVEST ANNOUNCEMENT</text>
     <text x="200" y="204" fill="#ffffff" font-family="'Cinzel', Georgia, serif" font-size="11" font-weight="600" letter-spacing="1" text-anchor="middle">${cleanTitle.length > 34 ? cleanTitle.slice(0, 32) + '...' : cleanTitle}</text>
     <text x="200" y="225" fill="#d4af37" font-family="'Cinzel', Georgia, serif" font-size="9" letter-spacing="1.5" text-anchor="middle" fill-opacity="0.8">OFFICIAL SANCTUARY DISPATCH</text>
 </svg>`);
@@ -514,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p class="ann-content">${ann.content.substring(0, 130)}${ann.content.length > 130 ? '...' : ''}</p>
                 </div>
                 <div class="ann-footer">
-                    ${ann.premium ? '<span class="premium-badge">Collector Exclusives</span>' : `<button type="button" class="ann-read-more" onclick="event.stopPropagation(); window.openAnnModal && window.openAnnModal('${ann.id}')" style="background:none; border:none; padding:0; cursor:pointer; font:inherit; color:inherit;">Read Bulletin &rarr;</button>`}
+                    ${ann.premium ? '<span class="premium-badge">Collector Exclusives</span>' : `<button type="button" class="ann-read-more" onclick="event.stopPropagation(); window.openAnnModal && window.openAnnModal('${ann.id}')" style="background:none; border:none; padding:0; cursor:pointer; font:inherit; color:inherit;">Read Announcement &rarr;</button>`}
                 </div>
             </div>
         `).join('');
@@ -5349,7 +5349,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const count = (res && res.notifiedCount) ? res.notifiedCount : 0;
                 
                 showToast(
-                    "📢 Bulletin Published & Dispatched", 
+                    "📢 Announcement Published & Dispatched", 
                     `"${title}" is now live on the timeline and dispatch notification sent to ${count > 0 ? count + ' registered customers/subscribers' : 'all clients'}.`, 
                     "success",
                     5000
@@ -6278,16 +6278,16 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', () => {
                 const annId = btn.getAttribute('data-id');
                 const ann = (window.TeaFactoryStore.getAnnouncements() || []).find(a => String(a.id) === String(annId));
-                const annTitle = ann ? ann.title : `Bulletin #${annId}`;
+                const annTitle = ann ? ann.title : `Announcement #${annId}`;
                 showDeleteConfirmModal({
-                    title: 'Delete Bulletin Notice',
-                    subtitle: 'Estate Bulletin Log',
+                    title: 'Delete Announcement Notice',
+                    subtitle: 'Estate Announcement Log',
                     itemName: annTitle,
-                    message: 'Are you sure you want to delete this bulletin notice? It will be permanently removed from public view and estate logs.',
-                    confirmText: 'Delete Bulletin',
+                    message: 'Are you sure you want to delete this announcement notice? It will be permanently removed from public view and estate logs.',
+                    confirmText: 'Delete Announcement',
                     onConfirm: () => {
                         window.TeaFactoryStore.deleteAnnouncement(annId);
-                        showToast("Announcement Deleted", "The bulletin has been removed from the public logs.", "success");
+                        showToast("Announcement Deleted", "The announcement has been removed from the public logs.", "success");
                         renderTabContent('admin');
                     }
                 });
@@ -6747,11 +6747,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const dateEl = document.getElementById('ann-modal-date');
         const imgEl = document.getElementById('ann-modal-image');
 
-        if (titleEl) titleEl.innerText = ann.premium ? 'Collector Exclusive Bulletin' : 'Estate Bulletin Details';
-        if (headingEl) headingEl.innerText = ann.title || ann.heading || 'Estate Bulletin';
+        if (titleEl) titleEl.innerText = ann.premium ? 'Collector Exclusive Announcement' : 'Estate Announcement Details';
+        if (headingEl) headingEl.innerText = ann.title || ann.heading || 'Estate Announcement';
         if (contentEl) contentEl.innerText = ann.content || '';
         if (tagEl) {
-            tagEl.innerText = ann.tag || 'Bulletin';
+            tagEl.innerText = ann.tag || 'Announcement';
             tagEl.className = ann.premium ? 'box-badge status-booked' : 'box-badge status-available';
         }
         if (dateEl) dateEl.innerText = ann.date || ann.date_str || '';
@@ -8859,7 +8859,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
 
             // Show real-time notification toast to customer
             showToast(
-                "📢 New Estate Bulletin Published",
+                "📢 New Estate Announcement Published",
                 `"${ann.title}" • Tap to view latest harvest updates & offers.`,
                 "bulletin",
                 7000,
@@ -9050,151 +9050,615 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
     function initSpriteCache() {
         if (spriteCache.initialized) return;
 
-        // 1. Snow Crystal Sprite
-        const cSnow = createOffscreenCanvas(32, 32);
-        const ctxSnow = cSnow.getContext('2d');
-        if (ctxSnow) {
-            ctxSnow.translate(16, 16);
-            ctxSnow.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-            ctxSnow.lineWidth = 1.2;
-            ctxSnow.lineCap = 'round';
-            for (let i = 0; i < 6; i++) {
-                ctxSnow.save();
-                ctxSnow.rotate((i * 60 * Math.PI) / 180);
-                ctxSnow.beginPath();
-                ctxSnow.moveTo(0, 0);
-                ctxSnow.lineTo(0, -13);
-                ctxSnow.moveTo(0, -7);
-                ctxSnow.lineTo(-4, -10);
-                ctxSnow.moveTo(0, -7);
-                ctxSnow.lineTo(4, -10);
-                ctxSnow.stroke();
-                ctxSnow.restore();
-            }
-        }
-        spriteCache.snowCrystal = cSnow;
+        // Helper to generate crisp offscreen sprite canvas
+        const makeSprite = (w, h, drawFn) => {
+            const c = createOffscreenCanvas(w, h);
+            const ctx = c.getContext('2d');
+            if (ctx) drawFn(ctx, w, h);
+            return c;
+        };
 
-        // 2. Snow Orb Glow Sprite
-        const cSnowOrb = createOffscreenCanvas(24, 24);
-        const ctxSnowOrb = cSnowOrb.getContext('2d');
-        if (ctxSnowOrb) {
-            const grad = ctxSnowOrb.createRadialGradient(12, 12, 0, 12, 12, 11);
+        // 1. Christmas Snow Crystal & Glowing Orb
+        spriteCache.snowCrystal = makeSprite(32, 32, (ctx) => {
+            ctx.translate(16, 16);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.lineWidth = 1.2;
+            ctx.lineCap = 'round';
+            for (let i = 0; i < 6; i++) {
+                ctx.save();
+                ctx.rotate((i * 60 * Math.PI) / 180);
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(0, -13);
+                ctx.moveTo(0, -7);
+                ctx.lineTo(-4, -10);
+                ctx.moveTo(0, -7);
+                ctx.lineTo(4, -10);
+                ctx.stroke();
+                ctx.restore();
+            }
+        });
+
+        spriteCache.snowOrb = makeSprite(24, 24, (ctx) => {
+            const grad = ctx.createRadialGradient(12, 12, 0, 12, 12, 11);
             grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
             grad.addColorStop(0.5, 'rgba(230, 245, 255, 0.6)');
             grad.addColorStop(1, 'rgba(230, 245, 255, 0)');
-            ctxSnowOrb.fillStyle = grad;
-            ctxSnowOrb.beginPath();
-            ctxSnowOrb.arc(12, 12, 11, 0, Math.PI * 2);
-            ctxSnowOrb.fill();
-        }
-        spriteCache.snowOrb = cSnowOrb;
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(12, 12, 11, 0, Math.PI * 2);
+            ctx.fill();
+        });
 
-        // 3. Tea Leaf Sprite (Gold & Emerald)
-        function makeLeafSprite(color) {
-            const cLeaf = createOffscreenCanvas(28, 28);
-            const ctxL = cLeaf.getContext('2d');
-            if (ctxL) {
-                ctxL.translate(14, 14);
-                ctxL.fillStyle = color;
-                ctxL.beginPath();
-                ctxL.moveTo(0, -11);
-                ctxL.bezierCurveTo(7, -6, 7, 6, 0, 11);
-                ctxL.bezierCurveTo(-7, 6, -7, -6, 0, -11);
-                ctxL.fill();
-                ctxL.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-                ctxL.lineWidth = 0.8;
-                ctxL.beginPath();
-                ctxL.moveTo(0, -9);
-                ctxL.lineTo(0, 9);
-                ctxL.stroke();
+        // 2. Lunar New Year Silk Lantern & Auspicious Gold Coin
+        spriteCache.lantern = makeSprite(36, 42, (ctx) => {
+            ctx.translate(18, 18);
+            // Ambient outer glow
+            const glowGrad = ctx.createRadialGradient(0, 0, 4, 0, 0, 16);
+            glowGrad.addColorStop(0, 'rgba(254, 224, 71, 0.5)');
+            glowGrad.addColorStop(0.6, 'rgba(239, 68, 68, 0.25)');
+            glowGrad.addColorStop(1, 'rgba(220, 38, 38, 0)');
+            ctx.fillStyle = glowGrad;
+            ctx.beginPath();
+            ctx.arc(0, 0, 16, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Silk body
+            const bodyGrad = ctx.createRadialGradient(-3, -2, 1, 0, 0, 12);
+            bodyGrad.addColorStop(0, '#fef08a');
+            bodyGrad.addColorStop(0.4, '#ef4444');
+            bodyGrad.addColorStop(1, '#991b1b');
+            ctx.fillStyle = bodyGrad;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 10, 13, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Gold caps & ribs
+            ctx.fillStyle = '#facc15';
+            ctx.fillRect(-6, -14, 12, 2.5);
+            ctx.fillRect(-6, 12, 12, 2.5);
+            ctx.strokeStyle = 'rgba(253, 224, 71, 0.65)';
+            ctx.lineWidth = 0.9;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 5, 13, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Gold bottom tassel
+            ctx.strokeStyle = '#facc15';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(0, 14.5);
+            ctx.lineTo(0, 21);
+            ctx.stroke();
+        });
+
+        spriteCache.goldCoin = makeSprite(24, 24, (ctx) => {
+            ctx.translate(12, 12);
+            const grad = ctx.createRadialGradient(-2, -2, 1, 0, 0, 10);
+            grad.addColorStop(0, '#fff5c0');
+            grad.addColorStop(0.5, '#f59e0b');
+            grad.addColorStop(1, '#b45309');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(0, 0, 9, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#fde047';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            // Square center cutout
+            ctx.fillStyle = 'rgba(24, 4, 6, 0.8)';
+            ctx.fillRect(-3, -3, 6, 6);
+        });
+
+        // 3. Avurudu Traditional Sinhala & Tamil Sweets (Kavum, Kokis, Aluwa, Aasmi), Erabadu Mal & Solar Rays
+        // 3a. Konda Kavum (Golden Fried Honey Oil Cake with Top Crest)
+        spriteCache.kavumSweet = makeSprite(34, 36, (ctx) => {
+            ctx.translate(17, 18);
+            // Sweet base
+            const baseGrad = ctx.createRadialGradient(-2, 3, 2, 0, 4, 13);
+            baseGrad.addColorStop(0, '#f59e0b');
+            baseGrad.addColorStop(0.5, '#b45309');
+            baseGrad.addColorStop(1, '#78350f');
+            ctx.fillStyle = baseGrad;
+            ctx.beginPath();
+            ctx.ellipse(0, 4, 12, 9, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Signature top "Konda" crest
+            const kondaGrad = ctx.createLinearGradient(0, -14, 0, 4);
+            kondaGrad.addColorStop(0, '#d97706');
+            kondaGrad.addColorStop(0.6, '#92400e');
+            kondaGrad.addColorStop(1, '#78350f');
+            ctx.fillStyle = kondaGrad;
+            ctx.beginPath();
+            ctx.moveTo(-5, 2);
+            ctx.quadraticCurveTo(-1, -12, 0, -14);
+            ctx.quadraticCurveTo(1, -12, 5, 2);
+            ctx.closePath();
+            ctx.fill();
+
+            // Honey gloss highlight & sesame specks
+            ctx.fillStyle = 'rgba(254, 240, 138, 0.45)';
+            ctx.beginPath();
+            ctx.ellipse(-3, 1, 6, 2.5, -0.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#fef08a';
+            ctx.fillRect(-4, 5, 1.2, 1.2);
+            ctx.fillRect(3, 3, 1.2, 1.2);
+            ctx.fillRect(0, -5, 1.2, 1.2);
+        });
+
+        // 3b. Kokis (Crispy Golden-Yellow Flower Lattice Wheel)
+        spriteCache.kokisSweet = makeSprite(32, 32, (ctx) => {
+            ctx.translate(16, 16);
+            const kokisGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, 13);
+            kokisGrad.addColorStop(0, '#fef08a');
+            kokisGrad.addColorStop(0.6, '#facc15');
+            kokisGrad.addColorStop(1, '#d97706');
+            ctx.strokeStyle = kokisGrad;
+            ctx.lineWidth = 2.2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // Outer 5-petal star loop
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const angle = (i * 72 * Math.PI) / 180;
+                const rOuter = 12;
+                const rInner = 6;
+                const x1 = Math.cos(angle) * rOuter;
+                const y1 = Math.sin(angle) * rOuter;
+                const midAngle = angle + (36 * Math.PI) / 180;
+                const x2 = Math.cos(midAngle) * rInner;
+                const y2 = Math.sin(midAngle) * rInner;
+                if (i === 0) ctx.moveTo(x1, y1);
+                else ctx.lineTo(x1, y1);
+                ctx.lineTo(x2, y2);
             }
-            return cLeaf;
-        }
-        spriteCache.leafGold = makeLeafSprite('#f59e0b');
-        spriteCache.leafGreen = makeLeafSprite('#10b981');
-        spriteCache.leafAmber = makeLeafSprite('#d97706');
+            ctx.closePath();
+            ctx.stroke();
 
-        // 4. Oriental Lantern Sprite
-        const cLantern = createOffscreenCanvas(32, 36);
-        const ctxLan = cLantern.getContext('2d');
-        if (ctxLan) {
-            ctxLan.translate(16, 16);
-            const grad = ctxLan.createRadialGradient(0, 0, 0, 0, 0, 11);
-            grad.addColorStop(0, '#fde047');
-            grad.addColorStop(0.5, '#ef4444');
-            grad.addColorStop(1, '#991b1b');
-            ctxLan.fillStyle = grad;
-            ctxLan.beginPath();
-            ctxLan.ellipse(0, 0, 9, 11, 0, 0, Math.PI * 2);
-            ctxLan.fill();
-            ctxLan.fillStyle = '#facc15';
-            ctxLan.fillRect(-5, -12, 10, 2);
-            ctxLan.fillRect(-5, 10, 10, 2);
-            ctxLan.strokeStyle = '#fef08a';
-            ctxLan.lineWidth = 1;
-            ctxLan.beginPath();
-            ctxLan.moveTo(0, 12);
-            ctxLan.lineTo(0, 17);
-            ctxLan.stroke();
-        }
-        spriteCache.lantern = cLantern;
-
-        // 5. Diamond Star / Sparkle Sprite
-        function makeStarSprite(color) {
-            const cStar = createOffscreenCanvas(26, 26);
-            const ctxS = cStar.getContext('2d');
-            if (ctxS) {
-                ctxS.translate(13, 13);
-                ctxS.fillStyle = color;
-                ctxS.beginPath();
-                ctxS.moveTo(0, -11);
-                ctxS.quadraticCurveTo(0, 0, 11, 0);
-                ctxS.quadraticCurveTo(0, 0, 0, 11);
-                ctxS.quadraticCurveTo(0, 0, -11, 0);
-                ctxS.quadraticCurveTo(0, 0, 0, -11);
-                ctxS.fill();
+            // Inner wheel ring & spokes
+            ctx.lineWidth = 1.4;
+            ctx.beginPath();
+            ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
+            for (let i = 0; i < 5; i++) {
+                const angle = (i * 72 * Math.PI) / 180;
+                ctx.moveTo(0, 0);
+                ctx.lineTo(Math.cos(angle) * 11, Math.sin(angle) * 11);
             }
-            return cStar;
-        }
-        spriteCache.starGold = makeStarSprite('#facc15');
-        spriteCache.starBlue = makeStarSprite('#60a5fa');
-        spriteCache.starPink = makeStarSprite('#f43f5e');
+            ctx.stroke();
+        });
 
-        // 6. Romance Heart Sprite
-        const cHeart = createOffscreenCanvas(26, 26);
-        const ctxH = cHeart.getContext('2d');
-        if (ctxH) {
-            ctxH.translate(13, 13);
-            ctxH.fillStyle = 'rgba(244, 63, 94, 0.9)';
-            ctxH.beginPath();
-            const topY = -6;
-            ctxH.moveTo(0, topY + 5);
-            ctxH.bezierCurveTo(-10, topY - 3, -11, topY + 7, 0, topY + 14);
-            ctxH.bezierCurveTo(11, topY + 7, 10, topY - 3, 0, topY + 5);
-            ctxH.fill();
-        }
-        spriteCache.heart = cHeart;
+        // 3c. Aluwa (Diamond Rhombus Rice Flour Sweet with Cashew Flecks)
+        spriteCache.aluwaSweet = makeSprite(30, 28, (ctx) => {
+            ctx.translate(15, 14);
+            const aluwaGrad = ctx.createLinearGradient(-11, -8, 11, 8);
+            aluwaGrad.addColorStop(0, '#fef9c3');
+            aluwaGrad.addColorStop(0.5, '#fde047');
+            aluwaGrad.addColorStop(1, '#ca8a04');
+            ctx.fillStyle = aluwaGrad;
+            ctx.beginPath();
+            ctx.moveTo(0, -10);
+            ctx.lineTo(12, 0);
+            ctx.lineTo(0, 10);
+            ctx.lineTo(-12, 0);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#b45309';
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
 
-        // 7. Firework Sparkle Sprite
-        function makeSparkSprite(color) {
-            const cSpark = createOffscreenCanvas(24, 24);
-            const ctxSp = cSpark.getContext('2d');
-            if (ctxSp) {
-                const grad = ctxSp.createRadialGradient(12, 12, 0, 12, 12, 11);
-                grad.addColorStop(0, '#ffffff');
-                grad.addColorStop(0.3, color);
-                grad.addColorStop(1, 'rgba(0,0,0,0)');
-                ctxSp.fillStyle = grad;
-                ctxSp.beginPath();
-                ctxSp.arc(12, 12, 11, 0, Math.PI * 2);
-                ctxSp.fill();
-            }
-            return cSpark;
-        }
-        spriteCache.sparkGold = makeSparkSprite('#facc15');
-        spriteCache.sparkBlue = makeSparkSprite('#3b82f6');
-        spriteCache.sparkPurple = makeSparkSprite('#a855f7');
-        spriteCache.sparkAmber = makeSparkSprite('#fbbf24');
+            // Cashew nut pieces
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.ellipse(-3, -2, 3, 1.5, 0.4, 0, Math.PI * 2);
+            ctx.ellipse(3, 2, 2.5, 1.2, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // 3d. Aasmi (Crisp White Lattice Nest with Magenta Treacle Swirl)
+        spriteCache.aasmiSweet = makeSprite(32, 32, (ctx) => {
+            ctx.translate(16, 16);
+            // White laced string nest
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(0, 0, 11, 0, Math.PI * 2);
+            ctx.moveTo(-9, -4); ctx.quadraticCurveTo(0, 8, 9, -4);
+            ctx.moveTo(-7, 4); ctx.quadraticCurveTo(0, -8, 7, 4);
+            ctx.moveTo(-10, 0); ctx.lineTo(10, 0);
+            ctx.stroke();
+
+            // Bright Magenta / Rose Treacle Swirl (Iconic Aasmi topping)
+            ctx.strokeStyle = '#f43f5e';
+            ctx.lineWidth = 2.2;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(-8, -3);
+            ctx.bezierCurveTo(-2, -9, 4, 7, 9, 2);
+            ctx.stroke();
+            ctx.strokeStyle = '#be123c';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        });
+
+        // 3e. Erabadu Mal (Auspicious Scarlet Coral Blossom of Avurudu)
+        spriteCache.erabaduMal = makeSprite(32, 32, (ctx) => {
+            ctx.translate(16, 16);
+            // Glow
+            const glow = ctx.createRadialGradient(0, 0, 2, 0, 0, 14);
+            glow.addColorStop(0, 'rgba(239, 68, 68, 0.45)');
+            glow.addColorStop(1, 'rgba(153, 27, 27, 0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(0, 0, 14, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Curved crimson petals
+            const petalGrad = ctx.createLinearGradient(-8, -12, 8, 12);
+            petalGrad.addColorStop(0, '#f87171');
+            petalGrad.addColorStop(0.4, '#ef4444');
+            petalGrad.addColorStop(1, '#991b1b');
+            ctx.fillStyle = petalGrad;
+
+            ctx.beginPath();
+            ctx.moveTo(-2, 8);
+            ctx.bezierCurveTo(-10, 2, -12, -8, 2, -12);
+            ctx.bezierCurveTo(0, -6, 2, 2, -2, 8);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(2, 8);
+            ctx.bezierCurveTo(8, 3, 12, -6, 2, -12);
+            ctx.bezierCurveTo(4, -4, 6, 2, 2, 8);
+            ctx.fill();
+
+            // Golden stamens
+            ctx.fillStyle = '#facc15';
+            ctx.beginPath();
+            ctx.arc(-1, -12, 1.5, 0, Math.PI * 2);
+            ctx.arc(4, -10, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // 3f. Avurudu Ceylon Solar Ray & Auspicious Marigold / Jasmine Petals
+        spriteCache.sunburstSpark = makeSprite(28, 28, (ctx) => {
+            ctx.translate(14, 14);
+            const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, 12);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.35, '#facc15');
+            grad.addColorStop(0.7, '#ea580c');
+            grad.addColorStop(1, 'rgba(234, 88, 12, 0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(0, 0, 12, 0, Math.PI * 2);
+            ctx.fill();
+            // 4 main rays
+            ctx.strokeStyle = '#fff5c0';
+            ctx.lineWidth = 1.5;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(0, -11); ctx.lineTo(0, 11);
+            ctx.moveTo(-11, 0); ctx.lineTo(11, 0);
+            ctx.stroke();
+        });
+
+        spriteCache.marigoldPetal = makeSprite(26, 26, (ctx) => {
+            ctx.translate(13, 13);
+            const grad = ctx.createLinearGradient(-8, -10, 8, 10);
+            grad.addColorStop(0, '#fef08a');
+            grad.addColorStop(0.5, '#f59e0b');
+            grad.addColorStop(1, '#ea580c');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(0, -10);
+            ctx.bezierCurveTo(7, -6, 9, 6, 0, 11);
+            ctx.bezierCurveTo(-9, 6, -7, -6, 0, -10);
+            ctx.fill();
+        });
+
+        spriteCache.jasminePetal = makeSprite(24, 24, (ctx) => {
+            ctx.translate(12, 12);
+            const grad = ctx.createLinearGradient(0, -9, 0, 9);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.7, '#fef9c3');
+            grad.addColorStop(1, '#fde047');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(0, -9);
+            ctx.bezierCurveTo(6, -4, 5, 5, 0, 9);
+            ctx.bezierCurveTo(-5, 5, -6, -4, 0, -9);
+            ctx.fill();
+        });
+
+        // 4. Diwali Floating Diya Lamp & Rangoli Sparkle
+        spriteCache.diyaLamp = makeSprite(38, 30, (ctx) => {
+            ctx.translate(19, 15);
+            // Outer warm glow
+            const glow = ctx.createRadialGradient(0, -3, 2, 0, -3, 14);
+            glow.addColorStop(0, 'rgba(254, 240, 138, 0.6)');
+            glow.addColorStop(0.5, 'rgba(249, 115, 22, 0.3)');
+            glow.addColorStop(1, 'rgba(234, 88, 12, 0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(0, -3, 14, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Terracotta clay bowl
+            const clayGrad = ctx.createLinearGradient(-12, 0, 12, 10);
+            clayGrad.addColorStop(0, '#ea580c');
+            clayGrad.addColorStop(0.5, '#c2410c');
+            clayGrad.addColorStop(1, '#7c2d12');
+            ctx.fillStyle = clayGrad;
+            ctx.beginPath();
+            ctx.moveTo(-13, 0);
+            ctx.quadraticCurveTo(0, 12, 13, 0);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#facc15';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Golden oil pool
+            ctx.fillStyle = '#fef08a';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 11, 3, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Flickering flame
+            const flameGrad = ctx.createRadialGradient(0, -4, 1, 0, -6, 8);
+            flameGrad.addColorStop(0, '#ffffff');
+            flameGrad.addColorStop(0.4, '#fde047');
+            flameGrad.addColorStop(0.8, '#f97316');
+            flameGrad.addColorStop(1, 'rgba(220, 38, 38, 0)');
+            ctx.fillStyle = flameGrad;
+            ctx.beginPath();
+            ctx.moveTo(0, -13);
+            ctx.quadraticCurveTo(5, -6, 0, -1);
+            ctx.quadraticCurveTo(-5, -6, 0, -13);
+            ctx.fill();
+        });
+
+        spriteCache.diwaliStar = makeSprite(26, 26, (ctx) => {
+            ctx.translate(13, 13);
+            ctx.fillStyle = '#fde047';
+            ctx.beginPath();
+            ctx.moveTo(0, -11);
+            ctx.quadraticCurveTo(0, 0, 11, 0);
+            ctx.quadraticCurveTo(0, 0, 0, 11);
+            ctx.quadraticCurveTo(0, 0, -11, 0);
+            ctx.quadraticCurveTo(0, 0, 0, -11);
+            ctx.fill();
+            // Core sparkle
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // 5. Valentine's Velvet Crimson & Champagne Blush Rose Petals and Glowing Hearts
+        spriteCache.rosePetalCrimson = makeSprite(28, 28, (ctx) => {
+            ctx.translate(14, 14);
+            const grad = ctx.createLinearGradient(-10, -10, 10, 10);
+            grad.addColorStop(0, '#fb7185');
+            grad.addColorStop(0.4, '#e11d48');
+            grad.addColorStop(1, '#881337');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(0, -11);
+            ctx.bezierCurveTo(9, -7, 11, 5, 0, 12);
+            ctx.bezierCurveTo(-11, 5, -9, -7, 0, -11);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+            ctx.lineWidth = 0.7;
+            ctx.stroke();
+        });
+
+        spriteCache.rosePetalBlush = makeSprite(26, 26, (ctx) => {
+            ctx.translate(13, 13);
+            const grad = ctx.createLinearGradient(-8, -8, 8, 8);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.5, '#fecdd3');
+            grad.addColorStop(1, '#f43f5e');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(0, -10);
+            ctx.bezierCurveTo(8, -6, 9, 4, 0, 10);
+            ctx.bezierCurveTo(-9, 4, -8, -6, 0, -10);
+            ctx.fill();
+        });
+
+        spriteCache.heart = makeSprite(28, 28, (ctx) => {
+            ctx.translate(14, 14);
+            // Soft glow
+            const glow = ctx.createRadialGradient(0, 0, 3, 0, 0, 13);
+            glow.addColorStop(0, 'rgba(251, 113, 133, 0.7)');
+            glow.addColorStop(1, 'rgba(225, 29, 72, 0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(0, 0, 13, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Heart shape
+            ctx.fillStyle = '#f43f5e';
+            ctx.beginPath();
+            const topY = -7;
+            ctx.moveTo(0, topY + 5);
+            ctx.bezierCurveTo(-10, topY - 3, -11, topY + 7, 0, topY + 14);
+            ctx.bezierCurveTo(11, topY + 7, 10, topY - 3, 0, topY + 5);
+            ctx.fill();
+        });
+
+        // 6. Earth Day Rainforest Tea Leaves & Bioluminescent Fireflies
+        spriteCache.teaLeafGreen = makeSprite(28, 28, (ctx) => {
+            ctx.translate(14, 14);
+            const grad = ctx.createLinearGradient(0, -11, 0, 11);
+            grad.addColorStop(0, '#6ee7b7');
+            grad.addColorStop(0.5, '#10b981');
+            grad.addColorStop(1, '#065f46');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(0, -11);
+            ctx.bezierCurveTo(7, -6, 7, 6, 0, 11);
+            ctx.bezierCurveTo(-7, 6, -7, -6, 0, -11);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(0, -9);
+            ctx.lineTo(0, 9);
+            ctx.stroke();
+        });
+
+        spriteCache.teaLeafGold = makeSprite(28, 28, (ctx) => {
+            ctx.translate(14, 14);
+            const grad = ctx.createLinearGradient(0, -11, 0, 11);
+            grad.addColorStop(0, '#fef08a');
+            grad.addColorStop(0.5, '#f59e0b');
+            grad.addColorStop(1, '#b45309');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(0, -11);
+            ctx.bezierCurveTo(7, -6, 7, 6, 0, 11);
+            ctx.bezierCurveTo(-7, 6, -7, -6, 0, -11);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(0, -9);
+            ctx.lineTo(0, 9);
+            ctx.stroke();
+        });
+
+        spriteCache.fireflyGlow = makeSprite(26, 26, (ctx) => {
+            const grad = ctx.createRadialGradient(13, 13, 1, 13, 13, 12);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.3, '#a7f3d0');
+            grad.addColorStop(0.65, '#10b981');
+            grad.addColorStop(1, 'rgba(5, 150, 105, 0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(13, 13, 12, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // 7. Halloween & Autumn Harvest: Glowing Jack-o'-lantern, Maple/Oak Leaves & Amber Bats
+        spriteCache.pumpkinGlow = makeSprite(34, 32, (ctx) => {
+            ctx.translate(17, 16);
+            // Candlelight aura
+            const glow = ctx.createRadialGradient(0, 0, 3, 0, 0, 15);
+            glow.addColorStop(0, 'rgba(254, 240, 138, 0.65)');
+            glow.addColorStop(0.5, 'rgba(234, 88, 12, 0.35)');
+            glow.addColorStop(1, 'rgba(194, 65, 12, 0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(0, 0, 15, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Ribbed Pumpkin Body
+            const pGrad = ctx.createRadialGradient(-3, -2, 2, 0, 2, 13);
+            pGrad.addColorStop(0, '#fb923c');
+            pGrad.addColorStop(0.6, '#ea580c');
+            pGrad.addColorStop(1, '#9a3412');
+            ctx.fillStyle = pGrad;
+            ctx.beginPath();
+            ctx.ellipse(0, 2, 13, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Stem
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(-2, -10, 4, 4);
+
+            // Carved glowing eyes & mouth
+            ctx.fillStyle = '#fef08a';
+            ctx.beginPath();
+            ctx.moveTo(-6, -1); ctx.lineTo(-3, -1); ctx.lineTo(-4.5, -4); ctx.closePath();
+            ctx.moveTo(6, -1); ctx.lineTo(3, -1); ctx.lineTo(4.5, -4); ctx.closePath();
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(0, 3, 6, 0.2, Math.PI - 0.2);
+            ctx.lineWidth = 1.6;
+            ctx.strokeStyle = '#fef08a';
+            ctx.stroke();
+        });
+
+        spriteCache.leafMapleGold = makeSprite(30, 30, (ctx) => {
+            ctx.translate(15, 15);
+            const grad = ctx.createLinearGradient(-10, -10, 10, 10);
+            grad.addColorStop(0, '#fef08a');
+            grad.addColorStop(0.5, '#f59e0b');
+            grad.addColorStop(1, '#b45309');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(0, -12);
+            ctx.lineTo(3, -4); ctx.lineTo(10, -8); ctx.lineTo(7, -1);
+            ctx.lineTo(12, 3); ctx.lineTo(4, 4); ctx.lineTo(6, 11);
+            ctx.lineTo(0, 7);
+            ctx.lineTo(-6, 11); ctx.lineTo(-4, 4); ctx.lineTo(-12, 3);
+            ctx.lineTo(-7, -1); ctx.lineTo(-10, -8); ctx.lineTo(-3, -4);
+            ctx.closePath();
+            ctx.fill();
+        });
+
+        spriteCache.leafOakAmber = makeSprite(28, 32, (ctx) => {
+            ctx.translate(14, 16);
+            const grad = ctx.createLinearGradient(0, -13, 0, 13);
+            grad.addColorStop(0, '#fbbf24');
+            grad.addColorStop(0.5, '#ea580c');
+            grad.addColorStop(1, '#7c2d12');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(0, -13);
+            ctx.bezierCurveTo(8, -10, 10, -3, 6, 0);
+            ctx.bezierCurveTo(11, 3, 9, 10, 3, 13);
+            ctx.bezierCurveTo(0, 14, -3, 13, -3, 13);
+            ctx.bezierCurveTo(-9, 10, -11, 3, -6, 0);
+            ctx.bezierCurveTo(-10, -3, -8, -10, 0, -13);
+            ctx.fill();
+        });
+
+        spriteCache.batSilhouette = makeSprite(32, 22, (ctx) => {
+            ctx.translate(16, 11);
+            ctx.fillStyle = 'rgba(245, 158, 11, 0.85)';
+            ctx.beginPath();
+            ctx.moveTo(0, -3);
+            ctx.quadraticCurveTo(6, -9, 14, -6);
+            ctx.quadraticCurveTo(10, 2, 5, 2);
+            ctx.quadraticCurveTo(3, 7, 0, 5);
+            ctx.quadraticCurveTo(-3, 7, -5, 2);
+            ctx.quadraticCurveTo(-10, 2, -14, -6);
+            ctx.quadraticCurveTo(-6, -9, 0, -3);
+            ctx.fill();
+            ctx.fillRect(-2, -5, 1.5, 3);
+            ctx.fillRect(0.5, -5, 1.5, 3);
+        });
+
+        // 8. General Stars and Sparkles
+        spriteCache.starGold = makeSprite(26, 26, (ctx) => {
+            ctx.translate(13, 13);
+            ctx.fillStyle = '#facc15';
+            ctx.beginPath();
+            ctx.moveTo(0, -11);
+            ctx.quadraticCurveTo(0, 0, 11, 0);
+            ctx.quadraticCurveTo(0, 0, 0, 11);
+            ctx.quadraticCurveTo(0, 0, -11, 0);
+            ctx.quadraticCurveTo(0, 0, 0, -11);
+            ctx.fill();
+        });
+
+        spriteCache.sparkGold = makeSprite(24, 24, (ctx) => {
+            const grad = ctx.createRadialGradient(12, 12, 0, 12, 12, 11);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.3, '#facc15');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(12, 12, 11, 0, Math.PI * 2);
+            ctx.fill();
+        });
 
         spriteCache.initialized = true;
     }
@@ -9217,7 +9681,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             return;
         }
 
-        // Check for reduced motion preference
+        // Respect user accessibility preference
         if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             canvas.style.display = 'none';
             return;
@@ -9230,7 +9694,6 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         if (!ctx) return;
 
         function resizeCanvas() {
-            // Cap internal resolution to save GPU memory and prevent high-DPI stutter
             const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
             canvas.width = Math.min(window.innerWidth * dpr, 1440);
             canvas.height = Math.min(window.innerHeight * dpr, 900);
@@ -9243,49 +9706,201 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             resizeTimer = setTimeout(resizeCanvas, 200);
         }, { passive: true });
 
-        // Optimized particle counts: 10 on mobile, 20 on desktop
         const isMobile = window.innerWidth < 768;
-        const particleCount = isMobile ? 10 : 20;
+        const particleCount = isMobile ? 12 : 24;
         particles = [];
 
+        // ── A. Fireworks Simulation Subsystem (New Year) ──
+        let fwRockets = [];
+        let fwSparks = [];
+        let fwLastLaunch = 0;
+        const FW_COLORS = ['#facc15', '#60a5fa', '#f43f5e', '#a855f7', '#34d399', '#fef08a', '#38bdf8'];
+
+        function launchFwRocket() {
+            const x = Math.random() * (canvas.width * 0.7) + (canvas.width * 0.15);
+            const targetY = Math.random() * (canvas.height * 0.35) + (canvas.height * 0.12);
+            const speedY = -(Math.random() * 4 + 8.5);
+            const color = FW_COLORS[Math.floor(Math.random() * FW_COLORS.length)];
+            fwRockets.push({
+                x: x,
+                y: canvas.height + 10,
+                vx: (Math.random() - 0.5) * 1.8,
+                vy: speedY,
+                targetY: targetY,
+                color: color,
+                trail: []
+            });
+        }
+
+        function explodeFwRocket(x, y, color) {
+            const count = isMobile ? 32 : 55;
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 5.2 + 1.2;
+                fwSparks.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    color: (Math.random() > 0.25) ? color : '#ffffff',
+                    alpha: 1,
+                    decay: Math.random() * 0.02 + 0.014,
+                    gravity: 0.075,
+                    friction: 0.958,
+                    size: Math.random() * 2.4 + 1.6,
+                    flicker: Math.random() > 0.4
+                });
+            }
+        }
+
+        if (effectType === 'fireworks') {
+            launchFwRocket();
+            setTimeout(launchFwRocket, 400);
+        }
+
+        // ── B. Seed Theme-Specific Floating Particle Elements ──
         for (let i = 0; i < particleCount; i++) {
-            const isRising = (effectType === 'lanterns' || effectType === 'hearts');
             let sprite = spriteCache.snowOrb;
+            let isRising = false;
+            let baseSize = 14;
+            let speedX = (Math.random() - 0.5) * 0.7;
+            let speedY = Math.random() * 0.75 + 0.35;
+            let opacity = Math.random() * 0.45 + 0.35;
+            let pulseSpeed = 0;
 
             if (effectType === 'snow') {
                 sprite = (i % 2 === 0) ? spriteCache.snowCrystal : spriteCache.snowOrb;
-            } else if (effectType === 'leaves') {
-                const leafSprites = [spriteCache.leafGold, spriteCache.leafGreen, spriteCache.leafAmber];
-                sprite = leafSprites[i % leafSprites.length];
+                baseSize = (i % 2 === 0) ? 14 : 10;
+                speedY = Math.random() * 0.8 + 0.4;
             } else if (effectType === 'lanterns') {
-                sprite = spriteCache.lantern;
-            } else if (effectType === 'fireworks') {
-                const fwSprites = [spriteCache.starGold, spriteCache.starBlue, spriteCache.starPink, spriteCache.sparkGold, spriteCache.sparkPurple];
-                sprite = fwSprites[i % fwSprites.length];
-            } else if (effectType === 'hearts') {
-                sprite = spriteCache.heart;
+                // Lunar New Year: Rising silk lanterns & gold coins
+                isRising = true;
+                if (i % 3 === 0) {
+                    sprite = spriteCache.lantern;
+                    baseSize = Math.random() * 8 + 18;
+                    speedY = -(Math.random() * 0.45 + 0.25);
+                    opacity = Math.random() * 0.4 + 0.45;
+                } else if (i % 3 === 1) {
+                    sprite = spriteCache.goldCoin;
+                    baseSize = Math.random() * 6 + 12;
+                    speedY = -(Math.random() * 0.55 + 0.3);
+                } else {
+                    sprite = spriteCache.starGold;
+                    baseSize = Math.random() * 6 + 10;
+                    speedY = -(Math.random() * 0.65 + 0.35);
+                }
+            } else if (effectType === 'avurudu' || (effectType === 'sparkles' && window.TeaFactoryStore && window.TeaFactoryStore.getActiveThemeId() === 'avurudu')) {
+                // Ceylon Sinhala & Tamil New Year: Traditional Sweets (Konda Kavum, Kokis, Aluwa, Aasmi), Erabadu Mal & Solar Rays
+                const sweetSprites = [
+                    { sprite: spriteCache.kavumSweet, size: 20, speed: 0.65 },
+                    { sprite: spriteCache.kokisSweet, size: 20, speed: 0.6 },
+                    { sprite: spriteCache.aluwaSweet, size: 18, speed: 0.7 },
+                    { sprite: spriteCache.aasmiSweet, size: 20, speed: 0.62 },
+                    { sprite: spriteCache.erabaduMal, size: 18, speed: 0.68 },
+                    { sprite: spriteCache.sunburstSpark, size: 16, speed: 0.45, pulse: 0.04 },
+                    { sprite: spriteCache.jasminePetal, size: 13, speed: 0.55 }
+                ];
+                const item = sweetSprites[i % sweetSprites.length];
+                sprite = item.sprite;
+                baseSize = item.size + (Math.random() * 6 - 3);
+                speedY = Math.random() * 0.45 + item.speed;
+                pulseSpeed = item.pulse || 0;
+                opacity = Math.random() * 0.35 + 0.55;
+            } else if (effectType === 'diwali') {
+                // Diwali Festival of Lights: Floating Diya oil lamps & Rangoli light stars
+                if (i % 3 === 0) {
+                    sprite = spriteCache.diyaLamp;
+                    baseSize = Math.random() * 8 + 22;
+                    speedY = (Math.random() - 0.5) * 0.25; // Gentle float
+                    speedX = (Math.random() - 0.5) * 0.4;
+                    pulseSpeed = Math.random() * 0.06 + 0.03;
+                    opacity = Math.random() * 0.35 + 0.5;
+                } else if (i % 3 === 1) {
+                    sprite = spriteCache.diwaliStar;
+                    baseSize = Math.random() * 6 + 14;
+                    speedY = -(Math.random() * 0.4 + 0.2);
+                    pulseSpeed = Math.random() * 0.08 + 0.04;
+                } else {
+                    sprite = spriteCache.sparkGold;
+                    baseSize = Math.random() * 6 + 10;
+                    speedY = (Math.random() - 0.5) * 0.3;
+                }
+            } else if (effectType === 'valentines' || effectType === 'hearts') {
+                // Valentine's Royal Romance: Crimson & Champagne rose petals & glowing hearts
+                if (i % 3 === 0) {
+                    sprite = spriteCache.heart;
+                    baseSize = Math.random() * 6 + 16;
+                    isRising = true;
+                    speedY = -(Math.random() * 0.5 + 0.25);
+                    pulseSpeed = Math.random() * 0.05 + 0.02;
+                } else if (i % 3 === 1) {
+                    sprite = spriteCache.rosePetalCrimson;
+                    baseSize = Math.random() * 8 + 15;
+                    speedY = Math.random() * 0.7 + 0.35;
+                } else {
+                    sprite = spriteCache.rosePetalBlush;
+                    baseSize = Math.random() * 7 + 13;
+                    speedY = Math.random() * 0.65 + 0.3;
+                }
+            } else if (effectType === 'earthday' || effectType === 'leaves') {
+                // Earth Day Rainforest: Green tea leaves, golden tip leaves & glowing fireflies
+                if (i % 3 === 0) {
+                    sprite = spriteCache.fireflyGlow;
+                    baseSize = Math.random() * 8 + 14;
+                    speedY = (Math.random() - 0.5) * 0.4;
+                    speedX = (Math.random() - 0.5) * 0.6;
+                    pulseSpeed = Math.random() * 0.07 + 0.03;
+                    opacity = Math.random() * 0.4 + 0.4;
+                } else if (i % 3 === 1) {
+                    sprite = spriteCache.teaLeafGreen;
+                    baseSize = Math.random() * 6 + 15;
+                    speedY = Math.random() * 0.75 + 0.35;
+                } else {
+                    sprite = spriteCache.teaLeafGold;
+                    baseSize = Math.random() * 6 + 14;
+                    speedY = Math.random() * 0.7 + 0.35;
+                }
+            } else if (effectType === 'halloween') {
+                // Halloween & Autumn Harvest: Golden maple leaves, oak leaves, glowing Jack-o'-lanterns, amber bats & embers
+                const hwSprites = [
+                    { sprite: spriteCache.leafMapleGold, size: 20, speed: 0.7 },
+                    { sprite: spriteCache.pumpkinGlow, size: 22, speed: 0.5, pulse: 0.05 },
+                    { sprite: spriteCache.leafOakAmber, size: 20, speed: 0.65 },
+                    { sprite: spriteCache.batSilhouette, size: 18, speed: 0.45, pulse: 0.06 },
+                    { sprite: spriteCache.rosePetalCrimson, size: 16, speed: 0.68 },
+                    { sprite: spriteCache.sparkGold, size: 12, speed: 0.4, pulse: 0.07 }
+                ];
+                const item = hwSprites[i % hwSprites.length];
+                sprite = item.sprite;
+                baseSize = item.size + (Math.random() * 6 - 3);
+                speedY = Math.random() * 0.45 + item.speed;
+                pulseSpeed = item.pulse || 0;
+                opacity = Math.random() * 0.35 + 0.55;
             } else {
-                // Sparkles (Avurudu / Diwali)
+                // Fallback sparkles
                 sprite = (i % 2 === 0) ? spriteCache.starGold : spriteCache.sparkGold;
             }
 
             particles.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
-                size: Math.random() * (effectType === 'lanterns' ? 10 : 8) + 12,
-                speedY: isRising ? -(Math.random() * 0.65 + 0.3) : (Math.random() * 0.75 + 0.35),
-                speedX: (Math.random() - 0.5) * 0.65,
-                opacity: Math.random() * 0.55 + 0.35,
+                size: baseSize,
+                speedY: speedY,
+                speedX: speedX,
+                opacity: opacity,
+                baseOpacity: opacity,
+                pulseSpeed: pulseSpeed,
+                pulsePhase: Math.random() * Math.PI * 2,
                 rotation: Math.random() * 360,
-                rotationSpeed: (Math.random() - 0.5) * 1.2,
-                sprite: sprite
+                rotationSpeed: (Math.random() - 0.5) * 1.4,
+                sprite: sprite,
+                isRising: isRising
             });
         }
 
         function renderLoop(timestamp) {
             if (!timestamp) timestamp = performance.now();
 
-            // Throttle to ~35 FPS to save battery & CPU
             const delta = timestamp - lastFrameTime;
             if (delta < TARGET_FRAME_INTERVAL) {
                 ambientAnimationId = requestAnimationFrame(renderLoop);
@@ -9293,7 +9908,6 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             }
             lastFrameTime = timestamp;
 
-            // Pause if tab is hidden
             if (document.hidden) {
                 ambientAnimationId = requestAnimationFrame(renderLoop);
                 return;
@@ -9301,14 +9915,89 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // ── 1. New Year Fireworks Simulation ──
+            if (activeEffectType === 'fireworks') {
+                const now = timestamp;
+                const launchInterval = isMobile ? 1100 : 700;
+                if (now - fwLastLaunch > launchInterval && fwRockets.length < 3) {
+                    launchFwRocket();
+                    fwLastLaunch = now;
+                }
+
+                for (let rIdx = fwRockets.length - 1; rIdx >= 0; rIdx--) {
+                    const r = fwRockets[rIdx];
+                    r.trail.push({ x: r.x, y: r.y });
+                    if (r.trail.length > 5) r.trail.shift();
+
+                    r.x += r.vx;
+                    r.y += r.vy;
+                    r.vy += 0.04;
+
+                    ctx.save();
+                    ctx.strokeStyle = r.color;
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    for (let t = 0; t < r.trail.length; t++) {
+                        const pt = r.trail[t];
+                        if (t === 0) ctx.moveTo(pt.x, pt.y);
+                        else ctx.lineTo(pt.x, pt.y);
+                    }
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(r.x, r.y, 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+
+                    if (r.y <= r.targetY || r.vy >= -1) {
+                        explodeFwRocket(r.x, r.y, r.color);
+                        fwRockets.splice(rIdx, 1);
+                    }
+                }
+
+                for (let sIdx = fwSparks.length - 1; sIdx >= 0; sIdx--) {
+                    const s = fwSparks[sIdx];
+                    s.vx *= s.friction;
+                    s.vy = s.vy * s.friction + s.gravity;
+                    s.x += s.vx;
+                    s.y += s.vy;
+                    s.alpha -= s.decay;
+
+                    if (s.alpha <= 0) {
+                        fwSparks.splice(sIdx, 1);
+                        continue;
+                    }
+
+                    ctx.save();
+                    ctx.globalAlpha = s.flicker ? s.alpha * (0.65 + Math.random() * 0.35) : s.alpha;
+                    ctx.fillStyle = s.color;
+                    ctx.shadowColor = s.color;
+                    ctx.shadowBlur = 4;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            // ── 2. Atmospheric Themed Particles ──
             for (let i = 0; i < particles.length; i++) {
                 const p = particles[i];
                 ctx.save();
                 ctx.translate(p.x, p.y);
                 if (p.rotation !== 0) ctx.rotate((p.rotation * Math.PI) / 180);
-                ctx.globalAlpha = p.opacity;
 
-                // Ultra-fast cached sprite draw (up to 50x faster than canvas path operations)
+                // Handle organic pulse (for fireflies, diyas, solar flares, hearts)
+                if (p.pulseSpeed > 0) {
+                    p.pulsePhase += p.pulseSpeed;
+                    const pulseFactor = Math.sin(p.pulsePhase) * 0.35 + 0.65;
+                    ctx.globalAlpha = p.baseOpacity * pulseFactor;
+                } else {
+                    ctx.globalAlpha = p.opacity;
+                }
+
                 const half = p.size * 0.5;
                 if (p.sprite) {
                     ctx.drawImage(p.sprite, -half, -half, p.size, p.size);
@@ -9316,22 +10005,26 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
 
                 ctx.restore();
 
-                // Simple physics
+                // Physics update
                 p.y += p.speedY;
                 p.x += Math.sin(p.y * 0.012) * p.speedX;
                 p.rotation += p.rotationSpeed;
 
-                // Wrapping
-                if (p.speedY > 0 && p.y > canvas.height + 20) {
-                    p.y = -20;
-                    p.x = Math.random() * canvas.width;
-                } else if (p.speedY < 0 && p.y < -25) {
-                    p.y = canvas.height + 20;
-                    p.x = Math.random() * canvas.width;
+                // Screen edge wrap
+                if (p.isRising || p.speedY < 0) {
+                    if (p.y < -30) {
+                        p.y = canvas.height + 25;
+                        p.x = Math.random() * canvas.width;
+                    }
+                } else {
+                    if (p.y > canvas.height + 30) {
+                        p.y = -25;
+                        p.x = Math.random() * canvas.width;
+                    }
                 }
 
-                if (p.x > canvas.width + 20) p.x = -20;
-                else if (p.x < -20) p.x = canvas.width + 20;
+                if (p.x > canvas.width + 25) p.x = -25;
+                else if (p.x < -25) p.x = canvas.width + 25;
             }
 
             ambientAnimationId = requestAnimationFrame(renderLoop);
@@ -9353,6 +10046,42 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             }
         }
     });
+
+    function initSeasonalSkyFlyer(themeId, isActive) {
+        const skyEl = document.getElementById('seasonal-sky-flyer') || document.getElementById('christmas-santa-flyer');
+        if (!skyEl) return;
+
+        const rigEl = document.getElementById('seasonal-sky-rig') || skyEl.querySelector('.seasonal-sky-rig, .christmas-santa-rig');
+
+        if (isActive && themeId && themeId !== 'classic' && window.getSeasonalSkyRigHtml) {
+            const rigHtml = window.getSeasonalSkyRigHtml(themeId);
+            if (rigHtml && rigHtml.trim() !== '') {
+                if (rigEl) {
+                    rigEl.innerHTML = rigHtml;
+                }
+                skyEl.style.display = 'block';
+                void skyEl.offsetWidth; // Force reflow to re-trigger flight animation
+                skyEl.classList.add('active');
+                return;
+            }
+        }
+
+        // Deactivate & gracefully hide
+        skyEl.classList.remove('active');
+        setTimeout(() => {
+            if (skyEl && !skyEl.classList.contains('active')) {
+                skyEl.style.display = 'none';
+                if (rigEl) {
+                    rigEl.innerHTML = '';
+                }
+            }
+        }, 800);
+    }
+
+    // Backward-compatibility alias
+    function initChristmasSantaFlyer(isActive) {
+        initSeasonalSkyFlyer('christmas', isActive);
+    }
 
     window.appApplyTheme = function(themeId) {
         if (!window.TeaFactoryStore) return;
@@ -9403,6 +10132,13 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             } else {
                 heroSubtitles[0].textContent = 'Rock One Wild Tea (Pvt) Limited • Uva Medium Region';
             }
+        }
+
+        // 4. Seasonal Flying Sky Characters (Santa & Sleigh, NY Champagne, Lunar Dragon, Diwali Peacock, Cupid, Bird of Paradise, Koha)
+        if (currentThemeId !== 'classic' && settings.effectsEnabled !== false) {
+            initSeasonalSkyFlyer(currentThemeId, true);
+        } else {
+            initSeasonalSkyFlyer(currentThemeId, false);
         }
 
         // 5. Ambient Visual Effects (Snow, Leaves, Sparkles, Lanterns, Fireworks, Hearts)

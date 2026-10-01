@@ -227,7 +227,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png?v=1.26.0">
 
     <!-- Main Style Sheet -->
-    <link rel="stylesheet" href="css/style.css?v=3.1.0">
+    <link rel="stylesheet" href="css/style.css?v=3.2.5">
     
     <!-- Remote Debugging global error catcher -->
     <script>
@@ -294,6 +294,167 @@
 
     <!-- Ambient Seasonal Festive Canvas (Snow, Sparkles, Leaves, Lanterns) -->
     <canvas id="seasonal-ambient-canvas" class="seasonal-ambient-canvas"></canvas>
+
+    <!-- Seasonal Sky Flying Rig Overlay (Christmas Santa) -->
+    <div id="seasonal-sky-flyer" class="seasonal-sky-flyer" aria-hidden="true" style="display: none;">
+        <div id="seasonal-sky-rig" class="seasonal-sky-rig"></div>
+    </div>
+
+    <!-- Ceylon Sinhala & Tamil New Year (Avurudu) Perched Koha Bird & Erabadu Mal Branch -->
+    <div id="avurudu-koha-dock" class="avurudu-koha-dock" aria-label="Ceylon Avurudu Koha Bird and Erabadu Flowers">
+        <div class="koha-illustration-wrap">
+            <svg viewBox="0 0 200 170" width="100%" height="100%" class="koha-perch-svg">
+                <defs>
+                    <linearGradient id="kohaBlackGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#1e293b" />
+                        <stop offset="40%" stop-color="#0f172a" />
+                        <stop offset="100%" stop-color="#020617" />
+                    </linearGradient>
+                    <linearGradient id="kohaSheenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#065f46" />
+                        <stop offset="50%" stop-color="#0284c7" />
+                        <stop offset="100%" stop-color="#0f172a" />
+                    </linearGradient>
+                    <linearGradient id="erabaduPetalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#f87171" />
+                        <stop offset="50%" stop-color="#ef4444" />
+                        <stop offset="100%" stop-color="#991b1b" />
+                    </linearGradient>
+                    <filter id="kohaGlow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="3" result="blur" />
+                        <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                    </filter>
+                </defs>
+                <!-- Rustic Wooden Branch -->
+                <path d="M 0 145 Q 60 135, 110 140 Q 150 144, 200 135" stroke="#78350f" stroke-width="8" stroke-linecap="round" fill="none" />
+                <path d="M 0 145 Q 60 135, 110 140 Q 150 144, 200 135" stroke="#92400e" stroke-width="4" stroke-linecap="round" fill="none" />
+                <path d="M 120 142 Q 150 160, 180 165" stroke="#78350f" stroke-width="4" stroke-linecap="round" fill="none" />
+
+                <!-- Erabadu Leaves (Bright Tropical Foliage) -->
+                <g fill="#16a34a" stroke="#14532d" stroke-width="0.8">
+                    <path d="M 30 140 C 20 125, 45 120, 50 138 Z" />
+                    <path d="M 75 142 C 65 128, 90 122, 95 140 Z" />
+                    <path d="M 140 146 C 135 130, 160 130, 160 148 Z" />
+                    <path d="M 165 155 C 160 170, 185 170, 185 158 Z" />
+                </g>
+
+                <!-- Erabadu Mal (Scarlet Coral Flowers) -->
+                <g filter="url(#kohaGlow)">
+                    <!-- Flower Cluster 1 (Left of bird) -->
+                    <g transform="translate(40, 125)">
+                        <path d="M 0 0 C -8 -15, 8 -24, 18 -10 C 12 -2, 4 4, 0 0 Z" fill="url(#erabaduPetalGrad)" />
+                        <path d="M 8 -5 C 2 -20, 20 -28, 26 -12 C 20 -4, 12 2, 8 -5 Z" fill="url(#erabaduPetalGrad)" />
+                        <path d="M -4 2 C -15 -8, -6 -20, 4 -12 Z" fill="#dc2626" />
+                        <circle cx="15" cy="-18" r="1.5" fill="#facc15" />
+                        <circle cx="22" cy="-20" r="1.5" fill="#facc15" />
+                    </g>
+                    <!-- Flower Cluster 2 (Right of branch) -->
+                    <g transform="translate(150, 130)">
+                        <path d="M 0 0 C -6 -18, 12 -26, 22 -12 C 15 -3, 6 4, 0 0 Z" fill="url(#erabaduPetalGrad)" />
+                        <path d="M 10 -4 C 5 -22, 25 -30, 30 -14 C 24 -5, 14 3, 10 -4 Z" fill="url(#erabaduPetalGrad)" />
+                        <circle cx="18" cy="-20" r="1.5" fill="#facc15" />
+                        <circle cx="25" cy="-22" r="1.5" fill="#facc15" />
+                    </g>
+                </g>
+
+                <!-- Koha Bird (Asian Koel) Body, Wing, Tail & Head -->
+                <g class="koha-bird-rig" transform="translate(68, 48)">
+                    <!-- Long Tail Feathers -->
+                    <path d="M 28 65 Q 15 95, 0 120 Q 22 105, 34 70 Z" fill="#020617" />
+                    <path d="M 32 68 Q 24 95, 12 118 Q 30 100, 38 72 Z" fill="#0f172a" />
+
+                    <!-- Bird Feet Clasping Branch -->
+                    <path d="M 38 88 L 34 94 M 42 88 L 42 95 M 46 88 L 50 94" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" />
+
+                    <!-- Main Body -->
+                    <ellipse cx="50" cy="55" rx="22" ry="30" fill="url(#kohaBlackGrad)" transform="rotate(-20 50 55)" />
+
+                    <!-- Glossy Sheen Wing -->
+                    <path d="M 38 40 Q 25 65, 40 82 Q 55 65, 62 42 Q 50 35, 38 40 Z" fill="url(#kohaSheenGrad)" />
+                    <path d="M 40 45 Q 32 65, 45 78" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1.2" fill="none" />
+
+                    <!-- Head and Neck -->
+                    <circle cx="68" cy="28" r="14" fill="url(#kohaBlackGrad)" />
+
+                    <!-- Sleek Beak (Pale Ivory / Horn) -->
+                    <polygon points="80,26 95,30 80,34" fill="#fef08a" stroke="#ca8a04" stroke-width="0.8" />
+
+                    <!-- Piercing Ruby-Red Eye (Signature Avurudu Koha feature) -->
+                    <circle cx="73" cy="25" r="4.5" fill="#dc2626" filter="url(#kohaGlow)" />
+                    <circle cx="73" cy="25" r="2.5" fill="#991b1b" />
+                    <circle cx="73" cy="25" r="1.5" fill="#000000" />
+                    <circle cx="74" cy="24" r="1" fill="#ffffff" />
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Halloween & Autumn Harvest Jack-o'-lantern & Autumn Foliage Corner Dock -->
+    <div id="halloween-jacko-dock" class="halloween-jacko-dock" aria-label="Halloween Jack-o'-lantern and Autumn Leaves">
+        <div class="halloween-illustration-wrap">
+            <svg viewBox="0 0 190 160" width="100%" height="100%" class="halloween-jacko-svg">
+                <defs>
+                    <radialGradient id="jackoGlowGrad" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#fff5c0" />
+                        <stop offset="35%" stop-color="#f59e0b" />
+                        <stop offset="70%" stop-color="#ea580c" />
+                        <stop offset="100%" stop-color="rgba(194, 65, 12, 0)" />
+                    </radialGradient>
+                    <linearGradient id="pumpkinSkin" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#fb923c" />
+                        <stop offset="50%" stop-color="#ea580c" />
+                        <stop offset="100%" stop-color="#7c2d12" />
+                    </linearGradient>
+                    <filter id="hwGlowFilter" x="-30%" y="-30%" width="160%" height="160%">
+                        <feGaussianBlur stdDeviation="3.5" result="blur" />
+                        <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                    </filter>
+                </defs>
+
+                <!-- Autumn Ground Leaves Bed -->
+                <g>
+                    <!-- Dark Oak Leaf Left -->
+                    <path d="M 20 145 C 10 120, 50 110, 70 135 C 50 150, 30 155, 20 145 Z" fill="#9a3412" opacity="0.8" />
+                    <!-- Golden Maple Leaf Right -->
+                    <path d="M 170 145 C 160 120, 120 115, 100 140 C 130 155, 155 155, 170 145 Z" fill="#d97706" opacity="0.85" />
+                    <!-- Crimson Accent Leaf -->
+                    <path d="M 50 150 C 40 135, 75 125, 90 145 Z" fill="#991b1b" opacity="0.75" />
+                </g>
+
+                <!-- Glowing Jack-o'-lantern Body -->
+                <g transform="translate(95, 88)" filter="url(#hwGlowFilter)">
+                    <!-- Candle Aura -->
+                    <circle cx="0" cy="0" r="46" fill="url(#jackoGlowGrad)" opacity="0.45" />
+
+                    <!-- Pumpkin Outer Lobes -->
+                    <ellipse cx="-22" cy="2" rx="18" ry="32" fill="#9a3412" transform="rotate(-12 -22 2)" />
+                    <ellipse cx="22" cy="2" rx="18" ry="32" fill="#9a3412" transform="rotate(12 22 2)" />
+                    <!-- Pumpkin Mid Lobes -->
+                    <ellipse cx="-12" cy="0" rx="20" ry="34" fill="url(#pumpkinSkin)" transform="rotate(-6 -12 0)" />
+                    <ellipse cx="12" cy="0" rx="20" ry="34" fill="url(#pumpkinSkin)" transform="rotate(6 12 0)" />
+                    <!-- Center Lobe -->
+                    <ellipse cx="0" cy="0" rx="20" ry="35" fill="url(#pumpkinSkin)" />
+
+                    <!-- Stem -->
+                    <path d="M -4 -34 C -5 -46, 6 -52, 10 -48 C 6 -42, 4 -34, 4 -34 Z" fill="#4d3209" stroke="#1c1303" stroke-width="0.8" />
+                    <path d="M 4 -40 Q 14 -44, 18 -36" stroke="#15803d" stroke-width="1.8" fill="none" stroke-linecap="round" />
+
+                    <!-- Carved Glowing Eyes & Grin -->
+                    <polygon points="-16,-10 -6,-10 -11,-20" fill="#fef08a" />
+                    <polygon points="16,-10 6,-10 11,-20" fill="#fef08a" />
+                    <path d="M -18 8 Q 0 24, 18 8 Q 12 18, 0 19 Q -12 18, -18 8 Z" fill="#fef08a" />
+                    <polygon points="-6,10 -2,10 -4,15" fill="#7c2d12" />
+                    <polygon points="4,10 8,10 6,15" fill="#7c2d12" />
+                </g>
+
+                <!-- Floating Little Amber Bats -->
+                <g fill="#f59e0b" opacity="0.8" filter="url(#hwGlowFilter)">
+                    <path d="M 35 35 Q 45 25, 55 30 Q 50 40, 45 38 Q 40 45, 35 35 Z" />
+                    <path d="M 155 45 Q 165 38, 172 42 Q 168 50, 164 48 Q 160 54, 155 45 Z" />
+                </g>
+            </svg>
+        </div>
+    </div>
 
     <!-- Seasonal Theme Festive Header Banner -->
     <div id="seasonal-theme-banner-strip" class="seasonal-theme-banner" style="display: none;">
@@ -666,14 +827,14 @@
 
             <!-- Daily Updates & Offers Section -->
             <div class="home-announcements-block" style="margin-bottom: 5rem; padding-bottom: 4rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <span class="section-tag">Daily Updates & Offers</span>
-                <h3 class="home-section-title" style="margin-bottom: 2rem;">Latest Bulletins from the Estate</h3>
+                <span class="section-tag">Estate News &amp; Updates</span>
+                <h3 class="home-section-title" style="margin-bottom: 2rem;">Latest Announcements</h3>
                 <div id="home-announcements-grid" class="announcements-grid">
                     <!-- Loaded dynamically -->
                 </div>
                 <div style="text-align: center; margin-top: 2.5rem;">
                     <span class="btn btn-outline" onclick="window.appSwitchTab ? window.appSwitchTab('announcements') : (document.getElementById('nav-announcements') &amp;&amp; document.getElementById('nav-announcements').click())">
-                        View All Bulletins
+                        View All Announcements
                     </span>
                 </div>
             </div>
@@ -811,7 +972,7 @@
                 <ul class="footer-links-list">
                     <li><span onclick="window.appSwitchTab ? window.appSwitchTab('home') : (document.getElementById('nav-home') &amp;&amp; document.getElementById('nav-home').click())">Home</span></li>
                     <li><span onclick="window.appOpenAboutModal ? window.appOpenAboutModal() : (window.appSwitchTab &amp;&amp; window.appSwitchTab('about'))">About Us &amp; Heritage</span></li>
-                    <li><span onclick="window.appSwitchTab ? window.appSwitchTab('announcements') : (document.getElementById('nav-announcements') &amp;&amp; document.getElementById('nav-announcements').click())">Bulletins</span></li>
+                    <li><span onclick="window.appSwitchTab ? window.appSwitchTab('announcements') : (document.getElementById('nav-announcements') &amp;&amp; document.getElementById('nav-announcements').click())">Announcements</span></li>
                     <li><span onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') &amp;&amp; document.getElementById('nav-gifts').click())">Gift Catalog</span></li>
                     <li><span onclick="window.appSwitchTab ? window.appSwitchTab('catalog') : (document.getElementById('nav-catalog') &amp;&amp; document.getElementById('nav-catalog').click())">Product Catalog</span></li>
                     <li><span onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') &amp;&amp; document.getElementById('nav-tours').click())">Factory Tours</span></li>
@@ -900,7 +1061,7 @@
     <div id="announcement-modal" class="drawer-overlay">
         <div class="drawer-container" style="max-width: 600px;">
             <div class="drawer-header">
-                <h3 id="ann-modal-title" class="drawer-title">Bulletin Details</h3>
+                <h3 id="ann-modal-title" class="drawer-title">Announcement Details</h3>
                 <button id="ann-modal-close-btn" class="drawer-close" aria-label="Close details modal">&times;</button>
             </div>
             <div class="drawer-body" style="padding: 0;">
@@ -1101,12 +1262,12 @@
         </div>
     </button>
 
-    <!-- Floating Luxury Bulletins / Daily Updates & Offers Button (Right Screen Side) -->
+    <!-- Floating Luxury Announcements / Daily Updates & Offers Button (Right Screen Side) -->
     <button id="floating-bulletins-btn" 
             class="floating-bulletins-btn" 
             onclick="window.appSwitchTab ? window.appSwitchTab('announcements') : (document.getElementById('nav-announcements') &amp;&amp; document.getElementById('nav-announcements').click())"
-            aria-label="Estate Bulletins, Daily Updates &amp; Special Offers" 
-            title="Daily Bulletins • Latest Estate News &amp; Offers">
+            aria-label="Estate Announcements, Daily Updates &amp; Special Offers" 
+            title="Estate Announcements • Latest News &amp; Offers">
         <div class="bulletins-btn-pulse-ring" id="floating-bulletins-pulse"></div>
         <div class="bulletins-shine-sheen"></div>
         <div class="bulletins-icon-box">
@@ -1645,9 +1806,9 @@
     </button>
 
     <!-- Script Loads (Execution dependency order: i18n -> store -> components -> app) -->
-    <script defer src="js/i18n.js?v=3.1.0"></script>
-    <script defer src="js/store.js?v=3.1.0"></script>
-    <script defer src="js/components.js?v=3.1.0"></script>
-    <script defer src="js/app.js?v=3.1.0"></script>
+    <script defer src="js/i18n.js?v=3.2.5"></script>
+    <script defer src="js/store.js?v=3.2.5"></script>
+    <script defer src="js/components.js?v=3.2.5"></script>
+    <script defer src="js/app.js?v=3.2.5"></script>
 </body>
 </html>

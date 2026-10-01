@@ -48,24 +48,6 @@ const DEFAULT_SEASONAL_THEMES = [
         effects: "snow"
     },
     {
-        id: "halloween",
-        name: "Halloween & Autumn Harvest",
-        occasion: "October • Autumn Solstice & Harvest",
-        iconKey: "halloween",
-        greetingTitle: "Happy Halloween & Autumn Harvest!",
-        tagline: "Spiced pumpkin amber, mysterious night obsidian, and glowing harvest embers.",
-        primaryColor: "#f59e0b",
-        goldLight: "#fcd34d",
-        bgDeep: "#0e0804",
-        accentColor: "#c2410c",
-        bannerText: "Happy Halloween! Discover Our Limited Cask-Aged Wood-Fired Orthodox Autumn Selection",
-        headerBadge: "Autumn Harvest Edition",
-        heroSubtitle: "Autumn Solstice Harvest • Wood-Fired Family Estate Reserve",
-        sommelierGreeting: "**Happy Halloween & Autumn Harvest!** Welcome to our mountain sanctuary. Discover our special small-batch wood-fired orthodox teas cured over fragrant cinnamon wood.\n\nWhat can I brew for you today?",
-        badge: "Autumn Harvest",
-        effects: "leaves"
-    },
-    {
         id: "newyear",
         name: "New Year Celebration",
         occasion: "January • Global New Year",
@@ -117,7 +99,7 @@ const DEFAULT_SEASONAL_THEMES = [
         heroSubtitle: "Auspicious New Year Harvest • Traditional Uva Mountain Terroir",
         sommelierGreeting: "**Subha Aluth Avuruddak Wewa / Iniya Puthandu Vazhthukkal!** Welcome to our ancestral family estate. Celebrate the auspicious April harvest with freshly plucked Silver Tips.\n\nSelect a topic below:",
         badge: "Ceylon Heritage",
-        effects: "sparkles"
+        effects: "avurudu"
     },
     {
         id: "diwali",
@@ -135,7 +117,7 @@ const DEFAULT_SEASONAL_THEMES = [
         heroSubtitle: "Festival of Lights Reserve • Luminous Golden Tips Edition",
         sommelierGreeting: "**Shubh Deepavali! Happy Festival of Lights!** May light, sweetness, and prosperity fill your home. Let us help you curate festive gift chests for family & connoisseurs.",
         badge: "Festival of Lights",
-        effects: "sparkles"
+        effects: "diwali"
     },
     {
         id: "valentines",
@@ -153,7 +135,7 @@ const DEFAULT_SEASONAL_THEMES = [
         heroSubtitle: "Royal Romance Edition • Pure Handcrafted Artisanal Ceylon",
         sommelierGreeting: "**Happy Valentine's Season!** Discover the elegance of gifting handcrafted single-estate tea in individually numbered teak wood chests.\n\nHow may I assist your romantic selection?",
         badge: "Royal Romance",
-        effects: "hearts"
+        effects: "valentines"
     },
     {
         id: "earthday",
@@ -171,7 +153,25 @@ const DEFAULT_SEASONAL_THEMES = [
         heroSubtitle: "Rainforest Sanctuary Reserve • 100% Virgin Forest Canopy Cultivation",
         sommelierGreeting: "**Happy Earth Day!** At Rock One Wild Tea, we nurture wild arbor tea bushes beneath protected mountain rock formations without chemicals or synthetic sprays.\n\nDiscover our sustainable story below:",
         badge: "Rainforest Eco",
-        effects: "leaves"
+        effects: "earthday"
+    },
+    {
+        id: "halloween",
+        name: "Halloween & Autumn Harvest",
+        occasion: "October • Halloween & Autumn Harvest",
+        iconKey: "halloween",
+        greetingTitle: "A Bewitching Brew • Happy Halloween & Autumn Harvest",
+        tagline: "Moody forest obsidian, glowing harvest amber, and mystical Ceylon mountain terroir.",
+        primaryColor: "#f59e0b",
+        goldLight: "#fde047",
+        bgDeep: "#0a100c",
+        accentColor: "#ea580c",
+        bannerText: "A Bewitching Brew: From the Wild Forest Garden to Your Cup • Mystical Autumn Harvest Reserve",
+        headerBadge: "Gothic Autumn Harvest",
+        heroSubtitle: "Halloween & Autumn Harvest Reserve • Handcrafted Ceylon Mountain Garden",
+        sommelierGreeting: "**Welcome to our Autumn Harvest Sanctuary!** Step into the mystical realm of Rock One Wild Tea. Discover our spiced black teas and rare whole-leaf harvests aged in solid teak chests.\n\nHow may I assist your autumn reservation?",
+        badge: "Autumn Harvest",
+        effects: "halloween"
     }
 ];
 
@@ -1091,7 +1091,9 @@ class TeaFactoryStore {
     }
 
     getActiveThemeId() {
-        return (this.state && this.state.activeTheme) || localStorage.getItem('tea_factory_active_theme') || 'classic';
+        const id = (this.state && this.state.activeTheme) || localStorage.getItem('tea_factory_active_theme') || 'classic';
+        const exists = DEFAULT_SEASONAL_THEMES.some(t => t.id === id);
+        return exists ? id : 'classic';
     }
 
     getActiveTheme() {

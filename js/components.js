@@ -21,8 +21,6 @@ window.getSeasonalThemeIconSvg = function(themeId, size = 18, extraClass = '') {
     switch (themeId) {
         case 'christmas':
             return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><polygon points="12 2 15 8 13.5 8 17 14 15 14 19 20 5 20 9 14 7 14 10.5 8 9 8 12 2"></polygon><line x1="12" y1="20" x2="12" y2="23"></line></svg>`;
-        case 'halloween':
-            return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><path d="M12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2Z"></path><path d="M7 10L9 12L7 14"></path><path d="M17 10L15 12L17 14"></path><path d="M9 17C10.5 18 13.5 18 15 17"></path><path d="M12 2V5"></path></svg>`;
         case 'newyear':
             return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
         case 'lunarnewyear':
@@ -35,6 +33,8 @@ window.getSeasonalThemeIconSvg = function(themeId, size = 18, extraClass = '') {
             return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>`;
         case 'earthday':
             return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><path d="M7 20h10"></path><path d="M10 20c0-4 2-7 2-10"></path><path d="M12 10C10.5 7.5 8 6 5 6c0 4 2 7.5 5 8"></path><path d="M12 7c2-2 5-3 7-3 0 3.5-1.5 6-4 7"></path></svg>`;
+        case 'halloween':
+            return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><ellipse cx="12" cy="13" rx="9" ry="7"></ellipse><path d="M12 6V3"></path><path d="M9 11l1 1-1 1"></path><path d="M15 11l-1 1 1 1"></path><path d="M9 16c1.5 1 4.5 1 6 0"></path></svg>`;
         case 'classic':
         default:
             return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${cls}><path d="M12 22V12"></path><path d="M12 12C12 7 7 4 2 4C2 9 5 14 12 14"></path><path d="M12 12C12 7 17 4 22 4C22 9 19 14 12 14"></path></svg>`;
@@ -72,13 +72,13 @@ const UIComponents = {
                     <p class="ann-content">${ann.content}</p>
                 </div>
                 <div class="ann-footer">
-                    ${ann.premium ? '<span class="premium-badge">Collector Exclusives</span>' : `<button type="button" class="ann-read-more" onclick="event.stopPropagation(); window.openAnnModal && window.openAnnModal('${ann.id}')" style="background:none; border:none; padding:0; cursor:pointer; font:inherit; color:inherit;">Read Bulletin &rarr;</button>`}
+                    ${ann.premium ? '<span class="premium-badge">Collector Exclusives</span>' : `<button type="button" class="ann-read-more" onclick="event.stopPropagation(); window.openAnnModal && window.openAnnModal('${ann.id}')" style="background:none; border:none; padding:0; cursor:pointer; font:inherit; color:inherit;">Read Announcement &rarr;</button>`}
                 </div>
             </div>
         `).join('');
     },
 
-    // 1b. Render Dedicated Announcements & Bulletins Page
+    // 1b. Render Dedicated Announcements Page
     renderAnnouncementsPage(containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -88,15 +88,15 @@ const UIComponents = {
         let html = `
             <div class="tour-header-block" style="margin-bottom: 3rem;">
                 <span class="section-tag">Estate Happenings</span>
-                <h2 class="view-title">Announcements &amp; Bulletins</h2>
+                <h2 class="view-title">Announcements</h2>
                 <p class="view-subtitle">Stay informed on our latest organic tea harvest notes, estate events, and exclusive sommelier updates.</p>
             </div>
 
-            <!-- Bulletins Showcase Block -->
+            <!-- Announcements Showcase Block -->
             <div class="announcements-showcase-card" style="background-image: linear-gradient(rgba(4, 10, 6, 0.4), rgba(4, 10, 6, 0.9)), url('images/luxury_tea_announcement.jpg');">
                 <div class="showcase-content">
                     <span class="season-badge">Master Sommelier Journal</span>
-                    <h3 class="showcase-title">Artisanal Harvesting Bulletins</h3>
+                    <h3 class="showcase-title">Artisanal Harvest Announcements</h3>
                     <p class="showcase-desc">Read our master tea maker's notes on weather conditions, seasonal plucking cycles, and flavor profile developments direct from the wild forest slopes.</p>
                 </div>
             </div>
@@ -105,7 +105,7 @@ const UIComponents = {
         `;
 
         if (announcements.length === 0) {
-            html += `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 4rem;">No active bulletins at this time. Check back soon.</div>`;
+            html += `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 4rem;">No active announcements at this time. Check back soon.</div>`;
         } else {
             html += announcements.map(ann => `
                 <div class="box-card announcement-card ${ann.premium ? 'premium-ann' : ''}" data-id="${ann.id}" onclick="window.openAnnModal && window.openAnnModal('${ann.id}')" style="cursor: pointer;">
@@ -125,7 +125,7 @@ const UIComponents = {
                             <p class="box-details" style="line-height: 1.6; font-size: 0.8rem; height: 50px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 0;">${ann.content}</p>
                         </div>
                         <div class="box-footer" style="margin-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 0.75rem; text-align: right;">
-                            <button type="button" class="ann-read-more" onclick="event.stopPropagation(); window.openAnnModal && window.openAnnModal('${ann.id}')" style="background:none; border:none; padding:0; cursor:pointer; font:inherit; color: var(--color-gold); font-size: 0.75rem; font-weight: 600;">Read Bulletin &rarr;</button>
+                            <button type="button" class="ann-read-more" onclick="event.stopPropagation(); window.openAnnModal && window.openAnnModal('${ann.id}')" style="background:none; border:none; padding:0; cursor:pointer; font:inherit; color: var(--color-gold); font-size: 0.75rem; font-weight: 600;">Read Announcement &rarr;</button>
                         </div>
                     </div>
                 </div>
@@ -2032,11 +2032,11 @@ const UIComponents = {
             html += `
                 <div class="panel-card" style="max-width: 600px; margin: 0 auto;">
                     <h3 class="panel-title">Create Announcement or Event</h3>
-                    <p class="panel-desc">Post a bulletin detailing estate harvest notes, updates, or private tasting invitations.</p>
+                    <p class="panel-desc">Post an announcement detailing estate harvest notes, updates, or private tasting invitations.</p>
                     
                     <form id="announcement-form" class="admin-form">
                         <div class="form-group">
-                            <label for="ann-title-input">Bulletin Title</label>
+                            <label for="ann-title-input">Announcement Title</label>
                             <input type="text" id="ann-title-input" placeholder="e.g. Organic Jasmine Reserve Launch" required>
                         </div>
                         <div class="form-group">
@@ -2050,7 +2050,7 @@ const UIComponents = {
                         </div>
                         <div class="form-group">
                             <label for="ann-content-input">Message Details</label>
-                            <textarea id="ann-content-input" rows="3" placeholder="Enter bulletin details here..." required></textarea>
+                            <textarea id="ann-content-input" rows="3" placeholder="Enter announcement details here..." required></textarea>
                         </div>
                         <div class="form-group inline-checkbox">
                             <input type="checkbox" id="ann-premium-input">
@@ -2071,7 +2071,7 @@ const UIComponents = {
 
                     <!-- Existing Announcements List -->
                     <div class="existing-announcements" style="margin-top: 3rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 2rem;">
-                        <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--color-white); margin-bottom: 1.5rem;">Manage Published Bulletins</h4>
+                        <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--color-white); margin-bottom: 1.5rem;">Manage Published Announcements</h4>
                         <div style="display: flex; flex-direction: column; gap: 1rem;">
                             ${announcements.map(ann => `
                                 <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.04);">
@@ -2774,7 +2774,16 @@ const UIComponents = {
                                             </span>
                                         </div>
 
-                                        <p style="font-size: 0.8rem; color: #cbd5e1; line-height: 1.45; margin-bottom: 1rem;">${t.tagline}</p>
+                                        <p style="font-size: 0.8rem; color: #cbd5e1; line-height: 1.45; margin-bottom: 0.85rem;">${t.tagline}</p>
+
+                                        ${t.previewImage ? `
+                                            <div style="width: 100%; height: 95px; border-radius: 8px; overflow: hidden; margin-bottom: 0.85rem; border: 1px solid rgba(212,175,55,0.3); position: relative; background: #000;">
+                                                <img src="${t.previewImage}" alt="${t.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.style.display='none'">
+                                                <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 0.25rem 0.5rem; background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%); font-size: 0.65rem; color: #fef08a; font-weight: 600;">
+                                                    ✨ Curated Festive Visuals Active
+                                                </div>
+                                            </div>
+                                        ` : ''}
 
                                         <!-- Palette Swatch Circles -->
                                         <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.55rem 0.85rem; margin-bottom: 1.15rem;">
@@ -5589,3 +5598,30 @@ const UIComponents = {
 };
 
 window.UIComponents = UIComponents;
+
+/**
+ * Generates custom, theme-specific animated sky characters and celebration rigs
+ */
+window.getSeasonalSkyRigHtml = function(themeId) {
+    if (!themeId || themeId === 'classic') return '';
+
+    if (themeId === 'christmas') {
+        return `
+            <img src="images/santa_reindeer_team_transparent.png?v=3.1.2" 
+                 alt="Santa Claus Flying with 6 Reindeer and Sleigh" 
+                 class="theme-sky-img" 
+                 loading="eager" 
+                 decoding="async">
+            <div class="sky-stardust-trail">
+                <span class="stardust-sparkle s1">✨</span>
+                <span class="stardust-sparkle s2">⭐</span>
+                <span class="stardust-sparkle s3">✨</span>
+                <span class="stardust-sparkle s4">🌟</span>
+            </div>
+            <div class="sky-luxury-wish">✨ Merry Christmas & Happy Holidays ✨</div>
+        `;
+    }
+
+    // All other themes use custom ambient full-screen canvas particle & atmosphere engines (no flying cartoon rigs)
+    return '';
+};

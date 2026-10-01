@@ -20,7 +20,8 @@
             // Navigation
             nav_home: "Home",
             nav_about: "About Us",
-            nav_bulletins: "Bulletins",
+            nav_bulletins: "Announcements",
+            nav_announcements: "Announcements",
             nav_gifts: "Gift Catalog",
             nav_products: "Products",
             nav_tours: "Factory Tours",
@@ -1130,7 +1131,8 @@
             // Navigation
             nav_home: "الرئيسية",
             nav_about: "من نحن",
-            nav_bulletins: "النشرات",
+            nav_bulletins: "الإعلانات",
+            nav_announcements: "الإعلانات",
             nav_gifts: "صناديق الهدايا",
             nav_products: "تشكيلة الشاي",
             nav_tours: "جولات المصنع",
