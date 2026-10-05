@@ -292,6 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedGalleryImageBase64 = '';
     let selectedOrderSlipBase64 = '';
     let selectedTourSlipBase64 = '';
+    let selectedProdSlipBase64 = '';
     let activeAdminSubTab = 'audits';
 
     // 2. Select DOM Elements
@@ -1777,11 +1778,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 </button>
             `;
 
+            selectedProdSlipBase64 = '';
             bindPaymentTabs('prod-booking-form');
             bindBespokeGiftEvents('prod');
-            bindFileUpload('prod-bank-slip', 'prod-bank-slip-zone', 'prod-slip-preview');
-            bindFileUpload('prod-cash-slip', 'prod-cash-slip-zone', 'prod-cash-slip-preview');
-            document.getElementById('submit-prod-booking-btn').addEventListener('click', handleProductBookingSubmit);
+            bindFileUpload('prod-bank-slip', 'prod-bank-slip-zone', 'prod-slip-preview', (b64) => {
+                selectedProdSlipBase64 = b64;
+            });
+            bindFileUpload('prod-cash-slip', 'prod-cash-slip-zone', 'prod-cash-slip-preview', (b64) => {
+                selectedProdSlipBase64 = b64;
+            });
+            document.getElementById('submit-prod-booking-btn')?.addEventListener('click', handleProductBookingSubmit);
         
         } else if (type === 'review') {
             drawerTitle.innerText = "Rate & Review Your Experience";
@@ -1896,18 +1902,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             updateStars(5);
 
-            document.getElementById('submit-review-btn').addEventListener('click', () => {
+            document.getElementById('submit-review-btn')?.addEventListener('click', () => {
                 const form = document.getElementById('review-submission-form');
+                if (!form) return;
                 if (!form.checkValidity()) {
                     form.reportValidity();
                     return;
                 }
 
-                const name = document.getElementById('rev-cust-name').value.trim();
-                const location = document.getElementById('rev-cust-location').value.trim();
-                const title = document.getElementById('rev-cust-title').value.trim();
-                const experienceType = document.getElementById('rev-experience-type').value;
-                const comment = document.getElementById('rev-comment').value.trim();
+                const name = document.getElementById('rev-cust-name')?.value?.trim() || 'Valued Guest';
+                const location = document.getElementById('rev-cust-location')?.value?.trim() || 'Sri Lanka';
+                const title = document.getElementById('rev-cust-title')?.value?.trim() || 'Tea Connoisseur';
+                const experienceType = document.getElementById('rev-experience-type')?.value || 'General Tasting';
+                const comment = document.getElementById('rev-comment')?.value?.trim() || '';
 
                 window.TeaFactoryStore.addReview({
                     name,
@@ -2022,22 +2029,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6. Box Enquiry Submission handler
     function handleBoxEnquirySubmit(channel) {
         const form = document.getElementById('box-booking-form');
+        if (!form) return;
         if (!form.checkValidity()) {
             form.reportValidity();
             return;
         }
 
-        const name = document.getElementById('cust-name').value;
-        const email = document.getElementById('cust-email').value;
-        const phone = document.getElementById('cust-phone').value;
-        const preferredDate = document.getElementById('cust-pref-date').value;
-        const message = document.getElementById('cust-enquiry-msg').value;
+        const name = document.getElementById('cust-name')?.value?.trim() || '';
+        const email = document.getElementById('cust-email')?.value?.trim() || '';
+        const phone = document.getElementById('cust-phone')?.value?.trim() || '';
+        const preferredDate = document.getElementById('cust-pref-date')?.value || '';
+        const message = document.getElementById('cust-enquiry-msg')?.value?.trim() || '';
         const isGift = document.getElementById('box-enable-gift')?.checked || false;
         const giftWax = document.getElementById('box-wax-val')?.value || 'Imperial Gold';
-        const giftMonogram = document.getElementById('box-monogram-input')?.value.trim().toUpperCase() || '';
-        const giftMsg = document.getElementById('box-gift-msg')?.value.trim() || '';
+        const giftMonogram = document.getElementById('box-monogram-input')?.value?.trim().toUpperCase() || '';
+        const giftMsg = document.getElementById('box-gift-msg')?.value?.trim() || '';
 
-        const boxId = currentDrawerContext.id;
+        const boxId = currentDrawerContext ? currentDrawerContext.id : null;
         const result = window.TeaFactoryStore.bookBox(boxId, { 
             name, 
             email, 
@@ -2107,18 +2115,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // 7. Tour Booking Submission handler
     function handleTourBookingSubmit() {
         const form = document.getElementById('tour-booking-form');
+        if (!form) return;
         if (!form.checkValidity()) {
             form.reportValidity();
             return;
         }
 
-        const name = document.getElementById('tour-cust-name').value.trim();
-        const email = document.getElementById('tour-cust-email').value.trim();
-        const phone = document.getElementById('tour-cust-phone').value.trim();
-        const guests = Math.max(1, parseInt(document.getElementById('tour-guests').value) || 1);
-        const tourDate = document.getElementById('tour-date-input').value;
-        const dietaryNotes = document.getElementById('tour-dietary').value;
-        const transportRequired = document.getElementById('tour-transport').value;
+        const name = document.getElementById('tour-cust-name')?.value?.trim() || '';
+        const email = document.getElementById('tour-cust-email')?.value?.trim() || '';
+        const phone = document.getElementById('tour-cust-phone')?.value?.trim() || '';
+        const guests = Math.max(1, parseInt(document.getElementById('tour-guests')?.value) || 1);
+        const tourDate = document.getElementById('tour-date-input')?.value || '';
+        const dietaryNotes = document.getElementById('tour-dietary')?.value || 'None';
+        const transportRequired = document.getElementById('tour-transport')?.value || 'No Transport Needed';
         
         // Active payment method
         const activeTabBtn = form.querySelector('.pay-tab.active');
@@ -2132,8 +2141,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const slipImg = selectedTourSlipBase64 || 
+            document.getElementById('tour-bank-slip-zone')?.dataset?.fileBase64 || 
+            document.getElementById('tour-cash-slip-zone')?.dataset?.fileBase64 || '';
+
         // Check slip requirement for bank/slip methods
-        if ((paymentMethod === 'bank' || paymentMethod === 'slip') && !selectedTourSlipBase64) {
+        if ((paymentMethod === 'bank' || paymentMethod === 'slip') && !slipImg) {
             showToast("Deposit Slip Required", "Please attach your bank deposit receipt / transfer screenshot to submit.", "error");
             return;
         }
@@ -2163,7 +2176,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dietaryNotes, 
             transportRequired,
             paymentMethod,
-            slipImage: selectedTourSlipBase64
+            slipImage: slipImg
         });
 
         if (result.success) {
@@ -2234,22 +2247,37 @@ document.addEventListener('DOMContentLoaded', () => {
     // 7b. Product Order Submission Handler
     function handleProductBookingSubmit() {
         const form = document.getElementById('prod-booking-form');
+        if (!form) return;
         if (!form.checkValidity()) {
             form.reportValidity();
             return;
         }
 
-        const name = document.getElementById('prod-cust-name').value;
-        const email = document.getElementById('prod-cust-email').value;
-        const phone = document.getElementById('prod-cust-phone').value;
-        const preferredDate = document.getElementById('prod-pref-date').value;
-        const socialChannel = document.getElementById('prod-social-channel').value;
+        const name = document.getElementById('prod-cust-name')?.value?.trim() || '';
+        const email = document.getElementById('prod-cust-email')?.value?.trim() || '';
+        const phone = document.getElementById('prod-cust-phone')?.value?.trim() || '';
+        const preferredDate = document.getElementById('prod-pref-date')?.value || '';
+        const socialChannel = document.getElementById('prod-social-channel')?.value || 'WhatsApp';
         const isGift = document.getElementById('prod-enable-gift')?.checked || false;
         const giftWax = document.getElementById('prod-wax-val')?.value || 'Imperial Gold';
-        const giftMonogram = document.getElementById('prod-monogram-input')?.value.trim().toUpperCase() || '';
-        const giftMsg = document.getElementById('prod-gift-msg')?.value.trim() || '';
+        const giftMonogram = document.getElementById('prod-monogram-input')?.value?.trim().toUpperCase() || '';
+        const giftMsg = document.getElementById('prod-gift-msg')?.value?.trim() || '';
 
-        const productId = currentDrawerContext.id;
+        const activeTabBtn = form.querySelector('.pay-tab.active');
+        const paymentMethod = activeTabBtn ? activeTabBtn.getAttribute('data-method') : 'bank';
+
+        if (paymentMethod === 'card') {
+            showToast("Card Gateway Coming Soon", "Please select Bank Transfer or Cash Deposit Slip and attach your receipt to confirm your order.", "info");
+            const bankTab = form.querySelector('.pay-tab[data-method="bank"]');
+            if (bankTab) bankTab.click();
+            return;
+        }
+
+        const slipImg = selectedProdSlipBase64 || 
+            document.getElementById('prod-bank-slip-zone')?.dataset?.fileBase64 || 
+            document.getElementById('prod-cash-slip-zone')?.dataset?.fileBase64 || '';
+
+        const productId = currentDrawerContext ? currentDrawerContext.id : null;
         const result = window.TeaFactoryStore.bookProduct(productId, { 
             name, 
             email, 
@@ -2259,7 +2287,9 @@ document.addEventListener('DOMContentLoaded', () => {
             giftPackaging: isGift,
             waxSealColor: isGift ? giftWax : '',
             monogramInitials: isGift ? giftMonogram : '',
-            giftMessage: isGift ? giftMsg : ''
+            giftMessage: isGift ? giftMsg : '',
+            paymentMethod,
+            slipImage: slipImg
         });
 
         if (result.success) {
@@ -2701,14 +2731,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 7d. File upload zone binding
-    function bindFileUpload(inputId, zoneId, previewId) {
+    function bindFileUpload(inputId, zoneId, previewId, onFileLoadedCallback) {
         const input = document.getElementById(inputId);
         const zone = document.getElementById(zoneId);
         const preview = document.getElementById(previewId);
         if (!input || !zone || !preview) return;
 
-        // Click on zone opens file picker
-        zone.addEventListener('click', () => input.click());
+        // Click on zone opens file picker (avoid double trigger if clicking input directly)
+        zone.addEventListener('click', (e) => {
+            if (e.target !== input) input.click();
+        });
 
         // Drag and drop
         zone.addEventListener('dragover', (e) => {
@@ -2719,32 +2751,34 @@ document.addEventListener('DOMContentLoaded', () => {
         zone.addEventListener('drop', (e) => {
             e.preventDefault();
             zone.classList.remove('drag-over');
-            if (e.dataTransfer.files.length > 0) {
-                handleFileSelected(e.dataTransfer.files[0], zone, preview);
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                handleFileSelected(e.dataTransfer.files[0], zone, preview, onFileLoadedCallback);
             }
         });
 
         // File selected via input
         input.addEventListener('change', () => {
-            if (input.files.length > 0) {
-                handleFileSelected(input.files[0], zone, preview);
+            if (input.files && input.files.length > 0) {
+                handleFileSelected(input.files[0], zone, preview, onFileLoadedCallback);
             }
         });
     }
 
-    function handleFileSelected(file, zone, preview) {
+    function handleFileSelected(file, zone, preview, onFileLoadedCallback) {
+        if (!file) return;
         if (file.size > 5 * 1024 * 1024) {
             showToast('File Too Large', 'Please upload a file under 5MB.', 'error');
             return;
         }
         const reader = new FileReader();
         reader.onload = (e) => {
+            const base64 = e.target.result;
             const isImage = file.type.startsWith('image/');
             preview.style.display = 'block';
             if (isImage) {
                 preview.innerHTML = `
                     <div class="slip-preview-inner">
-                        <img src="${e.target.result}" alt="Deposit Slip Preview" style="max-width:100%;max-height:160px;border-radius:8px;border:1px solid rgba(212,175,55,0.3);" onerror="window.handleImageError && window.handleImageError(this, 'slip')">
+                        <img src="${base64}" alt="Deposit Slip Preview" style="max-width:100%;max-height:160px;border-radius:8px;border:1px solid rgba(212,175,55,0.3);" onerror="window.handleImageError && window.handleImageError(this, 'slip')">
                         <div class="slip-filename">&#x2714; ${file.name}</div>
                     </div>`;
             } else {
@@ -2755,6 +2789,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>`;
             }
             zone.classList.add('has-file');
+            zone.dataset.fileBase64 = base64;
+            if (typeof onFileLoadedCallback === 'function') {
+                onFileLoadedCallback(base64, file);
+            }
         };
         reader.readAsDataURL(file);
     }
