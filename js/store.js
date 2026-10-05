@@ -1312,31 +1312,37 @@ class TeaFactoryStore {
         );
         if (foundOrder) return foundOrder;
 
-        // 2. Check in state.bookings (Tour Bookings & Experience Bookings)
+        // 2. Check in state.bookings (Tour Bookings, Product Orders & Experience Bookings)
         const foundBooking = (this.state.bookings || []).find(b => 
             String(b.id).toUpperCase() === cleanId
         );
         if (foundBooking) {
             const isTour = foundBooking.type === 'tour' || cleanId.startsWith('TB-') || cleanId.startsWith('TR-');
-            let status = foundBooking.status || 'Pending Verification';
+            let status = foundBooking.status || 'Awaiting Payment';
             if (status === 'confirmed' || status === 'Paid & Confirmed') {
                 status = 'Paid & Confirmed';
             } else if (foundBooking.slipImage && status !== 'Slip Rejected') {
                 status = 'Slip Submitted';
             }
 
+            const rawPrice = (foundBooking.price !== undefined && foundBooking.price !== null) 
+                ? foundBooking.price 
+                : ((foundBooking.totalPrice !== undefined && foundBooking.totalPrice !== null) 
+                    ? foundBooking.totalPrice 
+                    : (foundBooking.depositPaid !== undefined ? foundBooking.depositPaid : (foundBooking.deposit || 0)));
+
             return {
                 id: foundBooking.id,
                 bookingId: foundBooking.id,
                 type: isTour ? 'tour' : (foundBooking.type || 'product'),
                 isTour: isTour,
-                boxName: isTour ? (foundBooking.packageName || 'Highland Estate Factory Tour') : (foundBooking.productName || foundBooking.boxName || 'Single-Estate Order'),
-                seasonName: isTour ? `${foundBooking.tourDate || 'Scheduled Date'} @ ${foundBooking.timeSlot || ''} (${foundBooking.guests || 1} Guest${(foundBooking.guests || 1) > 1 ? 's' : ''})` : (foundBooking.seasonName || 'Artisanal Reserve'),
+                boxName: isTour ? (foundBooking.packageName || 'Highland Estate Factory Tour') : (foundBooking.productName || foundBooking.boxName || 'Single-Estate Reserve'),
+                seasonName: isTour ? `${foundBooking.tourDate || 'Scheduled Date'} @ ${foundBooking.timeSlot || ''} (${foundBooking.guests || 1} Guest${(foundBooking.guests || 1) > 1 ? 's' : ''})` : (foundBooking.weight ? `${foundBooking.weight} Artisanal Tin` : (foundBooking.seasonName || 'Artisanal Reserve')),
                 customerName: foundBooking.customerName || foundBooking.name || 'Estate Guest',
                 email: foundBooking.email || '',
                 phone: foundBooking.phone || '',
-                price: parseFloat(foundBooking.depositPaid || foundBooking.deposit || foundBooking.totalPrice || 50.00),
-                formattedPrice: isTour ? `$${Number(foundBooking.depositPaid || foundBooking.deposit || 50.00).toFixed(2)} USD (Deposit)` : `$${Number(foundBooking.totalPrice || foundBooking.price || 0).toFixed(2)} USD`,
+                price: parseFloat(rawPrice) || 0,
+                formattedPrice: foundBooking.formattedPrice || (isTour ? `$${Number(rawPrice).toFixed(2)} USD (Deposit)` : `$${Number(rawPrice).toFixed(2)} USD`),
                 status: status,
                 slipImage: foundBooking.slipImage || '',
                 tourDate: foundBooking.tourDate || '',
@@ -2439,8 +2445,10 @@ Rock One Wild Tea Tour Coordinators
             monogramInitials: customerData.monogramInitials || "",
             currency: this.getActiveCurrency(),
             formattedPrice: this.formatCurrency(product.price),
-            status: "Pending Verification",
-            socialChannel: customerData.socialChannel || "WhatsApp"
+            status: customerData.slipImage ? "Pending Verification" : (customerData.status || "Awaiting Payment"),
+            socialChannel: customerData.socialChannel || "WhatsApp",
+            paymentMethod: customerData.paymentMethod || "bank",
+            slipImage: customerData.slipImage || ""
         };
 
         // Add to global bookings list
@@ -2448,6 +2456,9 @@ Rock One Wild Tea Tour Coordinators
 
         // Generate Automated Email Notification Log
         this.logMockProductEmail(newBooking);
+
+        // Save order ID to device memory so it appears in My Orders
+        this.saveRecentOrderId(bookingId);
 
         this.saveState();
         return { success: true, booking: newBooking };

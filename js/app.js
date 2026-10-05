@@ -2213,7 +2213,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             closeDrawer();
-            renderTabContent(activeTab);
+            
+            // Seamlessly navigate to My Order page and display newly booked tour pass
+            switchTab('order');
+            setTimeout(() => {
+                const idInput = document.getElementById('order-id-input');
+                if (idInput) idInput.value = booking.id;
+                const orderData = window.TeaFactoryStore.getOrderById(booking.id);
+                if (orderData) {
+                    window.UIComponents.renderOrderDetails(orderData);
+                    bindOrderSlipEvents(orderData.id);
+                    const panel = document.getElementById('order-details-panel');
+                    if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 60);
 
             // Forward summary message / connect to concierge desk
             const message = `Hello Rock One Wild Tea!\n\nI would like to confirm my Factory Tour reservation:\n• Booking Ref: ${booking.id}\n• Lead Guest: ${name}\n• Contact Email: ${email}\n• WhatsApp: ${phone}\n• Tour Date: ${tourDate}\n• Time Slot: ${booking.timeSlot}\n• Number of Guests: ${guests} ${guests === 1 ? 'Guest' : 'Guests'}\n• Experience: ${packageName}\n• Total Amount: LKR ${totalLkr.toLocaleString()} (approx. $${totalDeposit.toFixed(2)} USD)\n\nPlease confirm availability and gate access guidance.`;
@@ -2330,7 +2343,20 @@ document.addEventListener('DOMContentLoaded', () => {
             );
 
             closeDrawer();
-            renderTabContent(activeTab);
+            
+            // Seamlessly navigate to My Order page and display newly placed order
+            switchTab('order');
+            setTimeout(() => {
+                const idInput = document.getElementById('order-id-input');
+                if (idInput) idInput.value = booking.id;
+                const orderData = window.TeaFactoryStore.getOrderById(booking.id);
+                if (orderData) {
+                    window.UIComponents.renderOrderDetails(orderData);
+                    bindOrderSlipEvents(orderData.id);
+                    const panel = document.getElementById('order-details-panel');
+                    if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 60);
 
             // Redirect to WhatsApp / Instagram
             setTimeout(() => {
@@ -3768,11 +3794,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (slipForm) {
             slipForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                if (!selectedOrderSlipBase64) {
+                const slipToSubmit = selectedOrderSlipBase64 || document.getElementById('order-slip-zone')?.dataset?.fileBase64 || '';
+                if (!slipToSubmit) {
                     showToast('Slip Required', 'Please select a deposit slip image to upload.', 'error');
                     return;
                 }
-                const success = window.TeaFactoryStore.updateOrderStatus(orderId, 'Slip Submitted', selectedOrderSlipBase64);
+                const success = window.TeaFactoryStore.updateOrderStatus(orderId, 'Slip Submitted', slipToSubmit);
                 if (success) {
                     showToast('Slip Submitted!', 'Your deposit slip has been submitted. We will confirm your order within 24 hours.', 'success');
                     const updatedOrder = window.TeaFactoryStore.getOrderById(orderId);
