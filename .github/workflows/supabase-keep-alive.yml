@@ -1,0 +1,55 @@
+name: Supabase Database Keep-Alive
+
+on:
+  schedule:
+    # Runs automatically every 2 days at 06:00 UTC (11:30 AM Sri Lanka Time)
+    # Supabase only pauses after 7 days of inactivity, so this guarantees it NEVER pauses.
+    - cron: '0 6 */2 * *'
+  workflow_dispatch:
+    # Allows you to click "Run workflow" manually from GitHub Actions tab anytime to test.
+
+jobs:
+  ping-supabase:
+    name: Ping Database & Reset Inactivity Timer
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Keep-Alive Request to Live API & Supabase
+        run: |
+          echo "======================================================="
+          echo "🌿 Rock One Wild Tea - Supabase Keep-Alive Ping"
+          echo "Time: $(date -u)"
+          echo "======================================================="
+
+          # 1. Ping the live production API which queries Supabase directly
+          echo "📡 Pinging live Vercel API (queries Supabase products table)..."
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" "https://rock-one-wild-tea.vercel.app/api/products?reserve=false")
+          
+          HTTP_BODY=$(echo "$RESPONSE" | sed -e '$d')
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n1 | cut -d':' -f2)
+
+          echo "Response Status Code: $HTTP_STATUS"
+
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "✅ Success: Live website and Supabase database are awake and active!"
+            echo "Inactivity timer has been successfully reset."
+            exit 0
+          else
+            echo "⚠️ Warning: Live API returned status $HTTP_STATUS"
+            echo "Attempting fallback direct ping to Supabase REST API..."
+
+            # 2. Fallback: Direct ping to Supabase REST endpoint
+            DIRECT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              "https://gozetekxnevnmwekrrhr.supabase.co/rest/v1/products?select=id&limit=1" \
+              -H "apikey: ${{ secrets.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvemV0ZWt4bmV2bm13ZWtycmhyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODMyOTUzMSwiZXhwIjoyMTAzOTA1NTMxfQ.EUtT7ttc3r-PmEeQr-mBvE_2ptexTNC0nZ_sYdzoHrM' }}" \
+              -H "Authorization: Bearer ${{ secrets.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvemV0ZWt4bmV2bm13ZWtycmhyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODMyOTUzMSwiZXhwIjoyMTAzOTA1NTMxfQ.EUtT7ttc3r-PmEeQr-mBvE_2ptexTNC0nZ_sYdzoHrM' }}")
+
+            echo "Direct Supabase REST Status: $DIRECT_STATUS"
+
+            if [ "$DIRECT_STATUS" -eq 200 ]; then
+              echo "✅ Success: Direct Supabase REST query succeeded. Inactivity timer reset!"
+              exit 0
+            else
+              echo "❌ Error: Could not reach Supabase. HTTP Status: $DIRECT_STATUS"
+              exit 1
+            fi
+          fi
