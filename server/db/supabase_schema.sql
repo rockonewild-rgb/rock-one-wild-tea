@@ -183,7 +183,7 @@ VALUES
     'images/Product.jpeg',
     'Sun-withered velvety buds harvested at dawn before direct mountain sunlight touches the forest canopy. Imparts floral wildflower honey and raw pear aromatics.',
     '["Wild Orchid", "Mountain Honey", "White Peach", "Subtle Pine"]'::jsonb,
-    '{"temp": "75°C - 80°C", "time": "4 - 5 mins", "leaves": "3g per 150ml"}'::jsonb,
+    '{"temp": "80°C (176°F)", "time": "4 Minutes", "steepSeconds": 240, "flavorProfile": "Fresh Jasmine, White Peach, Sweet Montane Dew", "tastingNotes": ["Wild Orchid", "Mountain Honey", "White Peach", "Subtle Pine"], "sensoryRadar": {"floral": 85, "malty": 20, "sweetness": 90, "astringency": 18, "body": 55, "aroma": 92}}'::jsonb,
     true
 ),
 (
@@ -199,7 +199,7 @@ VALUES
     'images/luxury_tea_tin.jpg',
     'Full-leaf whole orthodox black tea hand-rolled on cedar tables and cured over slow-burning cinnamon wood kilns.',
     '["Malt & Date", "Dark Cocoa", "Wood Smoke", "Golden Caramel"]'::jsonb,
-    '{"temp": "95°C - 100°C", "time": "3 - 4 mins", "leaves": "2.5g per 200ml"}'::jsonb,
+    '{"temp": "95°C (203°F)", "time": "3 Minutes", "steepSeconds": 180, "flavorProfile": "Wild Orchid, Honeyed Malt, Caramelized Fig", "tastingNotes": ["Malt & Date", "Dark Cocoa", "Wood Smoke", "Golden Caramel"], "sensoryRadar": {"floral": 65, "malty": 92, "sweetness": 80, "astringency": 42, "body": 88, "aroma": 94}}'::jsonb,
     false
 ),
 (
@@ -215,7 +215,7 @@ VALUES
     'images/luxury_tea_chest.jpg',
     'Wok-fired whole leaf green tea retaining vibrant antioxidant chlorophyll and sweet vegetative minerals.',
     '["Sweet Grass", "Steamed Bamboo", "Toasted Pine Nut", "Fresh Dew"]'::jsonb,
-    '{"temp": "80°C - 85°C", "time": "2 - 3 mins", "leaves": "2g per 150ml"}'::jsonb,
+    '{"temp": "80°C (176°F)", "time": "2-3 Minutes", "steepSeconds": 150, "flavorProfile": "Vibrant Chlorophyll, Steamed Bamboo, Roasted Pine", "tastingNotes": ["Sweet Grass", "Steamed Bamboo", "Toasted Pine Nut", "Fresh Dew"], "sensoryRadar": {"floral": 78, "malty": 28, "sweetness": 76, "astringency": 52, "body": 68, "aroma": 86}}'::jsonb,
     false
 ),
 (
@@ -231,7 +231,7 @@ VALUES
     'images/Gift Box.jpeg',
     'Strictly allocated micro-harvest from 80-year-old wild tea arbor trees. Numbered and sealed with private wax estate stamp.',
     '["Cinnamon Bark", "Dried Apricot", "Muscatel Grape", "Amber Resin"]'::jsonb,
-    '{"temp": "90°C - 95°C", "time": "3.5 mins", "leaves": "3g per 180ml"}'::jsonb,
+    '{"temp": "95°C (203°F)", "time": "3.5 Minutes", "steepSeconds": 210, "flavorProfile": "Montane Wild Honey, Muscatel Grape, Dried Apricot", "tastingNotes": ["Cinnamon Bark", "Dried Apricot", "Muscatel Grape", "Amber Resin"], "sensoryRadar": {"floral": 82, "malty": 88, "sweetness": 84, "astringency": 36, "body": 84, "aroma": 95}}'::jsonb,
     true
 );
 

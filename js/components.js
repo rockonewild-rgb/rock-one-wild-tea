@@ -388,7 +388,7 @@ const UIComponents = {
         let prodHtml = `<div class="products-grid">`;
         prodHtml += filteredProducts.map(p => {
             const tastingChips = (p.tastingNotes && p.tastingNotes.length > 0)
-                ? p.tastingNotes.slice(0, 3).map(n => `<span class="tasting-chip">${this.highlightText(n, searchFilter)}</span>`).join('')
+                ? p.tastingNotes.map(n => `<span class="tasting-chip">${this.highlightText(n, searchFilter)}</span>`).join('')
                 : `<span class="tasting-chip">${_t('terroir_pure_ceylon', 'Pure Ceylon')}</span><span class="tasting-chip">${_t('terroir_single_estate', 'Single Estate')}</span>`;
 
             const radar = p.sensoryRadar || { floral: 75, malty: 70, sweetness: 75, astringency: 40, body: 75, aroma: 85 };
@@ -419,6 +419,11 @@ const UIComponents = {
                             </div>
                         </div>
                         <p class="product-card-description">${displayDesc}</p>
+                        ${p.flavorProfile ? `
+                        <div class="product-flavor-profile-row" style="margin-bottom: 0.65rem; font-size: 0.76rem; color: var(--color-gold); font-weight: 500; display: flex; align-items: center; gap: 0.35rem; line-height: 1.35;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polygon points="12 6 12 12 16 14"/></svg>
+                            <span>${this.highlightText(p.flavorProfile, searchFilter)}</span>
+                        </div>` : ''}
                         
                         <!-- Tasting Notes Chords -->
                         <div class="product-tasting-chips-row">
@@ -438,6 +443,34 @@ const UIComponents = {
                             <div class="spec-cell" title="${_t('stat_aroma', 'Aroma Score')}">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                                 <span>${_t('stat_aroma', 'Aroma')} ${radar.aroma || 85}%</span>
+                            </div>
+                        </div>
+
+                        <!-- 6-Point Calibrated Sensory Spectrum Ribbon -->
+                        <div class="product-sensory-ribbon" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 0.3rem 0.45rem; background: rgba(4,14,8,0.65); border: 1px solid rgba(212,175,55,0.2); border-radius: 8px; padding: 0.45rem 0.6rem; margin-bottom: 0.85rem; font-size: 0.7rem; color: #dcece1;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_floral', 'Floral')}">
+                                <span>🌸 ${_t('radar_floral', 'Floral')}</span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.floral ?? 80}%</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_malty', 'Malty')}">
+                                <span>🌾 ${_t('radar_malty', 'Malty')}</span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.malty ?? 75}%</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_sweetness', 'Sweetness')}">
+                                <span>🍯 ${_t('radar_sweetness', 'Sweet')}</span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.sweetness ?? 80}%</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_astringency', 'Astringency')}">
+                                <span>🍃 ${_t('radar_astringency', 'Astringent')}</span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.astringency ?? 40}%</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_body', 'Body')}">
+                                <span>⚖️ ${_t('radar_body', 'Body')}</span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.body ?? 80}%</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_aroma', 'Aroma')}">
+                                <span>✨ ${_t('radar_aroma', 'Aroma')}</span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.aroma ?? 90}%</strong>
                             </div>
                         </div>
 
@@ -2143,6 +2176,13 @@ const UIComponents = {
                                         const categoryStr = prod.category || 'Imperial Reserve';
                                         const weightStr = prod.weight || '100g Vintage Tin';
                                         const stockStr = prod.stock || (prod.stock_quantity > 0 ? 'In Stock' : 'In Stock');
+                                        const flavorProfileStr = prod.flavorProfile || prod.flavor_profile || '';
+                                        const tastingNotesArr = Array.isArray(prod.tastingNotes) ? prod.tastingNotes : (Array.isArray(prod.flavor_notes) ? prod.flavor_notes : []);
+                                        const tastingNotesStr = tastingNotesArr.join(', ');
+                                        const radar = prod.sensoryRadar || { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 };
+                                        const steepSeconds = prod.steepSeconds || 180;
+                                        const elevationStr = prod.elevation || '1,200m Highlands';
+
                                         let prodImg = prod.image || prod.image_url || 'images/Product.jpeg';
                                         if (prodImg.includes('silver_tips')) prodImg = 'images/Product.jpeg';
                                         else if (prodImg.includes('black_tea')) prodImg = 'images/luxury_tea_tin.jpg';
@@ -2154,7 +2194,19 @@ const UIComponents = {
                                             <td>
                                                 <img src="${prodImg}" alt="${prod.name}" style="width: 44px; height: 44px; object-fit: contain; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); background: rgba(0,0,0,0.4); display: block;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
                                             </td>
-                                            <td><strong>${prod.name}</strong><br><small style="color:var(--color-text-muted);">${leafGradeStr}</small></td>
+                                            <td>
+                                                <strong>${prod.name}</strong><br>
+                                                <small style="color:var(--color-text-muted);">${leafGradeStr}</small>
+                                                ${flavorProfileStr ? `<br><small style="color:var(--color-gold); font-size:0.68rem; font-style:italic;">🫖 ${flavorProfileStr}</small>` : ''}
+                                                <div style="display:flex; flex-wrap:wrap; gap:0.25rem; margin-top:0.35rem;">
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Floral">🌸 ${radar.floral ?? 80}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Malty">🌾 ${radar.malty ?? 75}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Sweetness">🍯 ${radar.sweetness ?? 80}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Astringency">🍃 ${radar.astringency ?? 40}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Body">⚖️ ${radar.body ?? 80}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Aroma">✨ ${radar.aroma ?? 90}%</span>
+                                                </div>
+                                            </td>
                                             <td>${categoryStr}</td>
                                             <td>${weightStr}</td>
                                             <td style="color:var(--color-gold); font-weight: 600;">$${priceVal.toFixed(2)}</td>
@@ -2173,11 +2225,21 @@ const UIComponents = {
                                                             data-weight="${weightStr}" 
                                                             data-symbol="${prod.symbol || ''}" 
                                                             data-stock="${stockStr}" 
-                                                            data-desc="${prod.desc || prod.description || ''}" 
+                                                            data-desc="${(prod.desc || prod.description || '').replace(/"/g, '&quot;')}" 
                                                             data-grade="${leafGradeStr}" 
                                                             data-temp="${prod.steepTemp || prod.steep_temp || ''}" 
                                                             data-time="${prod.steepTime || prod.steep_time || ''}" 
                                                             data-image="${prod.image || prod.image_url || 'images/Product.jpeg'}" 
+                                                            data-flavor-profile="${flavorProfileStr.replace(/"/g, '&quot;')}" 
+                                                            data-tasting-notes="${tastingNotesStr.replace(/"/g, '&quot;')}" 
+                                                            data-radar-floral="${radar.floral ?? 80}" 
+                                                            data-radar-malty="${radar.malty ?? 75}" 
+                                                            data-radar-sweetness="${radar.sweetness ?? 80}" 
+                                                            data-radar-astringency="${radar.astringency ?? 40}" 
+                                                            data-radar-body="${radar.body ?? 80}" 
+                                                            data-radar-aroma="${radar.aroma ?? 90}" 
+                                                            data-steep-seconds="${steepSeconds}" 
+                                                            data-elevation="${elevationStr.replace(/"/g, '&quot;')}" 
                                                             style="background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); color: var(--color-gold); padding: 0.35rem 0.65rem; font-size: 0.7rem; border-radius: 3px; cursor: pointer; transition: var(--transition-smooth); display: inline-flex; align-items: center; gap: 0.25rem;" 
                                                             title="Edit Product">
                                                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -2289,7 +2351,103 @@ const UIComponents = {
                                 </div>
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
                                     <label class="form-label" for="prod-time" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Steep Time</label>
-                                    <input class="form-input" type="text" id="prod-time" placeholder="e.g. 3-5 Minutes">
+                                    <input class="form-input" type="text" id="prod-time" placeholder="e.g. 3-4 Minutes (or 180s)">
+                                </div>
+                            </div>
+
+                            <!-- Sensory Flavour Profile & Tasting Radar Master Section -->
+                            <div class="admin-sensory-panel" style="background: rgba(4, 14, 8, 0.75); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 12px; padding: 1.35rem 1.25rem; display: flex; flex-direction: column; gap: 1.15rem; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
+                                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 0.65rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="12 6 12 12 16 14"/></svg>
+                                        <span style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold);">Sensory Flavour Profile &amp; Tasting Radar</span>
+                                    </div>
+                                    <span style="font-size: 0.68rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px;">Connoisseur Dossier</span>
+                                </div>
+
+                                <!-- Flavour Profile Headline / Bouquet -->
+                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                    <label class="form-label" for="prod-flavor-profile" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
+                                        Sensory Flavour Profile *
+                                    </label>
+                                    <input class="form-input" type="text" id="prod-flavor-profile" required placeholder="e.g. Fresh Jasmine, White Peach, Sweet Montane Dew" style="font-weight: 500;">
+                                    <small style="font-size: 0.7rem; color: var(--color-text-muted);">Main bouquet chord displayed on customer storefront cards and sommelier guide.</small>
+                                </div>
+
+                                <!-- Tasting Notes / Chords (Tags) -->
+                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                    <label class="form-label" for="prod-tasting-notes" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
+                                        Sommelier Tasting Chords (Comma Separated) *
+                                    </label>
+                                    <input class="form-input" type="text" id="prod-tasting-notes" required placeholder="e.g. Wild Orchid, Golden Honey, Warm Cocoa, Montane Mineral">
+                                    <small style="font-size: 0.7rem; color: var(--color-text-muted);">Rendered as tasting chord tags on product cards and in the Sensory Dossier modal.</small>
+                                </div>
+
+                                <!-- Terroir Elevation -->
+                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                    <label class="form-label" for="prod-elevation" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Terroir Elevation</label>
+                                    <input class="form-input" type="text" id="prod-elevation" placeholder="e.g. 1,240m Montane Ridge">
+                                    <small style="font-size: 0.7rem; color: var(--color-text-muted);">Estate harvest altitude displayed in customer Connoisseur Dossier.</small>
+                                </div>
+
+                                <!-- 6-Point Sensory Radar Calibration Sliders -->
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+                                        <label class="form-label" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); margin-bottom: 0;">
+                                            6-Point Sensory Radar Calibration (0% - 100%)
+                                        </label>
+                                        <small style="font-size: 0.68rem; color: var(--color-text-muted);">Calibrates polygon radar chart</small>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;" class="admin-radar-sliders-grid">
+                                        <!-- Floral -->
+                                        <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                                            <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
+                                                <span>🌸 Floral Intensity</span>
+                                                <strong id="badge-radar-floral" style="color: var(--color-gold); font-family: monospace;">80%</strong>
+                                            </div>
+                                            <input type="range" id="prod-radar-floral" min="0" max="100" value="80" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
+                                        </div>
+                                        <!-- Malty -->
+                                        <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                                            <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
+                                                <span>🌾 Malty / Roast</span>
+                                                <strong id="badge-radar-malty" style="color: var(--color-gold); font-family: monospace;">75%</strong>
+                                            </div>
+                                            <input type="range" id="prod-radar-malty" min="0" max="100" value="75" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
+                                        </div>
+                                        <!-- Sweetness -->
+                                        <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                                            <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
+                                                <span>🍯 Natural Sweetness</span>
+                                                <strong id="badge-radar-sweetness" style="color: var(--color-gold); font-family: monospace;">80%</strong>
+                                            </div>
+                                            <input type="range" id="prod-radar-sweetness" min="0" max="100" value="80" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
+                                        </div>
+                                        <!-- Astringency -->
+                                        <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                                            <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
+                                                <span>🍃 Astringency</span>
+                                                <strong id="badge-radar-astringency" style="color: var(--color-gold); font-family: monospace;">40%</strong>
+                                            </div>
+                                            <input type="range" id="prod-radar-astringency" min="0" max="100" value="40" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
+                                        </div>
+                                        <!-- Body -->
+                                        <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                                            <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
+                                                <span>⚖️ Body &amp; Structure</span>
+                                                <strong id="badge-radar-body" style="color: var(--color-gold); font-family: monospace;">80%</strong>
+                                            </div>
+                                            <input type="range" id="prod-radar-body" min="0" max="100" value="80" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
+                                        </div>
+                                        <!-- Aroma -->
+                                        <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                                            <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
+                                                <span>✨ Aroma Intensity</span>
+                                                <strong id="badge-radar-aroma" style="color: var(--color-gold); font-family: monospace;">90%</strong>
+                                            </div>
+                                            <input type="range" id="prod-radar-aroma" min="0" max="100" value="90" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -4565,37 +4723,74 @@ const UIComponents = {
                         </div>
 
                         <h4 style="font-family:var(--font-serif); color:var(--color-gold); font-size:1.1rem; margin-bottom:0.6rem;">${_t('dossier_sensory_title', 'Sommelier Tasting Chords')}</h4>
+                        ${product.flavorProfile ? `
+                        <div style="font-size:0.84rem; color:#f1f5f9; font-style:italic; margin-bottom:0.85rem; border-left:2.5px solid var(--color-gold); padding-left:0.75rem; line-height:1.45; background:rgba(212,175,55,0.06); padding-top:0.4rem; padding-bottom:0.4rem; border-radius:0 8px 8px 0;">
+                            "${product.flavorProfile}"
+                        </div>` : ''}
                         <div style="display:flex; flex-wrap:wrap; gap:0.45rem; margin-bottom:1.25rem;">
                             ${tastingTags}
                         </div>
 
-                        <!-- Sensory Spectrum Horizontal Bars -->
-                        <div style="display:flex; flex-direction:column; gap:0.55rem; background:rgba(4,14,8,0.65); border:1px solid rgba(212,175,55,0.2); border-radius:12px; padding:1rem 1.15rem;">
+                        <!-- Sensory Spectrum Horizontal Bars (All 6 Calibrated Sommelier Dimensions) -->
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.65rem 0.95rem; background:rgba(4,14,8,0.65); border:1px solid rgba(212,175,55,0.2); border-radius:12px; padding:0.95rem 1.15rem;">
+                            <!-- Floral -->
                             <div class="spectrum-bar-item">
-                                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#dcece1; margin-bottom:0.25rem;">
-                                    <span>${_t('radar_aroma', 'Aroma Intensity')}</span>
-                                    <strong style="color:var(--color-gold);">${radar.aroma}%</strong>
+                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#dcece1; margin-bottom:0.25rem;">
+                                    <span>🌸 ${_t('radar_floral', 'Floral Intensity')}</span>
+                                    <strong style="color:var(--color-gold);">${radar.floral ?? 80}%</strong>
                                 </div>
                                 <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
-                                    <div style="width:${radar.aroma}%; height:100%; background:linear-gradient(90deg, #aa820a, #d4af37); border-radius:3px;"></div>
+                                    <div style="width:${radar.floral ?? 80}%; height:100%; background:linear-gradient(90deg, #aa820a, #d4af37); border-radius:3px;"></div>
                                 </div>
                             </div>
+                            <!-- Malty -->
                             <div class="spectrum-bar-item">
-                                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#dcece1; margin-bottom:0.25rem;">
-                                    <span>${_t('radar_body', 'Malt & Body Structure')}</span>
-                                    <strong style="color:var(--color-gold);">${radar.body}%</strong>
+                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#dcece1; margin-bottom:0.25rem;">
+                                    <span>🌾 ${_t('radar_malty', 'Malty / Roast')}</span>
+                                    <strong style="color:var(--color-gold);">${radar.malty ?? 75}%</strong>
                                 </div>
                                 <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
-                                    <div style="width:${radar.body}%; height:100%; background:linear-gradient(90deg, #aa820a, #d4af37); border-radius:3px;"></div>
+                                    <div style="width:${radar.malty ?? 75}%; height:100%; background:linear-gradient(90deg, #aa820a, #d4af37); border-radius:3px;"></div>
                                 </div>
                             </div>
+                            <!-- Sweetness -->
                             <div class="spectrum-bar-item">
-                                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#dcece1; margin-bottom:0.25rem;">
-                                    <span>${_t('radar_sweetness', 'Natural Sweetness')}</span>
-                                    <strong style="color:var(--color-gold);">${radar.sweetness}%</strong>
+                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#dcece1; margin-bottom:0.25rem;">
+                                    <span>🍯 ${_t('radar_sweetness', 'Natural Sweetness')}</span>
+                                    <strong style="color:var(--color-gold);">${radar.sweetness ?? 80}%</strong>
                                 </div>
                                 <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
-                                    <div style="width:${radar.sweetness}%; height:100%; background:linear-gradient(90deg, #aa820a, #d4af37); border-radius:3px;"></div>
+                                    <div style="width:${radar.sweetness ?? 80}%; height:100%; background:linear-gradient(90deg, #aa820a, #d4af37); border-radius:3px;"></div>
+                                </div>
+                            </div>
+                            <!-- Astringency -->
+                            <div class="spectrum-bar-item">
+                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#dcece1; margin-bottom:0.25rem;">
+                                    <span>🍃 ${_t('radar_astringency', 'Astringency')}</span>
+                                    <strong style="color:var(--color-gold);">${radar.astringency ?? 40}%</strong>
+                                </div>
+                                <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
+                                    <div style="width:${radar.astringency ?? 40}%; height:100%; background:linear-gradient(90deg, #aa820a, #d4af37); border-radius:3px;"></div>
+                                </div>
+                            </div>
+                            <!-- Body -->
+                            <div class="spectrum-bar-item">
+                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#dcece1; margin-bottom:0.25rem;">
+                                    <span>⚖️ ${_t('radar_body', 'Body & Structure')}</span>
+                                    <strong style="color:var(--color-gold);">${radar.body ?? 80}%</strong>
+                                </div>
+                                <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
+                                    <div style="width:${radar.body ?? 80}%; height:100%; background:linear-gradient(90deg, #aa820a, #d4af37); border-radius:3px;"></div>
+                                </div>
+                            </div>
+                            <!-- Aroma -->
+                            <div class="spectrum-bar-item">
+                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#dcece1; margin-bottom:0.25rem;">
+                                    <span>✨ ${_t('radar_aroma', 'Aroma Intensity')}</span>
+                                    <strong style="color:var(--color-gold);">${radar.aroma ?? 90}%</strong>
+                                </div>
+                                <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
+                                    <div style="width:${radar.aroma ?? 90}%; height:100%; background:linear-gradient(90deg, #aa820a, #d4af37); border-radius:3px;"></div>
                                 </div>
                             </div>
                         </div>

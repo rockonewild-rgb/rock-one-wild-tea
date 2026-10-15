@@ -1187,6 +1187,21 @@ class TeaFactoryStore {
             if (!p.leafGrade && p.leaf_grade) p.leafGrade = p.leaf_grade;
             if (!p.desc && p.description) p.desc = p.description;
             if (!p.image && p.image_url) p.image = p.image_url;
+            if (!p.sensoryRadar) {
+                const bg = (typeof p.brewing_guide === 'string' ? JSON.parse(p.brewing_guide) : p.brewing_guide) || {};
+                p.sensoryRadar = bg.sensoryRadar || { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 };
+            }
+            if (!p.flavorProfile || !p.tastingNotes) {
+                const bg = (typeof p.brewing_guide === 'string' ? JSON.parse(p.brewing_guide) : p.brewing_guide) || {};
+                const notes = p.tastingNotes || p.flavor_notes || bg.tastingNotes || [];
+                const notesArr = Array.isArray(notes) ? notes : (typeof notes === 'string' ? notes.split(',').map(s => s.trim()).filter(Boolean) : []);
+                if (!p.tastingNotes) p.tastingNotes = notesArr;
+                if (!p.flavorProfile) p.flavorProfile = bg.flavorProfile || (notesArr.length > 0 ? notesArr.join(', ') : 'Single-Estate Reserve');
+            }
+            if (!p.steepSeconds) {
+                const bg = (typeof p.brewing_guide === 'string' ? JSON.parse(p.brewing_guide) : p.brewing_guide) || {};
+                p.steepSeconds = bg.steepSeconds || (parseInt(p.steepTime, 10) ? parseInt(p.steepTime, 10) * 60 : 180);
+            }
             return p;
         });
     }
@@ -2043,6 +2058,12 @@ class TeaFactoryStore {
         if (!this.state.products) this.state.products = [];
         const id = productData.id || ('prod-' + Date.now().toString(36));
         const priceVal = Number(productData.price || productData.price_usd || 0);
+        const sensoryRadar = productData.sensoryRadar || { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 };
+        const tastingNotes = Array.isArray(productData.tastingNotes) ? productData.tastingNotes : (Array.isArray(productData.flavor_notes) ? productData.flavor_notes : ['Single Estate', 'Artisanal Harvest']);
+        const flavorProfile = productData.flavorProfile || (tastingNotes.length > 0 ? tastingNotes.join(', ') : 'Single-Estate Reserve');
+        const steepSeconds = parseInt(productData.steepSeconds, 10) || 180;
+        const elevation = productData.elevation || '1,200m Wellawela Slopes';
+
         const newProduct = {
             id,
             name: productData.name || 'Artisanal Tea Item',
@@ -2050,11 +2071,12 @@ class TeaFactoryStore {
             type: productData.type || 'Specialty Tea',
             season: productData.season || '2026 Flush',
             grade: productData.leafGrade || productData.grade || 'OP1',
-            elevation: productData.elevation || '1,200m Wellawela Slopes',
+            elevation: elevation,
+            harvestSeason: productData.harvestSeason || 'Single-Estate Seasonal',
             price: priceVal,
             price_usd: priceVal,
             weight: productData.weight || '100g Vintage Tin',
-            stock: productData.stock !== undefined ? productData.stock : 10,
+            stock: productData.stock !== undefined ? productData.stock : 'In Stock',
             stock_quantity: typeof productData.stock === 'number' ? productData.stock : 10,
             image: productData.image || 'images/Product.jpeg',
             desc: productData.desc || productData.description || '',
@@ -2062,8 +2084,24 @@ class TeaFactoryStore {
             leafGrade: productData.leafGrade || productData.grade || 'Premium Grade',
             steepTemp: productData.steepTemp || '85°C (185°F)',
             steepTime: productData.steepTime || '3-4 Minutes',
-            flavor_notes: Array.isArray(productData.flavor_notes) ? productData.flavor_notes : [],
-            brewing_guide: productData.brewing_guide || { temp: productData.steepTemp || '85°C', time: productData.steepTime || '3-4 mins' },
+            steepSeconds: steepSeconds,
+            flavorProfile: flavorProfile,
+            tastingNotes: tastingNotes,
+            flavor_notes: tastingNotes,
+            sensoryRadar: sensoryRadar,
+            infusions: productData.infusions || [
+                { round: 1, seconds: steepSeconds, label: "1st Infusion (Aroma & Floral)" },
+                { round: 2, seconds: steepSeconds + 30, label: "2nd Infusion (Body & Richness)" },
+                { round: 3, seconds: steepSeconds + 90, label: "3rd Infusion (Sweet Mineral Finish)" }
+            ],
+            brewing_guide: productData.brewing_guide || {
+                temp: productData.steepTemp || '85°C',
+                time: productData.steepTime || '3-4 mins',
+                steepSeconds: steepSeconds,
+                sensoryRadar: sensoryRadar,
+                flavorProfile: flavorProfile,
+                tastingNotes: tastingNotes
+            },
             is_reserve: Boolean(productData.is_reserve)
         };
 
@@ -2084,23 +2122,51 @@ class TeaFactoryStore {
 
         const current = this.state.products[idx];
         const priceVal = updatedData.price !== undefined ? Number(updatedData.price) : Number(current.price || current.price_usd || 0);
+        const tastingNotes = updatedData.tastingNotes !== undefined ? updatedData.tastingNotes : (current.tastingNotes || current.flavor_notes || ['Single Estate', 'Artisanal Harvest']);
+        const flavorProfile = updatedData.flavorProfile !== undefined ? updatedData.flavorProfile : (current.flavorProfile || (tastingNotes.length > 0 ? tastingNotes.join(', ') : ''));
+        const sensoryRadar = updatedData.sensoryRadar !== undefined ? updatedData.sensoryRadar : (current.sensoryRadar || { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 });
+        const steepSeconds = updatedData.steepSeconds !== undefined ? parseInt(updatedData.steepSeconds, 10) : (current.steepSeconds || 180);
+        const elevation = updatedData.elevation !== undefined ? updatedData.elevation : (current.elevation || '1,200m Highlands');
+
         const updated = {
             ...current,
             ...updatedData,
             price: priceVal,
             price_usd: priceVal,
-            description: updatedData.desc !== undefined ? updatedData.desc : (updatedData.description !== undefined ? updatedData.description : current.description)
+            elevation: elevation,
+            description: updatedData.desc !== undefined ? updatedData.desc : (updatedData.description !== undefined ? updatedData.description : current.description),
+            flavorProfile: flavorProfile,
+            tastingNotes: tastingNotes,
+            flavor_notes: tastingNotes,
+            sensoryRadar: sensoryRadar,
+            steepSeconds: steepSeconds,
+            infusions: updatedData.infusions || current.infusions || [
+                { round: 1, seconds: steepSeconds, label: "1st Infusion (Aroma & Floral)" },
+                { round: 2, seconds: steepSeconds + 30, label: "2nd Infusion (Body & Richness)" },
+                { round: 3, seconds: steepSeconds + 90, label: "3rd Infusion (Sweet Mineral Finish)" }
+            ],
+            brewing_guide: {
+                ...(current.brewing_guide || {}),
+                temp: updatedData.steepTemp || current.steepTemp || '85°C',
+                time: updatedData.steepTime || current.steepTime || '3-4 mins',
+                steepSeconds: steepSeconds,
+                sensoryRadar: sensoryRadar,
+                flavorProfile: flavorProfile,
+                tastingNotes: tastingNotes
+            }
         };
 
         this.state.products[idx] = updated;
         this.saveState();
 
-        if (typeof TeaFactoryAPI !== 'undefined') {
+        if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.updateProduct === 'function') {
+            TeaFactoryAPI.updateProduct(productId, updated).catch(e => console.warn('Supabase product update error:', e));
+        } else if (typeof fetch !== 'undefined') {
             fetch(`/api/products/${encodeURIComponent(productId)}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updated)
-            }).catch(e => console.warn('Supabase product update error:', e));
+            }).catch(e => console.warn('Product update error:', e));
         }
 
         return updated;
@@ -2801,6 +2867,12 @@ Rock One Wild Tea Sanctuary Concierge Team
             if (prodRes.status === 'fulfilled' && Array.isArray(prodRes.value) && prodRes.value.length > 0) {
                 this.state.products = prodRes.value.map(p => {
                     const priceNum = Number(p.price !== undefined ? p.price : (p.price_usd !== undefined ? p.price_usd : 0)) || 0;
+                    const bg = typeof p.brewing_guide === 'string' ? JSON.parse(p.brewing_guide) : (p.brewing_guide || {});
+                    const fNotes = Array.isArray(p.tastingNotes) ? p.tastingNotes : (Array.isArray(p.flavor_notes) ? p.flavor_notes : (typeof p.flavor_notes === 'string' ? JSON.parse(p.flavor_notes) : (bg.tastingNotes || [])));
+                    const fProfile = p.flavorProfile || bg.flavorProfile || (fNotes.length > 0 ? fNotes.join(', ') : 'Single-Estate Reserve');
+                    const radar = p.sensoryRadar || bg.sensoryRadar || { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 };
+                    const steepSec = p.steepSeconds || bg.steepSeconds || (parseInt(p.steepTime, 10) ? parseInt(p.steepTime, 10) * 60 : 180);
+
                     return {
                         id: p.id,
                         name: p.name || 'Single-Estate Ceylon Tea',
@@ -2811,9 +2883,23 @@ Rock One Wild Tea Sanctuary Concierge Team
                         stock: p.stock || (p.stock_quantity > 0 ? 'In Stock' : 'In Stock'),
                         image: p.image || p.image_url || 'images/Product.jpeg',
                         desc: p.desc || p.description || '',
+                        description: p.desc || p.description || '',
                         leafGrade: p.leafGrade || p.leaf_grade || 'Finest Broken Orange Pekoe',
+                        elevation: p.elevation || '1,200m Highlands',
+                        harvestSeason: p.harvestSeason || p.harvest_season || 'Single-Estate Seasonal',
                         steepTemp: p.steepTemp || p.steep_temp || '95°C',
                         steepTime: p.steepTime || p.steep_time || '3-4 mins',
+                        steepSeconds: steepSec,
+                        flavorProfile: fProfile,
+                        tastingNotes: fNotes.length > 0 ? fNotes : ['Single Estate', 'Artisanal Harvest'],
+                        flavor_notes: fNotes.length > 0 ? fNotes : ['Single Estate', 'Artisanal Harvest'],
+                        sensoryRadar: radar,
+                        infusions: p.infusions || bg.infusions || [
+                            { round: 1, seconds: steepSec, label: "1st Infusion (Aroma & Floral)" },
+                            { round: 2, seconds: steepSec + 30, label: "2nd Infusion (Body & Richness)" },
+                            { round: 3, seconds: steepSec + 90, label: "3rd Infusion (Sweet Mineral Finish)" }
+                        ],
+                        brewing_guide: bg,
                         symbol: p.symbol || ''
                     };
                 });
@@ -3097,6 +3183,19 @@ const TeaFactoryAPI = {
         try {
             const res = await fetch(`${this.baseUrl}/products`, {
                 method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(product)
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async updateProduct(id, product) {
+        try {
+            const res = await fetch(`${this.baseUrl}/products/${encodeURIComponent(id)}`, {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(product)
             });

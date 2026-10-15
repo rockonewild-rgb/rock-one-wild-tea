@@ -480,6 +480,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     renderAdminLogin('admin-dashboard-container');
                 }
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
                 break;
         }
 
@@ -578,10 +581,31 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
-        // Focus input
+        // Firmly ensure view is pinned to the top on loading login screen
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+
+        // Focus input without triggering any downward viewport scroll
         const input = document.getElementById('admin-passcode');
         if (input) {
-            setTimeout(() => input.focus(), 100);
+            setTimeout(() => {
+                try {
+                    input.focus({ preventScroll: true });
+                } catch (e) {
+                    input.focus();
+                }
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }, 60);
+
+            // Prevent browser from auto-scrolling down when user taps or focuses the input
+            input.addEventListener('focus', () => {
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            });
         }
 
         // Toggle eye visibility
@@ -618,11 +642,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 try { sessionStorage.setItem('tea_factory_admin_auth', 'true'); } catch(e){}
                 updateNavStaffVisibility();
                 showToast("Access Granted", "Welcome back, Estate Concierge.", "success");
+
+                // Firmly pin viewport to top when switching to the Admin Operations Console
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+
                 renderTabContent('admin');
+
+                requestAnimationFrame(() => {
+                    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                    document.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
+                });
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                    document.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
+                }, 80);
             } else {
                 showToast("Access Denied", "Invalid staff credentials passcode. (Default: hasi@123)", "error");
-                document.getElementById('admin-passcode').value = '';
-                document.getElementById('admin-passcode').focus();
+                const passInput = document.getElementById('admin-passcode');
+                if (passInput) {
+                    passInput.value = '';
+                    try {
+                        passInput.focus({ preventScroll: true });
+                    } catch (err) {
+                        passInput.focus();
+                    }
+                    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                    document.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
+                }
             }
         });
     }
@@ -5884,6 +5935,17 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Bind real-time range slider percentage displays for sensory radar
+        ['floral', 'malty', 'sweetness', 'astringency', 'body', 'aroma'].forEach(metric => {
+            const slider = document.getElementById(`prod-radar-${metric}`);
+            const badge = document.getElementById(`badge-radar-${metric}`);
+            if (slider && badge) {
+                slider.addEventListener('input', () => {
+                    badge.innerText = `${slider.value}%`;
+                });
+            }
+        });
+
         // Add / Edit Product Form Handler
         const addProductForm = document.getElementById('admin-add-product-form');
         if (addProductForm) {
@@ -5902,16 +5964,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 const steepTime = document.getElementById('prod-time').value.trim() || '3-4 Minutes';
                 const image = selectedProdImageBase64;
 
+                const flavorProfile = document.getElementById('prod-flavor-profile')?.value?.trim() || '';
+                const tastingNotesRaw = document.getElementById('prod-tasting-notes')?.value?.trim() || '';
+                const tastingNotes = tastingNotesRaw 
+                    ? tastingNotesRaw.split(',').map(s => s.trim()).filter(Boolean) 
+                    : (flavorProfile ? flavorProfile.split(',').map(s => s.trim()).filter(Boolean) : ['Single Estate', 'Artisanal Harvest']);
+                const elevation = document.getElementById('prod-elevation')?.value?.trim() || '1,200m Highlands';
+
+                // Automatically calculate countdown seconds from single Steep Time field
+                let steepSeconds = 180;
+                const matchedNum = steepTime.match(/(\d+(\.\d+)?)/);
+                if (matchedNum) {
+                    const parsedNum = parseFloat(matchedNum[1]);
+                    steepSeconds = parsedNum >= 30 ? Math.round(parsedNum) : Math.round(parsedNum * 60);
+                }
+
+                const sensoryRadar = {
+                    floral: parseInt(document.getElementById('prod-radar-floral')?.value, 10) || 80,
+                    malty: parseInt(document.getElementById('prod-radar-malty')?.value, 10) || 75,
+                    sweetness: parseInt(document.getElementById('prod-radar-sweetness')?.value, 10) || 80,
+                    astringency: parseInt(document.getElementById('prod-radar-astringency')?.value, 10) || 40,
+                    body: parseInt(document.getElementById('prod-radar-body')?.value, 10) || 80,
+                    aroma: parseInt(document.getElementById('prod-radar-aroma')?.value, 10) || 90
+                };
+
+                const productPayload = {
+                    name, category, price, weight, symbol, stock, desc, leafGrade, steepTemp, steepTime,
+                    flavorProfile: flavorProfile || (tastingNotes.length > 0 ? tastingNotes.join(', ') : 'Single-Estate Reserve'),
+                    tastingNotes,
+                    flavor_notes: tastingNotes,
+                    elevation,
+                    steepSeconds,
+                    sensoryRadar
+                };
+
                 if (editId) {
-                    const updatedData = { name, category, price, weight, symbol, stock, desc, leafGrade, steepTemp, steepTime };
-                    if (image) updatedData.image = image;
-                    window.TeaFactoryStore.updateProduct(editId, updatedData);
-                    showToast("Product Updated", `"${name}" specifications have been updated.`, "success");
+                    if (image) productPayload.image = image;
+                    window.TeaFactoryStore.updateProduct(editId, productPayload);
+                    showToast("Product Updated", `"${name}" specifications and sensory profile have been updated.`, "success");
                 } else {
-                    window.TeaFactoryStore.addProduct({
-                        name, category, price, weight, symbol, stock, desc, leafGrade, steepTemp, steepTime, image: image || 'images/Product.jpeg'
-                    });
-                    showToast("Product Introduced", `"${name}" has been published to the Product Catalog.`, "success");
+                    productPayload.image = image || 'images/Product.jpeg';
+                    window.TeaFactoryStore.addProduct(productPayload);
+                    showToast("Product Introduced", `"${name}" has been published with sensory profile & radar to the catalog.`, "success");
                 }
                 
                 selectedProdImageBase64 = '';
@@ -5920,6 +6014,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (editIdInput) editIdInput.value = '';
                 if (prodImageZone) prodImageZone.classList.remove('has-file');
                 if (prodImagePreview) prodImagePreview.style.display = 'none';
+
+                // Reset radar badges to defaults
+                const defaultRadar = { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 };
+                Object.keys(defaultRadar).forEach(k => {
+                    const slider = document.getElementById(`prod-radar-${k}`);
+                    const badge = document.getElementById(`badge-radar-${k}`);
+                    if (slider) slider.value = defaultRadar[k];
+                    if (badge) badge.innerText = `${defaultRadar[k]}%`;
+                });
+
                 renderTabContent('admin');
             });
         }
@@ -5940,6 +6044,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const temp = btn.getAttribute('data-temp');
                 const time = btn.getAttribute('data-time');
                 const image = btn.getAttribute('data-image');
+                const flavorProfile = btn.getAttribute('data-flavor-profile') || '';
+                const tastingNotes = btn.getAttribute('data-tasting-notes') || '';
+                const elevation = btn.getAttribute('data-elevation') || '';
+                const steepSeconds = btn.getAttribute('data-steep-seconds') || '180';
+                const radarFloral = btn.getAttribute('data-radar-floral') || '80';
+                const radarMalty = btn.getAttribute('data-radar-malty') || '75';
+                const radarSweetness = btn.getAttribute('data-radar-sweetness') || '80';
+                const radarAstringency = btn.getAttribute('data-radar-astringency') || '40';
+                const radarBody = btn.getAttribute('data-radar-body') || '80';
+                const radarAroma = btn.getAttribute('data-radar-aroma') || '90';
 
                 const editIdInput = document.getElementById('prod-edit-id');
                 const nameInput = document.getElementById('prod-name');
@@ -5952,6 +6066,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const gradeInput = document.getElementById('prod-grade');
                 const tempInput = document.getElementById('prod-temp');
                 const timeInput = document.getElementById('prod-time');
+                const flavorProfileInput = document.getElementById('prod-flavor-profile');
+                const tastingNotesInput = document.getElementById('prod-tasting-notes');
+                const elevationInput = document.getElementById('prod-elevation');
                 const titleEl = document.getElementById('prod-form-title');
                 const descEl = document.getElementById('prod-form-desc');
                 const saveBtn = document.getElementById('btn-save-prod');
@@ -5967,10 +6084,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (descInput) descInput.value = desc || '';
                 if (gradeInput) gradeInput.value = grade || '';
                 if (tempInput) tempInput.value = temp || '';
-                if (timeInput) timeInput.value = time || '';
+                if (timeInput) timeInput.value = time || (steepSeconds ? `${Math.floor(steepSeconds / 60)} Minutes` : '3-4 Minutes');
+                if (flavorProfileInput) flavorProfileInput.value = flavorProfile;
+                if (tastingNotesInput) tastingNotesInput.value = tastingNotes;
+                if (elevationInput) elevationInput.value = elevation;
+
+                const setRadarVal = (key, val) => {
+                    const slider = document.getElementById(`prod-radar-${key}`);
+                    const badge = document.getElementById(`badge-radar-${key}`);
+                    if (slider) slider.value = val;
+                    if (badge) badge.innerText = `${val}%`;
+                };
+                setRadarVal('floral', radarFloral);
+                setRadarVal('malty', radarMalty);
+                setRadarVal('sweetness', radarSweetness);
+                setRadarVal('astringency', radarAstringency);
+                setRadarVal('body', radarBody);
+                setRadarVal('aroma', radarAroma);
 
                 if (titleEl) titleEl.innerText = `Edit Product: ${name}`;
-                if (descEl) descEl.innerText = `Update storefront details, tasting notes, and image for ${name}.`;
+                if (descEl) descEl.innerText = `Update storefront details, tasting notes, sensory radar, and image for ${name}.`;
                 if (saveBtn) saveBtn.innerText = 'Update Product';
                 if (cancelBtn) cancelBtn.style.display = 'inline-block';
 
@@ -6006,6 +6139,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 cancelEditProdBtn.style.display = 'none';
                 if (prodImageZone) prodImageZone.classList.remove('has-file');
                 if (prodImagePreview) prodImagePreview.style.display = 'none';
+
+                // Reset radar sliders & badges
+                const defaultRadar = { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 };
+                Object.keys(defaultRadar).forEach(k => {
+                    const slider = document.getElementById(`prod-radar-${k}`);
+                    const badge = document.getElementById(`badge-radar-${k}`);
+                    if (slider) slider.value = defaultRadar[k];
+                    if (badge) badge.innerText = `${defaultRadar[k]}%`;
+                });
             });
         }
 
