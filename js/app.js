@@ -661,7 +661,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.documentElement.scrollTop = 0;
                 }, 80);
             } else {
-                showToast("Access Denied", "Invalid staff credentials passcode. (Default: hasi@123)", "error");
+                showToast("Access Denied", "Invalid staff credentials passcode. Please try again.", "error");
                 const passInput = document.getElementById('admin-passcode');
                 if (passInput) {
                     passInput.value = '';
