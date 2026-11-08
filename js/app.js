@@ -9118,6 +9118,224 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         updateBulletinsBadge();
     }
 
+    // ── Luxury Cookie & Estate Terroir Privacy System ──
+    function initCookieConsent() {
+        const COOKIE_KEY = 'rockone_cookie_consent';
+        const banner = document.getElementById('estate-cookie-banner');
+        const modal = document.getElementById('cookie-policy-modal');
+        const backdrop = document.getElementById('cookie-modal-backdrop');
+        const closeBtn = document.getElementById('cookie-modal-close-btn');
+
+        const acceptAllBannerBtn = document.getElementById('cookie-accept-all-btn');
+        const essentialBannerBtn = document.getElementById('cookie-essential-btn');
+        const manageBannerBtn = document.getElementById('cookie-manage-btn');
+
+        const modalAcceptAllBtn = document.getElementById('cookie-modal-accept-all-btn');
+        const modalEssentialBtn = document.getElementById('cookie-modal-essential-only-btn');
+        const modalSaveCustomBtn = document.getElementById('cookie-modal-save-custom-btn');
+        const modalResetBtn = document.getElementById('cookie-modal-reset-btn');
+
+        const prefPersonalization = document.getElementById('cookie-pref-personalization');
+        const prefAnalytics = document.getElementById('cookie-pref-analytics');
+
+        function getStoredConsent() {
+            try {
+                const raw = localStorage.getItem(COOKIE_KEY);
+                if (!raw) return null;
+                if (raw === 'all') {
+                    return { consent: 'all', personalization: true, analytics: true, timestamp: Date.now() };
+                }
+                if (raw === 'essential') {
+                    return { consent: 'essential', personalization: false, analytics: false, timestamp: Date.now() };
+                }
+                return JSON.parse(raw);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function saveConsent(type, personalization = true, analytics = true) {
+            const data = {
+                consent: type,
+                personalization: type === 'all' ? true : (type === 'essential' ? false : !!personalization),
+                analytics: type === 'all' ? true : (type === 'essential' ? false : !!analytics),
+                timestamp: Date.now(),
+                date: new Date().toISOString()
+            };
+            try {
+                localStorage.setItem(COOKIE_KEY, JSON.stringify(data));
+            } catch (e) {
+                console.warn('LocalStorage unavailable for cookie consent', e);
+            }
+            return data;
+        }
+
+        function showBanner() {
+            if (!banner) return;
+            banner.classList.add('active');
+        }
+
+        function hideBanner() {
+            if (!banner) return;
+            banner.classList.remove('active');
+        }
+
+        function openModal() {
+            if (!modal) return;
+            const current = getStoredConsent();
+            if (current) {
+                if (prefPersonalization) prefPersonalization.checked = !!current.personalization;
+                if (prefAnalytics) prefAnalytics.checked = !!current.analytics;
+            } else {
+                if (prefPersonalization) prefPersonalization.checked = true;
+                if (prefAnalytics) prefAnalytics.checked = true;
+            }
+
+            if (drawerOverlay) {
+                drawerOverlay.classList.remove('active');
+                drawerOverlay.classList.remove('open');
+            }
+            const cartOverlay = document.getElementById('cart-drawer-overlay');
+            if (cartOverlay) {
+                cartOverlay.classList.remove('active');
+                cartOverlay.classList.remove('open');
+            }
+            const prefsPopup = document.getElementById('global-prefs-popup');
+            if (prefsPopup) {
+                prefsPopup.classList.remove('active');
+                prefsPopup.setAttribute('aria-hidden', 'true');
+            }
+
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            if (!modal) return;
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        // Expose globally
+        window.openCookiePolicyModal = openModal;
+        window.closeCookiePolicyModal = closeModal;
+        window.getCookieConsent = getStoredConsent;
+        window.resetCookieConsent = function() {
+            try {
+                localStorage.removeItem(COOKIE_KEY);
+            } catch (e) {}
+            hideBanner();
+            openModal();
+            if (typeof showToast === 'function') {
+                showToast('Consent Reset', 'Cookie preferences reset to initial state.', 'info');
+            }
+        };
+
+        // Wire banner buttons
+        if (acceptAllBannerBtn) {
+            acceptAllBannerBtn.addEventListener('click', () => {
+                saveConsent('all', true, true);
+                hideBanner();
+                if (typeof showToast === 'function') {
+                    showToast('Cookie Preferences Saved', 'All essential & refined cookies accepted for your Ceylon journey.', 'info');
+                }
+            });
+        }
+
+        if (essentialBannerBtn) {
+            essentialBannerBtn.addEventListener('click', () => {
+                saveConsent('essential', false, false);
+                hideBanner();
+                if (typeof showToast === 'function') {
+                    showToast('Essential Storage Active', 'Only strictly required storage enabled for cart and currency.', 'info');
+                }
+            });
+        }
+
+        if (manageBannerBtn) {
+            manageBannerBtn.addEventListener('click', () => {
+                openModal();
+            });
+        }
+
+        // Wire modal buttons
+        if (modalAcceptAllBtn) {
+            modalAcceptAllBtn.addEventListener('click', () => {
+                saveConsent('all', true, true);
+                closeModal();
+                hideBanner();
+                if (typeof showToast === 'function') {
+                    showToast('All Cookies Accepted', 'Full luxury tea personalization and terroir analytics active.', 'info');
+                }
+            });
+        }
+
+        if (modalEssentialBtn) {
+            modalEssentialBtn.addEventListener('click', () => {
+                saveConsent('essential', false, false);
+                closeModal();
+                hideBanner();
+                if (typeof showToast === 'function') {
+                    showToast('Essential Storage Active', 'Non-essential personalization and analytics disabled.', 'info');
+                }
+            });
+        }
+
+        if (modalSaveCustomBtn) {
+            modalSaveCustomBtn.addEventListener('click', () => {
+                const pers = prefPersonalization ? prefPersonalization.checked : true;
+                const anal = prefAnalytics ? prefAnalytics.checked : true;
+                saveConsent('custom', pers, anal);
+                closeModal();
+                hideBanner();
+                if (typeof showToast === 'function') {
+                    showToast('Custom Preferences Saved', 'Your privacy choices have been updated.', 'info');
+                }
+            });
+        }
+
+        if (modalResetBtn) {
+            modalResetBtn.addEventListener('click', () => {
+                try {
+                    localStorage.removeItem(COOKIE_KEY);
+                } catch (e) {}
+                closeModal();
+                if (typeof showToast === 'function') {
+                    showToast('Preferences Reset', 'Your cookie preferences have been cleared.', 'info');
+                }
+                setTimeout(showBanner, 400);
+            });
+        }
+
+        if (backdrop) backdrop.addEventListener('click', closeModal);
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Global trigger delegation
+        document.addEventListener('click', (e) => {
+            const trigger = e.target.closest('[data-action="open-cookie-policy"], .open-cookie-policy-btn');
+            if (trigger) {
+                e.preventDefault();
+                openModal();
+            }
+        });
+
+        // Initial check: if no consent recorded yet, show banner smoothly
+        const existing = getStoredConsent();
+        if (!existing) {
+            setTimeout(() => {
+                showBanner();
+            }, 850);
+        }
+    }
+
     // 9. Initial Load Orchestration
     initCustomCursor();
     initLanguageSwitchers();
@@ -9125,6 +9343,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
     initFloatingGlobalPreferences();
     initCartSystem();
     initBulletinsNotificationSystem();
+    initCookieConsent();
     initAboutUsModal();
     initLookbookModal();
     initFaqChatbot();

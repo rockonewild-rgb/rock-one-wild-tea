@@ -4215,7 +4215,11 @@ const UIComponents = {
                             Immerse in the mist-veiled mountain amphitheaters of Ettampitiya (1,200m+), witness the sacred orthodox hand-rolling rituals, and explore the uncultivated wild tea sanctuary.
                         </p>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                        <a href="https://www.youtube.com/@Rockonewildtea001" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.45rem; background: rgba(255, 0, 0, 0.15); border: 1px solid rgba(255, 60, 60, 0.45); color: #ff8585; font-size: 0.74rem; font-weight: 700; padding: 0.35rem 0.85rem; border-radius: 20px; text-decoration: none; transition: all 0.25s ease;" onmouseover="this.style.background='rgba(255,0,0,0.3)'; this.style.borderColor='#ff4444'; this.style.color='#ffffff';" onmouseout="this.style.background='rgba(255,0,0,0.15)'; this.style.borderColor='rgba(255,60,60,0.45)'; this.style.color='#ff8585';" title="Visit Rock One Wild Tea on YouTube">
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                            <span>@Rockonewildtea001</span>
+                        </a>
                         <span style="font-size: 0.7rem; color: var(--color-gold); background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.35); padding: 0.35rem 0.75rem; border-radius: 20px; font-weight: 700; letter-spacing: 1px;">
                             4K CINEMATIC MASTER
                         </span>

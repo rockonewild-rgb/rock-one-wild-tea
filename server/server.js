@@ -5,8 +5,9 @@ const morgan = require('morgan');
 const compression = require('compression');
 require('dotenv').config();
 
-// Initialize database
+// Initialize database & Supabase client
 require('./db/database');
+const { pingSupabase, getSupabaseHealth } = require('./db/supabase');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -48,15 +49,39 @@ app.use(express.static(path.join(__dirname, '..'), {
     }
 }));
 
-// API Healthcheck
-app.get('/api/health', (req, res) => {
+// API Healthcheck with Supabase keep-alive ping support
+app.get('/api/health', async (req, res) => {
+    let pingResult = null;
+    const shouldPing = req.query.ping === 'true' || req.query.keepalive === 'true' || req.query.ping === '1';
+    
+    if (shouldPing && typeof pingSupabase === 'function') {
+        pingResult = await pingSupabase();
+    }
+    
+    const health = typeof getSupabaseHealth === 'function' ? getSupabaseHealth() : { isHealthy: true };
+
     res.json({
         status: 'online',
         service: 'Rock One Wild Tea Estate REST API',
         version: '1.0.0',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        database: {
+            sqlite: 'connected',
+            supabase: health.isHealthy ? 'connected' : 'circuit-breaker-fallback',
+            supabaseHealth: health,
+            ping: pingResult
+        }
     });
 });
+
+// Periodic in-process keep-alive: pings Supabase every 6 hours while server is running
+setInterval(async () => {
+    try {
+        if (typeof pingSupabase === 'function') {
+            await pingSupabase();
+        }
+    } catch (e) {}
+}, 6 * 60 * 60 * 1000);
 
 // Mount Routes
 app.use('/api/products', require('./routes/products'));

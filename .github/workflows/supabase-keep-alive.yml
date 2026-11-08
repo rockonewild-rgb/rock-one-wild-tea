@@ -2,9 +2,9 @@ name: Supabase Database Keep-Alive
 
 on:
   schedule:
-    # Runs automatically every 2 days at 06:00 UTC (11:30 AM Sri Lanka Time)
-    # Supabase only pauses after 7 days of inactivity, so this guarantees it NEVER pauses.
-    - cron: '0 6 */2 * *'
+    # Runs twice every day (every 12 hours at 06:00 and 18:00 UTC)
+    # Supabase only pauses after 7 days of inactivity, so twice daily ensures it NEVER pauses.
+    - cron: '0 6,18 * * *'
   workflow_dispatch:
     # Allows you to click "Run workflow" manually from GitHub Actions tab anytime to test.
 
@@ -21,7 +21,8 @@ jobs:
           echo "======================================================="
 
           # 1. Ping the live production API which queries Supabase directly
-          echo "📡 Pinging live Vercel API (queries Supabase products table)..."
+          echo "📡 Pinging live Vercel API (queries Supabase products table & health ping)..."
+          curl -s "https://rock-one-wild-tea.vercel.app/api/health?ping=1" > /dev/null || true
           RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" "https://rock-one-wild-tea.vercel.app/api/products?reserve=false")
           
           HTTP_BODY=$(echo "$RESPONSE" | sed -e '$d')
