@@ -2,13 +2,23 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../db/database');
 const { supabase, isSupabaseAvailable } = require('../db/supabase');
+const { isTursoAvailable, queryTurso, executeTurso } = require('../db/turso');
 
 /**
  * GET /api/announcements
- * Fetch active announcements
+ * Fetch active announcements (Turso Primary)
  */
 router.get('/', async (req, res) => {
     try {
+        // 1. Turso Cloud (Primary)
+        if (isTursoAvailable()) {
+            const tursoRows = await queryTurso('SELECT * FROM announcements WHERE is_active = 1 ORDER BY created_at DESC');
+            if (Array.isArray(tursoRows)) {
+                return res.json({ success: true, count: tursoRows.length, data: tursoRows, source: 'turso' });
+            }
+        }
+
+        // 2. Supabase Cloud (Secondary Fallback)
         if (isSupabaseAvailable()) {
             const { data, error } = await supabase
                 .from('announcements')
@@ -16,14 +26,14 @@ router.get('/', async (req, res) => {
                 .eq('is_active', true)
                 .order('created_at', { ascending: false });
 
-            if (!error && data) {
-                return res.json({ success: true, count: data.length, data });
+            if (!error && Array.isArray(data)) {
+                return res.json({ success: true, count: data.length, data, source: 'supabase' });
             }
         }
 
-        // SQLite fallback
+        // 3. SQLite Fallback
         const rows = db.prepare('SELECT * FROM announcements WHERE is_active = 1 ORDER BY created_at DESC').all();
-        res.json({ success: true, count: rows.length, data: rows });
+        res.json({ success: true, count: rows.length, data: rows, source: 'sqlite' });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
@@ -56,33 +66,39 @@ router.post('/', async (req, res) => {
             content,
             image,
             link,
-            is_active: true
+            is_active: 1
         };
 
-        if (isSupabaseAvailable()) {
-            const { data, error } = await supabase.from('announcements').insert([record]).select().single();
-            if (!error && data) {
-                // Keep local sqlite in sync
-                try {
-                    db.prepare(`
-                        INSERT OR REPLACE INTO announcements (id, tag, date_str, heading, content, image, link, is_active)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, 1)
-                    `).run(id, tag, dateStr, finalHeading, content, image, link);
-                } catch (e) {}
-
-                return res.status(201).json({ success: true, data });
+        // 1. Turso Cloud (Primary)
+        if (isTursoAvailable()) {
+            try {
+                await executeTurso(`
+                    INSERT OR REPLACE INTO announcements (id, tag, date_str, heading, content, image, link, is_active)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+                `, [id, tag, dateStr, finalHeading, content, image, link]);
+            } catch (te) {
+                console.warn('⚠️ [Turso] Announcement insert error:', te.message);
             }
         }
 
-        // SQLite fallback
-        const insert = db.prepare(`
-            INSERT INTO announcements (id, tag, date_str, heading, content, image, link, is_active)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 1)
-        `);
-        insert.run(id, tag, dateStr, finalHeading, content, image, link);
+        // 2. Supabase
+        if (isSupabaseAvailable()) {
+            try {
+                await supabase.from('announcements').upsert([record]);
+            } catch (se) {
+                console.warn('⚠️ [Supabase] Announcement insert error:', se.message);
+            }
+        }
 
-        const created = db.prepare('SELECT * FROM announcements WHERE id = ?').get(id);
-        res.status(201).json({ success: true, data: created });
+        // 3. SQLite
+        try {
+            db.prepare(`
+                INSERT OR REPLACE INTO announcements (id, tag, date_str, heading, content, image, link, is_active)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+            `).run(id, tag, dateStr, finalHeading, content, image, link);
+        } catch (e) {}
+
+        res.status(201).json({ success: true, data: record });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
@@ -90,20 +106,27 @@ router.post('/', async (req, res) => {
 
 /**
  * DELETE /api/announcements/:id
- * Delete an announcement from Supabase & SQLite
  */
 router.delete('/:id', async (req, res) => {
     try {
         const annId = req.params.id;
 
-        if (isSupabaseAvailable()) {
-            const { error } = await supabase.from('announcements').delete().eq('id', annId);
-            if (error) {
-                console.warn('⚠️ Supabase delete error:', error.message);
+        // 1. Turso Cloud
+        if (isTursoAvailable()) {
+            try {
+                await executeTurso('DELETE FROM announcements WHERE id = ?', [annId]);
+            } catch (te) {
+                console.warn('⚠️ [Turso] Announcement delete error:', te.message);
             }
         }
 
-        // SQLite deletion
+        // 2. Supabase
+        if (isSupabaseAvailable()) {
+            const { error } = await supabase.from('announcements').delete().eq('id', annId);
+            if (error) console.warn('⚠️ Supabase delete error:', error.message);
+        }
+
+        // 3. SQLite
         try {
             db.prepare('DELETE FROM announcements WHERE id = ?').run(annId);
         } catch (e) {}

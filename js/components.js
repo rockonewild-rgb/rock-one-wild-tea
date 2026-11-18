@@ -611,6 +611,27 @@ const UIComponents = {
             `;
         }
 
+        // If no collector boxes exist in the database, render elegant empty allocation state
+        if (!boxes || boxes.length === 0) {
+            container.innerHTML = headerHtml + `
+                <div class="empty-collector-chests-view" style="text-align: center; padding: 4.5rem 2rem; background: radial-gradient(circle at 50% 20%, rgba(212,175,55,0.06) 0%, rgba(10,10,10,0.8) 100%); border: 1px dashed rgba(212,175,55,0.25); border-radius: 8px; margin: 2rem 0;">
+                    <div style="width: 60px; height: 60px; margin: 0 auto 1.5rem; border-radius: 50%; background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.2); display: flex; align-items: center; justify-content: center; color: var(--color-gold);">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    </div>
+                    <h3 style="font-family: var(--font-serif); color: var(--color-gold); font-size: 1.6rem; margin-bottom: 0.6rem; letter-spacing: 0.05em;">
+                        All Collector Chests Concluded
+                    </h3>
+                    <p style="color: var(--color-text-muted); max-width: 520px; margin: 0 auto 1.8rem; font-size: 0.88rem; line-height: 1.6;">
+                        There are currently no active numbered collector chests allocated for this seasonal release. Our tea sommelier is curating the forthcoming reserve vintage.
+                    </p>
+                    <a href="#catalog" class="btn btn-outline" style="border-color: var(--color-gold); color: var(--color-gold); padding: 0.75rem 1.75rem; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;">
+                        Explore Single-Estate Teas
+                    </a>
+                </div>
+            `;
+            return;
+        }
+
         // Initially select the first available box or box 1
         const defaultBox = boxes.find(b => b.status === 'Available') || boxes[0];
         let defaultStatusText = 'Available for Allocation';

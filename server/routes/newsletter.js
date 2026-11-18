@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../db/database');
 const { supabase, isSupabaseAvailable } = require('../db/supabase');
+const { isTursoAvailable, queryTurso, executeTurso } = require('../db/turso');
 
 /**
  * POST /api/newsletter/subscribe
@@ -20,21 +21,30 @@ router.post('/subscribe', async (req, res) => {
         const normalizedEmail = email.trim().toLowerCase();
         const id = 'sub-' + Date.now().toString(36);
 
-        if (isSupabaseAvailable()) {
-            const { data, error } = await supabase.from('newsletter_subscribers').upsert([
-                { id, email: normalizedEmail, source }
-            ], { onConflict: 'email' }).select().single();
-
-            if (!error && data) {
-                return res.status(201).json({
-                    success: true,
-                    message: 'Thank you for subscribing to our private Connoisseur Club.',
-                    data
-                });
+        // 1. Turso Cloud (Primary)
+        if (isTursoAvailable()) {
+            try {
+                await executeTurso(`
+                    INSERT OR IGNORE INTO newsletter_subscribers (id, email, source, subscribed_at)
+                    VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+                `, [id, normalizedEmail, source]);
+            } catch (te) {
+                console.warn('⚠️ [Turso] Newsletter subscription error:', te.message);
             }
         }
 
-        // SQLite fallback
+        // 2. Supabase Cloud (Secondary)
+        if (isSupabaseAvailable()) {
+            try {
+                await supabase.from('newsletter_subscribers').upsert([
+                    { id, email: normalizedEmail, source }
+                ], { onConflict: 'email' });
+            } catch (se) {
+                console.warn('⚠️ [Supabase] Newsletter subscription error:', se.message);
+            }
+        }
+
+        // 3. SQLite Fallback
         try {
             db.prepare(`
                 INSERT OR IGNORE INTO newsletter_subscribers (id, email, source)
@@ -44,7 +54,8 @@ router.post('/subscribe', async (req, res) => {
 
         res.status(201).json({
             success: true,
-            message: 'Thank you for subscribing to our private Connoisseur Club.'
+            message: 'Thank you for subscribing to our private Connoisseur Club.',
+            data: { id, email: normalizedEmail, source }
         });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
@@ -56,15 +67,25 @@ router.post('/subscribe', async (req, res) => {
  */
 router.get('/subscribers', async (req, res) => {
     try {
-        if (isSupabaseAvailable()) {
-            const { data, error } = await supabase.from('newsletter_subscribers').select('*').order('subscribed_at', { ascending: false });
-            if (!error && data) {
-                return res.json({ success: true, count: data.length, data });
+        // 1. Turso Cloud (Primary)
+        if (isTursoAvailable()) {
+            const tursoRows = await queryTurso('SELECT * FROM newsletter_subscribers ORDER BY subscribed_at DESC');
+            if (Array.isArray(tursoRows)) {
+                return res.json({ success: true, count: tursoRows.length, data: tursoRows, source: 'turso' });
             }
         }
 
+        // 2. Supabase Cloud (Secondary)
+        if (isSupabaseAvailable()) {
+            const { data, error } = await supabase.from('newsletter_subscribers').select('*').order('subscribed_at', { ascending: false });
+            if (!error && Array.isArray(data)) {
+                return res.json({ success: true, count: data.length, data, source: 'supabase' });
+            }
+        }
+
+        // 3. SQLite Fallback
         const rows = db.prepare('SELECT * FROM newsletter_subscribers ORDER BY subscribed_at DESC').all();
-        res.json({ success: true, count: rows.length, data: rows });
+        res.json({ success: true, count: rows.length, data: rows, source: 'sqlite' });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }

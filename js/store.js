@@ -555,14 +555,8 @@ class TeaFactoryStore {
                     this.state.currentSeason = { name: "Royal Emerald Reserve", seriesNumber: 1, pricePerBox: 150.00 };
                     needsSave = true;
                 }
-                if (!this.state.boxes || !Array.isArray(this.state.boxes) || this.state.boxes.length === 0) {
-                    this.state.boxes = Array.from({ length: 10 }, (_, i) => ({
-                        id: i + 1,
-                        name: `Gift Box #${String(i + 1).padStart(2, '0')}`,
-                        status: "Available",
-                        price: 150.00,
-                        booking: null
-                    }));
+                if (!this.state.boxes || !Array.isArray(this.state.boxes)) {
+                    this.state.boxes = [];
                     needsSave = true;
                 }
                 if (!this.state.products || !Array.isArray(this.state.products) || this.state.products.length === 0 || !localStorage.getItem('products_migrated_v5')) {
@@ -1089,14 +1083,8 @@ class TeaFactoryStore {
                 seriesNumber: 1,
                 pricePerBox: 150.00 // Premium pricing in USD
             },
-            // 1 to 10 gift boxes
-            boxes: Array.from({ length: 10 }, (_, i) => ({
-                id: i + 1,
-                name: `Gift Box #${String(i + 1).padStart(2, '0')}`,
-                status: "Available", // "Available", "Pending", "Booked"
-                price: 150.00,
-                booking: null // Will hold customer details when booked
-            })),
+            // Collector gift boxes (loaded dynamically from Turso Cloud / SQLite)
+            boxes: [],
             products: this.getDefaultProducts(),
             bookings: [],
             // 4 Daily Tour Slots (Monday - Saturday, Max 10 visitors)
@@ -1743,6 +1731,18 @@ class TeaFactoryStore {
         }
 
         this.saveState();
+
+        if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.createBox === 'function') {
+            TeaFactoryAPI.createBox({
+                number: newId,
+                name: newBox.name,
+                reserve_flush: newBox.desc || 'Highland Single-Estate Flush',
+                price_usd: newBox.price,
+                status: (newBox.status || 'available').toLowerCase(),
+                gold_seal_code: `RW-2026-BOX-${String(newId).padStart(2, '0')}`
+            }).catch(e => console.warn('Create box backend sync notice:', e));
+        }
+
         return newBox;
     }
 
@@ -1763,6 +1763,15 @@ class TeaFactoryStore {
         };
 
         this.saveState();
+
+        if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.updateBox === 'function') {
+            TeaFactoryAPI.updateBox(boxId, {
+                status: (updatedData.status || '').toLowerCase() || undefined,
+                price_usd: updatedData.price !== undefined ? parseFloat(updatedData.price) : undefined,
+                reserve_flush: updatedData.desc || undefined
+            }).catch(e => console.warn('Update box backend sync notice:', e));
+        }
+
         return this.state.boxes[boxIndex];
     }
 
@@ -1770,6 +1779,11 @@ class TeaFactoryStore {
         if (!this.state.boxes) return false;
         this.state.boxes = this.state.boxes.filter(b => b.id !== boxId);
         this.saveState();
+
+        if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.deleteBox === 'function') {
+            TeaFactoryAPI.deleteBox(boxId).catch(e => console.warn('Delete box backend sync notice:', e));
+        }
+
         return true;
     }
 
@@ -3040,13 +3054,13 @@ Rock One Wild Tea Sanctuary Concierge Team
                 });
             }
 
-            // 2. Sync Collector Boxes
-            if (boxRes.status === 'fulfilled' && Array.isArray(boxRes.value) && boxRes.value.length > 0) {
+            // 2. Sync Collector Boxes (Authoritative from Turso Cloud / Backend)
+            if (boxRes.status === 'fulfilled' && Array.isArray(boxRes.value)) {
                 this.state.boxes = boxRes.value.map(b => ({
                     id: b.number,
                     number: b.number,
                     name: b.name,
-                    status: b.status.charAt(0).toUpperCase() + b.status.slice(1),
+                    status: (b.status || 'Available').charAt(0).toUpperCase() + (b.status || 'Available').slice(1),
                     price: b.price_usd,
                     allocated_to: b.allocated_to,
                     gold_seal_code: b.gold_seal_code,
@@ -3388,12 +3402,36 @@ const TeaFactoryAPI = {
         }
     },
 
+    async createBox(payload) {
+        try {
+            const res = await fetch(`${this.baseUrl}/boxes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
     async updateBox(number, payload) {
         try {
             const res = await fetch(`${this.baseUrl}/boxes/${encodeURIComponent(number)}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async deleteBox(number) {
+        try {
+            const res = await fetch(`${this.baseUrl}/boxes/${encodeURIComponent(number)}`, {
+                method: 'DELETE'
             });
             return await res.json();
         } catch (e) {

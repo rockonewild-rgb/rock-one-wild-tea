@@ -16,6 +16,30 @@ router.get('/slots', async (req, res) => {
     try {
         const { date } = req.query;
 
+        // 1. Turso Cloud (Primary)
+        if (isTursoAvailable()) {
+            let query = 'SELECT * FROM tour_slots WHERE is_active = 1';
+            const params = [];
+            if (date) {
+                query += ' AND tour_date = ?';
+                params.push(date);
+            }
+            query += ' ORDER BY tour_date ASC, time_slot ASC';
+            const tursoRows = await queryTurso(query, params);
+            if (Array.isArray(tursoRows)) {
+                return res.json({
+                    success: true,
+                    count: tursoRows.length,
+                    data: tursoRows.map(s => ({
+                        ...s,
+                        available_seats: (s.max_capacity || 12) - (s.booked_seats || 0)
+                    })),
+                    source: 'turso'
+                });
+            }
+        }
+
+        // 2. Supabase Cloud (Secondary Fallback)
         if (isSupabaseAvailable()) {
             let query = supabase.from('tour_slots').select('*').eq('is_active', true);
             if (date) {
@@ -24,18 +48,20 @@ router.get('/slots', async (req, res) => {
             query = query.order('tour_date', { ascending: true }).order('time_slot', { ascending: true });
 
             const { data, error } = await query;
-            if (!error && data) {
+            if (!error && Array.isArray(data)) {
                 return res.json({
                     success: true,
                     count: data.length,
                     data: data.map(s => ({
                         ...s,
                         available_seats: (s.max_capacity || 12) - (s.booked_seats || 0)
-                    }))
+                    })),
+                    source: 'supabase'
                 });
             }
         }
 
+        // 3. Local SQLite (Offline Fallback)
         let query = 'SELECT * FROM tour_slots WHERE is_active = 1';
         const params = [];
 
@@ -45,23 +71,16 @@ router.get('/slots', async (req, res) => {
         }
 
         query += ' ORDER BY tour_date ASC, time_slot ASC';
-        let slots = [];
-        if (isTursoAvailable()) {
-            try {
-                slots = (await queryTurso(query, params)) || [];
-            } catch (e) {}
-        }
-        if (!slots || slots.length === 0) {
-            slots = db.prepare(query).all(...params);
-        }
+        const slots = db.prepare(query).all(...params);
 
         res.json({
             success: true,
             count: slots.length,
             data: slots.map(s => ({
                 ...s,
-                available_seats: s.max_capacity - s.booked_seats
-            }))
+                available_seats: (s.max_capacity || 12) - (s.booked_seats || 0)
+            })),
+            source: 'sqlite'
         });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
@@ -381,22 +400,25 @@ router.post('/bookings/:id/send-gatepass', async (req, res) => {
  */
 router.get('/bookings', async (req, res) => {
     try {
-        if (isSupabaseAvailable()) {
-            const { data, error } = await supabase.from('tour_bookings').select('*').order('created_at', { ascending: false });
-            if (!error && data) {
-                return res.json({ success: true, count: data.length, data });
-            }
-        }
-
+        // 1. Turso Cloud (Primary)
         if (isTursoAvailable()) {
             const tursoRows = await queryTurso('SELECT * FROM tour_bookings ORDER BY created_at DESC');
-            if (tursoRows && tursoRows.length > 0) {
-                return res.json({ success: true, count: tursoRows.length, data: tursoRows });
+            if (Array.isArray(tursoRows)) {
+                return res.json({ success: true, count: tursoRows.length, data: tursoRows, source: 'turso' });
             }
         }
 
+        // 2. Supabase Cloud (Secondary Fallback)
+        if (isSupabaseAvailable()) {
+            const { data, error } = await supabase.from('tour_bookings').select('*').order('created_at', { ascending: false });
+            if (!error && Array.isArray(data)) {
+                return res.json({ success: true, count: data.length, data, source: 'supabase' });
+            }
+        }
+
+        // 3. Local SQLite (Offline Fallback)
         const rows = db.prepare('SELECT * FROM tour_bookings ORDER BY created_at DESC').all();
-        res.json({ success: true, count: rows.length, data: rows });
+        res.json({ success: true, count: rows.length, data: rows, source: 'sqlite' });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
@@ -408,11 +430,23 @@ router.get('/bookings', async (req, res) => {
 router.delete('/bookings/:id', async (req, res) => {
     try {
         const bookId = req.params.id;
+
+        // 1. Delete from Turso Cloud
+        if (isTursoAvailable()) {
+            try {
+                await executeTurso('DELETE FROM tour_bookings WHERE id = ?', [bookId]);
+            } catch (te) {
+                console.warn('⚠️ [Turso] Tour booking delete error:', te.message);
+            }
+        }
+
+        // 2. Delete from Supabase
         if (isSupabaseAvailable()) {
             const { error } = await supabase.from('tour_bookings').delete().eq('id', bookId);
             if (error) console.warn('⚠️ Supabase tour booking delete error:', error.message);
         }
 
+        // 3. Delete from SQLite
         try {
             db.prepare('DELETE FROM tour_bookings WHERE id = ?').run(bookId);
         } catch (e) {}

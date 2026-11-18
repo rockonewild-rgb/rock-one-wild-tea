@@ -170,17 +170,11 @@ router.post('/', async (req, res) => {
  */
 router.get('/', async (req, res) => {
     try {
-        if (isSupabaseAvailable()) {
-            const { data, error } = await supabase.from('orders').select('*, order_items(*)').order('created_at', { ascending: false });
-            if (!error && data) {
-                return res.json({ success: true, count: data.length, data });
-            }
-        }
-
+        // 1. Turso Cloud (Primary)
         if (isTursoAvailable()) {
             const tursoOrders = await queryTurso('SELECT * FROM orders ORDER BY created_at DESC');
-            if (tursoOrders && tursoOrders.length > 0) {
-                const tursoItems = await queryTurso('SELECT * FROM order_items') || [];
+            if (Array.isArray(tursoOrders)) {
+                const tursoItems = (await queryTurso('SELECT * FROM order_items')) || [];
                 const fullOrders = tursoOrders.map(ord => ({
                     ...ord,
                     order_items: tursoItems.filter(it => it.order_id === ord.id).map(it => ({
@@ -188,10 +182,19 @@ router.get('/', async (req, res) => {
                         gift_options: it.gift_options ? (typeof it.gift_options === 'string' ? JSON.parse(it.gift_options) : it.gift_options) : null
                     }))
                 }));
-                return res.json({ success: true, count: fullOrders.length, data: fullOrders });
+                return res.json({ success: true, count: fullOrders.length, data: fullOrders, source: 'turso' });
             }
         }
 
+        // 2. Supabase Cloud (Secondary Fallback)
+        if (isSupabaseAvailable()) {
+            const { data, error } = await supabase.from('orders').select('*, order_items(*)').order('created_at', { ascending: false });
+            if (!error && Array.isArray(data)) {
+                return res.json({ success: true, count: data.length, data, source: 'supabase' });
+            }
+        }
+
+        // 3. Local SQLite (Offline Fallback)
         const orders = db.prepare('SELECT * FROM orders ORDER BY created_at DESC').all();
         const getItems = db.prepare('SELECT * FROM order_items WHERE order_id = ?');
 
@@ -203,7 +206,7 @@ router.get('/', async (req, res) => {
             }))
         }));
 
-        res.json({ success: true, count: fullOrders.length, data: fullOrders });
+        res.json({ success: true, count: fullOrders.length, data: fullOrders, source: 'sqlite' });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }

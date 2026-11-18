@@ -85,22 +85,25 @@ router.post('/', async (req, res) => {
  */
 router.get('/', async (req, res) => {
     try {
-        if (isSupabaseAvailable()) {
-            const { data, error } = await supabase.from('inquiries').select('*').order('created_at', { ascending: false });
-            if (!error && data) {
-                return res.json({ success: true, count: data.length, data });
-            }
-        }
-
+        // 1. Turso Cloud (Primary)
         if (isTursoAvailable()) {
             const tursoRows = await queryTurso('SELECT * FROM inquiries ORDER BY created_at DESC');
-            if (tursoRows && tursoRows.length > 0) {
-                return res.json({ success: true, count: tursoRows.length, data: tursoRows });
+            if (Array.isArray(tursoRows)) {
+                return res.json({ success: true, count: tursoRows.length, data: tursoRows, source: 'turso' });
             }
         }
 
+        // 2. Supabase Cloud (Secondary Fallback)
+        if (isSupabaseAvailable()) {
+            const { data, error } = await supabase.from('inquiries').select('*').order('created_at', { ascending: false });
+            if (!error && Array.isArray(data)) {
+                return res.json({ success: true, count: data.length, data, source: 'supabase' });
+            }
+        }
+
+        // 3. Local SQLite (Offline Fallback)
         const rows = db.prepare('SELECT * FROM inquiries ORDER BY created_at DESC').all();
-        res.json({ success: true, count: rows.length, data: rows });
+        res.json({ success: true, count: rows.length, data: rows, source: 'sqlite' });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }

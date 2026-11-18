@@ -11,22 +11,25 @@ router.get('/', async (req, res) => {
     try {
         let reviews = [];
 
-        if (isSupabaseAvailable()) {
-            const { data, error } = await supabase.from('reviews').select('*').order('created_at', { ascending: false });
-            if (!error && data) {
-                reviews = data;
-            }
-        }
-
-        if (reviews.length === 0 && isTursoAvailable()) {
+        // 1. Turso Cloud (Primary)
+        if (isTursoAvailable()) {
             try {
                 const tursoRows = await queryTurso('SELECT * FROM reviews ORDER BY created_at DESC');
-                if (tursoRows && tursoRows.length > 0) {
+                if (Array.isArray(tursoRows)) {
                     reviews = tursoRows;
                 }
             } catch (e) {}
         }
 
+        // 2. Supabase Cloud (Secondary Fallback)
+        if (reviews.length === 0 && isSupabaseAvailable()) {
+            const { data, error } = await supabase.from('reviews').select('*').order('created_at', { ascending: false });
+            if (!error && Array.isArray(data)) {
+                reviews = data;
+            }
+        }
+
+        // 3. Local SQLite (Offline Fallback)
         if (reviews.length === 0) {
             reviews = db.prepare('SELECT * FROM reviews ORDER BY created_at DESC').all();
         }

@@ -13,14 +13,80 @@ function normalizeProductImage(img) {
     return img;
 }
 
+function formatProductRow(r) {
+    if (!r) return null;
+    const priceVal = Number(r.price_usd !== undefined ? r.price_usd : (r.price !== undefined ? r.price : 0)) || 0;
+    const shippingVal = Number(r.shipping_fee_usd !== undefined ? r.shipping_fee_usd : (r.shippingCharge !== undefined ? r.shippingCharge : (r.shippingFee || 0))) || 0;
+    const bg = typeof r.brewing_guide === 'string' ? JSON.parse(r.brewing_guide) : (r.brewing_guide || {});
+    const fNotes = Array.isArray(r.flavor_notes) ? r.flavor_notes : (typeof r.flavor_notes === 'string' ? JSON.parse(r.flavor_notes) : (bg.tastingNotes || []));
+    const radar = bg.sensoryRadar || { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 };
+    const fProfile = bg.flavorProfile || (fNotes.length > 0 ? fNotes.join(', ') : 'Single-Estate Reserve');
+    const tNotes = (bg.tastingNotes && bg.tastingNotes.length > 0) ? bg.tastingNotes : (fNotes.length > 0 ? fNotes : ['Single Estate', 'Artisanal Harvest']);
+    const stockStatus = bg.stock_status || (typeof r.stock === 'number' ? (r.stock <= 5 ? 'Low Stock' : 'In Stock') : (r.stock || 'In Stock'));
+    const stockQty = typeof r.stock === 'number' ? r.stock : (stockStatus === 'Low Stock' ? 5 : 15);
+    const steepSec = bg.steepSeconds || (parseInt(bg.time, 10) ? parseInt(bg.time, 10) * 60 : 180);
+
+    return {
+        ...r,
+        price: priceVal,
+        price_usd: priceVal,
+        shipping_fee_usd: shippingVal,
+        shippingCharge: shippingVal,
+        shippingFee: shippingVal,
+        leafGrade: r.grade || bg.leafGrade || 'Single-Estate Reserve',
+        subcategory: bg.subcategory || r.subcategory || 'Hot Tea (Gongfu style)',
+        weight: bg.weight || '100g Vintage Tin',
+        symbol: bg.symbol || '',
+        steepTemp: bg.temp || bg.steepTemp || '90°C',
+        steepTime: bg.time || bg.steepTime || '3-4 Minutes',
+        stock: stockStatus,
+        stock_quantity: stockQty,
+        image: normalizeProductImage(r.image),
+        flavor_notes: fNotes,
+        flavorProfile: fProfile,
+        tastingNotes: tNotes,
+        sensoryRadar: radar,
+        steepSeconds: steepSec,
+        brewing_guide: bg,
+        is_reserve: Boolean(r.is_reserve)
+    };
+}
+
 /**
  * GET /api/products
- * Fetch all products
+ * Fetch all products (Turso Cloud Primary)
  */
 router.get('/', async (req, res) => {
     try {
         const { category, search, reserve } = req.query;
 
+        // 1. Turso Cloud (Primary)
+        if (isTursoAvailable()) {
+            let query = 'SELECT * FROM products WHERE 1=1';
+            const params = [];
+            if (category && category !== 'all') {
+                query += ' AND category = ?';
+                params.push(category);
+            }
+            if (reserve !== undefined) {
+                query += ' AND is_reserve = ?';
+                params.push(reserve === 'true' || reserve === '1' ? 1 : 0);
+            }
+            if (search) {
+                query += ' AND (name LIKE ? OR description LIKE ? OR flavor_notes LIKE ?)';
+                const term = `%${search}%`;
+                params.push(term, term, term);
+            }
+            query += ' ORDER BY price_usd DESC';
+
+            const tursoRows = await queryTurso(query, params);
+            if (Array.isArray(tursoRows)) {
+                const formatted = tursoRows.map(formatProductRow);
+                return res.json({ success: true, count: formatted.length, data: formatted, source: 'turso' });
+            }
+        }
+
+        // 2. Supabase Cloud (Secondary Fallback)
         if (isSupabaseAvailable()) {
             let query = supabase.from('products').select('*');
             if (category && category !== 'all') {
@@ -35,104 +101,33 @@ router.get('/', async (req, res) => {
             query = query.order('price_usd', { ascending: false });
 
             const { data, error } = await query;
-            if (!error && data) {
-                const formatted = data.map(r => {
-                    const bg = typeof r.brewing_guide === 'string' ? JSON.parse(r.brewing_guide) : (r.brewing_guide || {});
-                    const fNotes = Array.isArray(r.flavor_notes) ? r.flavor_notes : (typeof r.flavor_notes === 'string' ? JSON.parse(r.flavor_notes) : []);
-                    const radar = bg.sensoryRadar || { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 };
-                    const fProfile = bg.flavorProfile || (fNotes.length > 0 ? fNotes.join(', ') : '');
-                    const tNotes = (bg.tastingNotes && bg.tastingNotes.length > 0) ? bg.tastingNotes : (fNotes.length > 0 ? fNotes : ['Single Estate', 'Artisanal Harvest']);
-                    return {
-                        ...r,
-                        price: Number(r.price_usd || 0),
-                        price_usd: Number(r.price_usd || 0),
-                        leafGrade: r.grade || bg.leafGrade || 'Single-Estate Reserve',
-                subcategory: bg.subcategory || r.subcategory || 'Hot Tea (Gongfu style)',
-                        subcategory: bg.subcategory || r.subcategory || 'Hot Tea (Gongfu style)',
-                        weight: bg.weight || '100g',
-                        symbol: bg.symbol || '',
-                        steepTemp: bg.temp || bg.steepTemp || '90°C',
-                        steepTime: bg.time || bg.steepTime || '3-4 Minutes',
-                        stock: bg.stock_status || (typeof r.stock === 'number' ? (r.stock <= 5 ? 'Low Stock' : 'In Stock') : (r.stock || 'In Stock')),
-                        stock_quantity: typeof r.stock === 'number' ? r.stock : 10,
-                        image: normalizeProductImage(r.image),
-                        flavor_notes: fNotes,
-                        flavorProfile: fProfile,
-                        tastingNotes: tNotes,
-                        sensoryRadar: radar,
-                        steepSeconds: bg.steepSeconds || 180,
-                        brewing_guide: bg,
-                        is_reserve: Boolean(r.is_reserve)
-                    };
-                });
-                return res.json({ success: true, count: formatted.length, data: formatted });
+            if (!error && Array.isArray(data)) {
+                const formatted = data.map(formatProductRow);
+                return res.json({ success: true, count: formatted.length, data: formatted, source: 'supabase' });
             }
         }
 
-        // SQLite fallback
+        // 3. Local SQLite (Offline Fallback)
         let query = 'SELECT * FROM products WHERE 1=1';
         const params = [];
-
         if (category && category !== 'all') {
             query += ' AND category = ?';
             params.push(category);
         }
-
         if (reserve !== undefined) {
             query += ' AND is_reserve = ?';
             params.push(reserve === 'true' || reserve === '1' ? 1 : 0);
         }
-
         if (search) {
             query += ' AND (name LIKE ? OR description LIKE ? OR flavor_notes LIKE ?)';
             const term = `%${search}%`;
             params.push(term, term, term);
         }
-
         query += ' ORDER BY price_usd DESC';
-        let rows = [];
-        if (isTursoAvailable()) {
-            try {
-                rows = (await queryTurso(query, params)) || [];
-            } catch (e) {
-                console.warn('Turso products query notice:', e.message);
-            }
-        }
-        if (!rows || rows.length === 0) {
-            rows = db.prepare(query).all(...params);
-        }
 
-        const products = rows.map(r => {
-            const priceVal = Number(r.price_usd !== undefined ? r.price_usd : (r.price !== undefined ? r.price : 0)) || 0;
-            const bg = r.brewing_guide ? JSON.parse(r.brewing_guide) : {};
-            const fNotes = r.flavor_notes ? JSON.parse(r.flavor_notes) : [];
-            const radar = bg.sensoryRadar || { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 };
-            const fProfile = bg.flavorProfile || (fNotes.length > 0 ? fNotes.join(', ') : '');
-            const tNotes = (bg.tastingNotes && bg.tastingNotes.length > 0) ? bg.tastingNotes : (fNotes.length > 0 ? fNotes : ['Single Estate', 'Artisanal Harvest']);
-            return {
-                ...r,
-                price: priceVal,
-                price_usd: priceVal,
-                leafGrade: r.grade || bg.leafGrade || 'Single-Estate Reserve',
-                subcategory: bg.subcategory || r.subcategory || 'Hot Tea (Gongfu style)',
-                weight: bg.weight || '100g',
-                symbol: bg.symbol || '',
-                steepTemp: bg.temp || bg.steepTemp || '90°C',
-                steepTime: bg.time || bg.steepTime || '3-4 Minutes',
-                stock: bg.stock_status || (typeof r.stock === 'number' ? (r.stock <= 5 ? 'Low Stock' : 'In Stock') : (r.stock || 'In Stock')),
-                stock_quantity: typeof r.stock === 'number' ? r.stock : 10,
-                image: normalizeProductImage(r.image),
-                flavor_notes: fNotes,
-                flavorProfile: fProfile,
-                tastingNotes: tNotes,
-                sensoryRadar: radar,
-                steepSeconds: bg.steepSeconds || 180,
-                brewing_guide: bg,
-                is_reserve: Boolean(r.is_reserve)
-            };
-        });
-
-        res.json({ success: true, count: products.length, data: products });
+        const rows = db.prepare(query).all(...params);
+        const formatted = rows.map(formatProductRow);
+        res.json({ success: true, count: formatted.length, data: formatted, source: 'sqlite' });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
@@ -140,72 +135,34 @@ router.get('/', async (req, res) => {
 
 /**
  * GET /api/products/:id
+ * Fetch single product by ID
  */
 router.get('/:id', async (req, res) => {
     try {
-        if (isSupabaseAvailable()) {
-            const { data, error } = await supabase.from('products').select('*').eq('id', req.params.id).single();
-            if (!error && data) {
-                const bg = typeof data.brewing_guide === 'string' ? JSON.parse(data.brewing_guide) : (data.brewing_guide || {});
-                const fNotes = Array.isArray(data.flavor_notes) ? data.flavor_notes : (typeof data.flavor_notes === 'string' ? JSON.parse(data.flavor_notes) : []);
-                const radar = bg.sensoryRadar || { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 };
-                const fProfile = bg.flavorProfile || (fNotes.length > 0 ? fNotes.join(', ') : '');
-                const tNotes = (bg.tastingNotes && bg.tastingNotes.length > 0) ? bg.tastingNotes : (fNotes.length > 0 ? fNotes : ['Single Estate', 'Artisanal Harvest']);
-                return res.json({
-                    success: true,
-                    data: {
-                        ...data,
-                        price: Number(data.price_usd || 0),
-                        leafGrade: data.grade || bg.leafGrade || 'Single-Estate Reserve',
-                        weight: bg.weight || '100g',
-                        symbol: bg.symbol || '',
-                        steepTemp: bg.temp || bg.steepTemp || '90°C',
-                        steepTime: bg.time || bg.steepTime || '3-4 Minutes',
-                        stock: bg.stock_status || (typeof data.stock === 'number' ? (data.stock <= 5 ? 'Low Stock' : 'In Stock') : (data.stock || 'In Stock')),
-                        stock_quantity: typeof data.stock === 'number' ? data.stock : 10,
-                        flavor_notes: fNotes,
-                        flavorProfile: fProfile,
-                        tastingNotes: tNotes,
-                        sensoryRadar: radar,
-                        steepSeconds: bg.steepSeconds || 180,
-                        brewing_guide: bg,
-                        is_reserve: Boolean(data.is_reserve)
-                    }
-                });
+        const prodId = req.params.id;
+
+        // 1. Turso Cloud
+        if (isTursoAvailable()) {
+            const rows = await queryTurso('SELECT * FROM products WHERE id = ?', [prodId]);
+            if (Array.isArray(rows) && rows.length > 0) {
+                return res.json({ success: true, data: formatProductRow(rows[0]), source: 'turso' });
             }
         }
 
-        const row = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
+        // 2. Supabase
+        if (isSupabaseAvailable()) {
+            const { data, error } = await supabase.from('products').select('*').eq('id', prodId).single();
+            if (!error && data) {
+                return res.json({ success: true, data: formatProductRow(data), source: 'supabase' });
+            }
+        }
+
+        // 3. SQLite
+        const row = db.prepare('SELECT * FROM products WHERE id = ?').get(prodId);
         if (!row) {
             return res.status(404).json({ success: false, error: 'Product not found' });
         }
-
-        const bg = row.brewing_guide ? JSON.parse(row.brewing_guide) : {};
-        const fNotes = row.flavor_notes ? JSON.parse(row.flavor_notes) : [];
-        const radar = bg.sensoryRadar || { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 };
-        const fProfile = bg.flavorProfile || (fNotes.length > 0 ? fNotes.join(', ') : '');
-        const tNotes = (bg.tastingNotes && bg.tastingNotes.length > 0) ? bg.tastingNotes : (fNotes.length > 0 ? fNotes : ['Single Estate', 'Artisanal Harvest']);
-
-        const product = {
-            ...row,
-            leafGrade: row.grade || bg.leafGrade || 'Single-Estate Reserve',
-            subcategory: bg.subcategory || row.subcategory || 'Hot Tea (Gongfu style)',
-            weight: bg.weight || '100g',
-            symbol: bg.symbol || '',
-            steepTemp: bg.temp || bg.steepTemp || '90°C',
-            steepTime: bg.time || bg.steepTime || '3-4 Minutes',
-            stock: bg.stock_status || (typeof row.stock === 'number' ? (row.stock <= 5 ? 'Low Stock' : 'In Stock') : (row.stock || 'In Stock')),
-            stock_quantity: typeof row.stock === 'number' ? row.stock : 10,
-            flavor_notes: fNotes,
-            flavorProfile: fProfile,
-            tastingNotes: tNotes,
-            sensoryRadar: radar,
-            steepSeconds: bg.steepSeconds || 180,
-            brewing_guide: bg,
-            is_reserve: Boolean(row.is_reserve)
-        };
-
-        res.json({ success: true, data: product });
+        res.json({ success: true, data: formatProductRow(row), source: 'sqlite' });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
@@ -213,6 +170,7 @@ router.get('/:id', async (req, res) => {
 
 /**
  * POST /api/products
+ * Create a new product across Turso, Supabase, and SQLite
  */
 router.post('/', async (req, res) => {
     try {
@@ -255,7 +213,7 @@ router.post('/', async (req, res) => {
             tastingNotes: finalTastingNotes,
             steepSeconds: finalSteepSeconds,
             shippingCharge: finalShipping,
-            shipping_fee: finalShipping,
+            shippingFee: finalShipping,
             subcategory: finalSubcategory
         };
 
@@ -277,52 +235,7 @@ router.post('/', async (req, res) => {
             is_reserve: Boolean(is_reserve)
         };
 
-        if (isSupabaseAvailable()) {
-            const { data, error } = await supabase.from('products').insert([record]).select().single();
-            if (!error && data) {
-                // SQLite sync
-                try {
-                    db.prepare(`
-                        INSERT OR REPLACE INTO products (id, name, category, type, season, grade, elevation, price_usd, shipping_fee_usd, stock, image, description, flavor_notes, brewing_guide, is_reserve)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    `).run(id, name, category, type, season, finalGrade, elevation, finalPrice, finalShipping, Number(stock) || 10, image, finalDesc, JSON.stringify(finalTastingNotes), JSON.stringify(bg), is_reserve ? 1 : 0);
-                } catch (e) {}
-
-                return res.status(201).json({
-                    success: true,
-                    data: {
-                        ...data,
-                        leafGrade: finalGrade,
-                        weight: bg.weight,
-                        symbol: bg.symbol,
-                        steepTemp: bg.temp,
-                        steepTime: bg.time,
-                        stock: stockStatusStr,
-                        stock_quantity: stockInt,
-                        flavorProfile: finalFlavorProfile,
-                        tastingNotes: finalTastingNotes,
-                        sensoryRadar: finalRadar,
-                        steepSeconds: finalSteepSeconds,
-                        shippingCharge: finalShipping,
-                        shippingFee: finalShipping
-                    }
-                });
-            }
-        }
-
-        // SQLite fallback
-        const insert = db.prepare(`
-            INSERT INTO products (id, name, category, type, season, grade, elevation, price_usd, shipping_fee_usd, stock, image, description, flavor_notes, brewing_guide, is_reserve)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `);
-
-        insert.run(
-            id, name, category, type, season, finalGrade, elevation,
-            finalPrice, finalShipping, stockInt, image, finalDesc,
-            JSON.stringify(finalTastingNotes), JSON.stringify(bg),
-            is_reserve ? 1 : 0
-        );
-
+        // 1. Insert into Turso Cloud (Primary)
         if (isTursoAvailable()) {
             try {
                 await executeTurso(`
@@ -335,30 +248,37 @@ router.post('/', async (req, res) => {
                     is_reserve ? 1 : 0
                 ]);
             } catch (te) {
-                console.warn('⚠️ Turso insert product error:', te.message);
+                console.warn('⚠️ [Turso] Product insert error:', te.message);
             }
         }
 
-        const created = db.prepare('SELECT * FROM products WHERE id = ?').get(id);
+        // 2. Insert into Supabase (Secondary)
+        if (isSupabaseAvailable()) {
+            try {
+                await supabase.from('products').upsert([record], { onConflict: 'id' });
+            } catch (se) {
+                console.warn('⚠️ [Supabase] Product insert error:', se.message);
+            }
+        }
+
+        // 3. Insert into SQLite (Local)
+        try {
+            db.prepare(`
+                INSERT OR REPLACE INTO products (id, name, category, type, season, grade, elevation, price_usd, shipping_fee_usd, stock, image, description, flavor_notes, brewing_guide, is_reserve)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `).run(
+                id, name, category, type, season, finalGrade, elevation,
+                finalPrice, finalShipping, stockInt, image, finalDesc,
+                JSON.stringify(finalTastingNotes), JSON.stringify(bg),
+                is_reserve ? 1 : 0
+            );
+        } catch (e) {}
+
+        const formatted = formatProductRow(record);
         res.status(201).json({
             success: true,
-            data: {
-                ...created,
-                leafGrade: finalGrade,
-                weight: bg.weight,
-                symbol: bg.symbol,
-                steepTemp: bg.temp,
-                steepTime: bg.time,
-                stock: stockStatusStr,
-                stock_quantity: stockInt,
-                flavor_notes: finalTastingNotes,
-                flavorProfile: finalFlavorProfile,
-                tastingNotes: finalTastingNotes,
-                sensoryRadar: finalRadar,
-                steepSeconds: finalSteepSeconds,
-                brewing_guide: bg,
-                is_reserve: Boolean(created.is_reserve)
-            }
+            message: 'Product created successfully',
+            data: formatted
         });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
@@ -367,6 +287,7 @@ router.post('/', async (req, res) => {
 
 /**
  * PUT /api/products/:id
+ * Update product details across all databases
  */
 router.put('/:id', async (req, res) => {
     try {
@@ -422,43 +343,76 @@ router.put('/:id', async (req, res) => {
         }
         if (is_reserve !== undefined) updates.is_reserve = Boolean(is_reserve);
 
-        if (isSupabaseAvailable()) {
-            const { data, error } = await supabase.from('products').update(updates).eq('id', prodId).select().single();
-            if (!error && data) {
-                return res.json({ success: true, data });
+        // 1. Update Turso Cloud (Primary)
+        if (isTursoAvailable()) {
+            try {
+                await executeTurso(`
+                    UPDATE products
+                    SET name = COALESCE(?, name),
+                        price_usd = COALESCE(?, price_usd),
+                        shipping_fee_usd = COALESCE(?, shipping_fee_usd),
+                        stock = COALESCE(?, stock),
+                        image = COALESCE(?, image),
+                        description = COALESCE(?, description),
+                        flavor_notes = COALESCE(?, flavor_notes),
+                        brewing_guide = COALESCE(?, brewing_guide),
+                        is_reserve = COALESCE(?, is_reserve)
+                    WHERE id = ?
+                `, [
+                    updates.name || null,
+                    updates.price_usd !== undefined ? updates.price_usd : null,
+                    updates.shipping_fee_usd !== undefined ? updates.shipping_fee_usd : null,
+                    updates.stock !== undefined ? updates.stock : null,
+                    updates.image || null,
+                    updates.description || null,
+                    updates.flavor_notes ? JSON.stringify(updates.flavor_notes) : null,
+                    updates.brewing_guide ? JSON.stringify(updates.brewing_guide) : null,
+                    updates.is_reserve !== undefined ? (updates.is_reserve ? 1 : 0) : null,
+                    prodId
+                ]);
+            } catch (te) {
+                console.warn('⚠️ [Turso] Product update error:', te.message);
             }
         }
 
-        // SQLite & Turso update
+        // 2. Update Supabase
+        if (isSupabaseAvailable()) {
+            try {
+                await supabase.from('products').update(updates).eq('id', prodId);
+            } catch (se) {
+                console.warn('⚠️ [Supabase] Product update error:', se.message);
+            }
+        }
+
+        // 3. Update SQLite
         try {
             db.prepare(`
                 UPDATE products
-                SET name = COALESCE(?, name), price_usd = COALESCE(?, price_usd), shipping_fee_usd = COALESCE(?, shipping_fee_usd), stock = COALESCE(?, stock),
-                    flavor_notes = COALESCE(?, flavor_notes), brewing_guide = COALESCE(?, brewing_guide)
+                SET name = COALESCE(?, name),
+                    price_usd = COALESCE(?, price_usd),
+                    shipping_fee_usd = COALESCE(?, shipping_fee_usd),
+                    stock = COALESCE(?, stock),
+                    image = COALESCE(?, image),
+                    description = COALESCE(?, description),
+                    flavor_notes = COALESCE(?, flavor_notes),
+                    brewing_guide = COALESCE(?, brewing_guide),
+                    is_reserve = COALESCE(?, is_reserve)
                 WHERE id = ?
             `).run(
-                name, updates.price_usd || null, updates.shipping_fee_usd !== undefined ? updates.shipping_fee_usd : null, Number(stock) || null,
-                finalTNotes ? JSON.stringify(finalTNotes) : null,
+                updates.name || null,
+                updates.price_usd !== undefined ? updates.price_usd : null,
+                updates.shipping_fee_usd !== undefined ? updates.shipping_fee_usd : null,
+                updates.stock !== undefined ? updates.stock : null,
+                updates.image || null,
+                updates.description || null,
+                updates.flavor_notes ? JSON.stringify(updates.flavor_notes) : null,
                 updates.brewing_guide ? JSON.stringify(updates.brewing_guide) : null,
+                updates.is_reserve !== undefined ? (updates.is_reserve ? 1 : 0) : null,
                 prodId
             );
-
-            if (isTursoAvailable()) {
-                await executeTurso(`
-                    UPDATE products
-                    SET name = COALESCE(?, name), price_usd = COALESCE(?, price_usd), shipping_fee_usd = COALESCE(?, shipping_fee_usd), stock = COALESCE(?, stock),
-                        flavor_notes = COALESCE(?, flavor_notes), brewing_guide = COALESCE(?, brewing_guide)
-                    WHERE id = ?
-                `, [
-                    name, updates.price_usd || null, updates.shipping_fee_usd !== undefined ? updates.shipping_fee_usd : null, Number(stock) || null,
-                    finalTNotes ? JSON.stringify(finalTNotes) : null,
-                    updates.brewing_guide ? JSON.stringify(updates.brewing_guide) : null,
-                    prodId
-                ]);
-            }
         } catch (e) {}
 
-        res.json({ success: true, message: 'Product updated successfully' });
+        res.json({ success: true, message: 'Product updated successfully', id: prodId });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
@@ -471,16 +425,27 @@ router.delete('/:id', async (req, res) => {
     try {
         const prodId = req.params.id;
 
-        if (isSupabaseAvailable()) {
-            const { error } = await supabase.from('products').delete().eq('id', prodId);
-            if (error) console.warn('⚠️ Supabase delete error:', error.message);
+        // 1. Delete from Turso Cloud
+        if (isTursoAvailable()) {
+            try {
+                await executeTurso('DELETE FROM products WHERE id = ?', [prodId]);
+            } catch (te) {
+                console.warn('⚠️ [Turso] Product delete error:', te.message);
+            }
         }
 
+        // 2. Delete from Supabase
+        if (isSupabaseAvailable()) {
+            try {
+                await supabase.from('products').delete().eq('id', prodId);
+            } catch (se) {
+                console.warn('⚠️ [Supabase] Product delete error:', se.message);
+            }
+        }
+
+        // 3. Delete from SQLite
         try {
             db.prepare('DELETE FROM products WHERE id = ?').run(prodId);
-            if (isTursoAvailable()) {
-                await executeTurso('DELETE FROM products WHERE id = ?', [prodId]);
-            }
         } catch (e) {}
 
         res.json({ success: true, message: 'Product deleted successfully', id: prodId });

@@ -2,13 +2,54 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../db/database');
 const { supabase, isSupabaseAvailable } = require('../db/supabase');
+const { isTursoAvailable, queryTurso } = require('../db/turso');
 
 /**
  * GET /api/stats
- * Aggregate dashboard metrics (Supabase Primary with SQLite Fallback)
+ * Aggregate dashboard metrics (Turso Cloud Primary)
  */
 router.get('/', async (req, res) => {
     try {
+        // 1. Turso Cloud (Primary)
+        if (isTursoAvailable()) {
+            try {
+                const [prods, ords, books, inqs, subs, boxes] = await Promise.all([
+                    queryTurso('SELECT COUNT(*) as c FROM products'),
+                    queryTurso('SELECT COALESCE(SUM(total_usd), 0) as rev, COUNT(*) as c FROM orders'),
+                    queryTurso('SELECT COUNT(*) as c FROM tour_bookings'),
+                    queryTurso('SELECT COUNT(*) as c FROM inquiries'),
+                    queryTurso('SELECT COUNT(*) as c FROM newsletter_subscribers'),
+                    queryTurso('SELECT status, COUNT(*) as c FROM boxes GROUP BY status')
+                ]);
+
+                if (prods && ords && books && inqs && subs && boxes) {
+                    const boxStats = { available: 0, reserved: 0, sold: 0 };
+                    boxes.forEach(b => {
+                        const st = (b.status || 'available').toLowerCase();
+                        boxStats[st] = (boxStats[st] || 0) + Number(b.c || 0);
+                    });
+
+                    return res.json({
+                        success: true,
+                        source: 'turso',
+                        data: {
+                            total_products: Number(prods[0]?.c || 0),
+                            total_orders: Number(ords[0]?.c || 0),
+                            total_revenue_usd: Number(ords[0]?.rev || 0),
+                            total_tour_bookings: Number(books[0]?.c || 0),
+                            total_inquiries: Number(inqs[0]?.c || 0),
+                            total_subscribers: Number(subs[0]?.c || 0),
+                            collector_boxes: boxStats,
+                            server_time: new Date().toISOString()
+                        }
+                    });
+                }
+            } catch (te) {
+                console.warn('⚠️ [Turso] Stats aggregation error:', te.message);
+            }
+        }
+
+        // 2. Supabase Cloud (Secondary Fallback)
         if (isSupabaseAvailable()) {
             const [prodRes, ordRes, bookRes, inqRes, subRes, boxRes] = await Promise.all([
                 supabase.from('products').select('id'),
@@ -44,6 +85,7 @@ router.get('/', async (req, res) => {
             }
         }
 
+        // 3. Local SQLite (Offline Fallback)
         const totalProducts = db.prepare('SELECT COUNT(*) as count FROM products').get().count;
         const totalOrders = db.prepare('SELECT COUNT(*) as count FROM orders').get().count;
         const revenue = db.prepare('SELECT COALESCE(SUM(total_usd), 0) as total FROM orders').get().total;
