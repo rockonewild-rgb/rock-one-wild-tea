@@ -543,14 +543,18 @@ class TeaFactoryStore {
 
     // Load state from localStorage or initialize with defaults
     loadState() {
-        const stored = localStorage.getItem(this.storageKey);
+        // Force flush legacy mock localStorage so Turso Cloud is authoritative
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('tea_store_db_synced_v5') !== 'true') {
+            localStorage.removeItem(this.storageKey);
+            localStorage.setItem('tea_store_db_synced_v5', 'true');
+        }
+
+        const stored = typeof localStorage !== 'undefined' ? localStorage.getItem(this.storageKey) : null;
         if (stored) {
             try {
                 this.state = JSON.parse(stored);
                 
-                // Robust state migration for older localStorage versions
                 let needsSave = false;
-                
                 if (!this.state.currentSeason) {
                     this.state.currentSeason = { name: "Royal Emerald Reserve", seriesNumber: 1, pricePerBox: 150.00 };
                     needsSave = true;
@@ -559,54 +563,20 @@ class TeaFactoryStore {
                     this.state.boxes = [];
                     needsSave = true;
                 }
-                if (!this.state.products || !Array.isArray(this.state.products) || this.state.products.length === 0 || !localStorage.getItem('products_migrated_v5')) {
-                    this.state.products = this.getDefaultProducts();
-                    localStorage.setItem('products_migrated_v5', 'true');
+                if (!this.state.products || !Array.isArray(this.state.products)) {
+                    this.state.products = [];
                     needsSave = true;
                 }
                 if (!this.state.bookings || !Array.isArray(this.state.bookings)) {
                     this.state.bookings = [];
                     needsSave = true;
                 }
-                if (!this.state.tourSlots || !Array.isArray(this.state.tourSlots) || this.state.tourSlots.length === 0 || this.state.tourSlots.length > 4) {
-                    this.state.tourSlots = [
-                        { id: 1, timeSlot: "09:30 AM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
-                        { id: 2, timeSlot: "11:00 AM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
-                        { id: 3, timeSlot: "01:30 PM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
-                        { id: 4, timeSlot: "03:30 PM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 }
-                    ];
+                if (!this.state.tourSlots || !Array.isArray(this.state.tourSlots)) {
+                    this.state.tourSlots = [];
                     needsSave = true;
                 }
-                if (!this.state.announcements || !Array.isArray(this.state.announcements) || this.state.announcements.length === 0) {
-                    this.state.announcements = [
-                        {
-                            id: 1,
-                            title: "The Launch of Golden Leaf Selection",
-                            date: "August 15, 2026",
-                            content: "Discover our premium Gold-tipped black tea, harvested under the full moon from our highest estate slopes. Exclusively available in Series 3.",
-                            tag: "New Release",
-                            premium: true,
-                            image: "images/luxury_tea_tin.jpg"
-                        },
-                        {
-                            id: 2,
-                            title: "Exclusive Private Tasting Session",
-                            date: "September 02, 2026",
-                            content: "We are hosting an exclusive private tasting session for tea connoisseurs. Learn the art of tea brewing from our Master Tea Sommelier. Limited slots available.",
-                            tag: "Event",
-                            premium: false,
-                            image: "images/luxury_tea_estate.jpg"
-                        },
-                        {
-                            id: 3,
-                            title: "Factory Estate Tour Bookings Open",
-                            date: "Ongoing",
-                            content: "Take a step back in time. Explore the historical 1890 Tea Factory, walk through the organic gardens, and witness the artisanal processing first-hand.",
-                            tag: "Announcement",
-                            premium: true,
-                            image: "images/luxury_tea_tour.jpg"
-                        }
-                    ];
+                if (!this.state.announcements || !Array.isArray(this.state.announcements)) {
+                    this.state.announcements = [];
                     needsSave = true;
                 }
                 if (!this.state.emailLogs || !Array.isArray(this.state.emailLogs)) {
@@ -617,12 +587,16 @@ class TeaFactoryStore {
                     this.state.orders = [];
                     needsSave = true;
                 }
-                if (!this.state.reviews || !Array.isArray(this.state.reviews) || this.state.reviews.length === 0) {
-                    this.state.reviews = this.getDefaultReviews();
+                if (!this.state.reviews || !Array.isArray(this.state.reviews)) {
+                    this.state.reviews = [];
                     needsSave = true;
                 }
-                if (!this.state.inquiries || !Array.isArray(this.state.inquiries) || this.state.inquiries.length === 0) {
-                    this.state.inquiries = this.getDefaultInquiries();
+                if (!this.state.inquiries || !Array.isArray(this.state.inquiries)) {
+                    this.state.inquiries = [];
+                    needsSave = true;
+                }
+                if (!this.state.users || !Array.isArray(this.state.users)) {
+                    this.state.users = [];
                     needsSave = true;
                 }
                 if (!this.state.cart || !Array.isArray(this.state.cart)) {
@@ -646,58 +620,7 @@ class TeaFactoryStore {
     }
 
     getDefaultReviews() {
-        return [
-            {
-                id: "rev_1",
-                name: "Marcus Vance",
-                location: "London, United Kingdom",
-                title: "Executive Tea Sommelier",
-                rating: 5,
-                experienceType: "Gift Box Reserve",
-                comment: "A masterpiece of orthodox Ceylon tea. The woodiness and wild floral honey notes are unlike anything else in the market. Each steep reveals a deeper layer of complexity.",
-                date: "August 18, 2026"
-            },
-            {
-                id: "rev_2",
-                name: "Clara Montaigne",
-                location: "Paris, France",
-                title: "Editorial Director, Luxury Traveler Digest",
-                rating: 5,
-                experienceType: "Estate Factory Tour",
-                comment: "Tasting these numbered reserves is a sacred ritual. The handcrafted light-wood cedar box represents the supreme dedication of the estate to artisanal history.",
-                date: "August 12, 2026"
-            },
-            {
-                id: "rev_3",
-                name: "Dr. Kenji Tanaka",
-                location: "Kyoto, Japan",
-                title: "Founder, Kyoto Tea Connoisseurs Club",
-                rating: 5,
-                experienceType: "Sommelier Private Cupping",
-                comment: "An unforgettable encounter at the historic factory. The private tasting tours are educational, serene, and represent Sri Lanka's finest luxury hospitality.",
-                date: "July 29, 2026"
-            },
-            {
-                id: "rev_4",
-                name: "Sophia Al-Maktoum",
-                location: "Dubai, UAE",
-                title: "Private Tea Collector",
-                rating: 5,
-                experienceType: "Gift Box Reserve",
-                comment: "The limited equinox chest arrived in pristine condition with gold wax seal intact. Exceptional single-estate character with unparalleled floral fragrance.",
-                date: "July 15, 2026"
-            },
-            {
-                id: "rev_5",
-                name: "Julian Bernhardt",
-                location: "Zurich, Switzerland",
-                title: "Fine Tea Importer & Connoisseur",
-                rating: 5,
-                experienceType: "Pure Orthodox Tea",
-                comment: "The deep taproot arbor trees impart a mineral depth that cannot be replicated by commercial plantations. Truly Ceylon's crown jewel.",
-                date: "June 30, 2026"
-            }
-        ];
+        return [];
     }
 
     getReviews() {
@@ -747,44 +670,7 @@ class TeaFactoryStore {
     }
 
     getDefaultInquiries() {
-        return [
-            {
-                id: "INQ-98241",
-                fullName: "Lady Eleanor Sterling",
-                email: "e.sterling@mayfair-estates.co.uk",
-                phone: "+44 7700 900452",
-                country: "United Kingdom",
-                organization: "Mayfair Private Cellars",
-                interests: [
-                    "Numbered Collector Teak Wood Chests (Series 01–10)",
-                    "Single-Estate Imperial Golden Needle & Silver Tips"
-                ],
-                volumeTier: "Cellar Reserve Tier (6 – 20 Units / Season)",
-                contactMethod: "WhatsApp Priority Desk",
-                notes: "Requesting allocation reservation for Series 03 and Series 07 of upcoming equinox flush. Interested in bespoke brass monogram plate.",
-                date: "August 29, 2026",
-                status: "Allocated",
-                timestamp: Date.now() - 86400000 * 2
-            },
-            {
-                id: "INQ-98105",
-                fullName: "Antoine de Rochechouart",
-                email: "a.rochechouart@chateau-lyon.fr",
-                phone: "+33 6 12 34 56 78",
-                country: "France",
-                organization: "Rochechouart Hospitality Group",
-                interests: [
-                    "Bespoke Corporate, Diplomatic & Luxury Gifting",
-                    "Private Sommelier Cupping & Master Factory Tour"
-                ],
-                volumeTier: "Sovereign Patron / Corporate Tier (20+ Bespoke Units)",
-                contactMethod: "Direct Email Ledger",
-                notes: "Planning delegation visit to Sri Lanka in November 2026. Inquiring about 50 customized gift chests with diplomatic heraldic sealing.",
-                date: "August 27, 2026",
-                status: "Pending Concierge Review",
-                timestamp: Date.now() - 86400000 * 4
-            }
-        ];
+        return [];
     }
 
     getInquiries() {
@@ -861,140 +747,7 @@ class TeaFactoryStore {
     }
 
     getDefaultProducts() {
-        return [
-            {
-                id: "p1",
-                name: "Imperial Gold Tip",
-                category: "Black Tea",
-                price: 45.00,
-                weight: "100g",
-                image: "images/Product.jpeg",
-                desc: "Hand-rolled golden tips from our 1,240m+ highest estate fields, producing a rich coppery brew with honeyed floral notes and sweet malt finish.",
-                stock: "Rare Reserve",
-                symbol: "",
-                leafGrade: "FBOPF Extra Special (Gold Tip)",
-                elevation: "1,240m Highlands",
-                harvestSeason: "Equinox First Flush",
-                flavorProfile: "Wild Orchid, Honeyed Malt, Caramelized Fig",
-                tastingNotes: ["Wild Orchid", "Warm Wildflower Honey", "Malted Barley", "Sweet Caramelized Fig"],
-                steepTemp: "95°C (203°F)",
-                steepTime: "3 Minutes",
-                steepSeconds: 180,
-                leafRatio: "2.5g / 180ml",
-                infusions: [
-                    { round: 1, seconds: 180, label: "1st Infusion (Aroma & Floral)" },
-                    { round: 2, seconds: 210, label: "2nd Infusion (Body & Honey Malt)" },
-                    { round: 3, seconds: 270, label: "3rd Infusion (Sweet Mineral Finish)" }
-                ],
-                sensoryRadar: {
-                    floral: 85,
-                    malty: 92,
-                    sweetness: 80,
-                    astringency: 42,
-                    body: 88,
-                    aroma: 94
-                }
-            },
-            {
-                id: "p2",
-                name: "Highlands Silver Needle Tips",
-                category: "White Tea",
-                price: 65.00,
-                weight: "80g",
-                image: "images/Product.jpeg",
-                desc: "Sun-dried velvety unopened buds hand-plucked at dawn. Delivers an ethereal pale champagne liquor with lingering honeysuckle sweetness.",
-                stock: "Micro-Batch",
-                symbol: "",
-                leafGrade: "Imperial Silver Tips (Hand-Selected)",
-                elevation: "1,320m Peak Ridge",
-                harvestSeason: "Morning Mist Spring Harvest",
-                flavorProfile: "Fresh Jasmine, White Peach, Sweet Montane Dew",
-                tastingNotes: ["Fresh Jasmine Blossom", "White Peach", "Sweet Dew", "Subtle Vanilla Pod"],
-                steepTemp: "80°C (176°F)",
-                steepTime: "4 Minutes",
-                steepSeconds: 240,
-                leafRatio: "3.0g / 180ml",
-                infusions: [
-                    { round: 1, seconds: 240, label: "1st Infusion (Delicate White Blossom)" },
-                    { round: 2, seconds: 300, label: "2nd Infusion (Nectar & Ripe Peach)" },
-                    { round: 3, seconds: 360, label: "3rd Infusion (Velvety Lingering Sweetness)" }
-                ],
-                sensoryRadar: {
-                    floral: 96,
-                    malty: 20,
-                    sweetness: 90,
-                    astringency: 18,
-                    body: 55,
-                    aroma: 98
-                }
-            },
-            {
-                id: "p3",
-                name: "Estate Emerald Mountain Needle",
-                category: "Green Tea",
-                price: 42.00,
-                weight: "100g",
-                image: "images/Product.jpeg",
-                desc: "Pan-roasted single-estate green tea leaves with vibrant jade clarity, toasted chestnut notes, and crisp montane mineral undertones.",
-                stock: "In Stock",
-                symbol: "",
-                leafGrade: "Orthodox Whole Leaf Green",
-                elevation: "1,200m Valley Slopes",
-                harvestSeason: "Spring Sunrise Harvest",
-                flavorProfile: "Toasted Chestnut, Bamboo Shoots, Sweet Umami",
-                tastingNotes: ["Fresh Toasted Chestnut", "Steamed Bamboo Leaf", "Sweet Umami", "Crisp Montane Mineral"],
-                steepTemp: "82°C (180°F)",
-                steepTime: "2.5 Minutes",
-                steepSeconds: 150,
-                leafRatio: "2.0g / 180ml",
-                infusions: [
-                    { round: 1, seconds: 150, label: "1st Infusion (Bright Vegetal & Umami)" },
-                    { round: 2, seconds: 180, label: "2nd Infusion (Nutty Roasted Chestnut)" },
-                    { round: 3, seconds: 240, label: "3rd Infusion (Clean Refreshing Mineral)" }
-                ],
-                sensoryRadar: {
-                    floral: 68,
-                    malty: 28,
-                    sweetness: 76,
-                    astringency: 52,
-                    body: 68,
-                    aroma: 86
-                }
-            },
-            {
-                id: "p4",
-                name: "Ceylon Amber Oolong Reserve",
-                category: "Oolong Tea",
-                price: 52.00,
-                weight: "90g",
-                image: "images/Product.jpeg",
-                desc: "Semi-oxidized artisanal mountain tea rolled by hand and lightly roasted over aromatic wood embers. Rich notes of ripe apricot and amber honey.",
-                stock: "Seasonal Special",
-                symbol: "",
-                leafGrade: "Artisanal Twisted Leaf Oolong",
-                elevation: "1,180m Montane Slope",
-                harvestSeason: "Autumn Equinox Batch",
-                flavorProfile: "Ripe Apricot, Roasted Macadamia, Amber Honey",
-                tastingNotes: ["Ripe Apricot", "Roasted Macadamia", "Magnolia Petals", "Amber Honey"],
-                steepTemp: "90°C (194°F)",
-                steepTime: "3 Minutes",
-                steepSeconds: 180,
-                leafRatio: "2.5g / 180ml",
-                infusions: [
-                    { round: 1, seconds: 180, label: "1st Infusion (Floral Magnolia Opening)" },
-                    { round: 2, seconds: 240, label: "2nd Infusion (Warm Roasted Apricot)" },
-                    { round: 3, seconds: 300, label: "3rd Infusion (Silky Honey Finish)" }
-                ],
-                sensoryRadar: {
-                    floral: 88,
-                    malty: 72,
-                    sweetness: 84,
-                    astringency: 36,
-                    body: 80,
-                    aroma: 92
-                }
-            }
-        ];
+        return [];
     }
 
     addProduct(productData) {
@@ -1081,25 +834,20 @@ class TeaFactoryStore {
             currentSeason: {
                 name: "Royal Emerald Reserve",
                 seriesNumber: 1,
-                pricePerBox: 150.00 // Premium pricing in USD
+                pricePerBox: 150.00
             },
-            // Collector gift boxes (loaded dynamically from Turso Cloud / SQLite)
             boxes: [],
-            products: this.getDefaultProducts(),
+            products: [],
             bookings: [],
-            // 4 Daily Tour Slots (Monday - Saturday, Max 10 visitors)
-            tourSlots: [
-                { id: 1, timeSlot: "09:30 AM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
-                { id: 2, timeSlot: "11:00 AM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
-                { id: 3, timeSlot: "01:30 PM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
-                { id: 4, timeSlot: "03:30 PM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 }
-            ],
-            announcements: [...DEFAULT_ANNOUNCEMENTS],
+            tourSlots: [],
+            announcements: [],
             gallery: [...DEFAULT_GALLERY_IMAGES],
-            emailLogs: [], // Mock logs for emails sent to clients
-            orders: [],    // Payment orders created by owner from enquiries
-            reviews: this.getDefaultReviews(),
-            inquiries: this.getDefaultInquiries(),
+            emailLogs: [],
+            orders: [],
+            reviews: [],
+            inquiries: [],
+            users: [],
+            cart: [],
             activeCurrency: "USD"
         };
         this.saveState();
@@ -1238,8 +986,8 @@ class TeaFactoryStore {
     getCurrentSeason() { return this.state.currentSeason || { name: "Royal Emerald Reserve", seriesNumber: 1, pricePerBox: 150.00 }; }
     getBoxes() { return this.state.boxes || []; }
     getProducts() {
-        if (!this.state.products || !Array.isArray(this.state.products) || this.state.products.length === 0) {
-            this.state.products = this.getDefaultProducts();
+        if (!this.state.products || !Array.isArray(this.state.products)) {
+            this.state.products = [];
             this.saveState();
         }
         return this.state.products.map(p => {
@@ -1268,6 +1016,11 @@ class TeaFactoryStore {
             return p;
         });
     }
+
+    getUsers() {
+        return this.state.users || [];
+    }
+
     getProductById(id) {
         const prod = (this.getProducts() || []).find(p => p && (p.id == id || String(p.id) === String(id)));
         if (prod) {
@@ -3002,20 +2755,24 @@ Rock One Wild Tea Sanctuary Concierge Team
             const isOnline = await TeaFactoryAPI.isOnline();
             if (!isOnline) return;
 
-            // Fetch all resources concurrently in 1 parallel batch
-            const [prodRes, boxRes, tourRes, revRes, annRes, inqRes] = await Promise.allSettled([
+            // Fetch all 9 resources concurrently in 1 parallel batch from Turso Cloud
+            const [prodRes, boxRes, tourRes, revRes, annRes, inqRes, ordRes, bookRes, userRes] = await Promise.allSettled([
                 TeaFactoryAPI.fetchProducts(),
                 TeaFactoryAPI.fetchBoxes(),
                 TeaFactoryAPI.fetchTourSlots(),
                 TeaFactoryAPI.fetchReviews(),
                 TeaFactoryAPI.fetchAnnouncements(),
-                TeaFactoryAPI.fetchInquiries()
+                TeaFactoryAPI.fetchInquiries(),
+                TeaFactoryAPI.fetchOrders(),
+                TeaFactoryAPI.fetchTourBookings(),
+                TeaFactoryAPI.fetchUsers()
             ]);
 
             // 1. Sync Products
-            if (prodRes.status === 'fulfilled' && Array.isArray(prodRes.value) && prodRes.value.length > 0) {
+            if (prodRes.status === 'fulfilled' && Array.isArray(prodRes.value)) {
                 this.state.products = prodRes.value.map(p => {
                     const priceNum = Number(p.price !== undefined ? p.price : (p.price_usd !== undefined ? p.price_usd : 0)) || 0;
+                    const shippingNum = Number(p.shipping_fee_usd !== undefined ? p.shipping_fee_usd : (p.shippingCharge !== undefined ? p.shippingCharge : 0)) || 0;
                     const bg = typeof p.brewing_guide === 'string' ? JSON.parse(p.brewing_guide) : (p.brewing_guide || {});
                     const fNotes = Array.isArray(p.tastingNotes) ? p.tastingNotes : (Array.isArray(p.flavor_notes) ? p.flavor_notes : (typeof p.flavor_notes === 'string' ? JSON.parse(p.flavor_notes) : (bg.tastingNotes || [])));
                     const fProfile = p.flavorProfile || bg.flavorProfile || (fNotes.length > 0 ? fNotes.join(', ') : 'Single-Estate Reserve');
@@ -3028,6 +2785,9 @@ Rock One Wild Tea Sanctuary Concierge Team
                         category: p.category || 'Imperial Reserve',
                         price: priceNum,
                         price_usd: priceNum,
+                        shipping_fee_usd: shippingNum,
+                        shippingCharge: shippingNum,
+                        shippingFee: shippingNum,
                         weight: p.weight || '100g Vintage Tin',
                         stock: p.stock || (p.stock_quantity > 0 ? 'In Stock' : 'In Stock'),
                         image: p.image || p.image_url || 'images/Product.jpeg',
@@ -3054,7 +2814,7 @@ Rock One Wild Tea Sanctuary Concierge Team
                 });
             }
 
-            // 2. Sync Collector Boxes (Authoritative from Turso Cloud / Backend)
+            // 2. Sync Collector Boxes
             if (boxRes.status === 'fulfilled' && Array.isArray(boxRes.value)) {
                 this.state.boxes = boxRes.value.map(b => ({
                     id: b.number,
@@ -3069,7 +2829,7 @@ Rock One Wild Tea Sanctuary Concierge Team
             }
 
             // 3. Sync Tour Slots
-            if (tourRes.status === 'fulfilled' && Array.isArray(tourRes.value) && tourRes.value.length > 0) {
+            if (tourRes.status === 'fulfilled' && Array.isArray(tourRes.value)) {
                 this.state.tourSlots = tourRes.value.map(s => {
                     const isBooked = (s.booked_seats >= (s.max_capacity || 12)) || s.status === 'Booked' || s.status === 'reserved';
                     const time = s.time_slot || s.timeSlot || s.time || "09:00 AM - 10:00 AM";
@@ -3083,7 +2843,7 @@ Rock One Wild Tea Sanctuary Concierge Team
                         status: isBooked ? 'Booked' : 'Available',
                         booking: s.booked_seats > 0 ? { customerName: 'Reserved Session', guests: s.booked_seats, package: pkg } : (s.booking || null),
                         tour_date: s.tour_date || 'Daily',
-                        price: s.price_usd || s.price || 75.00,
+                        price: Number(s.price_usd || s.price || 65.00),
                         max_capacity: s.max_capacity || 12,
                         booked_seats: s.booked_seats || 0
                     };
@@ -3105,7 +2865,7 @@ Rock One Wild Tea Sanctuary Concierge Team
             }
 
             // 5. Sync Announcements
-            if (annRes.status === 'fulfilled' && Array.isArray(annRes.value) && annRes.value.length > 0) {
+            if (annRes.status === 'fulfilled' && Array.isArray(annRes.value)) {
                 this.state.announcements = annRes.value.map(a => ({
                     id: a.id,
                     tag: a.tag,
@@ -3118,7 +2878,7 @@ Rock One Wild Tea Sanctuary Concierge Team
             }
 
             // 6. Sync Inquiries
-            if (inqRes.status === 'fulfilled' && Array.isArray(inqRes.value) && inqRes.value.length > 0) {
+            if (inqRes.status === 'fulfilled' && Array.isArray(inqRes.value)) {
                 this.state.inquiries = inqRes.value.map(inq => ({
                     id: inq.id,
                     fullName: inq.full_name || inq.fullName || inq.name || 'Anonymous Patron',
@@ -3139,8 +2899,86 @@ Rock One Wild Tea Sanctuary Concierge Team
                 }));
             }
 
+            // 7. Sync Orders
+            if (ordRes.status === 'fulfilled' && Array.isArray(ordRes.value)) {
+                this.state.orders = ordRes.value.map(o => ({
+                    id: o.id,
+                    orderId: o.id,
+                    customerName: o.customer_name || 'Estate Patron',
+                    email: o.customer_email || '',
+                    phone: o.customer_phone || '',
+                    address: o.shipping_address || '',
+                    subtotal: Number(o.subtotal_usd || 0),
+                    shippingFee: Number(o.shipping_usd || 0),
+                    discount: Number(o.discount_usd || 0),
+                    total: Number(o.total_usd || 0),
+                    total_usd: Number(o.total_usd || 0),
+                    currencyCode: o.currency_code || 'USD',
+                    currencyRate: Number(o.currency_rate || 1.0),
+                    totalInCurrency: Number(o.total_in_currency || o.total_usd || 0),
+                    paymentMethod: o.payment_method || 'bank',
+                    paymentStatus: o.payment_status || 'paid',
+                    status: o.fulfillment_status || 'processing',
+                    fulfillmentStatus: o.fulfillment_status || 'processing',
+                    bespokeNotes: o.bespoke_notes || '',
+                    slipImage: o.slip_image || '',
+                    date: o.created_at ? new Date(o.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Recent',
+                    createdAt: o.created_at,
+                    items: Array.isArray(o.order_items) ? o.order_items.map(it => ({
+                        id: it.id,
+                        productId: it.product_id,
+                        productName: it.product_name,
+                        quantity: Number(it.quantity) || 1,
+                        unitPrice: Number(it.unit_price_usd) || 0,
+                        totalPrice: Number(it.total_price_usd) || 0,
+                        giftOptions: it.gift_options || {}
+                    })) : []
+                }));
+            }
+
+            // 8. Sync Tour Bookings
+            if (bookRes.status === 'fulfilled' && Array.isArray(bookRes.value)) {
+                this.state.bookings = bookRes.value.map(b => ({
+                    id: b.id,
+                    bookingId: b.id,
+                    tourSlotId: b.tour_slot_id,
+                    tourDate: b.tour_date,
+                    timeSlot: b.time_slot,
+                    customerName: b.guest_name,
+                    email: b.guest_email,
+                    phone: b.guest_phone || '',
+                    guestCount: b.guest_count || 1,
+                    guests: b.guest_count || 1,
+                    packageName: b.package_name || 'Highland Estate Factory Tour & Cupping',
+                    totalPrice: Number(b.total_price) || 0,
+                    price: Number(b.total_price) || 0,
+                    currencyCode: b.currency_code || 'USD',
+                    totalInCurrency: Number(b.total_in_currency) || 0,
+                    paymentMethod: b.payment_method || 'bank',
+                    status: b.status === 'confirmed' ? 'Booked' : (b.status === 'deposit_pending' ? 'Pending Verification' : (b.status || 'Pending')),
+                    notes: b.notes || '',
+                    slipImage: b.slip_image || '',
+                    type: 'tour',
+                    date: b.created_at ? new Date(b.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Recent',
+                    bookingDate: b.created_at
+                }));
+            }
+
+            // 9. Sync Users
+            if (userRes.status === 'fulfilled' && Array.isArray(userRes.value)) {
+                this.state.users = userRes.value;
+            }
+
             this.saveState();
-            console.log('🌿 [Store] Parallel database sync complete.');
+            console.log('🌿 [Store] Full Turso Cloud database sync complete.');
+
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('tea_store_synced', { detail: this.state }));
+                if (typeof window.renderTabContent === 'function' && typeof window.getActiveTab === 'function') {
+                    const currentTab = window.getActiveTab();
+                    if (currentTab) window.renderTabContent(currentTab);
+                }
+            }
         } catch (e) {
             console.warn('🌿 [Store] Sync notice:', e.message);
         }
@@ -3242,6 +3080,36 @@ const TeaFactoryAPI = {
             return json.success ? json : null;
         } catch (e) {
             return null;
+        }
+    },
+
+    async fetchOrders() {
+        try {
+            const res = await fetch(`${this.baseUrl}/orders`);
+            const json = await res.json();
+            return json.success && Array.isArray(json.data) ? json.data : [];
+        } catch (e) {
+            return [];
+        }
+    },
+
+    async fetchTourBookings() {
+        try {
+            const res = await fetch(`${this.baseUrl}/tours/bookings`);
+            const json = await res.json();
+            return json.success && Array.isArray(json.data) ? json.data : [];
+        } catch (e) {
+            return [];
+        }
+    },
+
+    async fetchUsers() {
+        try {
+            const res = await fetch(`${this.baseUrl}/users`);
+            const json = await res.json();
+            return json.success && Array.isArray(json.data) ? json.data : [];
+        } catch (e) {
+            return [];
         }
     },
 

@@ -423,6 +423,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Expose switchTab and switchAdminSubTab globally for internal CTA buttons
     window.appSwitchTab = switchTab;
+    window.renderTabContent = renderTabContent;
+    window.getActiveTab = () => activeTab;
     window.switchAdminSubTab = function(subTab) {
         activeAdminSubTab = subTab || 'audits';
         if (activeTab !== 'admin') {
@@ -431,6 +433,12 @@ document.addEventListener('DOMContentLoaded', () => {
             renderTabContent('admin');
         }
     };
+
+    window.addEventListener('tea_store_synced', () => {
+        if (typeof activeTab === 'string') {
+            renderTabContent(activeTab);
+        }
+    });
 
     function renderTabContent(tabId) {
         switch (tabId) {
