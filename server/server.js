@@ -5,9 +5,10 @@ const morgan = require('morgan');
 const compression = require('compression');
 require('dotenv').config();
 
-// Initialize database & Supabase client
+// Initialize database, Supabase & Turso clients
 require('./db/database');
 const { pingSupabase, getSupabaseHealth } = require('./db/supabase');
+const { isTursoAvailable, initTursoSchema, syncLocalToTurso } = require('./db/turso');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -67,6 +68,7 @@ app.get('/api/health', async (req, res) => {
         timestamp: new Date().toISOString(),
         database: {
             sqlite: 'connected',
+            turso: isTursoAvailable() ? 'connected' : 'not-configured (using local SQLite)',
             supabase: health.isHealthy ? 'connected' : 'circuit-breaker-fallback',
             supabaseHealth: health,
             ping: pingResult
@@ -74,16 +76,20 @@ app.get('/api/health', async (req, res) => {
     });
 });
 
-// Periodic in-process keep-alive: pings Supabase every 6 hours while server is running
-setInterval(async () => {
+// Periodic in-process keep-alive: pings Supabase every 6 hours only if Supabase is configured
+const keepAliveTimer = setInterval(async () => {
     try {
-        if (typeof pingSupabase === 'function') {
+        const { isSupabaseAvailable } = require('./db/supabase');
+        if (typeof pingSupabase === 'function' && isSupabaseAvailable()) {
             await pingSupabase();
         }
     } catch (e) {}
 }, 6 * 60 * 60 * 1000);
+if (keepAliveTimer.unref) keepAliveTimer.unref();
 
 // Mount Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/users', require('./routes/users'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/boxes', require('./routes/boxes'));
 app.use('/api/tours', require('./routes/tours'));
@@ -93,6 +99,7 @@ app.use('/api/reviews', require('./routes/reviews'));
 app.use('/api/announcements', require('./routes/announcements'));
 app.use('/api/newsletter', require('./routes/newsletter'));
 app.use('/api/stats', require('./routes/stats'));
+app.use('/api/paypal', require('./routes/paypal'));
 
 // 404 Handler for undefined API routes
 app.use('/api', (req, res) => {
@@ -112,11 +119,37 @@ app.use((err, req, res, next) => {
 
 // Start Server
 if (require.main === module) {
-    app.listen(PORT, () => {
+    app.listen(PORT, async () => {
+        const sbHealth = typeof getSupabaseHealth === 'function' ? getSupabaseHealth() : { url: 'Not configured' };
         console.log(`\n🌿 Rock One Wild Tea REST API Server running on port ${PORT}`);
-        console.log(`   Local URL:    http://localhost:${PORT}`);
-        console.log(`   API Health:   http://localhost:${PORT}/api/health`);
-        console.log(`   Database:     data/teafactory.db (SQLite)\n`);
+        console.log(`   Local URL:       http://localhost:${PORT}`);
+        console.log(`   API Health:      http://localhost:${PORT}/api/health?ping=1`);
+        console.log(`   Primary DB:      ${isTursoAvailable() ? 'Turso Cloud (libSQL)' : 'Supabase Cloud / Local SQLite'}`);
+        console.log(`   Local Fallback:  data/teafactory.db (SQLite)`);
+
+        if (isTursoAvailable()) {
+            console.log(`   Turso Status:    🌿 CONNECTED (${process.env.TURSO_DATABASE_URL})`);
+            try {
+                await initTursoSchema();
+                await syncLocalToTurso();
+            } catch (e) {
+                console.warn('   Turso Init Note:', e.message);
+            }
+        } else {
+            console.log(`   Turso Status:    ℹ️ Not configured (Set TURSO_DATABASE_URL & TURSO_AUTH_TOKEN in .env)`);
+        }
+
+        const { isSupabaseAvailable } = require('./db/supabase');
+        if (isSupabaseAvailable() && typeof pingSupabase === 'function') {
+            const probe = await pingSupabase();
+            if (probe.success) {
+                console.log(`   Supabase Status: ✅ ONLINE & SYNCED (Live Read/Write active)\n`);
+            } else {
+                console.log(`   Supabase Status: ⚠️ OFFLINE/PAUSED (${probe.error}) -> Serving from Turso Cloud\n`);
+            }
+        } else {
+            console.log(`   Supabase Status: ℹ️ Not configured (All operations active on Turso Cloud)\n`);
+        }
     });
 }
 

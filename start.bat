@@ -24,6 +24,7 @@ node server/server.js
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
-    echo [Error] Failed to start server.
+    echo [Error] Server stopped or failed to start.
+    echo [Tip] If port 3000 is already in use, close any other command windows running the server.
     pause
 )

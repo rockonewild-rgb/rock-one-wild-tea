@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../db/database');
 const { supabase, isSupabaseAvailable } = require('../db/supabase');
+const { isTursoAvailable, queryTurso, executeTurso } = require('../db/turso');
 
 /**
  * GET /api/boxes
@@ -13,6 +14,13 @@ router.get('/', async (req, res) => {
             const { data, error } = await supabase.from('boxes').select('*').order('number', { ascending: true });
             if (!error && data) {
                 return res.json({ success: true, count: data.length, data });
+            }
+        }
+
+        if (isTursoAvailable()) {
+            const tursoRows = await queryTurso('SELECT * FROM boxes ORDER BY number ASC');
+            if (tursoRows && tursoRows.length > 0) {
+                return res.json({ success: true, count: tursoRows.length, data: tursoRows });
             }
         }
 
@@ -67,6 +75,16 @@ router.put('/:number', async (req, res) => {
             SET status = ?, allocated_to = ?, reserve_flush = ?, price_usd = ?, updated_at = CURRENT_TIMESTAMP
             WHERE number = ?
         `).run(newStatus, newAllocatedTo, newFlush, newPrice, boxNumber);
+
+        if (isTursoAvailable()) {
+            try {
+                await executeTurso(`
+                    UPDATE boxes
+                    SET status = ?, allocated_to = ?, reserve_flush = ?, price_usd = ?, updated_at = CURRENT_TIMESTAMP
+                    WHERE number = ?
+                `, [newStatus, newAllocatedTo, newFlush, newPrice, boxNumber]);
+            } catch (te) {}
+        }
 
         const updatedBox = db.prepare('SELECT * FROM boxes WHERE number = ?').get(boxNumber);
         res.json({ success: true, data: updatedBox });

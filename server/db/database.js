@@ -55,6 +55,7 @@ function initSchema() {
             grade TEXT,
             elevation TEXT,
             price_usd REAL NOT NULL,
+            shipping_fee_usd REAL DEFAULT 0.0,
             stock INTEGER DEFAULT 10,
             image TEXT,
             description TEXT,
@@ -112,6 +113,7 @@ function initSchema() {
             customer_phone TEXT,
             shipping_address TEXT NOT NULL,
             subtotal_usd REAL NOT NULL,
+            shipping_usd REAL DEFAULT 0,
             discount_usd REAL DEFAULT 0,
             total_usd REAL NOT NULL,
             currency_code TEXT DEFAULT 'USD',
@@ -184,11 +186,25 @@ function initSchema() {
             source TEXT DEFAULT 'website_banner',
             subscribed_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
+
+        -- 11. Customer Patron Accounts Table (Offline / Local Fallback alongside Supabase Auth)
+        CREATE TABLE IF NOT EXISTS customer_users (
+            id TEXT PRIMARY KEY,
+            full_name TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            phone TEXT DEFAULT '',
+            password_hash TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
     `);
 
     // Safe migration checks for new columns
     try {
+        const prodCols = db.prepare("PRAGMA table_info(products)").all().map(c => c.name);
+        if (!prodCols.includes('shipping_fee_usd')) db.prepare("ALTER TABLE products ADD COLUMN shipping_fee_usd REAL DEFAULT 0.0").run();
+
         const orderCols = db.prepare("PRAGMA table_info(orders)").all().map(c => c.name);
+        if (!orderCols.includes('shipping_usd')) db.prepare("ALTER TABLE orders ADD COLUMN shipping_usd REAL DEFAULT 0.0").run();
         if (!orderCols.includes('slip_image')) db.prepare("ALTER TABLE orders ADD COLUMN slip_image TEXT").run();
         if (!orderCols.includes('validated_at')) db.prepare("ALTER TABLE orders ADD COLUMN validated_at TEXT").run();
         if (!orderCols.includes('validation_note')) db.prepare("ALTER TABLE orders ADD COLUMN validation_note TEXT").run();
@@ -197,6 +213,16 @@ function initSchema() {
         if (!tourCols.includes('slip_image')) db.prepare("ALTER TABLE tour_bookings ADD COLUMN slip_image TEXT").run();
         if (!tourCols.includes('validated_at')) db.prepare("ALTER TABLE tour_bookings ADD COLUMN validated_at TEXT").run();
         if (!tourCols.includes('validation_note')) db.prepare("ALTER TABLE tour_bookings ADD COLUMN validation_note TEXT").run();
+        if (!tourCols.includes('total_price')) db.prepare("ALTER TABLE tour_bookings ADD COLUMN total_price REAL DEFAULT 0.0").run();
+        if (!tourCols.includes('currency_code')) db.prepare("ALTER TABLE tour_bookings ADD COLUMN currency_code TEXT DEFAULT 'USD'").run();
+        if (!tourCols.includes('total_in_currency')) db.prepare("ALTER TABLE tour_bookings ADD COLUMN total_in_currency REAL DEFAULT 0.0").run();
+        if (!tourCols.includes('package_name')) db.prepare("ALTER TABLE tour_bookings ADD COLUMN package_name TEXT").run();
+        if (!tourCols.includes('payment_method')) db.prepare("ALTER TABLE tour_bookings ADD COLUMN payment_method TEXT DEFAULT 'bank'").run();
+
+        const userCols = db.prepare("PRAGMA table_info(customer_users)").all().map(c => c.name);
+        if (!userCols.includes('role')) db.prepare("ALTER TABLE customer_users ADD COLUMN role TEXT DEFAULT 'staff'").run();
+        if (!userCols.includes('status')) db.prepare("ALTER TABLE customer_users ADD COLUMN status TEXT DEFAULT 'active'").run();
+        if (!userCols.includes('last_login')) db.prepare("ALTER TABLE customer_users ADD COLUMN last_login TEXT").run();
     } catch (e) {
         console.warn('SQLite schema column check notice:', e.message);
     }
@@ -421,6 +447,52 @@ function seedInitialData() {
         defaultAnnouncements.forEach(a => {
             insertAnn.run(a.id, a.tag, a.date_str, a.heading, a.content, a.image, a.link, 1);
         });
+    }
+
+    // 7. Seed System Users if empty
+    try {
+        const userCount = db.prepare('SELECT COUNT(*) as count FROM customer_users').get().count;
+        if (userCount === 0) {
+            const { hashPassword } = require('../services/auth_utils');
+            const insertUser = db.prepare(`
+                INSERT INTO customer_users (id, full_name, email, phone, password_hash, role, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            `);
+            const defaultUsers = [
+                {
+                    id: 'USR-ADMIN-01',
+                    full_name: 'Rock One Wild Tea Estate Admin',
+                    email: 'rockonewild@gmail.com',
+                    phone: '+94 77 320 9950',
+                    password: 'AdminPassword2026!',
+                    role: 'admin',
+                    status: 'active'
+                },
+                {
+                    id: 'USR-STAFF-02',
+                    full_name: 'Tharindu Wickramasinghe',
+                    email: 'sommelier@rockonewild.com',
+                    phone: '+94 76 789 7817',
+                    password: 'SommelierPass2026!',
+                    role: 'sommelier',
+                    status: 'active'
+                },
+                {
+                    id: 'USR-STAFF-03',
+                    full_name: 'Dilshan Senanayake',
+                    email: 'concierge@rockonewild.com',
+                    phone: '+94 77 123 4567',
+                    password: 'ConciergePass2026!',
+                    role: 'concierge',
+                    status: 'active'
+                }
+            ];
+            defaultUsers.forEach(u => {
+                insertUser.run(u.id, u.full_name, u.email, u.phone, hashPassword(u.password), u.role, u.status);
+            });
+        }
+    } catch (e) {
+        console.warn('SQLite user seed notice:', e.message);
     }
 }
 

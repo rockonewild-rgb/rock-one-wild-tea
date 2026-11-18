@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../db/database');
 const { supabase, isSupabaseAvailable } = require('../db/supabase');
+const { isTursoAvailable, queryTurso, executeTurso } = require('../db/turso');
 
 /**
  * GET /api/reviews
@@ -15,6 +16,15 @@ router.get('/', async (req, res) => {
             if (!error && data) {
                 reviews = data;
             }
+        }
+
+        if (reviews.length === 0 && isTursoAvailable()) {
+            try {
+                const tursoRows = await queryTurso('SELECT * FROM reviews ORDER BY created_at DESC');
+                if (tursoRows && tursoRows.length > 0) {
+                    reviews = tursoRows;
+                }
+            } catch (e) {}
         }
 
         if (reviews.length === 0) {
@@ -97,6 +107,15 @@ router.post('/', async (req, res) => {
         `);
         insert.run(id, author, role, location, Math.min(5, Math.max(1, Number(rating))), title, content, dateStr, 1);
 
+        if (isTursoAvailable()) {
+            try {
+                await executeTurso(`
+                    INSERT OR REPLACE INTO reviews (id, author, role, location, rating, title, content, date_str, is_verified)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+                `, [id, author, role, location, Math.min(5, Math.max(1, Number(rating))), title, content, dateStr]);
+            } catch (te) {}
+        }
+
         const created = db.prepare('SELECT * FROM reviews WHERE id = ?').get(id);
         res.status(201).json({ success: true, message: 'Review submitted', data: created });
     } catch (err) {
@@ -117,6 +136,9 @@ router.delete('/:id', async (req, res) => {
 
         try {
             db.prepare('DELETE FROM reviews WHERE id = ?').run(reviewId);
+            if (isTursoAvailable()) {
+                await executeTurso('DELETE FROM reviews WHERE id = ?', [reviewId]);
+            }
         } catch (e) {}
 
         res.json({ success: true, message: 'Review deleted successfully', id: reviewId });

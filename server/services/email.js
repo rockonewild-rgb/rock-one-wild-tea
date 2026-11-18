@@ -3,7 +3,23 @@ const { Resend } = require('resend');
 // Initialize Resend client with API key from environment or fallback
 const FALLBACK_KEY = Buffer.from('cmVfY29uWFFXRVFfTm55bUFSZHpvOGFlakRSaWpzMUtMMWNz', 'base64').toString('utf8');
 const resendApiKey = process.env.RESEND_API_KEY || FALLBACK_KEY;
-const resend = resendApiKey ? new Resend(resendApiKey) : null;
+const rawResend = resendApiKey ? new Resend(resendApiKey) : null;
+// The Resend SDK returns { data, error } instead of throwing. Wrap it so a rejected email
+// (e.g. unverified domain, invalid address) throws and is reported as a failure, not as "sent".
+const resend = rawResend ? {
+    emails: {
+        send: async (payload) => {
+            const res = await rawResend.emails.send(payload);
+            if (res && res.error) {
+                const err = new Error(`Resend rejected email to ${payload.to}: ${res.error.message}`);
+                err.resendError = res.error;
+                console.error('❌ [Email Service]', err.message);
+                throw err;
+            }
+            return res;
+        }
+    }
+} : null;
 
 const SENDER_EMAIL = process.env.RESEND_FROM_EMAIL || 'Rock One Wild Tea <onboarding@resend.dev>';
 const CONCIERGE_INBOX = process.env.CONCIERGE_EMAIL || 'rockonewild@gmail.com';
@@ -156,8 +172,9 @@ async function sendOrderConfirmationEmails(order) {
     }
 
     const results = { adminEmail: null, customerEmail: null };
+    const isCOD = (order.payment_method || '').toLowerCase() === 'cod';
     const isBank = (order.payment_method || '').toLowerCase().includes('bank') || (order.payment_method || '').toLowerCase().includes('deposit');
-    const paymentModeLabel = isBank ? 'Bank Cash Deposit / Wire Transfer' : 'Online Payment Gateway';
+    const paymentModeLabel = isCOD ? 'Cash on Delivery (COD) - Sri Lanka Post EMS' : (isBank ? 'Bank Cash Deposit / Wire Transfer' : 'Online Payment Gateway (PayPal / Cards)');
     const cleanPhone = (order.customer_phone || order.phone || '').replace(/[^0-9+]/g, '');
     const custName = order.customer_name || order.customerName || 'Valued Patron';
     const custEmail = order.customer_email || order.email || '';
@@ -336,10 +353,10 @@ async function sendOrderConfirmationEmails(order) {
                                 </h4>
                                 <p style="font-size: 13px; color: #d1d5db; margin: 0 0 12px 0;">Please transfer the total amount using the banking instructions below:</p>
                                 <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #ffffff;">
-                                    <tr><td style="padding: 4px 0; color: #9ca3af; width: 40%;"><strong>Bank Name:</strong></td><td>Commercial Bank of Ceylon</td></tr>
-                                    <tr><td style="padding: 4px 0; color: #9ca3af;"><strong>Account Name:</strong></td><td>Rock One Wild Tea (Pvt) Ltd</td></tr>
-                                    <tr><td style="padding: 4px 0; color: #9ca3af;"><strong>Account Number:</strong></td><td style="font-family: monospace; font-size: 15px; color: #ffd875; font-weight: bold;">8002345678</td></tr>
-                                    <tr><td style="padding: 4px 0; color: #9ca3af;"><strong>Branch:</strong></td><td>Bandarawela / Ettampitiya</td></tr>
+                                    <tr><td style="padding: 4px 0; color: #9ca3af; width: 40%;"><strong>Bank Name:</strong></td><td>Bank of Ceylon</td></tr>
+                                    <tr><td style="padding: 4px 0; color: #9ca3af;"><strong>Account Name:</strong></td><td>Rock one wild tea</td></tr>
+                                    <tr><td style="padding: 4px 0; color: #9ca3af;"><strong>Account Number:</strong></td><td style="font-family: monospace; font-size: 15px; color: #ffd875; font-weight: bold;">94945708</td></tr>
+                                    <tr><td style="padding: 4px 0; color: #9ca3af;"><strong>Branch:</strong></td><td>Ettampitiya branch</td></tr>
                                     <tr><td style="padding: 4px 0; color: #9ca3af;"><strong>Payment Reference:</strong></td><td style="font-family: monospace; color: #86efac; font-weight: bold;">${order.id}</td></tr>
                                 </table>
                                 <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed rgba(212,175,55,0.3); font-size: 12px; color: #d1d5db;">
@@ -359,6 +376,22 @@ async function sendOrderConfirmationEmails(order) {
                             <div style="color: #d1d5db; line-height: 1.6;">
                                 Destination: <strong style="color:#ffffff;">${order.shipping_address || order.address || 'Standard International Delivery'}</strong><br>
                                 Estimated Dispatch: <strong style="color:#ffffff;">3–7 business days via Express Priority Courier</strong> with live tracking.
+                            </div>
+                        </div>
+
+                        <!-- Executive Director & CEO Attestation -->
+                        <div style="margin: 25px 0; padding: 20px 16px; border: 1px dashed rgba(212,175,55,0.4); border-radius: 8px; text-align: center; background: rgba(0,0,0,0.35);">
+                            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #ffd875; margin-bottom: 6px; font-weight: bold;">Artisanal Allocation Attestation</div>
+                            <p style="font-size: 12px; color: #d1d5db; margin: 0 0 10px 0; font-style: italic;">
+                                "Every single leaf in this allocation has been harvested and prepared to our highest estate standards."
+                            </p>
+                            <div style="margin: 8px auto; display: inline-block;">
+                                <img src="https://rockonewildtea.com/images/ceo_signature_gold.png" alt="Director &amp; CEO Signature" style="height: 44px; object-fit: contain; display: block; margin: 0 auto;" />
+                            </div>
+                            <div style="border-top: 1px solid rgba(212,175,55,0.35); width: 190px; margin: 6px auto; padding-top: 5px;">
+                                <div style="font-size: 13px; font-weight: bold; color: #ffffff; letter-spacing: 0.5px;">Prasanga</div>
+                                <div style="font-size: 11px; color: #d4af37; font-weight: 600;">Managing Director &amp; CEO</div>
+                                <div style="font-size: 10px; color: #9ca3af;">Rock One Wild Tea Estate (Pvt) Ltd</div>
                             </div>
                         </div>
 
@@ -388,15 +421,15 @@ async function sendOrderConfirmationEmails(order) {
 }
 
 /**
- * Send Factory Tour Booking Confirmation to Guest & Estate Concierge Desk
+ * Send Factory Tour Deposit Received Notification to Estate Concierge Desk (rockonewild@gmail.com)
+ * Triggered immediately when a guest books a tour and attaches/submits a payment deposit slip.
  */
-async function sendTourConfirmationEmails(booking) {
+async function sendTourDepositReceivedAdminAlert(booking) {
     if (!resend) {
-        console.log('🌿 [Email Service] RESEND_API_KEY not set. Logged tour booking to database:', booking.id);
+        console.log('🌿 [Email Service] RESEND_API_KEY not set. Logged tour booking deposit to database:', booking.id);
         return { success: false, reason: 'RESEND_API_KEY not configured' };
     }
 
-    const results = { adminEmail: null, customerEmail: null };
     const guestName = booking.guest_name || booking.name || booking.customerName || 'Valued Guest';
     const guestEmail = booking.guest_email || booking.email || '';
     const guestPhone = booking.guest_phone || booking.phone || '';
@@ -404,28 +437,43 @@ async function sendTourConfirmationEmails(booking) {
     const tourDate = booking.tour_date || booking.tourDate || 'Selected Date';
     const timeSlot = booking.time_slot || booking.timeSlot || '10:00 AM - 11:30 AM';
     const guestCount = Number(booking.guest_count || booking.guests || 1);
+    const packageName = booking.package_name || booking.packageName || '01. Gongfu-Style Black Tea Brewing Experience';
     const notes = booking.notes || booking.dietaryNotes || '';
+    const slipImage = booking.slip_image || booking.slipImage || '';
+    
+    // Price calculations (LKR and USD)
+    const usdAmount = Number(booking.total_price || booking.totalPrice || booking.deposit_paid || booking.depositPaid || (guestCount * 4.754)).toFixed(2);
+    const lkrAmount = (guestCount * 1450).toLocaleString();
+    const formattedAmount = `LKR ${lkrAmount} (approx. $${usdAmount} USD)`;
 
-    // 1. Dispatch Tour Booking Alert to Estate Concierge Desk (rockonewild@gmail.com)
+    const waLink = cleanPhone ? `https://wa.me/${cleanPhone.replace('+', '')}?text=Hello%20${encodeURIComponent(guestName)},%20thank%20you%20for%20your%20factory%20tour%20booking%20at%20Rock%20One%20Wild%20Tea%20Estate%20[Ref:%20${booking.id}].` : 'https://wa.me/94773209950';
+
     try {
-        const adminSubject = `[Tour Reservation ${booking.id}] ${guestName} (${guestCount} Guests) - ${tourDate} @ ${timeSlot}`;
+        const adminSubject = `[Tour Deposit Received ${booking.id}] ${guestName} (${guestCount} Guests) - ${tourDate} @ ${timeSlot}`;
         const adminEmail = await resend.emails.send({
             from: SENDER_EMAIL,
             to: CONCIERGE_INBOX,
-            replyTo: guestEmail,
+            replyTo: guestEmail || undefined,
             subject: adminSubject,
             html: `
                 <div style="background-color: #040e08; font-family: 'Helvetica Neue', Arial, sans-serif; color: #f5f5f5; padding: 40px 20px; max-width: 650px; margin: 0 auto; border-radius: 12px; border: 1px solid #d4af37;">
                     <!-- Header -->
                     <div style="text-align: center; padding-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
-                        <span style="color: #d4af37; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; font-weight: bold;">Rock One Wild Tea Estate &bull; Tour Concierge</span>
-                        <h1 style="color: #ffffff; font-size: 22px; margin: 10px 0 0 0; font-family: Georgia, serif;">New Factory Tour Reservation</h1>
-                        <p style="color: #86efac; font-size: 13px; margin: 5px 0 0 0;">Tour Pass Reference: <strong style="color:#ffd875;">${booking.id}</strong></p>
+                        <span style="color: #d4af37; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; font-weight: bold;">Rock One Wild Tea Estate &bull; Concierge Desk</span>
+                        <h1 style="color: #ffffff; font-size: 22px; margin: 10px 0 0 0; font-family: Georgia, serif;">Tour Booking &amp; Deposit Slip Received</h1>
+                        <p style="color: #ffd875; font-size: 13px; margin: 5px 0 0 0;">Booking Reference: <strong style="color:#ffffff;">${booking.id}</strong></p>
                     </div>
 
-                    <!-- Tour Schedule Card -->
-                    <div style="background: rgba(255, 255, 255, 0.04); border-radius: 8px; padding: 22px; margin: 25px 0; border: 1px solid rgba(255, 255, 255, 0.1);">
-                        <h3 style="color: #d4af37; font-size: 13px; margin-top: 0; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 8px;">Reservation Schedule &amp; Guest Scope</h3>
+                    <!-- Notification Banner -->
+                    <div style="background: rgba(212, 175, 55, 0.1); border-left: 4px solid #d4af37; border-radius: 4px; padding: 14px 18px; margin: 22px 0;">
+                        <p style="margin: 0; font-size: 13px; color: #f3f4f6; line-height: 1.6;">
+                            A new factory tour booking has been placed with a <strong>payment deposit</strong>. Please review the attached bank deposit slip in the Admin Panel Orders Desk and click <strong>"Approve &amp; Confirm Payment"</strong> to automatically dispatch the official Gate Pass to the guest.
+                        </p>
+                    </div>
+
+                    <!-- Tour & Guest Particulars Card -->
+                    <div style="background: rgba(255, 255, 255, 0.04); border-radius: 8px; padding: 22px; margin: 20px 0; border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <h3 style="color: #d4af37; font-size: 13px; margin-top: 0; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 8px;">Reservation Particulars</h3>
                         <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
                             <tr>
                                 <td style="padding: 7px 0; color: #9ca3af; width: 40%;"><strong>Lead Guest:</strong></td>
@@ -440,8 +488,12 @@ async function sendTourConfirmationEmails(booking) {
                                 <td style="padding: 7px 0; color: #ffffff;">${guestPhone || 'Not provided'}</td>
                             </tr>
                             <tr>
+                                <td style="padding: 7px 0; color: #9ca3af;"><strong>Experience:</strong></td>
+                                <td style="padding: 7px 0; color: #ffd875; font-weight: bold;">${packageName}</td>
+                            </tr>
+                            <tr>
                                 <td style="padding: 7px 0; color: #9ca3af;"><strong>Tour Date:</strong></td>
-                                <td style="padding: 7px 0; color: #ffd875; font-weight: bold;">${tourDate}</td>
+                                <td style="padding: 7px 0; color: #ffffff; font-weight: bold;">${tourDate}</td>
                             </tr>
                             <tr>
                                 <td style="padding: 7px 0; color: #9ca3af;"><strong>Time Slot:</strong></td>
@@ -452,151 +504,337 @@ async function sendTourConfirmationEmails(booking) {
                                 <td style="padding: 7px 0; color: #ffffff; font-weight: bold;">${guestCount} ${guestCount === 1 ? 'Guest' : 'Guests'}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 7px 0; color: #9ca3af;"><strong>Reservation Status:</strong></td>
-                                <td style="padding: 7px 0; color: #86efac;"><span style="background: rgba(34,197,94,0.15); color: #86efac; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">Confirmed</span></td>
+                                <td style="padding: 7px 0; color: #9ca3af;"><strong>Total Payable:</strong></td>
+                                <td style="padding: 7px 0; color: #ffd875; font-weight: bold; font-size: 15px;">${formattedAmount}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 7px 0; color: #9ca3af;"><strong>Payment Mode:</strong></td>
+                                <td style="padding: 7px 0; color: #ffffff;">Bank Cash Deposit / Wire Transfer</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 7px 0; color: #9ca3af;"><strong>Current Status:</strong></td>
+                                <td style="padding: 7px 0;"><span style="background: rgba(212,175,55,0.25); color: #ffd875; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; border: 1px solid rgba(212,175,55,0.4);">Deposit Review Pending</span></td>
                             </tr>
                         </table>
                     </div>
 
+                    <!-- Deposit Slip Preview if attached -->
+                    ${slipImage ? `
+                        <div style="background: rgba(212, 175, 55, 0.06); border: 1px solid #d4af37; border-radius: 8px; padding: 18px; margin: 20px 0;">
+                            <h4 style="color: #ffd875; margin: 0 0 10px 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">
+                                Bank Deposit Slip Attached by Guest
+                            </h4>
+                            <p style="font-size: 12px; color: #d1d5db; margin: 0 0 12px 0;">The guest attached a bank deposit receipt / transfer screenshot during booking:</p>
+                            <div style="text-align: center;">
+                                <img src="${slipImage}" alt="Bank Deposit Slip" style="max-width: 100%; max-height: 280px; border-radius: 6px; border: 1px solid rgba(212,175,55,0.4); object-fit: contain; background: #000;">
+                            </div>
+                        </div>
+                    ` : `
+                        <div style="background: rgba(255, 255, 255, 0.03); border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px; padding: 12px; margin: 15px 0; font-size: 12px; color: #9ca3af;">
+                            No image file attached directly; verification requested via direct bank ledger / teller check.
+                        </div>
+                    `}
+
                     <!-- Notes -->
                     ${notes ? `
                         <div style="background: rgba(4, 28, 14, 0.9); border-left: 3px solid #d4af37; padding: 14px 18px; margin: 20px 0; border-radius: 4px;">
-                            <h4 style="color: #d4af37; margin: 0 0 6px 0; font-size: 12px; text-transform: uppercase;">Special Dietary / Tour Notes:</h4>
+                            <h4 style="color: #d4af37; margin: 0 0 6px 0; font-size: 12px; text-transform: uppercase;">Special Dietary / Transport Notes:</h4>
                             <p style="color: #f3f4f6; font-size: 13px; margin: 0; line-height: 1.6;">${notes}</p>
                         </div>
                     ` : ''}
 
                     <!-- Action Buttons -->
                     <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                        <a href="mailto:${guestEmail}?subject=Re: Rock One Wild Tea Factory Tour [${booking.id}]" style="background: #d4af37; color: #040a06; text-decoration: none; padding: 12px 24px; border-radius: 25px; font-weight: bold; font-size: 13px; display: inline-block; margin-right: 10px;">Reply to Guest</a>
-                        ${cleanPhone ? `<a href="https://wa.me/${cleanPhone.replace('+', '')}?text=Hello%20${encodeURIComponent(guestName)},%20greeting%20from%20Rock%20One%20Wild%20Tea%20Estate.%20Regarding%20your%20factory%20tour%20reservation%20[${booking.id}]..." style="background: #25D366; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 25px; font-weight: bold; font-size: 13px; display: inline-block;">WhatsApp Guest</a>` : ''}
+                        <a href="mailto:${guestEmail}?subject=Re: Rock One Wild Tea Tour Booking Deposit [${booking.id}]" style="background: #d4af37; color: #040a06; text-decoration: none; padding: 12px 24px; border-radius: 25px; font-weight: bold; font-size: 13px; display: inline-block; margin-right: 10px;">Reply to Guest</a>
+                        ${cleanPhone ? `<a href="${waLink}" style="background: #25D366; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 25px; font-weight: bold; font-size: 13px; display: inline-block;">WhatsApp Guest</a>` : ''}
                     </div>
 
                     <!-- Footer -->
                     <div style="text-align: center; margin-top: 30px; color: #888; font-size: 11px;">
-                        <p>Rock One Wild Tea Estate &bull; Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka</p>
+                        <p>Rock One Wild Tea Estate &bull; Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka<br>Direct Voice Hotline: +94 76 789 7817 &bull; WhatsApp Desk: +94 77 320 9950</p>
                     </div>
                 </div>
             `
         });
-        results.adminEmail = adminEmail;
-        console.log('🌿 [Email Service] Concierge tour alert dispatched to:', CONCIERGE_INBOX);
+        console.log('🌿 [Email Service] Tour deposit received alert dispatched to:', CONCIERGE_INBOX);
+        return { success: true, adminEmail };
     } catch (err) {
-        console.error('❌ [Email Service] Concierge tour email failed:', err.message);
+        console.error('❌ [Email Service] Tour deposit alert failed:', err.message);
+        return { success: false, error: err.message };
+    }
+}
+
+/**
+ * Send Official Factory Tour Gate Pass to Guest
+ * Triggered automatically AFTER the admin reviews and confirms the tour deposit payment in Admin Panel.
+ */
+async function sendTourGatePassEmail(booking) {
+    if (!resend) {
+        console.log('🌿 [Email Service] RESEND_API_KEY not set. Logged tour gate pass dispatch to database:', booking.id);
+        return { success: false, reason: 'RESEND_API_KEY not configured' };
     }
 
-    // 2. Dispatch Official Luxury VIP Tour Boarding Pass to Guest
+    const guestName = booking.guest_name || booking.name || booking.customerName || 'Valued Guest';
+    const guestEmail = booking.guest_email || booking.email || '';
+    const tourDate = booking.tour_date || booking.tourDate || 'Selected Date';
+    const timeSlot = booking.time_slot || booking.timeSlot || '10:00 AM - 11:30 AM';
+    const guestCount = Number(booking.guest_count || booking.guests || 1);
+    const packageName = booking.package_name || booking.packageName || '01. Gongfu-Style Black Tea Brewing Experience';
+    const confirmedDateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    if (!guestEmail) {
+        console.warn('⚠️ [Email Service] Cannot send Gate Pass: guest email is empty.');
+        return { success: false, reason: 'Guest email is required' };
+    }
+
     try {
-        if (guestEmail) {
-            const guestSubject = `[Tour Confirmed ${booking.id}] Rock One Wild Tea Factory Tour & Sommelier Cupping Pass`;
-            const customerEmail = await resend.emails.send({
-                from: SENDER_EMAIL,
-                to: guestEmail,
-                subject: guestSubject,
-                html: `
-                    <div style="background-color: #040e08; font-family: 'Helvetica Neue', Arial, sans-serif; color: #f5f5f5; padding: 40px 20px; max-width: 650px; margin: 0 auto; border-radius: 12px; border: 1px solid #d4af37;">
-                        <!-- Header -->
-                        <div style="text-align: center; padding-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
-                            <span style="color: #d4af37; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; font-weight: bold;">Highland Sanctuary &bull; Elevation 1,240m</span>
-                            <h1 style="color: #ffffff; font-size: 24px; margin: 10px 0 0 0; font-family: Georgia, serif;">Estate Tour Reservation Confirmed</h1>
-                            <p style="color: #86efac; font-size: 13px; margin: 5px 0 0 0;">Official Tour Gate Pass: <strong style="color:#ffd875;">${booking.id}</strong></p>
-                        </div>
+        const guestSubject = `[Official Gate Pass ${booking.id}] Rock One Wild Tea Factory Tour & Sommelier Cupping Pass`;
+        const customerEmail = await resend.emails.send({
+            from: SENDER_EMAIL,
+            to: guestEmail,
+            subject: guestSubject,
+            html: `
+                <div style="background-color: #040e08; font-family: 'Helvetica Neue', Arial, sans-serif; color: #f5f5f5; padding: 40px 20px; max-width: 650px; margin: 0 auto; border-radius: 12px; border: 1px solid #d4af37;">
+                    <!-- Header -->
+                    <div style="text-align: center; padding-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
+                        <span style="color: #d4af37; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; font-weight: bold;">Highland Sanctuary &bull; Elevation 1,240m</span>
+                        <h1 style="color: #ffffff; font-size: 24px; margin: 10px 0 0 0; font-family: Georgia, serif;">Estate Tour Gate Pass &bull; Confirmed</h1>
+                        <p style="color: #86efac; font-size: 13px; margin: 5px 0 0 0;">Official Tour Gate Pass: <strong style="color:#ffd875;">${booking.id}</strong></p>
+                    </div>
 
-                        <!-- Greeting -->
-                        <div style="padding: 25px 5px 15px 5px;">
-                            <p style="font-size: 16px; color: #ffffff; line-height: 1.6; margin-top: 0;">Dear <strong>${guestName}</strong>,</p>
-                            <p style="font-size: 14px; color: #d1d5db; line-height: 1.8;">
-                                We are delighted to welcome you to the private highlands of <strong>Rock One Wild Tea Estate</strong>. Your exclusive Factory Tour and Master Sommelier Cupping session is confirmed.
-                            </p>
-                        </div>
+                    <!-- Greeting & Payment Approval Notification -->
+                    <div style="padding: 25px 5px 15px 5px;">
+                        <p style="font-size: 16px; color: #ffffff; line-height: 1.6; margin-top: 0;">Dear <strong>${guestName}</strong>,</p>
+                        <p style="font-size: 14px; color: #d1d5db; line-height: 1.8;">
+                            We are delighted to inform you that your payment deposit has been <strong>reviewed and confirmed</strong> by our Estate Concierge Desk. Your exclusive reservation for the <strong>Rock One Wild Tea Estate Factory Tour &amp; Master Sommelier Cupping</strong> is officially approved.
+                        </p>
+                    </div>
 
-                        <!-- VIP Boarding Card -->
-                        <div style="background: linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(4,28,14,0.8) 100%); border: 1px solid #d4af37; border-radius: 10px; padding: 22px; margin: 20px 0;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(212,175,55,0.4); padding-bottom: 12px; margin-bottom: 14px;">
-                                <div>
-                                    <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #d4af37;">Experience</span>
-                                    <h2 style="color: #ffffff; font-size: 17px; margin: 2px 0 0 0; font-family: Georgia, serif;">Highland Estate Factory Tour &amp; Cupping</h2>
-                                </div>
-                                <div style="text-align: right;">
-                                    <span style="font-size: 10px; color: #9ca3af; text-transform: uppercase;">Pass Status</span>
-                                    <div style="color: #86efac; font-weight: bold; font-size: 13px;">Confirmed</div>
-                                </div>
+                    <!-- VIP Boarding Card -->
+                    <div style="background: linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(4,28,14,0.85) 100%); border: 1px solid #d4af37; border-radius: 10px; padding: 22px; margin: 20px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(212,175,55,0.4); padding-bottom: 12px; margin-bottom: 14px;">
+                            <div>
+                                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #d4af37;">Confirmed Experience</span>
+                                <h2 style="color: #ffffff; font-size: 17px; margin: 2px 0 0 0; font-family: Georgia, serif;">${packageName}</h2>
                             </div>
-
-                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                                <tr>
-                                    <td style="padding: 6px 0; color: #9ca3af; width: 38%;"><strong>Reservation Date:</strong></td>
-                                    <td style="padding: 6px 0; color: #ffd875; font-weight: bold; font-size: 15px;">${tourDate}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 6px 0; color: #9ca3af;"><strong>Time Slot:</strong></td>
-                                    <td style="padding: 6px 0; color: #86efac; font-weight: bold; font-size: 15px;">${timeSlot}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 6px 0; color: #9ca3af;"><strong>Guests Allocated:</strong></td>
-                                    <td style="padding: 6px 0; color: #ffffff; font-weight: bold;">${guestCount} ${guestCount === 1 ? 'Guest' : 'Guests'}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 6px 0; color: #9ca3af;"><strong>Booking Reference:</strong></td>
-                                    <td style="padding: 6px 0; font-family: monospace; color: #ffd875; font-weight: bold;">${booking.id}</td>
-                                </tr>
-                            </table>
+                            <div style="text-align: right;">
+                                <span style="font-size: 10px; color: #9ca3af; text-transform: uppercase;">Security Clearance</span>
+                                <div style="color: #86efac; font-weight: bold; font-size: 13px;">Authorized &bull; Paid</div>
+                            </div>
                         </div>
 
-                        <!-- What to Expect -->
-                        <div style="background: rgba(255, 255, 255, 0.04); border-radius: 8px; padding: 20px; margin: 20px 0; border: 1px solid rgba(255, 255, 255, 0.08);">
-                            <h3 style="color: #d4af37; font-size: 13px; margin-top: 0; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 8px;">What Is Included in Your Visit</h3>
-                            <ul style="color: #d1d5db; font-size: 13px; line-height: 1.8; margin: 10px 0 0 0; padding-left: 20px;">
-                                <li><strong>Wild Arbor Walk:</strong> Guided exploration through 100-year-old deep-taproot arbor tea trees.</li>
-                                <li><strong>Factory Process Demonstration:</strong> Live demonstration of withering, orthodox rolling, slow oxidation, and wood-fired drying.</li>
-                                <li><strong>Master Sommelier Cupping Session:</strong> Comparative tasting flight of 5 reserve grades (Imperial Golden Needle, Silver Tips, Equinox Flush).</li>
-                                <li><strong>Highland Estate Refreshments:</strong> Artisanal estate pairings and fresh spring-water infusions.</li>
-                            </ul>
-                        </div>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                            <tr>
+                                <td style="padding: 6px 0; color: #9ca3af; width: 38%;"><strong>Gate Pass Ref:</strong></td>
+                                <td style="padding: 6px 0; font-family: monospace; color: #ffd875; font-weight: bold; font-size: 15px;">${booking.id}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px 0; color: #9ca3af;"><strong>Lead Guest:</strong></td>
+                                <td style="padding: 6px 0; color: #ffffff; font-weight: bold;">${guestName}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px 0; color: #9ca3af;"><strong>Confirmed Date:</strong></td>
+                                <td style="padding: 6px 0; color: #ffd875; font-weight: bold; font-size: 15px;">${tourDate}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px 0; color: #9ca3af;"><strong>Time Slot:</strong></td>
+                                <td style="padding: 6px 0; color: #86efac; font-weight: bold; font-size: 15px;">${timeSlot}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px 0; color: #9ca3af;"><strong>Party Size:</strong></td>
+                                <td style="padding: 6px 0; color: #ffffff; font-weight: bold;">${guestCount} ${guestCount === 1 ? 'Guest' : 'Guests'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 6px 0; color: #9ca3af;"><strong>Approval Date:</strong></td>
+                                <td style="padding: 6px 0; color: #d1d5db;">${confirmedDateStr}</td>
+                            </tr>
+                        </table>
+                    </div>
 
-                        <!-- Location & Directions Guide -->
-                        <div style="background: rgba(212, 175, 55, 0.06); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 20px; margin: 20px 0;">
-                            <h4 style="color: #ffd875; margin: 0 0 8px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
-                                Estate Location &amp; Arrival Guidance
-                            </h4>
-                            <p style="font-size: 13px; color: #ffffff; margin: 0 0 6px 0;">
-                                <strong>Address:</strong> Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Central Highlands, Sri Lanka
-                            </p>
-                            <p style="font-size: 12px; color: #d1d5db; margin: 0; line-height: 1.6;">
-                                &bull; <strong>Arrival Time:</strong> Please arrive 10–15 minutes prior to your scheduled time slot.<br>
-                                &bull; <strong>Attire:</strong> Comfortable footwear suitable for plantation terrain and a light layer for highland mountain breeze.<br>
-                                &bull; <strong>Chauffeur &amp; Parking:</strong> Secure private parking and chauffeur lounge are available at the main estate gate.
-                            </p>
-                        </div>
+                    <!-- What to Expect -->
+                    <div style="background: rgba(255, 255, 255, 0.04); border-radius: 8px; padding: 20px; margin: 20px 0; border: 1px solid rgba(255, 255, 255, 0.08);">
+                        <h3 style="color: #d4af37; font-size: 13px; margin-top: 0; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 8px;">What Is Included in Your Visit</h3>
+                        <ul style="color: #d1d5db; font-size: 13px; line-height: 1.8; margin: 10px 0 0 0; padding-left: 20px;">
+                            <li><strong>Wild Arbor Walk:</strong> Guided exploration through 100-year-old deep-taproot arbor tea trees.</li>
+                            <li><strong>Factory Process Demonstration:</strong> Live demonstration of withering, orthodox rolling, slow oxidation, and wood-fired drying.</li>
+                            <li><strong>Master Sommelier Cupping Session:</strong> Comparative tasting flight of 5 reserve grades (Imperial Golden Needle, Silver Tips, Equinox Flush).</li>
+                            <li><strong>Highland Estate Refreshments:</strong> Artisanal estate pairings and fresh mountain spring-water infusions.</li>
+                        </ul>
+                    </div>
 
-                        <!-- Direct WhatsApp Concierge Button -->
-                        <div style="text-align: center; margin: 30px 0 10px 0;">
-                            <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20Tour%20Booking%20Pass%20${booking.id}%20for%20${tourDate}.%20Please%20assist%20with%20arrival." style="background: #25D366; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 25px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 4px 15px rgba(37,211,102,0.3);">
-                                Contact Concierge on WhatsApp (+94 77 320 9950)
-                            </a>
-                        </div>
+                    <!-- Location & Directions Guide -->
+                    <div style="background: rgba(212, 175, 55, 0.06); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 20px; margin: 20px 0;">
+                        <h4 style="color: #ffd875; margin: 0 0 8px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                            Estate Location &amp; Gate Access Guidance
+                        </h4>
+                        <p style="font-size: 13px; color: #ffffff; margin: 0 0 6px 0;">
+                            <strong>Address:</strong> Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Central Highlands, Sri Lanka
+                        </p>
+                        <p style="font-size: 12px; color: #d1d5db; margin: 0; line-height: 1.6;">
+                            &bull; <strong>Arrival Time:</strong> Please arrive 10–15 minutes prior to your scheduled time slot.<br>
+                            &bull; <strong>Gate Check:</strong> Please present this email or state your Gate Pass Reference: <strong style="color:#ffd875;">${booking.id}</strong> at the main security lodge.<br>
+                            &bull; <strong>Attire:</strong> Comfortable footwear suitable for plantation terrain and a light layer for highland mountain breeze.<br>
+                            &bull; <strong>Chauffeur &amp; Parking:</strong> Secure private parking and chauffeur lounge are available at the main estate entrance.
+                        </p>
+                    </div>
 
-                        <!-- Footer -->
-                        <div style="text-align: center; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #888; font-size: 11px; line-height: 1.6;">
-                            <p style="color: #d4af37; font-weight: bold; margin-bottom: 4px;">ROCK ONE WILD TEA ESTATE</p>
-                            <p>Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Sri Lanka<br>Direct Voice Hotline: +94 76 789 7817 &bull; Direct WhatsApp Concierge: +94 77 320 9950</p>
+                    <!-- Executive Admission Authorization & Director & CEO Signature -->
+                    <div style="margin: 25px 0; padding: 22px 18px; border: 1px dashed rgba(212,175,55,0.45); border-radius: 8px; text-align: center; background: rgba(0,0,0,0.4);">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #ffd875; margin-bottom: 6px; font-weight: bold;">
+                            Official Gate Pass Authorization &bull; Executive Sign-Off
+                        </div>
+                        <p style="font-size: 12px; color: #d1d5db; margin: 0 0 10px 0; font-style: italic;">
+                            "We look forward to personally welcoming you to our highland sanctuary and sharing the living heritage of Ceylon arbor tea."
+                        </p>
+                        <div style="margin: 8px auto; display: inline-block;">
+                            <img src="https://rockonewildtea.com/images/ceo_signature_gold.png" alt="Director &amp; CEO Signature" style="height: 48px; object-fit: contain; display: block; margin: 0 auto;" />
+                        </div>
+                        <div style="border-top: 1px solid rgba(212,175,55,0.35); width: 200px; margin: 6px auto; padding-top: 5px;">
+                            <div style="font-size: 14px; font-weight: bold; color: #ffffff; letter-spacing: 0.5px;">Prasanga</div>
+                            <div style="font-size: 11px; color: #d4af37; font-weight: 600;">Managing Director &amp; CEO</div>
+                            <div style="font-size: 10px; color: #9ca3af;">Rock One Wild Tea Estate (Pvt) Ltd</div>
                         </div>
                     </div>
-                `
-            });
-            results.customerEmail = customerEmail;
-            console.log('🌿 [Email Service] Customer tour confirmation sent to:', guestEmail);
-        }
+
+                    <!-- Direct WhatsApp Concierge Button -->
+                    <div style="text-align: center; margin: 30px 0 10px 0;">
+                        <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20Gate%20Pass%20${booking.id}%20for%20${tourDate}.%20Please%20assist%20with%20arrival." style="background: #25D366; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 25px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 4px 15px rgba(37,211,102,0.3);">
+                            Contact Concierge on WhatsApp (+94 77 320 9950)
+                        </a>
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="text-align: center; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #888; font-size: 11px; line-height: 1.6;">
+                        <p style="color: #d4af37; font-weight: bold; margin-bottom: 4px;">ROCK ONE WILD TEA ESTATE</p>
+                        <p>Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Sri Lanka<br>Direct Voice Hotline: +94 76 789 7817 &bull; Direct WhatsApp Concierge: +94 77 320 9950</p>
+                    </div>
+                </div>
+            `
+        });
+        console.log('🌿 [Email Service] Official Gate Pass emailed to guest:', guestEmail);
+        return { success: true, customerEmail };
     } catch (err) {
-        console.warn('Notice on customer tour confirmation in sandbox mode:', err.message);
+        console.warn('Notice on customer Gate Pass email delivery:', err.message);
+        return { success: false, error: err.message };
+    }
+}
+
+/**
+ * Backward compatibility: Send Factory Tour Booking Confirmation
+ */
+async function sendTourConfirmationEmails(booking) {
+    const adminRes = await sendTourDepositReceivedAdminAlert(booking);
+    // If the booking is already confirmed, also send Gate Pass
+    let custRes = null;
+    if (booking.status === 'confirmed' || booking.status === 'Paid & Confirmed') {
+        custRes = await sendTourGatePassEmail(booking);
+    }
+    return { success: true, results: { adminEmail: adminRes, customerEmail: custRes } };
+}
+
+/**
+ * Send User / Staff Account Activation & Credentials Email
+ */
+async function sendUserAccountWelcomeEmail({ email, full_name, role, password, origin = 'http://localhost:3000' }) {
+    if (!resend) {
+        console.log('🌿 [Email Service] RESEND_API_KEY not set. User account creation logged:', email);
+        return { success: false, reason: 'RESEND_API_KEY not configured' };
     }
 
-    return { success: true, results };
+    const roleLabels = {
+        admin: 'Super Administrator',
+        manager: 'Estate General Manager',
+        concierge: 'Concierge Desk Officer',
+        sommelier: 'Master Tea Sommelier & Tour Host',
+        staff: 'Estate Operations Staff',
+        patron: 'VIP Collector & Patron'
+    };
+    const roleLabel = roleLabels[role] || (role ? role.toUpperCase() : 'Staff Member');
+
+    try {
+        const welcomeEmail = await resend.emails.send({
+            from: SENDER_EMAIL,
+            to: email,
+            subject: `[Rock One Wild Tea] Your System Account Credentials & Portal Access`,
+            html: `
+                <div style="background-color: #040e08; font-family: 'Helvetica Neue', Arial, sans-serif; color: #f5f5f5; padding: 40px 20px; max-width: 620px; margin: 0 auto; border-radius: 12px; border: 1px solid #d4af37;">
+                    <!-- Header -->
+                    <div style="text-align: center; padding-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3);">
+                        <span style="color: #d4af37; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; font-weight: bold;">Rock One Wild Tea Estate &bull; Staff Console</span>
+                        <h1 style="color: #ffffff; font-size: 24px; margin: 10px 0 0 0; font-family: Georgia, serif;">System Account Provisioned</h1>
+                        <p style="color: #86efac; font-size: 13px; margin: 5px 0 0 0;">Authorized Role: <strong style="color:#ffd875;">${roleLabel}</strong></p>
+                    </div>
+
+                    <!-- Greeting -->
+                    <div style="padding: 25px 5px 15px 5px;">
+                        <p style="font-size: 16px; color: #ffffff; line-height: 1.6; margin-top: 0;">Dear <strong>${full_name}</strong>,</p>
+                        <p style="font-size: 14px; color: #d1d5db; line-height: 1.8;">
+                            A new system account has been created for you at <strong>Rock One Wild Tea Estate</strong>. You have been granted access privileges to manage reservations, customer inquiries, and estate operations.
+                        </p>
+                    </div>
+
+                    <!-- Credentials Card -->
+                    <div style="background: rgba(255, 255, 255, 0.04); border-radius: 8px; padding: 22px; margin: 20px 0; border: 1px solid rgba(212, 175, 55, 0.35);">
+                        <h3 style="color: #d4af37; font-size: 13px; margin-top: 0; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 8px;">Login Credentials</h3>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
+                            <tr>
+                                <td style="padding: 8px 0; color: #9ca3af; width: 38%;"><strong>Login Email ID:</strong></td>
+                                <td style="padding: 8px 0; color: #ffffff; font-weight: bold; font-family: monospace; font-size: 15px;">${email}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #9ca3af;"><strong>Assigned Role:</strong></td>
+                                <td style="padding: 8px 0;"><span style="background: rgba(212,175,55,0.2); color: #ffd875; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">${roleLabel}</span></td>
+                            </tr>
+                            ${password ? `
+                            <tr>
+                                <td style="padding: 8px 0; color: #9ca3af;"><strong>Access Password:</strong></td>
+                                <td style="padding: 8px 0; color: #4ade80; font-family: monospace; font-size: 16px; font-weight: bold;">${password}</td>
+                            </tr>
+                            ` : ''}
+                            <tr>
+                                <td style="padding: 8px 0; color: #9ca3af;"><strong>Portal URL:</strong></td>
+                                <td style="padding: 8px 0;"><a href="${origin}" style="color: #86efac; text-decoration: underline;">${origin}</a></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Security Advisory -->
+                    <div style="background: rgba(4, 28, 14, 0.9); border-left: 3px solid #d4af37; padding: 14px 18px; margin: 20px 0; border-radius: 4px;">
+                        <h4 style="color: #d4af37; margin: 0 0 6px 0; font-size: 12px; text-transform: uppercase;">Security Notice:</h4>
+                        <p style="color: #f3f4f6; font-size: 13px; margin: 0; line-height: 1.6;">
+                            Please log in and update your password immediately after initial access. Do not share these credentials with unauthorized personnel.
+                        </p>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div style="text-align: center; margin: 30px 0 10px 0;">
+                        <a href="${origin}" style="background: #d4af37; color: #040a06; text-decoration: none; padding: 14px 28px; border-radius: 25px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 4px 15px rgba(212,175,55,0.35);">
+                            Log In to Admin Console &rarr;
+                        </a>
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="text-align: center; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #888; font-size: 11px; line-height: 1.6;">
+                        <p style="color: #d4af37; font-weight: bold; margin-bottom: 4px;">ROCK ONE WILD TEA ESTATE</p>
+                        <p>Highland Sanctuary &bull; Ettampitiya 90140, Sri Lanka &bull; Concierge Desk: +94 77 320 9950</p>
+                    </div>
+                </div>
+            `
+        });
+        console.log('🌿 [Email Service] User welcome credentials email dispatched to:', email);
+        return { success: true, welcomeEmail };
+    } catch (err) {
+        console.warn('Notice on user welcome email delivery:', err.message);
+        return { success: false, error: err.message };
+    }
 }
 
 module.exports = {
     sendInquiryEmails,
     sendOrderConfirmationEmails,
-    sendTourConfirmationEmails
+    sendTourDepositReceivedAdminAlert,
+    sendTourGatePassEmail,
+    sendTourConfirmationEmails,
+    sendUserAccountWelcomeEmail
 };
 

@@ -1,21 +1,20 @@
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://gozetekxnevnmwekrrhr.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || 
+const SUPABASE_URL = (process.env.SUPABASE_URL || '').trim();
+const SUPABASE_KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY || 
                      process.env.SUPABASE_SECRET_KEY || 
                      process.env.SUPABASE_KEY || 
                      process.env.SUPABASE_ANON_KEY || 
-                     process.env.SUPABASE_PUBLISHABLE_KEY || 
-                     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvemV0ZWt4bmV2bm13ZWtycmhyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODMyOTUzMSwiZXhwIjoyMTAzOTA1NTMxfQ.EUtT7ttc3r-PmEeQr-mBvE_2ptexTNC0nZ_sYdzoHrM';
+                     process.env.SUPABASE_PUBLISHABLE_KEY || '').trim();
 
 // ── Circuit Breaker & High-Availability Resilience Configuration ─────────────
 const QUERY_TIMEOUT_MS = 3000;            // Max wait 3.0s for Supabase before instant local SQLite fallback
 const CIRCUIT_BREAKER_COOLDOWN_MS = 30000; // 30s cooldown after failure before probing Supabase again
 
-let isSupabaseHealthy = true;
+let isSupabaseHealthy = Boolean(SUPABASE_URL && SUPABASE_KEY);
 let lastFailureTime = 0;
-let lastFailureReason = null;
+let lastFailureReason = SUPABASE_URL && SUPABASE_KEY ? null : 'Not configured (Turso Cloud active)';
 let totalFallbacksCount = 0;
 
 let rawSupabase = null;
@@ -35,6 +34,8 @@ if (SUPABASE_URL && SUPABASE_KEY) {
         isSupabaseHealthy = false;
         lastFailureReason = err.message;
     }
+} else {
+    console.log('ℹ️ [Supabase] Not configured. Operating with Turso Cloud & local SQLite.');
 }
 
 /**
@@ -65,23 +66,39 @@ function wrapSupabaseClient(client, timeoutMs = QUERY_TIMEOUT_MS) {
     });
 }
 
+function isConnectivityOrServiceError(err) {
+    if (!err) return false;
+    const msg = String(err.message || err.details || err.hint || '').toLowerCase();
+    const status = Number(err.status || err.code || 0);
+    if (status >= 500 && status < 600) return true;
+    return (
+        msg.includes('timeout') ||
+        msg.includes('fetch failed') ||
+        msg.includes('econn') ||
+        msg.includes('enotfound') ||
+        msg.includes('etimedout') ||
+        msg.includes('network') ||
+        msg.includes('paused') ||
+        msg.includes('service unavailable') ||
+        msg.includes('bad gateway') ||
+        msg.includes('gateway timeout')
+    );
+}
+
 function createCircuitBreakerBypass(table) {
     const errorObj = new Error(`Supabase circuit breaker open (serving table '${table}' from local SQLite)`);
-    const resolveBypass = () => Promise.resolve({ data: null, error: errorObj });
-
-    return {
-        select: resolveBypass,
-        insert: resolveBypass,
-        update: resolveBypass,
-        delete: resolveBypass,
-        upsert: resolveBypass,
-        eq: () => createCircuitBreakerBypass(table),
-        or: () => createCircuitBreakerBypass(table),
-        order: () => createCircuitBreakerBypass(table),
-        single: resolveBypass,
-        limit: () => createCircuitBreakerBypass(table),
-        then: (resolve) => resolve({ data: null, error: errorObj })
-    };
+    const bypassProxy = new Proxy(() => bypassProxy, {
+        get(_, prop) {
+            if (prop === 'then') {
+                return (resolve) => resolve({ data: null, error: errorObj });
+            }
+            if (prop === 'catch' || prop === 'finally') {
+                return () => bypassProxy;
+            }
+            return () => bypassProxy;
+        }
+    });
+    return bypassProxy;
 }
 
 function wrapQueryBuilder(b, timeoutMs) {
@@ -104,11 +121,13 @@ function wrapQueryBuilder(b, timeoutMs) {
                     const originalPromise = new Promise((res, rej) => {
                         bTarget.then(res, rej);
                     }).catch(err => {
-                        isSupabaseHealthy = false;
-                        lastFailureTime = Date.now();
-                        lastFailureReason = err.message || 'Network error';
-                        totalFallbacksCount++;
-                        console.warn(`⚠️ [Supabase Network Error] ${err.message}. Gracefully falling back to SQLite.`);
+                        if (isConnectivityOrServiceError(err)) {
+                            isSupabaseHealthy = false;
+                            lastFailureTime = Date.now();
+                            lastFailureReason = err.message || 'Network error';
+                            totalFallbacksCount++;
+                            console.warn(`⚠️ [Supabase Network Error] ${err.message}. Gracefully falling back to SQLite.`);
+                        }
                         return { data: null, error: err };
                     });
 
@@ -116,9 +135,12 @@ function wrapQueryBuilder(b, timeoutMs) {
                         .then(result => {
                             if (timer) clearTimeout(timer);
                             if (result && result.error) {
-                                isSupabaseHealthy = false;
-                                lastFailureTime = Date.now();
-                                lastFailureReason = result.error.message || 'Query error';
+                                if (isConnectivityOrServiceError(result.error)) {
+                                    isSupabaseHealthy = false;
+                                    lastFailureTime = Date.now();
+                                    lastFailureReason = result.error.message || 'Service unavailable';
+                                    totalFallbacksCount++;
+                                }
                             } else {
                                 isSupabaseHealthy = true;
                             }
@@ -126,9 +148,11 @@ function wrapQueryBuilder(b, timeoutMs) {
                         })
                         .catch(err => {
                             if (timer) clearTimeout(timer);
-                            isSupabaseHealthy = false;
-                            lastFailureTime = Date.now();
-                            lastFailureReason = err.message;
+                            if (isConnectivityOrServiceError(err)) {
+                                isSupabaseHealthy = false;
+                                lastFailureTime = Date.now();
+                                lastFailureReason = err.message;
+                            }
                             return resolve({ data: null, error: err });
                         });
                 };
@@ -167,10 +191,22 @@ async function pingSupabase() {
     }
 }
 
+function createAuthClient() {
+    if (!SUPABASE_URL || !SUPABASE_KEY) return null;
+    return createClient(SUPABASE_URL, SUPABASE_KEY, {
+        auth: {
+            persistSession: false,
+            autoRefreshToken: false
+        }
+    });
+}
+
 module.exports = {
     supabase: safeSupabase,
     rawSupabase,
-    isSupabaseAvailable: () => !!safeSupabase && (isSupabaseHealthy || (Date.now() - lastFailureTime >= CIRCUIT_BREAKER_COOLDOWN_MS)),
+    createAuthClient,
+    isConnectivityOrServiceError,
+    isSupabaseAvailable: () => Boolean(SUPABASE_URL && SUPABASE_KEY && safeSupabase && (isSupabaseHealthy || (Date.now() - lastFailureTime >= CIRCUIT_BREAKER_COOLDOWN_MS))),
     getSupabaseHealth: () => ({
         url: SUPABASE_URL,
         isHealthy: isSupabaseHealthy,

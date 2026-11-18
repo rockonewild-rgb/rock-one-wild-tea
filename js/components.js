@@ -41,6 +41,172 @@ window.getSeasonalThemeIconSvg = function(themeId, size = 18, extraClass = '') {
     }
 };
 
+// Global User Accounts Desk Row Renderer
+window.renderUserTableRow = function(u) {
+    if (!u) return '';
+    const isOwner = (u.email || '').toLowerCase() === 'rockonewild@gmail.com';
+    const fullName = u.full_name || u.fullName || u.name || 'Staff Member';
+    const initials = fullName.split(' ').filter(Boolean).map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'ST';
+    
+    // Role styling & icons
+    let roleBadge = '';
+    const role = (u.role || 'staff').toLowerCase();
+    switch (role) {
+        case 'admin':
+            roleBadge = `<span style="background: rgba(212,175,55,0.15); color: var(--color-gold); border: 1px solid rgba(212,175,55,0.4); padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3 7h7l-5.5 4.5 2 7.5L12 17l-6.5 4 2-7.5L2 9h7z"/></svg>
+                ${isOwner ? '👑 Primary Admin' : 'Administrator'}
+            </span>`;
+            break;
+        case 'manager':
+            roleBadge = `<span style="background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.4); padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Estate Manager
+            </span>`;
+            break;
+        case 'sommelier':
+            roleBadge = `<span style="background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.4); padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path></svg>
+                Tea Sommelier
+            </span>`;
+            break;
+        case 'concierge':
+            roleBadge = `<span style="background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4); padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                Concierge Desk
+            </span>`;
+            break;
+        case 'patron':
+            roleBadge = `<span style="background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.4); padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                Connoisseur Patron
+            </span>`;
+            break;
+        case 'staff':
+        default:
+            roleBadge = `<span style="background: rgba(148,163,184,0.15); color: #cbd5e1; border: 1px solid rgba(148,163,184,0.4); padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Staff Member
+            </span>`;
+            break;
+    }
+
+    // Status styling
+    const status = (u.status || 'active').toLowerCase();
+    let statusPill = '';
+    if (status === 'active') {
+        statusPill = `<span class="box-badge status-available" style="font-size: 0.7rem; padding: 0.2rem 0.6rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #4ade80;"></span> Active
+        </span>`;
+    } else if (status === 'suspended') {
+        statusPill = `<span class="box-badge status-booked" style="font-size: 0.7rem; padding: 0.2rem 0.6rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #f87171;"></span> Suspended
+        </span>`;
+    } else {
+        statusPill = `<span class="box-badge status-pending" style="font-size: 0.7rem; padding: 0.2rem 0.6rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #fbbf24;"></span> Pending
+        </span>`;
+    }
+
+    // Phone / WhatsApp link
+    const cleanPhone = (u.phone || '').replace(/[^0-9]/g, '');
+    const phoneDisplay = u.phone ? `
+        <div style="display: flex; align-items: center; gap: 0.45rem;">
+            <span style="color: #cbd5e1; font-size: 0.82rem;">${u.phone}</span>
+            ${cleanPhone ? `
+                <a href="https://wa.me/${cleanPhone}" target="_blank" rel="noopener noreferrer" title="Direct WhatsApp Chat" style="color: #25D366; display: inline-flex; align-items: center; background: rgba(37,211,102,0.1); border: 1px solid rgba(37,211,102,0.3); border-radius: 4px; padding: 2px 5px; font-size: 0.7rem; text-decoration: none;">
+                    WA
+                </a>
+            ` : ''}
+        </div>
+    ` : `<span style="color: #64748b; font-size: 0.8rem;">—</span>`;
+
+    // Date display
+    let dateStr = 'Recent';
+    if (u.created_at) {
+        try {
+            dateStr = new Date(u.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        } catch(e) {
+            dateStr = u.created_at;
+        }
+    }
+
+    const safeSearchText = `${fullName} ${u.email || ''} ${u.phone || ''} ${role} ${status} ${u.id || ''}`.toLowerCase();
+
+    return `
+        <tr class="user-table-row" data-user-id="${u.id}" data-role="${role}" data-status="${status}" data-search-text="${safeSearchText}" style="border-bottom: 1px solid rgba(255,255,255,0.06); transition: background 0.2s ease;">
+            <!-- User Identity -->
+            <td style="padding: 0.95rem 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(7,20,13,0.9)); border: 1.5px solid var(--color-gold); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.82rem; color: var(--color-gold); flex-shrink: 0; box-shadow: 0 0 10px rgba(212,175,55,0.15);">
+                        ${initials}
+                    </div>
+                    <div>
+                        <div style="font-weight: 600; color: #ffffff; font-size: 0.9rem;">${fullName}</div>
+                        <div style="font-family: monospace; font-size: 0.72rem; color: var(--color-text-muted);">${u.id || ''}</div>
+                    </div>
+                </div>
+            </td>
+
+            <!-- Email ID (Primary Identity) -->
+            <td style="padding: 0.95rem 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <a href="mailto:${u.email}" style="color: var(--color-gold); font-size: 0.86rem; font-weight: 600; text-decoration: none; word-break: break-all;">
+                        ${u.email}
+                    </a>
+                    <button type="button" class="btn-copy-user-email" data-email="${u.email}" title="Copy Email ID" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 2px 6px; color: #cbd5e1; cursor: pointer; display: inline-flex; align-items: center;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </button>
+                    <span style="font-size: 0.65rem; background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.3); border-radius: 3px; padding: 1px 4px; font-weight: 600;">Verified ID</span>
+                </div>
+            </td>
+
+            <!-- Role -->
+            <td style="padding: 0.95rem 1rem;">
+                ${roleBadge}
+            </td>
+
+            <!-- Status -->
+            <td style="padding: 0.95rem 1rem;">
+                ${statusPill}
+            </td>
+
+            <!-- Phone / WhatsApp -->
+            <td style="padding: 0.95rem 1rem;">
+                ${phoneDisplay}
+            </td>
+
+            <!-- Created -->
+            <td style="padding: 0.95rem 1rem; color: #94a3b8; font-size: 0.78rem;">
+                ${dateStr}
+            </td>
+
+            <!-- Actions -->
+            <td style="padding: 0.95rem 1rem; text-align: right;">
+                <div style="display: inline-flex; align-items: center; gap: 0.4rem;">
+                    <button type="button" class="btn-edit-user" data-user-id="${u.id}" title="Edit Account Profile" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #e2e8f0; border-radius: 5px; padding: 5px 9px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        <span>Edit</span>
+                    </button>
+                    <button type="button" class="btn-reset-user-password" data-user-id="${u.id}" title="Reset Password & Email New Credentials" style="background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.35); color: var(--color-gold); border-radius: 5px; padding: 5px 9px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <span>Key</span>
+                    </button>
+                    ${isOwner ? `
+                        <button type="button" disabled title="Primary Estate Owner cannot be deleted" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); color: #52525b; border-radius: 5px; padding: 5px 9px; cursor: not-allowed; display: inline-flex; align-items: center; font-size: 0.75rem;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    ` : `
+                        <button type="button" class="btn-delete-user" data-user-id="${u.id}" data-user-name="${fullName}" data-user-email="${u.email}" title="Delete User Account" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.35); color: #f87171; border-radius: 5px; padding: 5px 9px; cursor: pointer; display: inline-flex; align-items: center; font-size: 0.75rem;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    `}
+                </div>
+            </td>
+        </tr>
+    `;
+};
+
 // Multi-Language dynamic translation helper
 const _t = (key, fallback) => (window.TeaFactoryI18n ? window.TeaFactoryI18n.t(key, fallback) : (fallback !== undefined ? fallback : key));
 
@@ -142,13 +308,11 @@ const UIComponents = {
         if (!container) return;
 
         const products = window.TeaFactoryStore.getProducts() || [];
-        const boxes = window.TeaFactoryStore.getBoxes() || [];
 
         const allCount = products.length;
         const blackCount = products.filter(p => p.category === 'Black Tea').length;
-        const greenWhiteCount = products.filter(p => p.category === 'Green & White Tea').length;
-        const oolongCount = products.filter(p => p.category === 'Oolongs').length;
-        const collectorCount = boxes.length;
+        const whiteCount = products.filter(p => p.category === 'White Tea').length;
+        const greenCount = products.filter(p => p.category === 'Green Tea').length;
 
         let html = `
             <div class="tour-header-block">
@@ -168,17 +332,13 @@ const UIComponents = {
                         <span>${_t('filter_black', 'Black Tea')}</span>
                         <span class="filter-tab-count">${blackCount}</span>
                     </button>
-                    <button class="btn btn-outline filter-tab-btn" data-category="Green & White Tea">
-                        <span>${_t('filter_green_white', 'Green & White Tea')}</span>
-                        <span class="filter-tab-count">${greenWhiteCount}</span>
+                    <button class="btn btn-outline filter-tab-btn" data-category="White Tea">
+                        <span>${_t('filter_white', 'White Tea')}</span>
+                        <span class="filter-tab-count">${whiteCount}</span>
                     </button>
-                    <button class="btn btn-outline filter-tab-btn" data-category="Oolongs">
-                        <span>${_t('filter_oolongs', 'Oolongs')}</span>
-                        <span class="filter-tab-count">${oolongCount}</span>
-                    </button>
-                    <button class="btn btn-outline filter-tab-btn" data-category="collector">
-                        <span>${_t('filter_collector', 'Collector Chests')}</span>
-                        <span class="filter-tab-count">${collectorCount}</span>
+                    <button class="btn btn-outline filter-tab-btn" data-category="Green Tea">
+                        <span>${_t('filter_green', 'Green Tea')}</span>
+                        <span class="filter-tab-count">${greenCount}</span>
                     </button>
                 </div>
                 
@@ -251,85 +411,6 @@ const UIComponents = {
         searchFilter = (searchFilter || '').toLowerCase().trim();
         const summaryEl = document.getElementById('catalog-results-summary');
 
-        // If category is "collector", render the 1-10 boxes grid
-        if (categoryFilter === 'collector') {
-            const boxes = window.TeaFactoryStore.getBoxes() || [];
-            const filteredBoxes = searchFilter ? boxes.filter(b => (b.name || '').toLowerCase().includes(searchFilter)) : boxes;
-
-            if (summaryEl) {
-                summaryEl.style.display = 'flex';
-                summaryEl.innerHTML = `
-                    <span>Showing <strong>${filteredBoxes.length}</strong> of ${boxes.length} numbered collector chests ${searchFilter ? `matching "<em>${searchFilter}</em>"` : ''}</span>
-                    ${searchFilter ? `<button type="button" id="catalog-reset-filters-btn" class="catalog-reset-link" style="background:none; border:none; color:var(--color-gold); font-size:0.75rem; text-decoration:underline; cursor:pointer; padding:0; margin-left:auto;">Reset search</button>` : ''}
-                `;
-            }
-
-            if (filteredBoxes.length === 0) {
-                gridContainer.innerHTML = `
-                    <div class="empty-state" style="text-align: center; padding: 3.5rem 1.5rem; background: rgba(14,26,18,0.4); border: 1px dashed rgba(212,175,55,0.25); border-radius: 12px; margin: 1.5rem 0;">
-                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.5" style="margin-bottom: 0.75rem; opacity: 0.85;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-                        <h4 style="font-size: 1.15rem; color: #fff; margin-bottom: 0.4rem;">${_t('collector_no_boxes', 'No matching collector boxes found.')}</h4>
-                        <p style="font-size: 0.82rem; color: var(--color-text-muted); margin-bottom: 1rem;">Try clearing your search query to view all available numbered chests.</p>
-                        <button type="button" id="catalog-empty-reset-btn" class="btn btn-outline" style="border-color: var(--color-gold); color: var(--color-gold); font-size: 0.78rem; padding: 0.5rem 1.25rem;">Clear Search</button>
-                    </div>
-                `;
-                return;
-            }
-
-            const season = window.TeaFactoryStore.getCurrentSeason() || { seriesNumber: 1, name: "Royal Emerald Reserve" };
-            let boxHtml = `
-                <div class="season-branding" style="margin-bottom: 2rem; border-left: 2px solid var(--color-gold); padding-left: 1.5rem;">
-                    <span class="season-badge">${_t('season_branding_badge', 'Series Release')} ${season.seriesNumber || 1}</span>
-                    <h3 class="season-title" style="font-size: 1.8rem; margin-bottom: 0.4rem; color: var(--color-gold-light);">${season.name}</h3>
-                    <p class="season-description" style="font-size: 0.88rem; color: var(--color-text-muted); max-width: 700px; line-height: 1.6;">
-                        ${_t('season_branding_sub', 'Select a box number from 1 to 10 below to secure your numbered luxury tea chest. Once booked, it instantly locks for other collectors.')}
-                    </p>
-                </div>
-                <div class="boxes-grid">
-            `;
-
-            boxHtml += filteredBoxes.map(box => {
-                let statusClass = 'status-available';
-                let badgeText = _t('status_available', 'Available');
-                let buttonHtml = `<button class="btn btn-primary btn-book-box" data-id="${box.id}">${_t('btn_enquire_now', 'Enquire Now')}</button>`;
-                
-                if (box.status === 'Booked') {
-                    statusClass = 'status-booked';
-                    badgeText = _t('status_reserved', 'Reserved');
-                    buttonHtml = `<button class="btn btn-secondary" disabled>${_t('status_reserved', 'Reserved')}</button>`;
-                } else if (box.status === 'Enquiry Pending') {
-                    statusClass = 'status-pending';
-                    badgeText = _t('status_pending', 'Enquiry Pending');
-                    buttonHtml = `<button class="btn btn-warning btn-book-box" data-id="${box.id}" style="background: rgba(212,175,55,0.12); border-color: var(--color-gold); color: var(--color-gold);">${_t('btn_inquire_again', 'Inquire Again')}</button>`;
-                }
-
-                const displayName = this.highlightText(box.name, searchFilter);
-
-                return `
-                    <div class="box-card ${statusClass}">
-                        <div class="box-inner">
-                            <div class="box-header">
-                                <span class="box-badge ${statusClass}">${badgeText}</span>
-                                <span class="box-price" style="font-size:0.8rem;color:var(--color-gold);">${_t('price_enquiry_only', 'Enquiry Only')}</span>
-                            </div>
-                            <div class="box-body">
-                                <div class="box-number-display">${String(box.id).padStart(2, '0')}</div>
-                                <h4 class="box-title">${displayName}</h4>
-                                <p class="box-details">${_t('box_seal_note', 'Individually numbered solid teak chest seal.')}</p>
-                            </div>
-                            <div class="box-footer">
-                                ${buttonHtml}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            boxHtml += `</div>`;
-            gridContainer.innerHTML = boxHtml;
-            return;
-        }
-
         // Standard products filtering and sorting
         const products = window.TeaFactoryStore.getProducts() || [];
         let filteredProducts = products.filter(p => {
@@ -345,6 +426,7 @@ const UIComponents = {
                 desc.toLowerCase().includes(searchFilter) ||
                 leafGrade.toLowerCase().includes(searchFilter) ||
                 elevation.toLowerCase().includes(searchFilter) ||
+                ((p.subcategory || '').toLowerCase().includes(searchFilter)) ||
                 (p.tastingNotes && p.tastingNotes.some(t => t.toLowerCase().includes(searchFilter)));
             return matchesCategory && matchesSearch;
         });
@@ -410,12 +492,19 @@ const UIComponents = {
                     <div class="product-card-content">
                         <div class="product-leaf-grade-banner">
                             <span class="leaf-grade-badge">${displayGrade}</span>
-                            <span class="product-category-crumb">${p.category || 'Pure Ceylon'}</span>
+                            <span class="product-category-crumb">${p.category || 'Pure Ceylon'}${p.subcategory ? ` &bull; ${p.subcategory}` : ''}</span>
                         </div>
                         <div class="product-title-pricing-row">
                             <h3 class="product-card-title">${displayName}</h3>
                             <div class="product-price-block">
                                 <span class="product-price-val">${window.TeaFactoryStore.formatCurrency(p.price)}</span>
+                                ${(() => {
+                                    const shipVal = Number(p.shippingCharge !== undefined ? p.shippingCharge : (p.shippingFee || 0)) || 0;
+                                    if (shipVal > 0) {
+                                        return `<span class="product-shipping-note" style="display:block; font-size:0.68rem; color:#86efac; font-weight:500; margin-top:2px;">+ ${window.TeaFactoryStore.formatCurrency(shipVal)} shipping</span>`;
+                                    }
+                                    return `<span class="product-shipping-note" style="display:block; font-size:0.68rem; color:rgba(255,255,255,0.45); font-weight:400; margin-top:2px;">Complimentary shipping</span>`;
+                                })()}
                             </div>
                         </div>
                         <p class="product-card-description">${displayDesc}</p>
@@ -524,15 +613,23 @@ const UIComponents = {
 
         // Initially select the first available box or box 1
         const defaultBox = boxes.find(b => b.status === 'Available') || boxes[0];
-        let defaultStatusText = _t('status_available', 'Available');
+        let defaultStatusText = 'Available for Allocation';
         let defaultBadgeClass = 'status-available';
-        let defaultButtonHtml = `<button class="btn btn-primary btn-book-box" data-id="${defaultBox.id}" style="width: 100%;">${_t('btn_enquire_now', 'Enquire Now')}</button>`;
+        let defaultButtonHtml = `<button class="btn btn-primary btn-book-box" data-id="${defaultBox.id}" style="width: 100%;">${_t('btn_enquire_allocation', 'Enquire for Allocation')}</button>`;
 
         if (defaultBox.status === 'Booked') {
             defaultStatusText = _t('status_reserved', 'Reserved');
             defaultBadgeClass = 'status-booked';
             defaultButtonHtml = `<button class="btn btn-secondary" disabled style="width: 100%;">${_t('status_reserved', 'Reserved')}</button>`;
-        } else if (defaultBox.status === 'Enquiry Pending') {
+        } else if (defaultBox.status === 'Pending Verification') {
+            defaultStatusText = 'Order Pending';
+            defaultBadgeClass = 'status-pending';
+            defaultButtonHtml = `<button class="btn btn-warning btn-book-box" data-id="${defaultBox.id}" style="width: 100%; background: rgba(212,175,55,0.12); border-color: var(--color-gold); color: var(--color-gold);">View Allocation Status</button>`;
+        } else if (defaultBox.status === 'Quotation Issued') {
+            defaultStatusText = 'Quotation Prepared';
+            defaultBadgeClass = 'status-pending';
+            defaultButtonHtml = `<button class="btn btn-warning btn-book-box" data-id="${defaultBox.id}" style="width: 100%; background: rgba(212,175,55,0.12); border-color: var(--color-gold); color: var(--color-gold);">Review Quotation / Enquire</button>`;
+        } else if (defaultBox.status === 'Enquiry Pending' || defaultBox.status === 'Awaiting Quotation') {
             defaultStatusText = _t('status_pending', 'Enquiry Pending');
             defaultBadgeClass = 'status-pending';
             defaultButtonHtml = `<button class="btn btn-warning btn-book-box" data-id="${defaultBox.id}" style="width: 100%; background: rgba(212,175,55,0.12); border-color: var(--color-gold); color: var(--color-gold);">${_t('btn_inquire_again', 'Inquire Again')}</button>`;
@@ -563,7 +660,14 @@ const UIComponents = {
                     </div>
                     <div class="showcase-details" style="padding: 1.5rem 0 0 0;">
                         <h4 id="selected-box-name" class="box-title" style="font-family: var(--font-serif); font-size: 1.35rem; color: var(--color-gold); margin-bottom: 0.5rem;">${defaultBox.name}</h4>
-                        <p class="box-details" id="selected-box-desc" style="color: var(--color-text-muted); font-size: 0.85rem; margin-bottom: 1.5rem; line-height: 1.5;">${defaultBox.desc || _t('box_seal_note', 'Individually numbered, hand-sealed cedar chest containing seasonal micro-batch leaves.')}</p>
+                        <p class="box-details" id="selected-box-desc" style="color: var(--color-text-muted); font-size: 0.85rem; margin-bottom: 1rem; line-height: 1.5;">${defaultBox.desc || _t('box_seal_note', 'Individually numbered, hand-sealed cedar chest containing seasonal micro-batch leaves.')}</p>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.15rem; padding:0.55rem 0.85rem; background:rgba(212,175,55,0.06); border:1px solid rgba(212,175,55,0.22); border-radius:6px; font-size:0.78rem;">
+                            <span style="color:var(--color-text-muted);">Pricing Mode:</span>
+                            <strong style="color:var(--color-gold); font-size:0.8rem; display:inline-flex; align-items:center; gap:0.35rem;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                Price Quoted on Request
+                            </strong>
+                        </div>
                         <div id="selected-box-action">
                             ${defaultButtonHtml}
                         </div>
@@ -582,7 +686,13 @@ const UIComponents = {
                             if (box.status === 'Booked') {
                                 btnClass = 'num-btn-booked';
                                 badgeLabel = _t('status_reserved', 'Reserved');
-                            } else if (box.status === 'Enquiry Pending') {
+                            } else if (box.status === 'Pending Verification') {
+                                btnClass = 'num-btn-pending';
+                                badgeLabel = 'Order Pending';
+                            } else if (box.status === 'Quotation Issued') {
+                                btnClass = 'num-btn-pending';
+                                badgeLabel = 'Quote Prepared';
+                            } else if (box.status === 'Enquiry Pending' || box.status === 'Awaiting Quotation') {
                                 btnClass = 'num-btn-pending';
                                 badgeLabel = _t('status_pending', 'Enquiry Pending');
                             }
@@ -781,9 +891,9 @@ const UIComponents = {
                     <div style="background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.35); border-radius: 12px; padding: 0.85rem 1.4rem; text-align: right;">
                         <span style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; display: block;">Per Person Fee</span>
                         <div style="font-size: 1.8rem; font-family: var(--font-serif); font-weight: 700; color: var(--color-gold);">
-                            LKR 1,450
+                            ${window.TeaFactoryStore && window.TeaFactoryStore.getActiveCurrency() === 'USD' ? '$4.75' : 'LKR 1,450'}
                         </div>
-                        <span style="font-size: 0.75rem; color: #94a3b8;">(approx. $4.75 USD / €4.40 EUR)</span>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">(${window.TeaFactoryStore && window.TeaFactoryStore.getActiveCurrency() === 'USD' ? 'approx. LKR 1,450 / €4.40 EUR' : 'approx. $4.75 USD / €4.40 EUR'})</span>
                     </div>
                 </div>
 
@@ -1009,29 +1119,36 @@ const UIComponents = {
         const activeTheme = window.TeaFactoryStore.getActiveTheme ? window.TeaFactoryStore.getActiveTheme() : { id: 'classic', name: 'Estate Heritage Gold', icon: '🌿' };
         const seasonalThemes = window.TeaFactoryStore.getSeasonalThemes ? window.TeaFactoryStore.getSeasonalThemes() : [];
         const themeSettings = window.TeaFactoryStore.getThemeSettings ? window.TeaFactoryStore.getThemeSettings() : { activeThemeId: 'classic', bannerEnabled: true, customBannerText: '', effectsEnabled: true };
+        const giftEnquiries = (bookings || []).filter(b => b.boxId || (b.id && b.id.startsWith('ENQ-')) || b.type === 'box');
+        const pendingGiftQuotesCount = giftEnquiries.filter(b => b.status === 'Awaiting Quotation').length;
+        const allUsers = (window.TeaFactoryStore && typeof window.TeaFactoryStore.getUsers === 'function') 
+            ? window.TeaFactoryStore.getUsers() 
+            : [];
+        const usersCount = allUsers.length;
 
         let html = `
-            <div class="admin-header-block" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap;">
-                <div>
-                    <h2 class="view-title">Estate Concierge Operations</h2>
-                    <p class="view-subtitle">Manage premium box reservations, seasonal resets, bulletins, and email monitors.</p>
+            <div class="admin-dashboard-wrapper">
+                <div class="admin-header-block" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap;">
+                    <div>
+                        <h2 class="view-title">Estate Admin Panel</h2>
+                        <p class="view-subtitle">Manage collector box reserves, order records, factory tours, seasonal resets, and bulletins.</p>
+                    </div>
+                    <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+                        <button id="admin-change-passcode-btn" class="btn btn-outline" style="border-color: rgba(212,175,55,0.4); color: var(--color-gold); font-size: 0.75rem; padding: 0.5rem 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;" title="Change Admin Panel Passcode">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Change Passcode
+                        </button>
+                        <button id="admin-backup-db-btn" class="btn btn-outline" style="border-color: rgba(212,175,55,0.4); color: var(--color-gold); font-size: 0.75rem; padding: 0.5rem 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;" title="Download full JSON database snapshot">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Backup Database (JSON)
+                        </button>
+                        <button id="admin-restore-db-trigger-btn" class="btn btn-outline" style="border-color: rgba(255,255,255,0.2); color: var(--color-text-primary); font-size: 0.75rem; padding: 0.5rem 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;" title="Restore state from JSON backup file">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> Restore Backup
+                        </button>
+                        <input type="file" id="admin-restore-db-file-input" accept=".json,application/json" style="display: none;">
+                        <button id="admin-logout-btn" class="btn btn-outline" style="border-color: rgba(255, 255, 255, 0.15); color: var(--color-text-muted); font-size: 0.75rem; padding: 0.5rem 0.85rem;">
+                            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Lock Admin Panel
+                        </button>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
-                    <button id="admin-change-passcode-btn" class="btn btn-outline" style="border-color: rgba(212,175,55,0.4); color: var(--color-gold); font-size: 0.75rem; padding: 0.5rem 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;" title="Change Concierge Operations Passcode">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Change Passcode
-                    </button>
-                    <button id="admin-backup-db-btn" class="btn btn-outline" style="border-color: rgba(212,175,55,0.4); color: var(--color-gold); font-size: 0.75rem; padding: 0.5rem 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;" title="Download full JSON database snapshot">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Backup Database (JSON)
-                    </button>
-                    <button id="admin-restore-db-trigger-btn" class="btn btn-outline" style="border-color: rgba(255,255,255,0.2); color: var(--color-text-primary); font-size: 0.75rem; padding: 0.5rem 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;" title="Restore state from JSON backup file">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> Restore Backup
-                    </button>
-                    <input type="file" id="admin-restore-db-file-input" accept=".json,application/json" style="display: none;">
-                    <button id="admin-logout-btn" class="btn btn-outline" style="border-color: rgba(255, 255, 255, 0.15); color: var(--color-text-muted); font-size: 0.75rem; padding: 0.5rem 0.85rem;">
-                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Lock Operations
-                    </button>
-                </div>
-            </div>
 
             <!-- KPI Metric Summary Grid (Always visible for CRM context) -->
             <div class="admin-stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
@@ -1075,6 +1192,11 @@ const UIComponents = {
                 <button class="admin-tab-btn ${activeSubTab === 'orders' ? 'active' : ''}" data-subtab="orders" style="display: flex; align-items: center; gap: 0.5rem;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg> Orders Desk
                 </button>
+                <button class="admin-tab-btn ${activeSubTab === 'giftquotes' ? 'active' : ''}" data-subtab="giftquotes" style="display: flex; align-items: center; gap: 0.5rem; ${activeSubTab === 'giftquotes' ? '' : (pendingGiftQuotesCount > 0 ? 'border-color: rgba(212,175,55,0.7); background: rgba(212,175,55,0.12);' : '')}">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    <span>Gift Box Quotations &amp; Payment Links</span>
+                    ${pendingGiftQuotesCount > 0 ? `<span class="box-badge status-pending" style="font-size: 0.6rem; padding: 0.1rem 0.45rem;">${pendingGiftQuotesCount} New</span>` : ''}
+                </button>
                 <button class="admin-tab-btn ${activeSubTab === 'gallery' ? 'active' : ''}" data-subtab="gallery" style="display: flex; align-items: center; gap: 0.5rem;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> Gallery Desk
                 </button>
@@ -1101,6 +1223,11 @@ const UIComponents = {
                 </button>
                 <button class="admin-tab-btn ${activeSubTab === 'reviews' ? 'active' : ''}" data-subtab="reviews" style="display: flex; align-items: center; gap: 0.5rem;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Reviews & Ratings Desk
+                </button>
+                <button class="admin-tab-btn ${activeSubTab === 'users' ? 'active' : ''}" data-subtab="users" style="display: flex; align-items: center; gap: 0.5rem; ${activeSubTab === 'users' ? '' : 'border-color: rgba(212,175,55,0.45); background: rgba(212,175,55,0.08);'}">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <span>User Accounts Desk</span>
+                    <span class="box-badge status-available" style="font-size: 0.6rem; padding: 0.1rem 0.45rem; margin-left: 0.2rem;">${usersCount} Accounts</span>
                 </button>
             </div>
 
@@ -1386,7 +1513,7 @@ const UIComponents = {
                                                     <img src="${item.slipImage}" alt="Deposit Slip Preview" style="max-width: 240px; max-height: 160px; border-radius: 6px; border: 1px solid rgba(212,175,55,0.4); object-fit: contain; background: #000; cursor: pointer;" onclick="window.open(this.src)" title="Click to view full size" onerror="window.handleImageError && window.handleImageError(this, 'slip')" loading="lazy" decoding="async">
                                                     <div style="flex: 1; min-width: 200px;">
                                                         <div style="font-size: 0.8rem; color: var(--color-text-primary); margin-bottom: 0.5rem; line-height: 1.5;">
-                                                            Review the bank teller stamp, account number (0083-1001-5271-8843), and deposit amount of <strong>$${item.amount.toFixed(2)} USD</strong>.
+                                                            Review the bank teller stamp, account number (94945708), and deposit amount of <strong>$${item.amount.toFixed(2)} USD</strong>.
                                                         </div>
                                                         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                                                             <button class="btn btn-outline" style="font-size: 0.7rem; padding: 0.35rem 0.75rem; color: var(--color-gold); border-color: rgba(212,175,55,0.4); display: inline-flex; align-items: center; gap: 0.25rem;" onclick="window.open('${item.slipImage}')">
@@ -1430,8 +1557,216 @@ const UIComponents = {
                                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                                         Payment Verified &amp; Confirmed
                                                     </span>
+                                                    ${(item.category === 'tour' || item.id.startsWith('TR-') || item.id.startsWith('TB-')) ? `
+                                                        <span class="box-badge status-available" style="font-size: 0.68rem; padding: 0.25rem 0.55rem; display:inline-flex; align-items:center; gap:0.25rem;" title="Official Gate Pass automatically dispatched upon approval">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                                            Gate Pass Emailed
+                                                        </span>
+                                                        <button class="btn btn-outline btn-resend-gatepass" data-id="${item.id}" data-email="${item.email}" style="font-size: 0.7rem; padding: 0.35rem 0.75rem; color: #81c784; border-color: rgba(46,125,50,0.4); display: inline-flex; align-items: center; gap: 0.25rem;" title="Re-dispatch Gate Pass email to customer">
+                                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                                            Re-send Gate Pass
+                                                        </button>
+                                                    ` : ''}
                                                 `}
                                             </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `}
+                </div>
+            `;
+        } else if (activeSubTab === 'giftquotes') {
+            const issuedQuotesCount = giftEnquiries.filter(b => b.status === 'Quotation Issued').length;
+            const verifiedQuotesCount = giftEnquiries.filter(b => b.status === 'Payment Confirmed' || b.status === 'Verified').length;
+            const slipSubmittedQuotesCount = giftEnquiries.filter(b => b.status === 'Pending Verification' || b.status === 'Slip Submitted').length;
+
+            html += `
+                <div class="panel-card" style="margin-bottom: 2rem;">
+                    <!-- Desk Header -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <h3 class="panel-title" style="margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line></svg>
+                                Collector Gift Box Quotations &amp; Payment Links Desk
+                            </h3>
+                            <p class="panel-desc" style="margin-bottom: 0;">Review bespoke client inquiries, formulate custom prices &amp; courier fees, generate instant checkout links &amp; scannable QR codes, and dispatch via WhatsApp or Email.</p>
+                        </div>
+                        <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;">
+                            <span class="box-badge ${pendingGiftQuotesCount > 0 ? 'status-pending' : 'status-available'}" style="font-size: 0.75rem; padding: 0.3rem 0.65rem;">
+                                ${pendingGiftQuotesCount} Awaiting Quotation
+                            </span>
+                            <span class="box-badge" style="font-size: 0.75rem; padding: 0.3rem 0.65rem; background: rgba(59,130,246,0.18); color: #60a5fa; border: 1px solid rgba(59,130,246,0.35);">
+                                ${issuedQuotesCount} Quotations Issued
+                            </span>
+                            <span class="box-badge status-available" style="font-size: 0.75rem; padding: 0.3rem 0.65rem;">
+                                ${verifiedQuotesCount + slipSubmittedQuotesCount} Paid / Confirmed
+                            </span>
+                        </div>
+                    </div>
+
+                    ${giftEnquiries.length === 0 ? `
+                        <div style="text-align: center; padding: 3.5rem 1.5rem; color: var(--color-text-muted); border: 1px dashed rgba(255,255,255,0.08); border-radius: 8px;">
+                            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.5" style="margin-bottom: 1rem;"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line></svg>
+                            <div style="font-size: 1.1rem; font-weight: 600; color: #fff; margin-bottom: 0.5rem;">No Collector Gift Box Enquiries Yet</div>
+                            <div style="font-size: 0.85rem; max-width: 520px; margin: 0 auto; line-height: 1.6;">
+                                When customers inquire about exclusive Collector Gift Boxes via WhatsApp or Email, their bespoke requests will appear here so you can set custom pricing, generate a checkout link &amp; QR code, and send it directly.
+                            </div>
+                        </div>
+                    ` : `
+                        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                            ${giftEnquiries.map(b => {
+                                const isQuoted = !!(b.quotedTotal || b.quotedPrice || b.status === 'Quotation Issued');
+                                const isPendingSlip = b.status === 'Pending Verification' || b.status === 'Slip Submitted';
+                                const isConfirmed = b.status === 'Payment Confirmed' || b.status === 'Verified';
+                                const isAwaiting = b.status === 'Awaiting Quotation' || !b.status;
+                                
+                                let origin = (typeof window !== 'undefined' && window.location) ? window.location.origin : '';
+                                let path = (typeof window !== 'undefined' && window.location) ? window.location.pathname : '/';
+                                const payLink = b.paymentLink || `${origin}${path}?pay=${b.id}`;
+                                const qrUrl = b.qrCodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=240x240&color=d4af37&bgcolor=040e08&data=${encodeURIComponent(payLink)}`;
+
+                                return `
+                                    <div class="panel-card" style="margin-bottom: 0; background: rgba(0,0,0,0.55); border: 1px solid rgba(212,175,55,${isAwaiting ? '0.45' : '0.2'}); border-radius: 10px; padding: 1.25rem; transition: var(--transition-smooth);">
+                                        <!-- Top Row: Ref ID, Date, Season, Status Badge -->
+                                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; padding-bottom: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 1rem;">
+                                            <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                                                <span style="font-family: monospace; font-size: 0.88rem; font-weight: 700; color: var(--color-gold); background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3); padding: 0.2rem 0.55rem; border-radius: 4px;">
+                                                    ${b.id}
+                                                </span>
+                                                <span style="font-size: 0.75rem; color: #94a3b8;">${b.bookingDate || 'Enquiry Submitted'}</span>
+                                                <span class="box-badge status-available" style="font-size: 0.65rem; padding: 0.15rem 0.45rem;">
+                                                    ${b.seasonName || 'Private Reserve'} &bull; Series ${b.seriesNumber || 1}
+                                                </span>
+                                                ${b.preferredCurrency ? `
+                                                    <span class="box-badge" style="font-size: 0.65rem; padding: 0.15rem 0.45rem; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.35); color: var(--color-gold); font-weight: 700;">
+                                                        Currency: ${b.preferredCurrency}
+                                                    </span>
+                                                ` : ''}
+                                            </div>
+                                            <div>
+                                                ${isAwaiting ? `
+                                                    <span class="box-badge status-pending" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; background: rgba(212,175,55,0.18); color: var(--color-gold); border: 1px solid rgba(212,175,55,0.4);">
+                                                        ⏳ Awaiting Quotation
+                                                    </span>
+                                                ` : (isPendingSlip ? `
+                                                    <span class="box-badge status-pending" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4);">
+                                                        📄 Bank Slip Submitted &bull; Pending Verification
+                                                    </span>
+                                                ` : (isConfirmed ? `
+                                                    <span class="box-badge status-available" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.4);">
+                                                        ✓ Payment Verified &amp; Confirmed
+                                                    </span>
+                                                ` : `
+                                                    <span class="box-badge" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; background: rgba(59,130,246,0.18); color: #60a5fa; border: 1px solid rgba(59,130,246,0.4);">
+                                                        ✉ Quotation Issued &bull; ${window.TeaFactoryStore.formatCurrency(b.quotedTotal || b.price)}
+                                                    </span>
+                                                `))}
+                                            </div>
+                                        </div>
+
+                                        <!-- Main Details Grid (3 columns) -->
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
+                                            <!-- Col 1: Box & Bespoke Curation -->
+                                            <div style="background: rgba(255,255,255,0.02); padding: 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
+                                                <div style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: var(--color-gold); letter-spacing: 0.5px; margin-bottom: 0.5rem;">
+                                                    Chest &amp; Bespoke Presentation
+                                                </div>
+                                                <div style="display: flex; gap: 0.65rem; align-items: center; margin-bottom: 0.6rem;">
+                                                    <img src="${b.image || 'images/Gift Box.jpeg'}" alt="${b.boxName}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(212,175,55,0.3);" onerror="window.handleImageError && window.handleImageError(this, 'box')">
+                                                    <div>
+                                                        <div style="font-weight: 600; color: #fff; font-size: 0.88rem;">${b.boxName}</div>
+                                                        <div style="font-size: 0.7rem; color: #94a3b8;">Solid Light-Wood Teak &bull; 500g Assortment</div>
+                                                    </div>
+                                                </div>
+                                                <div style="font-size: 0.75rem; color: #cbd5e1; line-height: 1.5; display: flex; flex-direction: column; gap: 0.25rem;">
+                                                    <div><span style="color: #94a3b8;">Artisan Wax Seal:</span> <strong style="color: var(--color-gold);">${b.waxSealColor || 'Imperial Gold'}</strong></div>
+                                                    <div><span style="color: #94a3b8;">Monogram Engraving:</span> <strong style="color: #fff;">${b.monogramInitials ? `"${b.monogramInitials}"` : 'None requested'}</strong></div>
+                                                    ${b.giftMessage ? `<div><span style="color: #94a3b8;">Gift Note:</span> <em style="color: #e2e8f0;">"${b.giftMessage}"</em></div>` : ''}
+                                                    ${b.message ? `<div style="margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px dashed rgba(255,255,255,0.08);"><span style="color: #94a3b8;">Client Message:</span> <div style="color: #e2e8f0; font-style: italic; margin-top: 0.15rem;">"${b.message}"</div></div>` : ''}
+                                                </div>
+                                            </div>
+
+                                            <!-- Col 2: Client Contact Details -->
+                                            <div style="background: rgba(255,255,255,0.02); padding: 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
+                                                <div style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: var(--color-gold); letter-spacing: 0.5px; margin-bottom: 0.5rem;">
+                                                    Client &amp; Destination Details
+                                                </div>
+                                                <div style="font-size: 0.78rem; line-height: 1.6; color: #cbd5e1; display: flex; flex-direction: column; gap: 0.25rem;">
+                                                    <div><span style="color: #94a3b8;">Name:</span> <strong style="color: #fff;">${b.customerName}</strong></div>
+                                                    <div><span style="color: #94a3b8;">Email:</span> <a href="mailto:${b.email}" style="color: #60a5fa; text-decoration: none;">${b.email}</a></div>
+                                                    <div><span style="color: #94a3b8;">Phone:</span> <strong style="color: #fff;">${b.phone}</strong></div>
+                                                    <div><span style="color: #94a3b8;">Preferred Arrival:</span> <span style="color: #fff;">${b.preferredDate || 'Earliest Available'}</span></div>
+                                                    <div><span style="color: #94a3b8;">Reply Channel:</span> <span class="box-badge status-available" style="font-size: 0.62rem; padding: 0.1rem 0.4rem;">${b.socialChannel || 'WhatsApp'}</span></div>
+                                                    ${b.address ? `<div><span style="color: #94a3b8;">Delivery:</span> <span style="color: #fff;">${b.address}, ${b.country || ''}</span></div>` : ''}
+                                                </div>
+                                            </div>
+
+                                            <!-- Col 3: Quotation Status & Figures -->
+                                            <div style="background: rgba(212,175,55,0.03); padding: 0.85rem; border-radius: 8px; border: 1px solid rgba(212,175,55,0.18);">
+                                                <div style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: var(--color-gold); letter-spacing: 0.5px; margin-bottom: 0.5rem;">
+                                                    Pricing &amp; Quotation Formulation
+                                                </div>
+                                                ${isQuoted ? `
+                                                    <div style="display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.78rem;">
+                                                        <div style="display: flex; justify-content: space-between;"><span style="color: #94a3b8;">Box Price:</span> <span style="color: #fff; font-weight: 600;">${window.TeaFactoryStore.formatCurrency(b.quotedPrice || b.price)}</span></div>
+                                                        <div style="display: flex; justify-content: space-between;"><span style="color: #94a3b8;">Courier &amp; Handling:</span> <span style="color: #86efac; font-weight: 600;">${b.quotedShipping > 0 ? window.TeaFactoryStore.formatCurrency(b.quotedShipping) : 'Complimentary'}</span></div>
+                                                        <div style="display: flex; justify-content: space-between; border-top: 1px solid rgba(212,175,55,0.3); padding-top: 0.35rem; margin-top: 0.2rem;">
+                                                            <strong style="color: #fff;">Total Quoted:</strong>
+                                                            <strong style="color: var(--color-gold); font-size: 1.05rem;">${window.TeaFactoryStore.formatCurrency(b.quotedTotal || b.price)}</strong>
+                                                        </div>
+                                                        <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.2rem;">Validity: <span style="color: #fff;">${b.quoteValidity || '7 Days'}</span> &bull; Quoted: <span style="color: #cbd5e1;">${b.quoteDate || 'Recent'}</span></div>
+                                                        ${b.quoteNotes ? `<div style="font-size: 0.7rem; color: #e2e8f0; background: rgba(0,0,0,0.3); padding: 0.35rem 0.5rem; border-radius: 4px; margin-top: 0.2rem;">Curator Note: ${b.quoteNotes}</div>` : ''}
+                                                    </div>
+                                                ` : `
+                                                    <div style="text-align: center; padding: 1rem 0.5rem; color: #94a3b8;">
+                                                        <div style="font-size: 0.8rem; color: var(--color-gold); font-weight: 600; margin-bottom: 0.3rem;">No Price Formulated Yet</div>
+                                                        <div style="font-size: 0.72rem; line-height: 1.4;">Customer is waiting for your bespoke quote. Click the gold button below to formulate the price, generate payment link &amp; QR code.</div>
+                                                    </div>
+                                                `}
+                                            </div>
+                                        </div>
+
+                                        <!-- Action Toolbar Footer -->
+                                        <div style="display: flex; gap: 0.55rem; flex-wrap: wrap; align-items: center; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.85rem;">
+                                            ${isAwaiting ? `
+                                                <button class="btn btn-primary btn-open-quote-modal" data-id="${b.id}" style="font-size: 0.78rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #d4af37, #aa820a); color: #040e08; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 10px rgba(212,175,55,0.25);">
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                                    Formulate Quotation &amp; Generate QR
+                                                </button>
+                                            ` : `
+                                                <button class="btn btn-outline btn-open-quote-modal" data-id="${b.id}" style="font-size: 0.72rem; padding: 0.45rem 0.8rem; color: var(--color-gold); border-color: rgba(212,175,55,0.4); display: inline-flex; align-items: center; gap: 0.35rem;">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                                    Edit Quote
+                                                </button>
+                                                <button class="btn btn-outline btn-copy-quote-link" data-link="${payLink}" style="font-size: 0.72rem; padding: 0.45rem 0.8rem; color: #60a5fa; border-color: rgba(96,165,250,0.4); display: inline-flex; align-items: center; gap: 0.35rem;">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                                    Copy Checkout Link
+                                                </button>
+                                                <button class="btn btn-outline btn-view-quote-qr" data-id="${b.id}" data-box="${b.boxName}" data-cust="${b.customerName}" data-amount="${window.TeaFactoryStore.formatCurrency(b.quotedTotal || b.price)}" data-qr="${qrUrl}" data-link="${payLink}" style="font-size: 0.72rem; padding: 0.45rem 0.8rem; color: #a78bfa; border-color: rgba(167,139,250,0.4); display: inline-flex; align-items: center; gap: 0.35rem;">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                                                    View / Download QR
+                                                </button>
+                                                <button class="btn btn-primary btn-dispatch-quote-whatsapp" data-id="${b.id}" style="font-size: 0.72rem; padding: 0.45rem 0.8rem; background: #25d366; border-color: #25d366; color: #fff; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.247 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.992-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.443-4.436-9.884-9.888-9.884-5.447 0-9.885 4.437-9.889 9.885-.001 2.016.52 3.49 1.37 4.975l-.997 3.641 3.731-.978z"/></svg>
+                                                    WhatsApp Dispatch
+                                                </button>
+                                                <button class="btn btn-outline btn-dispatch-quote-email" data-id="${b.id}" style="font-size: 0.72rem; padding: 0.45rem 0.8rem; color: #f59e0b; border-color: rgba(245,158,11,0.4); display: inline-flex; align-items: center; gap: 0.35rem;">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                                    Email Dispatch
+                                                </button>
+                                                <a href="${payLink}" target="_blank" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.45rem 0.8rem; color: #94a3b8; border-color: rgba(148,163,184,0.3); display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none;">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                                    Open Checkout
+                                                </a>
+                                            `}
+                                            ${isPendingSlip ? `
+                                                <button class="btn btn-primary btn-approve-slip" data-id="${b.id}" style="font-size: 0.72rem; padding: 0.45rem 0.85rem; background: #059669; border-color: #059669; color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                                    Approve Slip &amp; Confirm
+                                                </button>
+                                            ` : ''}
                                         </div>
                                     </div>
                                 `;
@@ -1765,6 +2100,7 @@ const UIComponents = {
                                                             data-package="${pkgName}" 
                                                             data-capacity="${maxCap}"
                                                             data-price-lkr="${priceLkr}"
+                                                            data-price-usd="${(priceLkr / 305).toFixed(2)}"
                                                             data-status="${statusStr}" 
                                                             style="background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); color: var(--color-gold); padding: 0.35rem 0.6rem; font-size: 0.7rem; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem;" 
                                                             title="Edit Time Slot">
@@ -1832,18 +2168,30 @@ const UIComponents = {
                                 </select>
                             </div>
 
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+                            <div style="display: grid; grid-template-columns: 1fr 140px 1.3fr; gap: 0.85rem; align-items: start;">
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.4rem;">
                                     <label class="form-label" for="slot-capacity-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Max Capacity (Guests)</label>
                                     <input class="form-input" type="number" id="slot-capacity-input" min="1" max="50" value="10" required>
                                     <span class="field-hint" style="font-size: 0.7rem; color: var(--color-text-muted);">Default: 10 visitors</span>
                                 </div>
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.4rem;">
-                                    <label class="form-label" for="slot-price-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Fee / Person (LKR)</label>
-                                    <input class="form-input" type="number" id="slot-price-input" min="0" value="1450" required>
-                                    <span class="field-hint" style="font-size: 0.7rem; color: var(--color-text-muted);">Default: LKR 1,450</span>
+                                    <label class="form-label" for="slot-currency" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Currency *</label>
+                                    <select class="form-input" id="slot-currency" style="font-weight: 700; color: var(--color-gold);">
+                                        <option value="LKR" selected>LKR (Rs)</option>
+                                        <option value="USD">USD ($)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.4rem;">
+                                    <label class="form-label" id="slot-amount-label" for="slot-amount-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #86efac;">Fee / Person *</label>
+                                    <input class="form-input" type="number" step="1" id="slot-amount-input" min="0" value="1450" required style="font-weight:600;">
+                                    <div id="slot-counterpart-price" style="font-size: 0.7rem; color: var(--color-gold); font-weight: 600; min-height: 1rem;">
+                                        ≈ $4.75 USD
+                                    </div>
                                 </div>
                             </div>
+                            <!-- Hidden dual currency inputs for tour slots -->
+                            <input type="hidden" id="slot-price-input" value="1450">
+                            <input type="hidden" id="slot-price-usd" value="4.75">
 
                             <div class="form-group" style="display: flex; flex-direction: column; gap: 0.4rem;">
                                 <label class="form-label" for="slot-status-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Slot Availability Status *</label>
@@ -1886,7 +2234,7 @@ const UIComponents = {
                                         <th>Image</th>
                                         <th>Box #</th>
                                         <th>Name</th>
-                                        <th>Price</th>
+                                        <th>Pricing / Quotation</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -1904,7 +2252,20 @@ const UIComponents = {
                                                 <strong>${box.name}</strong>
                                                 ${box.booking ? `<br><small style="color:var(--color-gold);">Client: ${box.booking.customerName}</small>` : ''}
                                             </td>
-                                            <td style="color:var(--color-gold); font-weight: 600;">$${(box.price || activeSeason.pricePerBox || 150).toFixed(2)}</td>
+                                            <td>
+                                                ${box.booking && (box.booking.quotedTotal || box.booking.quotedPrice) ? `
+                                                    <div style="color:var(--color-gold); font-weight: 700; font-size: 0.85rem;">
+                                                        $${parseFloat(box.booking.quotedTotal || box.booking.quotedPrice).toFixed(2)} USD
+                                                    </div>
+                                                    <small style="color: #86efac; font-weight: 600; font-size: 0.72rem;">
+                                                        (Rs ${Math.round(parseFloat(box.booking.quotedTotal || box.booking.quotedPrice) * 305).toLocaleString()} LKR)
+                                                    </small>
+                                                ` : `
+                                                    <span class="box-badge status-pending" style="font-size: 0.65rem; background: rgba(212,175,55,0.12); color: var(--color-gold); border: 1px solid rgba(212,175,55,0.3);">
+                                                        Enquiry Only &bull; Quoted on Request
+                                                    </span>
+                                                `}
+                                            </td>
                                             <td>
                                                 <span class="box-badge ${box.status === 'Available' ? 'status-available' : (box.status === 'Booked' ? 'status-booked' : 'status-pending')}" style="font-size: 0.65rem;">
                                                     ${box.status}
@@ -1912,7 +2273,7 @@ const UIComponents = {
                                             </td>
                                             <td>
                                                 <div style="display: flex; gap: 0.4rem; align-items: center;">
-                                                    <button class="btn-edit-box" data-id="${box.id}" data-name="${box.name}" data-price="${box.price || activeSeason.pricePerBox || 150}" data-status="${box.status}" data-desc="${box.desc || ''}" data-image="${box.image || 'images/Gift Box.jpeg'}" style="background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); color: var(--color-gold); padding: 0.35rem 0.65rem; font-size: 0.7rem; border-radius: 3px; cursor: pointer; transition: var(--transition-smooth); display: inline-flex; align-items: center; gap: 0.25rem;" title="Edit Gift Box">
+                                                    <button class="btn-edit-box" data-id="${box.id}" data-name="${box.name}" data-status="${box.status}" data-desc="${box.desc || ''}" data-image="${box.image || 'images/Gift Box.jpeg'}" style="background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); color: var(--color-gold); padding: 0.35rem 0.65rem; font-size: 0.7rem; border-radius: 3px; cursor: pointer; transition: var(--transition-smooth); display: inline-flex; align-items: center; gap: 0.25rem;" title="Edit Gift Box">
                                                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                                         Edit
                                                     </button>
@@ -1943,8 +2304,8 @@ const UIComponents = {
                         <form id="admin-add-box-form" class="admin-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
                             <input type="hidden" id="box-edit-id" value="">
                             
-                            <!-- Row 1: Box # and Box Display Name -->
-                            <div class="form-row" style="display: grid; grid-template-columns: 110px 1fr; gap: 1rem; align-items: start;">
+                            <!-- Row 1: Box #, Box Display Name, and Availability Status -->
+                            <div class="form-row" style="display: grid; grid-template-columns: 110px 1.4fr 1fr; gap: 1rem; align-items: start;">
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
                                     <label class="form-label" for="box-num-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); min-height: 1.2rem; display: flex; align-items: center;">Box ID *</label>
                                     <input class="form-input" type="number" id="box-num-input" required min="1" placeholder="e.g. ${boxes.length + 1}" value="${boxes.length + 1}" style="font-family: monospace; font-weight: 700; text-align: center;">
@@ -1953,18 +2314,10 @@ const UIComponents = {
                                     <label class="form-label" for="box-name-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); min-height: 1.2rem; display: flex; align-items: center;">Box Display Name *</label>
                                     <input class="form-input" type="text" id="box-name-input" required placeholder="e.g. Gift Box #${String(boxes.length + 1).padStart(2, '0')}" value="Gift Box #${String(boxes.length + 1).padStart(2, '0')}">
                                 </div>
-                            </div>
-                            
-                            <!-- Row 2: Price and Status -->
-                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start;">
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="box-price-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); min-height: 1.2rem; display: flex; align-items: center;">Price ($ USD) *</label>
-                                    <input class="form-input" type="number" step="0.01" id="box-price-input" required value="${(activeSeason.pricePerBox || 150.00).toFixed(2)}" style="font-weight: 600;">
-                                </div>
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
                                     <label class="form-label" for="box-status-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); min-height: 1.2rem; display: flex; align-items: center;">Availability Status *</label>
                                     <select class="form-input" id="box-status-input" required>
-                                        <option value="Available">Available (Open)</option>
+                                        <option value="Available">Available (Open for Enquiry)</option>
                                         <option value="Enquiry Pending">Enquiry Pending</option>
                                         <option value="Booked">Booked (Reserved)</option>
                                     </select>
@@ -2012,7 +2365,7 @@ const UIComponents = {
             html += `
                 <div class="panel-card" style="max-width: 600px; margin: 0 auto;">
                     <h3 class="panel-title">Seasonal Reset &amp; Transitions</h3>
-                    <p class="panel-desc">Configure the new catalog harvest series, apply bulk starting prices across gift boxes, or reset reservations.</p>
+                    <p class="panel-desc">Configure the new catalog harvest series or reset reservations.</p>
                     
                     <form id="season-reset-form" class="admin-form">
                         <div class="form-group">
@@ -2020,11 +2373,11 @@ const UIComponents = {
                             <input type="text" id="new-season-name" placeholder="e.g. Celestial Autumn Pearl" required>
                             <span class="field-hint">e.g., Celestial Autumn Pearl, Golden Leaf Selection, Imperial Jasmine Blossom</span>
                         </div>
-                        <div class="form-group">
-                            <label for="new-box-price">Default Batch Box Price (USD) <small style="color: var(--color-gold); font-weight: normal;">&mdash; Bulk Shortcut</small></label>
-                            <input type="number" id="new-box-price" value="150.00" min="10" step="0.01" required>
-                            <span class="field-hint">Sets this starting price across all gift boxes in the new series. Individual box prices can still be customized in the Gift Boxes Desk anytime.</span>
+                        <div style="font-size: 0.75rem; color: #cbd5e1; background: rgba(0,0,0,0.3); border: 1px solid rgba(212,175,55,0.25); padding: 0.85rem; border-radius: 6px; margin-bottom: 0.75rem; line-height: 1.5;">
+                            <strong style="color: var(--color-gold); display: block; margin-bottom: 0.25rem;">Bespoke Enquiry Architecture:</strong>
+                            All gift boxes in the new series will be introduced as <em>Enquiry Only</em>. Specific chest pricing and courier charges are formulated individually per client in the <strong>Gift Box Quotations &amp; Payment Links Desk</strong>.
                         </div>
+                        <input type="hidden" id="new-box-price" value="0">
                         <button type="submit" class="btn btn-primary w-full">Trigger Season Transition</button>
                     </form>
 
@@ -2162,7 +2515,7 @@ const UIComponents = {
                                     <tr>
                                         <th>Image</th>
                                         <th>Name & Grade</th>
-                                        <th>Category</th>
+                                        <th>Category & Sub-Category</th>
                                         <th>Weight</th>
                                         <th>Price</th>
                                         <th>Stock</th>
@@ -2172,8 +2525,10 @@ const UIComponents = {
                                 <tbody>
                                     ${products.map(prod => {
                                         const priceVal = Number(prod.price !== undefined ? prod.price : (prod.price_usd !== undefined ? prod.price_usd : 0)) || 0;
+                                        const shippingVal = Number(prod.shippingCharge !== undefined ? prod.shippingCharge : (prod.shippingFee !== undefined ? prod.shippingFee : (prod.shipping_fee_usd || 0))) || 0;
                                         const leafGradeStr = prod.leafGrade || prod.leaf_grade || 'Finest Harvest';
-                                        const categoryStr = prod.category || 'Imperial Reserve';
+                                        const categoryStr = prod.category || 'Black Tea';
+                                        const subcategoryStr = prod.subcategory || prod.sub_category || 'Hot Tea (Gongfu style)';
                                         const weightStr = prod.weight || '100g Vintage Tin';
                                         const stockStr = prod.stock || (prod.stock_quantity > 0 ? 'In Stock' : 'In Stock');
                                         const flavorProfileStr = prod.flavorProfile || prod.flavor_profile || '';
@@ -2207,9 +2562,15 @@ const UIComponents = {
                                                     <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Aroma">✨ ${radar.aroma ?? 90}%</span>
                                                 </div>
                                             </td>
-                                            <td>${categoryStr}</td>
+                                            <td>
+                                                <strong>${categoryStr}</strong><br>
+                                                <span style="font-size:0.68rem; color:var(--color-gold); background:rgba(212,175,55,0.1); padding:0.1rem 0.35rem; border-radius:3px; display:inline-block; margin-top:2px;">${subcategoryStr}</span>
+                                            </td>
                                             <td>${weightStr}</td>
-                                            <td style="color:var(--color-gold); font-weight: 600;">$${priceVal.toFixed(2)}</td>
+                                            <td style="color:var(--color-gold); font-weight: 600;">
+                                                <div>$${priceVal.toFixed(2)} <span style="font-size:0.72rem; color:#cbd5e1; font-weight:400;">(Rs ${(prod.price_lkr || Math.round(priceVal * 305)).toLocaleString()})</span></div>
+                                                ${shippingVal > 0 ? `<div style="font-size:0.65rem; color:#86efac; font-weight:500;">+$${shippingVal.toFixed(2)} ship <span style="color:#cbd5e1; font-weight:400;">(Rs ${(prod.shippingCharge_lkr !== undefined ? prod.shippingCharge_lkr : Math.round(shippingVal * 305)).toLocaleString()})</span></div>` : `<div style="font-size:0.65rem; color:rgba(255,255,255,0.4); font-weight:400;">Free ship</div>`}
+                                            </td>
                                             <td>
                                                 <span class="box-badge ${stockStr === 'In Stock' ? 'status-available' : 'status-pending'}" style="font-size: 0.65rem;">
                                                     ${stockStr}
@@ -2221,7 +2582,11 @@ const UIComponents = {
                                                             data-id="${prod.id}" 
                                                             data-name="${prod.name}" 
                                                             data-category="${categoryStr}" 
+                                                            data-subcategory="${subcategoryStr}" 
                                                             data-price="${priceVal}" 
+                                                            data-price-lkr="${prod.price_lkr || Math.round(priceVal * 305)}"
+                                                            data-shipping="${shippingVal}" 
+                                                            data-shipping-lkr="${prod.shippingCharge_lkr !== undefined ? prod.shippingCharge_lkr : Math.round(shippingVal * 305)}"
                                                             data-weight="${weightStr}" 
                                                             data-symbol="${prod.symbol || ''}" 
                                                             data-stock="${stockStr}" 
@@ -2271,7 +2636,7 @@ const UIComponents = {
                         
                         <form id="admin-add-product-form" class="admin-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
                             <input type="hidden" id="prod-edit-id" value="">
-                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start;">
+                            <div class="form-row" style="display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 1rem; align-items: start;">
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
                                     <label class="form-label" for="prod-name" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Product Name *</label>
                                     <input class="form-input" type="text" id="prod-name" required placeholder="e.g. Royal Earl Grey">
@@ -2279,23 +2644,53 @@ const UIComponents = {
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
                                     <label class="form-label" for="prod-category" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Category *</label>
                                     <select class="form-input" id="prod-category" required>
-                                        <option value="Black Tea">Black Tea</option>
-                                        <option value="Green & White Tea">Green & White Tea</option>
-                                        <option value="Oolongs">Oolongs</option>
+                                        <option value="Black Tea" selected>Black Tea</option>
+                                        <option value="White Tea">White Tea</option>
+                                        <option value="Green Tea">Green Tea</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                    <label class="form-label" for="prod-subcategory" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Sub-Category *</label>
+                                    <select class="form-input" id="prod-subcategory" required>
+                                        <option value="Hot Tea (Gongfu style)" selected>Hot Tea (Gongfu style)</option>
+                                        <option value="Ice Tea">Ice Tea</option>
+                                        <option value="Cool Tea">Cool Tea</option>
                                     </select>
                                 </div>
                             </div>
                             
-                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start;">
+                            <div class="form-row" style="display: grid; grid-template-columns: 140px 1.2fr 1.2fr 1fr; gap: 0.75rem; align-items: start;">
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-price" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Price ($ USD) *</label>
-                                    <input class="form-input" type="number" step="0.01" id="prod-price" required placeholder="45.00" style="font-weight: 600;">
+                                    <label class="form-label" for="prod-currency" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Currency *</label>
+                                    <select class="form-input" id="prod-currency" style="font-weight: 700; color: var(--color-gold);">
+                                        <option value="USD" selected>USD ($)</option>
+                                        <option value="LKR">LKR (Rs)</option>
+                                    </select>
                                 </div>
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-weight" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Weight (e.g. 100g) *</label>
+                                    <label class="form-label" id="prod-amount-label" for="prod-amount-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Product Price *</label>
+                                    <input class="form-input" type="number" step="0.01" id="prod-amount-input" required placeholder="45.00" style="font-weight: 600;">
+                                    <div id="prod-counterpart-price" style="font-size: 0.7rem; color: #86efac; font-weight: 600; min-height: 1rem;">
+                                        ≈ Rs 13,725 LKR
+                                    </div>
+                                </div>
+                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                    <label class="form-label" id="prod-shipping-label" for="prod-shipping-amount-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Shipping Charge</label>
+                                    <input class="form-input" type="number" step="0.01" min="0" id="prod-shipping-amount-input" placeholder="0.00" style="font-weight: 600;">
+                                    <div id="prod-counterpart-shipping" style="font-size: 0.7rem; color: #86efac; font-weight: 600; min-height: 1rem;">
+                                        ≈ Rs 0 LKR
+                                    </div>
+                                </div>
+                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                    <label class="form-label" for="prod-weight" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Weight *</label>
                                     <input class="form-input" type="text" id="prod-weight" required placeholder="100g">
                                 </div>
                             </div>
+                            <!-- Hidden dual currency inputs for store persistence -->
+                            <input type="hidden" id="prod-price" value="45.00">
+                            <input type="hidden" id="prod-price-lkr" value="13725">
+                            <input type="hidden" id="prod-shipping" value="0.00">
+                            <input type="hidden" id="prod-shipping-lkr" value="0">
 
                             <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start;">
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
@@ -2973,7 +3368,140 @@ const UIComponents = {
             `;
         }
 
+        if (activeSubTab === 'users') {
+            const users = (window.TeaFactoryStore && typeof window.TeaFactoryStore.getUsers === 'function')
+                ? window.TeaFactoryStore.getUsers()
+                : [];
+            
+            const totalUsers = users.length;
+            const adminCount = users.filter(u => (u.role || '').toLowerCase() === 'admin' || (u.role || '').toLowerCase() === 'manager').length;
+            const staffCount = users.filter(u => ['staff', 'sommelier', 'concierge'].includes((u.role || '').toLowerCase())).length;
+            const activeCount = users.filter(u => (u.status || 'active').toLowerCase() === 'active').length;
+
+            html += `
+                <div class="panel-card users-desk-wrapper" style="margin-bottom: 0; background: linear-gradient(145deg, rgba(8, 22, 14, 0.95), rgba(4, 12, 8, 0.98)); border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 16px 40px rgba(0,0,0,0.6); border-radius: 12px; padding: 1.75rem;">
+                    
+                    <!-- Header Section -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1.25rem; border-bottom: 1px solid rgba(212,175,55,0.18); padding-bottom: 1.25rem;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.35rem;">
+                                <span style="color: var(--color-gold); display: flex; align-items: center;">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                </span>
+                                <h3 class="panel-title" style="margin-bottom: 0; font-family: var(--font-serif, 'Playfair Display', serif); font-size: 1.45rem; color: var(--color-gold); letter-spacing: 0.5px;">
+                                    User Accounts &amp; Staff Access Desk
+                                </h3>
+                            </div>
+                            <p class="panel-desc" style="margin-bottom: 0; color: #94a3b8; font-size: 0.88rem;">
+                                Create, provision, and administer authenticated accounts using their Email ID as the primary system identity with role-based access controls.
+                            </p>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                            <button id="btn-open-create-user-modal" class="btn btn-primary" style="font-size: 0.82rem; padding: 0.65rem 1.25rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.45rem; box-shadow: 0 4px 15px rgba(212,175,55,0.25);">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span>Create New User Account</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- KPI Statistics Row -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; margin-bottom: 1.75rem;">
+                        <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(212,175,55,0.22); border-radius: 8px; padding: 1rem 1.2rem;">
+                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--color-text-muted); display: block; margin-bottom: 0.35rem;">Total System Accounts</span>
+                            <div style="font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; color: var(--color-gold); line-height: 1;">${totalUsers}</div>
+                            <span style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.35rem; display: block;">Registered Email identities</span>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(212,175,55,0.22); border-radius: 8px; padding: 1rem 1.2rem;">
+                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--color-text-muted); display: block; margin-bottom: 0.35rem;">Admins &amp; Managers</span>
+                            <div style="font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; color: #60a5fa; line-height: 1;">${adminCount}</div>
+                            <span style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.35rem; display: block;">Full console access</span>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(212,175,55,0.22); border-radius: 8px; padding: 1rem 1.2rem;">
+                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--color-text-muted); display: block; margin-bottom: 0.35rem;">Staff &amp; Sommeliers</span>
+                            <div style="font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; color: #facc15; line-height: 1;">${staffCount}</div>
+                            <span style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.35rem; display: block;">Floor &amp; cupping team</span>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(212,175,55,0.22); border-radius: 8px; padding: 1rem 1.2rem;">
+                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--color-text-muted); display: block; margin-bottom: 0.35rem;">Active Accounts</span>
+                            <div style="font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; color: #4ade80; line-height: 1;">${activeCount}</div>
+                            <span style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.35rem; display: block;">Authorized to login</span>
+                        </div>
+                    </div>
+
+                    <!-- Filter Toolbar -->
+                    <div style="display: flex; gap: 1rem; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; background: rgba(0,0,0,0.3); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                        <div style="display: flex; gap: 0.75rem; align-items: center; flex: 1; min-width: 260px;">
+                            <div style="position: relative; flex: 1;">
+                                <span style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--color-gold); display: flex; align-items: center; pointer-events: none;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                </span>
+                                <input type="text" id="users-search-input" placeholder="Search by Email ID, Name, Phone, Role, or ID..." style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.55); border: 1px solid rgba(212,175,55,0.3); border-radius: 6px; padding: 0.55rem 0.85rem 0.55rem 2.3rem; color: #fff; font-size: 0.85rem; outline: none;">
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                <label style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.6px;">Role:</label>
+                                <select id="users-role-filter" class="form-input" style="font-size: 0.8rem; padding: 0.45rem 0.75rem; border-radius: 6px; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(212,175,55,0.3); cursor: pointer;">
+                                    <option value="all">All Roles</option>
+                                    <option value="admin">Administrator</option>
+                                    <option value="manager">Estate Manager</option>
+                                    <option value="sommelier">Tea Sommelier</option>
+                                    <option value="concierge">Master Concierge</option>
+                                    <option value="staff">Staff Member</option>
+                                    <option value="patron">Connoisseur Patron</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                <label style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.6px;">Status:</label>
+                                <select id="users-status-filter" class="form-input" style="font-size: 0.8rem; padding: 0.45rem 0.75rem; border-radius: 6px; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(212,175,55,0.3); cursor: pointer;">
+                                    <option value="all">All Statuses</option>
+                                    <option value="active">Active</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="suspended">Suspended</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Accounts Table View -->
+                    <div style="overflow-x: auto; border: 1px solid rgba(212,175,55,0.2); border-radius: 8px; background: rgba(5,15,10,0.6);">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: rgba(212,175,55,0.08); border-bottom: 1px solid rgba(212,175,55,0.25); color: var(--color-gold); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.8px;">
+                                    <th style="padding: 0.85rem 1rem;">User / Account</th>
+                                    <th style="padding: 0.85rem 1rem;">Email ID (Identity)</th>
+                                    <th style="padding: 0.85rem 1rem;">Role</th>
+                                    <th style="padding: 0.85rem 1rem;">Status</th>
+                                    <th style="padding: 0.85rem 1rem;">Phone / WhatsApp</th>
+                                    <th style="padding: 0.85rem 1rem;">Created</th>
+                                    <th style="padding: 0.85rem 1rem; text-align: right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-tbody">
+                                ${users.length === 0 ? `
+                                    <tr>
+                                        <td colspan="7" style="text-align: center; padding: 2.5rem 1rem; color: var(--color-text-muted);">
+                                            No user accounts registered yet. Click "+ Create New User Account" to add the first user.
+                                        </td>
+                                    </tr>
+                                ` : users.map(u => window.renderUserTableRow(u)).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
         html += `
+            </div>
             </div>
         `;
 
@@ -2982,9 +3510,7 @@ const UIComponents = {
         // Populate current values in season form if in season tab
         if (activeSubTab === 'seasons') {
             const seasonNameInput = document.getElementById('new-season-name');
-            const boxPriceInput = document.getElementById('new-box-price');
             if (seasonNameInput) seasonNameInput.value = activeSeason.name;
-            if (boxPriceInput) boxPriceInput.value = activeSeason.pricePerBox;
         }
     },
 
@@ -4229,10 +4755,27 @@ const UIComponents = {
                 <!-- Full-Bleed Video Screen Frame -->
                 <div class="cinema-player-viewport" style="position: relative; width: 100%; border-radius: 16px; overflow: hidden; background: #010603; border: 1.5px solid rgba(212, 175, 55, 0.4); box-shadow: 0 16px 40px rgba(0,0,0,0.8), 0 0 25px rgba(212, 175, 55, 0.15); margin-bottom: 2rem;">
                     
-                    <!-- Engine 1: 4K Ceylon Artisanal Tea Documentary (YouTube 100% Reliable Embed) -->
+                    <!-- Luxury Video Poster Facade Overlay (Prevents YouTube Iframe from Stealing Focus & Auto-scrolling on Page Load / Refresh) -->
+                    <div id="cinema-poster-facade" style="position: absolute; inset: 0; z-index: 5; background: radial-gradient(circle at center, rgba(4,14,8,0.45) 0%, rgba(2,8,4,0.88) 100%), url('${posterImg}') center/cover no-repeat; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: opacity 0.35s ease, visibility 0.35s ease; padding: 2rem;">
+                        <div id="cinema-big-play-btn" style="width: 84px; height: 84px; border-radius: 50%; background: linear-gradient(135deg, rgba(212,175,55,0.95) 0%, rgba(180,140,30,0.9) 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 30px rgba(212,175,55,0.7); cursor: pointer; transition: all 0.3s ease; border: 2.5px solid #ffffff;">
+                            <svg width="34" height="34" viewBox="0 0 24 24" fill="#040e08" style="margin-left: 4px;">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                        </div>
+                        <div style="margin-top: 1.25rem; text-align: center; pointer-events: none;">
+                            <span style="font-size: 0.72rem; letter-spacing: 2.5px; text-transform: uppercase; color: var(--color-gold); font-weight: 700; display: block; margin-bottom: 0.35rem;">ESTATE CINEMATOGRAPHY • 4K ULTRA HD</span>
+                            <h4 style="font-size: 1.4rem; color: #ffffff; margin: 0; font-family: var(--font-serif); letter-spacing: 0.5px;">Click to Stream Living Terroir Film</h4>
+                            <span style="display: inline-block; margin-top: 0.55rem; background: rgba(4,14,8,0.75); border: 1px solid rgba(212,175,55,0.4); border-radius: 20px; padding: 0.3rem 0.95rem; font-size: 0.74rem; color: #cbd5e1;">4K Master • Orthophonic Terroir Audio</span>
+                        </div>
+                    </div>
+
+                    <!-- Engine 1: 4K Ceylon Artisanal Tea Documentary (YouTube 100% Reliable Embed - Lazy Loaded) -->
                     <div id="cinema-yt-wrapper" style="width: 100%; aspect-ratio: 16/9; min-height: 320px; position: relative;">
                         <iframe id="estate-cinema-iframe"
-                                src="https://www.youtube-nocookie.com/embed/kYJqK9oP64U?enablejsapi=1&rel=0&modestbranding=1&color=white&playsinline=1"
+                                tabindex="-1"
+                                loading="lazy"
+                                src=""
+                                data-src="https://www.youtube-nocookie.com/embed/kYJqK9oP64U?enablejsapi=1&rel=0&modestbranding=1&color=white&playsinline=1"
                                 style="width: 100%; height: 100%; min-height: 380px; border: 0; display: block; aspect-ratio: 16/9;"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                 allowfullscreen
@@ -4310,6 +4853,7 @@ const UIComponents = {
         const nearbyCities = [
             { name: "Bandarawela", type: "Colonial Hill Station", dist: "14 km", time: "25 min drive", routeQuery: "Bandarawela" },
             { name: "Welimada", type: "Highland Valley Hub", dist: "18 km", time: "30 min drive", routeQuery: "Welimada" },
+            { name: "Haputale", type: "Highland Ridge & Tea Country", dist: "23 km", time: "38 min drive", routeQuery: "Haputale, Sri Lanka" },
             { name: "Badulla", type: "Provincial Capital", dist: "22 km", time: "38 min drive", routeQuery: "Badulla" },
             { name: "Ella", type: "Global Travel Hub", dist: "24 km", time: "45 min drive", routeQuery: "Ella, Sri Lanka" },
             { name: "Nuwara Eliya", type: "Central Montane Capital", dist: "45 km", time: "1h 15m drive", routeQuery: "Nuwara Eliya" },
@@ -5211,10 +5755,39 @@ const UIComponents = {
                                 <strong style="color: var(--color-gold);">Estate Location:</strong> Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District (Elevation 1,240m)<br>
                                 <strong style="color: var(--color-gold);">Arrival Recommendation:</strong> Please arrive 10–15 minutes prior to ${timeSlot}.
                             </div>
-                            <div style="text-align: center; margin-top: 1.25rem;">
+
+                            <!-- Executive Director & CEO Verification Seal & Signature -->
+                            <div style="margin-top: 1.25rem; padding: 1.1rem 1.25rem; background: rgba(0,0,0,0.4); border: 1px solid rgba(212,175,55,0.45); border-radius: 8px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                                    <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(212,175,55,0.15); border: 1.5px solid #d4af37; display: flex; align-items: center; justify-content: center; color: #d4af37; flex-shrink: 0;">
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold); font-weight: 700;">Security Clearance Attestation</div>
+                                        <div style="font-size: 0.88rem; color: #ffffff; font-weight: 600;">Authorized for Highland Estate Admission</div>
+                                        <div style="font-size: 0.72rem; color: #9ca3af;">Highland Estate Security Lodge &bull; Gate Pass Verified</div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right; min-width: 140px;">
+                                    <div style="font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; margin-bottom: 2px;">Authorized Executive</div>
+                                    <div style="display: inline-block; text-align: center;">
+                                        <img src="images/ceo_signature_gold.png" alt="Director &amp; CEO Signature" style="height: 38px; object-fit: contain; display: block; margin: 0 auto;" />
+                                        <div style="border-top: 1px solid rgba(212,175,55,0.4); padding-top: 2px; margin-top: 2px;">
+                                            <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff; letter-spacing: 0.5px;">Prasanga</div>
+                                            <div style="font-size: 0.68rem; color: var(--color-gold); font-weight: 600;">Director &amp; CEO, Rock One Wild Tea</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 1.25rem;">
                                 <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20Authorized%20Tour%20Pass%20${order.id}%20for%20${tourDate}.%20Please%20guide%20our%20chauffeur." target="_blank" style="background: #25D366; color: #ffffff; text-decoration: none; padding: 10px 22px; border-radius: 25px; font-weight: bold; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem;">
                                     Message Concierge on WhatsApp (+94 77 320 9950)
                                 </a>
+                                <button type="button" class="btn btn-outline btn-tour-cert-download" data-order-id="${order.id}" style="font-size: 0.85rem; padding: 10px 22px; border-radius: 25px; border-color: rgba(212,175,55,0.5); color: var(--color-gold); display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(0,0,0,0.35);">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 13 7 8"></polyline><line x1="12" y1="3" x2="12" y2="13"></line></svg>
+                                    Download Gate Pass (PDF)
+                                </button>
                             </div>
                         </div>
                     ` : isSlipSent ? `
@@ -5226,7 +5799,7 @@ const UIComponents = {
                                 </div>
                                 <div>
                                     <div style="font-weight: 700; color: var(--color-gold); font-size: 1.05rem;">Tour Booking Pending — Deposit Slip Under Verification</div>
-                                    <div style="font-size: 0.8rem; color: var(--color-text-muted);">Slip uploaded and pending authorization by Estate Concierge</div>
+                                    <div style="font-size: 0.8rem; color: var(--color-text-muted);">Slip uploaded &bull; Official Gate Pass will be certified and signed by Director &amp; CEO upon clearance</div>
                                 </div>
                             </div>
                             <p style="font-size: 0.85rem; color: #f3f4f6; line-height: 1.6; margin: 0 0 1rem 0;">
@@ -5248,18 +5821,47 @@ const UIComponents = {
                             </div>
                         </div>
                     ` : `
-                        <!-- ⚪ STATE: SLIP REQUIRED FOR TOUR -->
+                        <!-- ⚪ STATE: PAYMENT REQUIRED FOR TOUR -->
+                        <h4 style="font-family: var(--font-serif); color: var(--color-white); margin-bottom: 1rem; font-size: 1.1rem; display: flex; align-items: center; gap: 0.45rem;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            Confirm Reservation &amp; Clear Gate Pass
+                        </h4>
+
+                        <!-- Option A: Instant PayPal & International Cards -->
+                        <div style="margin-bottom: 1.25rem; padding: 1.25rem; background: rgba(0, 112, 186, 0.05); border: 1.5px solid rgba(0, 112, 186, 0.45); border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
+                                <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#0070ba"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.655h6.613c3.082 0 5.488.75 6.073 3.652.31 1.542.022 2.894-.856 4.02-.99 1.267-2.613 1.942-4.83 1.942H9.86l-.995 6.3a.64.64 0 0 1-.633.542l-1.156.016v.006z"/></svg>
+                                    Option A: Instant Clearance via PayPal / Cards
+                                </div>
+                                <span style="background: rgba(0, 112, 186, 0.2); color: #38bdf8; font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px; text-transform: uppercase;">
+                                    Instant Gate Pass
+                                </span>
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted); line-height: 1.5; margin-bottom: 1rem;">
+                                Pay securely online in USD. Upon successful payment, your official Estate Tour Gate Pass signed by Director &amp; CEO Prasanga will be certified and released immediately.
+                            </div>
+                            <div id="order-detail-paypal-container" class="paypal-smart-container" style="min-height: 44px;"></div>
+                        </div>
+
+                        <!-- Option B: Direct Bank Cash Deposit + Slip Upload -->
                         <div style="margin-bottom: 1.5rem; padding: 1.25rem; background: rgba(212,175,55,0.03); border: 1.5px solid rgba(212,175,55,0.4); border-radius: 8px;">
-                            <div style="font-weight: 700; color: var(--color-gold); font-size: 0.95rem; margin-bottom: 0.5rem;">
-                                Direct Bank Deposit &amp; Slip Upload Required
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+                                <div style="font-weight: 700; color: var(--color-gold); font-size: 0.95rem;">
+                                    Option B: Direct Bank Deposit &amp; Slip Upload
+                                </div>
+                                <span style="background: rgba(46,125,50,0.2); color: #81c784; font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px; text-transform: uppercase;">
+                                    Active Live Method
+                                </span>
                             </div>
                             <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 1rem;">
-                                Please deposit the deposit amount of <strong>${order.formattedPrice || '$50.00 USD'}</strong> to reserve your slots, then upload your slip below for immediate concierge authorization:
+                                Please deposit the deposit amount of <strong>${order.formattedPrice || '$50.00 USD'}</strong> to reserve your slots, then upload your slip below for concierge authorization:
                             </p>
                             <div class="bank-details-block" style="margin-bottom: 1.25rem;">
-                                <div class="bank-detail-row"><span>Bank:</span><strong>Bank of Ceylon (Kandy / Badulla Branch)</strong></div>
-                                <div class="bank-detail-row"><span>Account Name:</span><strong>Rock One Wild Tea (Pvt) Ltd</strong></div>
-                                <div class="bank-detail-row"><span>Account No:</span><strong>0083-1001-5271-8843</strong></div>
+                                <div class="bank-detail-row"><span>Bank:</span><strong>Bank of Ceylon</strong></div>
+                                <div class="bank-detail-row"><span>Account Name:</span><strong>Rock one wild tea</strong></div>
+                                <div class="bank-detail-row"><span>Account No:</span><strong>94945708</strong></div>
+                                <div class="bank-detail-row"><span>Branch:</span><strong>Ettampitiya branch</strong></div>
                                 <div class="bank-detail-row"><span>Reference:</span><strong>${order.id}</strong></div>
                             </div>
                             <form id="order-slip-form" class="admin-form" style="gap: 1rem;">
@@ -5325,6 +5927,13 @@ const UIComponents = {
                         <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#81c784" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 0.5rem;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                         <div style="font-weight: 700; color: #81c784; font-size: 1rem; margin-bottom: 0.25rem;">Payment Confirmed!</div>
                         <div style="font-size: 0.8rem; color: var(--color-text-muted);">Your tea allocation has been reserved. Our concierge team will contact you shortly regarding delivery.</div>
+                        <div style="margin-top: 1rem; padding-top: 0.85rem; border-top: 1px dashed rgba(212,175,55,0.3); display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                            <img src="images/ceo_signature_gold.png" alt="Director &amp; CEO Signature" style="height: 34px; object-fit: contain;" />
+                            <div style="text-align: left; font-size: 0.78rem;">
+                                <div style="font-weight: 700; color: #ffffff;">Prasanga</div>
+                                <div style="color: var(--color-gold); font-size: 0.7rem;">Managing Director &amp; CEO, Rock One Wild Tea</div>
+                            </div>
+                        </div>
                     </div>
                 ` : isCancelled ? `
                     <div style="text-align: center; padding: 1.5rem; background: rgba(198,40,40,0.1); border-radius: 8px; border: 1px solid rgba(198,40,40,0.3);">
@@ -5345,20 +5954,21 @@ const UIComponents = {
                         Payment Methods &amp; Settlement
                     </h4>
 
-                    <!-- Option A: Online Card Gateway (Coming Soon Notice) -->
-                    <div style="margin-bottom: 1.25rem; padding: 1.25rem; background: rgba(255,255,255,0.02); border: 1px dashed rgba(212,175,55,0.35); border-radius: 8px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
-                            <div style="font-weight: 700; color: #ffffff; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                Online Card Gateway (Visa / Mastercard / AMEX)
+                    <!-- Option A: Instant Online Settlement via PayPal & Cards -->
+                    <div style="margin-bottom: 1.25rem; padding: 1.25rem; background: rgba(0, 112, 186, 0.05); border: 1.5px solid rgba(0, 112, 186, 0.45); border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
+                            <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="#0070ba"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.655h6.613c3.082 0 5.488.75 6.073 3.652.31 1.542.022 2.894-.856 4.02-.99 1.267-2.613 1.942-4.83 1.942H9.86l-.995 6.3a.64.64 0 0 1-.633.542l-1.156.016v.006z"/></svg>
+                                Option A: Instant Settlement via PayPal / Cards
                             </div>
-                            <span style="background: rgba(212,175,55,0.18); color: var(--color-gold); font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(212,175,55,0.35);">
-                                Coming Soon
+                            <span style="background: rgba(0, 112, 186, 0.2); color: #38bdf8; font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(0, 112, 186, 0.4);">
+                                Instant Confirmation
                             </span>
                         </div>
-                        <div style="font-size: 0.8rem; color: var(--color-text-muted); line-height: 1.5;">
-                            Direct online credit &amp; debit card processing is currently in preparation. To settle and confirm your order immediately, please use the live <strong>Direct Bank Deposit &amp; Slip Upload</strong> option below.
+                        <div style="font-size: 0.8rem; color: var(--color-text-muted); line-height: 1.5; margin-bottom: 1rem;">
+                            Settle instantly in USD via PayPal or international cards (Visa, MasterCard, American Express). Your official Allocation Certificate certified by Director &amp; CEO Prasanga will be unlocked immediately.
                         </div>
+                        <div id="order-detail-paypal-container" class="paypal-smart-container" style="min-height: 44px;"></div>
                     </div>
 
                     <!-- Option B: Direct Bank Cash Deposit + Slip Upload (Active Live Channel) -->
@@ -5376,9 +5986,10 @@ const UIComponents = {
                             Transfer or deposit the exact invoice amount into our Bank of Ceylon account, then upload your deposit receipt or mobile transfer screenshot below for rapid concierge validation.
                         </div>
                         <div class="bank-details-block" style="margin-bottom: 1.25rem;">
-                            <div class="bank-detail-row"><span>Bank:</span><strong>${order.bankName || 'Bank of Ceylon (Kandy Main Branch)'}</strong></div>
-                            <div class="bank-detail-row"><span>Account Name:</span><strong>${order.accountName || 'Rock One Wild Tea (Pvt) Ltd'}</strong></div>
-                            <div class="bank-detail-row"><span>Account No:</span><strong>${order.accountNo || '0083-1001-5271-8843'}</strong></div>
+                            <div class="bank-detail-row"><span>Bank:</span><strong>${order.bankName || 'Bank of Ceylon'}</strong></div>
+                            <div class="bank-detail-row"><span>Account Name:</span><strong>${order.accountName || 'Rock one wild tea'}</strong></div>
+                            <div class="bank-detail-row"><span>Account No:</span><strong>${order.accountNo || '94945708'}</strong></div>
+                            <div class="bank-detail-row"><span>Branch:</span><strong>${order.branch || 'Ettampitiya branch'}</strong></div>
                             ${order.referenceNote ? `<div class="bank-detail-row"><span>Reference:</span><strong>${order.referenceNote}</strong></div>` : `<div class="bank-detail-row"><span>Reference:</span><strong>${order.id}</strong></div>`}
                             <div class="bank-detail-row" style="border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 0.5rem; margin-top: 0.5rem;">
                                 <span>Amount:</span><strong style="color: var(--color-gold);">${order.formattedPrice || `$${(Number(order.price) || 0).toFixed(2)}`}</strong>
@@ -5602,6 +6213,11 @@ const UIComponents = {
                                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                 </button>
                             ` : (b.status === 'Paid & Confirmed') ? `
+                                ${isTour ? `
+                                    <button class="admin-action-btn btn-resend-gatepass" data-id="${b.id}" data-email="${b.email}" title="Re-dispatch Official Gate Pass Email to Customer" style="display:inline-flex; align-items:center; gap:0.25rem; color:#81c784; border-color:rgba(46,125,50,0.4);">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> Gate Pass
+                                    </button>
+                                ` : ''}
                                 <button class="admin-action-btn btn-act-complete btn-complete-booking" data-id="${b.id}" title="Mark Tour / Order Fulfilled" style="display:inline-flex; align-items:center; gap:0.3rem;">
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> Complete
                                 </button>
@@ -5714,7 +6330,18 @@ const UIComponents = {
         const cart = window.TeaFactoryStore.getCart();
         const totalCount = window.TeaFactoryStore.getCartTotalCount();
         const subtotalUSD = window.TeaFactoryStore.getCartSubtotal();
-        const formattedSubtotal = window.TeaFactoryStore.formatCurrency(subtotalUSD);
+        const shippingUSD = window.TeaFactoryStore.getCartShippingTotal ? window.TeaFactoryStore.getCartShippingTotal() : 0;
+        const grandTotalUSD = window.TeaFactoryStore.getCartGrandTotal ? window.TeaFactoryStore.getCartGrandTotal() : (subtotalUSD + shippingUSD);
+        
+        const selectedCountry = window.lastSelectedCheckoutCountry || 'Sri Lanka';
+        const isSriLanka = selectedCountry === 'Sri Lanka';
+        const currInfo = window.getCountryCurrency ? window.getCountryCurrency(selectedCountry) : (isSriLanka ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
+        
+        const formattedSubtotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(subtotalUSD, currInfo) : `$${subtotalUSD.toFixed(2)}`;
+        const formattedShipping = shippingUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(shippingUSD, currInfo) : `$${shippingUSD.toFixed(2)}`) : _t('bespoke_complimentary', 'Complimentary Estate Courier');
+        const formattedGrandTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(grandTotalUSD, currInfo) : `$${grandTotalUSD.toFixed(2)}`;
+        const grandTotalLKR = Math.round(grandTotalUSD * 305);
+        const bankAmountFormatted = isSriLanka ? `Rs ${grandTotalLKR.toLocaleString()} LKR` : `${formattedGrandTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>`;
 
         // Update header count label
         const countLabel = document.getElementById('cart-drawer-count-label');
@@ -5748,12 +6375,14 @@ const UIComponents = {
 
         // 2. Items List & In-Drawer Checkout
         const itemsHtml = cart.map(item => {
-            const unitPrice = window.TeaFactoryStore.formatCurrency(item.price);
-            const lineTotal = window.TeaFactoryStore.formatCurrency(item.price * item.quantity);
+            const itemPriceUSD = Number(item.price) || 0;
+            const itemLineUSD = itemPriceUSD * (item.quantity || 1);
+            const unitPrice = window.formatAmountInCurrency ? window.formatAmountInCurrency(itemPriceUSD, currInfo) : `$${itemPriceUSD.toFixed(2)}`;
+            const lineTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(itemLineUSD, currInfo) : `$${itemLineUSD.toFixed(2)}`;
             const hasGifting = item.giftOptions && item.giftOptions.giftPackaging;
 
             return `
-                <div class="cart-item-row" data-cart-key="${item.cartKey}" style="display: flex; gap: 1rem; align-items: flex-start; padding: 1.15rem 0; border-bottom: 1px solid rgba(212,175,55,0.12);">
+                <div class="cart-item-row" data-cart-key="${item.cartKey}" data-unit-usd="${itemPriceUSD}" data-line-usd="${itemLineUSD}" style="display: flex; gap: 1rem; align-items: flex-start; padding: 1.15rem 0; border-bottom: 1px solid rgba(212,175,55,0.12);">
                     <div class="cart-item-img-box" style="width: 68px; height: 68px; border-radius: 10px; overflow: hidden; background: rgba(0,0,0,0.4); border: 1px solid rgba(212,175,55,0.25); flex-shrink: 0; position: relative;">
                         <img src="${item.image || 'images/Product.jpeg'}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: contain;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
                     </div>
@@ -5789,8 +6418,8 @@ const UIComponents = {
                             </div>
 
                             <div style="text-align: right;">
-                                <span style="font-size: 0.92rem; font-weight: 700; color: var(--color-gold);">${lineTotal}</span>
-                                ${item.quantity > 1 ? `<div style="font-size: 0.68rem; color: var(--color-text-muted);">${unitPrice} ${_t('cart_qty', 'each')}</div>` : ''}
+                                <span class="cart-item-line-total" style="font-size: 0.92rem; font-weight: 700; color: var(--color-gold);">${lineTotal}</span>
+                                ${item.quantity > 1 ? `<div class="cart-item-unit-price" style="font-size: 0.68rem; color: var(--color-text-muted);">${unitPrice} ${_t('cart_qty', 'each')}</div>` : ''}
                             </div>
                         </div>
                     </div>
@@ -5799,99 +6428,417 @@ const UIComponents = {
         }).join('');
 
         container.innerHTML = `
-            <div class="cart-drawer-inner" style="display: flex; flex-direction: column; gap: 1.5rem; padding-bottom: 2rem;">
+            <div class="cart-drawer-inner" style="display: flex; flex-direction: column; gap: 1.15rem; padding-bottom: 2rem;">
                 
-                <!-- Items Scroll Area -->
-                <div class="cart-items-list" style="display: flex; flex-direction: column;">
-                    ${itemsHtml}
+                <!-- ==============================================
+                     1. ORDER SUMMARY & BAG ITEMS (TOP OF CHECKOUT)
+                     ============================================== -->
+                <div class="cart-step-card" style="background: rgba(4,14,8,0.78); border: 1.5px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 1.15rem; box-shadow: 0 4px 18px rgba(0,0,0,0.35);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.6rem; margin-bottom: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold);">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                            <span>1. Order Summary &amp; Allocations</span>
+                        </div>
+                        <span style="font-size: 0.72rem; color: #86efac; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 0.15rem 0.55rem; font-weight: 600;">${totalCount} ${_t('cart_qty', 'item')}${totalCount === 1 ? '' : 's'}</span>
+                    </div>
+
+                    <!-- Items List -->
+                    <div class="cart-items-list" style="display: flex; flex-direction: column;">
+                        ${itemsHtml}
+                    </div>
+
+                    <!-- Financial Subtotal & Total Breakdown -->
+                    <div style="margin-top: 0.85rem; padding-top: 0.75rem; border-top: 1px dashed rgba(212,175,55,0.2); display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.82rem;">
+                        <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
+                            <span>${_t('cart_subtotal_label', 'Items Allocation Subtotal')}</span>
+                            <strong id="cart-summary-subtotal" data-base-usd="${subtotalUSD}" style="color: #ffffff;">${formattedSubtotal}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
+                            <span id="cart-summary-shipping-label">${isSriLanka ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS International Priority Air'}</span>
+                            <span id="cart-summary-shipping" data-base-usd="${shippingUSD}" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-weight: 600;">${formattedShipping}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid rgba(212,175,55,0.25); padding-top: 0.55rem; margin-top: 0.25rem;">
+                            <div>
+                                <strong id="cart-summary-total-title" style="font-size: 0.95rem; color: #ffffff;">${_t('common_price', 'Total Due')} (${currInfo.code})</strong>
+                            </div>
+                            <strong id="cart-summary-total" data-base-usd="${grandTotalUSD}" style="font-size: 1.35rem; color: var(--color-gold); font-family: var(--font-serif);">${formattedGrandTotal}</strong>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Price Breakdown Card -->
-                <div class="cart-summary-box" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 12px; padding: 1.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">
-                        <span>${_t('cart_subtotal_label', 'Estimated Allocation Subtotal')}</span>
-                        <strong style="color: #fff; font-size: 0.95rem;">${formattedSubtotal}</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 0.75rem;">
-                        <span>${_t('tour_duration_label', 'Dispatch')}</span>
-                        <span style="color: var(--color-gold); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">${_t('bespoke_complimentary', 'Complimentary Estate Courier')}</span>
-                    </div>
-                    <div style="border-top: 1px dashed rgba(212,175,55,0.2); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.95rem; font-weight: 700; color: #fff;">${_t('common_price', 'Total Due')} (${window.TeaFactoryStore.getActiveCurrency()})</span>
-                        <span style="font-size: 1.35rem; font-weight: 700; color: var(--color-gold);">${formattedSubtotal}</span>
-                    </div>
+                <!-- ==============================================
+                     2. PATRON ACCOUNT / GUEST CHECKOUT BANNER
+                     ============================================== -->
+                <div class="cart-step-card" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.95rem 1.15rem;">
+                    ${(() => {
+                        const u = window.TeaFactoryStore.getCurrentUser ? window.TeaFactoryStore.getCurrentUser() : null;
+                        const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+                        if (u) {
+                            return `
+                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
+                                        <div>
+                                            <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Patron Account: <span style="color: var(--color-gold);">${esc(u.full_name || u.email)}</span></div>
+                                            <div style="font-size: 0.7rem; color: #86efac;">${esc(u.email)} &bull; Linked to Estate Master Ledger</div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); window.UIComponents.renderCartDrawer('cart-drawer-body'); window.appBindCartDrawerEvents &amp;&amp; window.appBindCartDrawerEvents();" style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: rgba(255,255,255,0.2); color: var(--color-text-muted);">
+                                        Switch Account
+                                    </button>
+                                </div>
+                            `;
+                        } else {
+                            return `
+                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                    <div style="flex: 1; min-width: 210px;">
+                                        <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.2rem;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                            <span>Guest Checkout Active (No Sign-In Required)</span>
+                                        </div>
+                                        <p style="font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.4; margin: 0;">
+                                            You can checkout immediately as a guest. Or sign in to track your allocation in the patron portal.
+                                        </p>
+                                    </div>
+                                    <button type="button" id="cart-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: var(--color-gold); color: var(--color-gold); white-space: nowrap;">
+                                        Sign In / Register
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    })()}
                 </div>
 
-                <!-- Checkout Details Form -->
-                <div class="cart-checkout-section" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.25rem;">
-                    <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold); margin-bottom: 1rem;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        <span>${_t('cart_checkout_title', 'Dispatch & Contact Details')}</span>
-                    </div>
+                <!-- ==============================================
+                     3. CHECKOUT FORM (DESTINATION, ADDRESS, SHIPPING & PAYMENT)
+                     ============================================== -->
+                <form id="cart-checkout-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                    
+                    ${(() => {
+                        const u = window.TeaFactoryStore.getCurrentUser ? window.TeaFactoryStore.getCurrentUser() : null;
+                        const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+                        let defaultFirstName = '';
+                        let defaultLastName = '';
+                        if (u && u.full_name) {
+                            const parts = u.full_name.trim().split(' ');
+                            defaultFirstName = parts[0] || '';
+                            defaultLastName = parts.slice(1).join(' ') || '';
+                        }
+                        const cartMinDate = new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0];
 
-                    <form id="cart-checkout-form" style="display: flex; flex-direction: column; gap: 0.85rem;">
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label class="form-label" for="cart-cust-name" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">${_t('cart_name_label', 'Full Name *')}</label>
-                            <input class="form-input" type="text" id="cart-cust-name" required placeholder="e.g. Lady Victoria Montgomery" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label class="form-label" for="cart-cust-email" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">${_t('cart_email_label', 'Email *')}</label>
-                                <input class="form-input" type="email" id="cart-cust-email" required placeholder="name@domain.com" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                        return `
+                        <!-- Section: Destination & Delivery -->
+                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                <span>2. Delivery Destination</span>
                             </div>
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label class="form-label" for="cart-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">${_t('cart_phone_label', 'Phone / WhatsApp *')}</label>
-                                <input class="form-input" type="tel" id="cart-cust-phone" required placeholder="+94 77 123 4567" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                <!-- Country Selector -->
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="cart-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Destination Country *</label>
+                                    <select class="form-input" id="cart-cust-country" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                        <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>🇱🇰 Sri Lanka (LKR Rs)</option>
+                                        <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>🇺🇸 United States (USD $)</option>
+                                        <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom (GBP £)</option>
+                                        <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>🇦🇺 Australia (AUD A$)</option>
+                                        <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>🇨🇦 Canada (CAD C$)</option>
+                                        <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>🇩🇪 Germany (EUR €)</option>
+                                        <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>🇫🇷 France (EUR €)</option>
+                                        <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>🇯🇵 Japan (JPY ¥)</option>
+                                        <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>🇦🇪 United Arab Emirates (AED)</option>
+                                        <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>🇸🇬 Singapore (SGD S$)</option>
+                                        <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>🇮🇳 India (INR ₹)</option>
+                                        <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>🇨🇭 Switzerland (CHF)</option>
+                                        <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>🇨🇳 China (CNY ¥)</option>
+                                        <option value="Worldwide" ${selectedCountry === 'Worldwide' ? 'selected' : ''}>🌐 Rest of World (USD $)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Region / Province (Dynamic) -->
+                                <div class="form-group" style="margin-bottom: 0;" id="cart-region-container">
+                                    ${isSriLanka ? `
+                                        <label class="form-label" for="cart-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Region / Province *</label>
+                                        <select class="form-input" id="cart-cust-region" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                            <option value="Western Province (Colombo, Gampaha, Kalutara)">Western Province (Colombo, Gampaha)</option>
+                                            <option value="Central Province (Kandy, Nuwara Eliya, Matale)">Central Province (Kandy, Nuwara Eliya)</option>
+                                            <option value="Uva Province (Badulla, Bandarawela, Ettampitiya)" selected>Uva Province (Badulla, Ettampitiya)</option>
+                                            <option value="Southern Province (Galle, Matara, Hambantota)">Southern Province (Galle, Matara)</option>
+                                            <option value="Sabaragamuwa Province (Ratnapura, Kegalle)">Sabaragamuwa Province (Ratnapura)</option>
+                                            <option value="North Western Province (Kurunegala, Puttalam)">North Western Province (Kurunegala)</option>
+                                            <option value="North Central Province (Anuradhapura, Polonnaruwa)">North Central Province (Anuradhapura)</option>
+                                            <option value="Northern Province (Jaffna, Kilinochchi, Vavuniya)">Northern Province (Jaffna)</option>
+                                            <option value="Eastern Province (Batticaloa, Trincomalee, Ampara)">Eastern Province (Batticaloa, Trincomalee)</option>
+                                        </select>
+                                    ` : `
+                                        <label class="form-label" for="cart-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">State / Province / County *</label>
+                                        <input class="form-input" type="text" id="cart-cust-region" placeholder="e.g. California / London / Tokyo" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
+                                    `}
+                                </div>
                             </div>
                         </div>
 
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label class="form-label" for="cart-cust-address" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">${_t('cart_address_label', 'Shipping Address')}</label>
-                            <input class="form-input" type="text" id="cart-cust-address" placeholder="Apartment / Suite, Street Address, City" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label class="form-label" for="cart-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">${_t('cart_country_label', 'Destination *')}</label>
-                                <select class="form-input" id="cart-cust-country" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                    <option value="Sri Lanka (Domestic Express)">Sri Lanka (Domestic Express)</option>
-                                    <option value="United States (Air Freight)">United States (Air Freight)</option>
-                                    <option value="United Kingdom (Air Freight)">United Kingdom (Air Freight)</option>
-                                    <option value="United Arab Emirates (Air Freight)">United Arab Emirates (Air Freight)</option>
-                                    <option value="Japan (Air Freight)">Japan (Air Freight)</option>
-                                    <option value="Germany (Air Freight)">Germany (Air Freight)</option>
-                                    <option value="Singapore (Air Freight)">Singapore (Air Freight)</option>
-                                    <option value="Australia (Air Freight)">Australia (Air Freight)</option>
-                                    <option value="Worldwide International">Worldwide International</option>
-                                </select>
+                        <!-- Section: Recipient & Delivery Address -->
+                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                <span>3. Recipient &amp; Delivery Address</span>
                             </div>
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label class="form-label" for="cart-payment-method" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">${_t('cart_pay_mode_label', 'Payment Settlement Mode')}</label>
-                                <select class="form-input" id="cart-payment-method" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                    <option value="bank" selected>${_t('cart_pay_bank', 'Direct Bank Cash Deposit & Slip Upload (Live)')}</option>
-                                    <option value="online" disabled>${_t('cart_pay_online', 'Online Card Payment (Cards / Gateway - Coming Soon)')}</option>
-                                </select>
-                                <span style="font-size: 0.7rem; color: var(--color-gold); margin-top: 0.35rem; display: block; line-height: 1.35;">
-                                    &#9432; Online card gateway coming soon. Live method: Direct Bank Deposit &amp; Slip Upload.
-                                </span>
+
+                            <!-- First Name & Last Name -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="cart-cust-firstname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">First Name *</label>
+                                    <input class="form-input" type="text" id="cart-cust-firstname" value="${esc(defaultFirstName)}" required placeholder="e.g. Ruwan" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="cart-cust-lastname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Last Name *</label>
+                                    <input class="form-input" type="text" id="cart-cust-lastname" value="${esc(defaultLastName)}" required placeholder="e.g. Perera" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                            </div>
+
+                            <!-- Email & Phone -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="cart-cust-email" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Email Address *</label>
+                                    <input class="form-input" type="email" id="cart-cust-email" value="${esc(u ? u.email : '')}" required placeholder="name@domain.com" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="cart-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Mobile / WhatsApp *</label>
+                                    <input class="form-input" type="tel" id="cart-cust-phone" value="${esc(u ? u.phone : '')}" required placeholder="+94 77 123 4567" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                            </div>
+
+                            <!-- Street Address -->
+                            <div class="form-group" style="margin-bottom: 0.75rem;">
+                                <label class="form-label" for="cart-cust-address" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Street Address *</label>
+                                <input class="form-input" type="text" id="cart-cust-address" value="${esc(u ? u.address : '')}" required placeholder="House No., Street Name, Neighborhood" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                            </div>
+
+                            <!-- Apartment / Suite (Optional) -->
+                            <div class="form-group" style="margin-bottom: 0.75rem;">
+                                <label class="form-label" for="cart-cust-suite" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7);">Apartment / Suite / Unit / Floor (Optional)</label>
+                                <input class="form-input" type="text" id="cart-cust-suite" placeholder="e.g. Apt 4B, Level 2" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                            </div>
+
+                            <!-- City & Postal Code -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="cart-cust-city" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">City / Town *</label>
+                                    <input class="form-input" type="text" id="cart-cust-city" required placeholder="e.g. Colombo / Badulla" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="cart-cust-postal" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Postal / ZIP Code *</label>
+                                    <input class="form-input" type="text" id="cart-cust-postal" required placeholder="e.g. 00100" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                            </div>
+
+                            <!-- Preferred Date & Courier Notes -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="cart-pref-date" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Preferred Dispatch Date *</label>
+                                    <input class="form-input" type="date" id="cart-pref-date" min="${cartMinDate}" value="${cartMinDate}" required style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="cart-cust-notes" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Courier Notes</label>
+                                    <input class="form-input" type="text" id="cart-cust-notes" placeholder="e.g. Call before arrival" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
                             </div>
                         </div>
 
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label class="form-label" for="cart-cust-notes" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">${_t('cart_notes_label', 'Special Courier Instructions')}</label>
-                            <textarea class="form-input" id="cart-cust-notes" rows="2" placeholder="${_t('cart_notes_placeholder', 'Optional delivery instructions or notes for concierge...')}" style="font-size: 0.82rem; line-height: 1.4; resize: vertical;"></textarea>
+                        <!-- Section: Shipping Method & Courier Charges -->
+                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                                <span>4. Shipping Method &amp; Courier Charges</span>
+                            </div>
+
+                            <div id="cart-shipping-methods-container" style="display: flex; flex-direction: column; gap: 0.65rem;">
+                                <!-- Option 1: Sri Lanka Post EMS Express (Pre-paid) -->
+                                <label class="shipping-option-card active" id="cart-shipping-card-ems" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid var(--color-gold); border-radius: 8px; background: rgba(212,175,55,0.08); cursor: pointer;">
+                                    <input type="radio" name="cart-shipping-method" value="ems_express" id="cart-ship-ems" checked style="margin-top: 0.2rem; accent-color: var(--color-gold);">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
+                                            <strong id="cart-shipping-ems-title" style="color: #ffffff; font-size: 0.88rem;">${isSriLanka ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air'}</strong>
+                                            <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                                <span style="font-size: 0.72rem; color: #86efac; font-weight: 700;">Tracked Dispatch</span>
+                                                <span id="cart-shipping-ems-price-pill" style="font-size: 0.78rem; color: var(--color-gold); font-weight: 700; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; padding: 0.2rem 0.55rem;">${formattedShipping}</span>
+                                            </div>
+                                        </div>
+                                        <p id="cart-shipping-ems-desc" style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
+                                            ${isSriLanka ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
+                                        </p>
+                                    </div>
+                                </label>
+
+                                <!-- Option 2: Cash on Delivery (COD) - Sri Lanka Only -->
+                                <label class="shipping-option-card" id="cart-shipping-card-cod" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 8px; background: rgba(0,0,0,0.3); cursor: pointer;">
+                                    <input type="radio" name="cart-shipping-method" value="cod" id="cart-ship-cod" style="margin-top: 0.2rem; accent-color: #25d366;">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
+                                            <strong style="color: #ffffff; font-size: 0.88rem; display: flex; align-items: center; gap: 0.4rem;">
+                                                <span>Cash on Delivery (COD)</span>
+                                                <span style="font-size: 0.62rem; padding: 0.1rem 0.45rem; border-radius: 3px; background: rgba(37,211,102,0.2); color: #4ade80; font-weight: 700;">SRI LANKA ONLY</span>
+                                            </strong>
+                                            <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                                <span style="font-size: 0.72rem; color: #4ade80; font-weight: 700;">Pay at Doorstep</span>
+                                                <span id="cart-shipping-cod-price-pill" style="font-size: 0.78rem; color: #4ade80; font-weight: 700; background: rgba(37,211,102,0.15); border: 1px solid rgba(37,211,102,0.35); border-radius: 6px; padding: 0.2rem 0.55rem;">${formattedShipping}</span>
+                                            </div>
+                                        </div>
+                                        <p style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
+                                            Pay cash to the Sri Lanka Post courier upon receiving your tea package. No upfront digital transaction required.
+                                        </p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Courier Shipping Charges Breakdown Banner -->
+                            <div style="margin-top: 0.65rem; padding: 0.65rem 0.85rem; background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.25); border-radius: 8px; font-size: 0.72rem; color: #cbd5e1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem;">
+                                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                    <span>Standard Insured Courier Dispatch:</span>
+                                </div>
+                                <span id="cart-shipping-rate-note" style="color: var(--color-gold); font-weight: 600;">${isSriLanka ? 'Rs 650 LKR (Complimentary over $80)' : (window.formatAmountInCurrency ? window.formatAmountInCurrency(15, currInfo) : '$15.00') + ' International EMS (Complimentary over $150)'}</span>
+                            </div>
                         </div>
 
-                        <button type="submit" id="btn-submit-cart-order" class="btn btn-primary" style="margin-top: 0.5rem; padding: 0.9rem 1.5rem; font-size: 0.92rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 4px 18px rgba(212,175,55,0.25);">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                            <span>${_t('btn_place_order', 'Place Reserve Order')} &bull; ${formattedSubtotal}</span>
-                        </button>
-                    </form>
-                </div>
+                        <!-- Section: Payment Method & Order Confirmation -->
+                        <div class="cart-step-card" id="cart-payment-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                <span>5. Payment Method &amp; Order Confirmation</span>
+                            </div>
+
+                            <!-- COD Panel (Visible when COD selected) -->
+                            <div id="cart-pay-panel-cod" style="display: none;">
+                                <div style="background: rgba(37,211,102,0.08); border: 1.5px solid rgba(37,211,102,0.4); border-radius: 10px; padding: 1.15rem; text-align: center; margin-bottom: 1rem;">
+                                    <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(37,211,102,0.15); border: 1.5px solid #25d366; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto; color: #25d366;">
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                    </div>
+                                    <h4 style="color: #4ade80; font-size: 1.05rem; margin-bottom: 0.35rem; font-weight: 700;">Cash on Delivery (COD) Selected</h4>
+                                    <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5; margin: 0 0 0.85rem 0;">
+                                        No online payment is needed now. The Sri Lanka Post EMS courier will collect the cash amount upon parcel handover.
+                                    </p>
+                                    <div style="background: rgba(0,0,0,0.45); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.65rem 1rem; display: inline-flex; align-items: center; gap: 0.75rem;">
+                                        <span style="font-size: 0.78rem; color: #9ca3af;">Amount Payable to Courier:</span>
+                                        <strong id="cart-cod-amount-display" style="font-size: 1.25rem; color: var(--color-gold); font-family: monospace;">Rs ${grandTotalLKR.toLocaleString()} LKR</strong>
+                                    </div>
+                                </div>
+
+                                <button type="submit" id="btn-submit-cart-cod" class="btn btn-primary" style="padding: 0.95rem 1.5rem; font-size: 0.95rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; box-shadow: 0 4px 18px rgba(37,211,102,0.3);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <span id="cart-cod-btn-text">Confirm Order via Cash on Delivery (COD) &bull; Rs ${grandTotalLKR.toLocaleString()} LKR</span>
+                                </button>
+                            </div>
+
+                            <!-- Pre-Paid Panels (Visible when EMS Pre-paid selected) -->
+                            <div id="cart-pay-panel-prepaid">
+                                <div class="payment-method-tabs" style="margin-bottom: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.35rem;">
+                                    <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
+                                        Bank Transfer (Live)
+                                    </button>
+                                    <button type="button" class="pay-tab" data-method="slip" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                        Cash Deposit Slip (Live)
+                                    </button>
+                                    <button type="button" class="pay-tab" data-method="paypal" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(0,121,193,0.5);">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
+                                        <span style="font-weight:700;"><span style="color:#0079C1;">Pay</span><span style="color:#00457C;">Pal</span></span>
+                                        <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(0,121,193,0.2); color:#38bdf8; font-weight:700;">LIVE</span>
+                                    </button>
+                                </div>
+
+                                <!-- Bank Transfer Panel -->
+                                <div id="cart-pay-panel-bank" class="pay-panel pay-panel-bank active">
+                                    <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.95rem;">
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#ffffff;">Bank of Ceylon</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:var(--color-gold);">Rock one wild tea</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:#ffffff; font-family:monospace; font-size:0.95rem; letter-spacing:1px;">94945708</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#ffffff;">Ettampitiya branch</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; border-top:1px dashed rgba(212,175,55,0.2); padding-top:0.45rem; margin-top:0.35rem; font-size:0.85rem;"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="cart-bank-amount-display" style="color:var(--color-gold); font-size:1rem;">${bankAmountFormatted}</strong></div>
+                                    </div>
+                                    <span class="field-hint" style="margin-top:0.5rem;display:block;font-size:0.72rem;color:var(--color-text-muted);">After transferring to Bank of Ceylon, please upload your transfer slip/receipt below.</span>
+                                    <div class="form-group" style="margin-top:0.65rem; margin-bottom: 0;">
+                                        <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Bank Transfer Slip *</label>
+                                        <div class="file-upload-zone" id="cart-bank-slip-zone">
+                                            <div class="file-upload-icon">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                                            </div>
+                                            <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse receipt file</span></div>
+                                            <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
+                                            <input type="file" id="cart-bank-slip" accept="image/*,.pdf" style="display:none;">
+                                        </div>
+                                        <div id="cart-slip-preview" class="slip-preview" style="display:none;"></div>
+                                    </div>
+                                    <button type="submit" id="btn-submit-cart-bank" class="btn btn-primary" style="margin-top: 0.85rem; padding: 0.85rem 1.5rem; font-size: 0.92rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 4px 18px rgba(212,175,55,0.25);">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                        <span id="cart-bank-btn-text">Place Bank Transfer Order &bull; ${formattedGrandTotal}</span>
+                                    </button>
+                                </div>
+
+                                <!-- Cash Deposit Panel -->
+                                <div id="cart-pay-panel-slip" class="pay-panel pay-panel-slip">
+                                    <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.95rem;">
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#ffffff;">Bank of Ceylon</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:var(--color-gold);">Rock one wild tea</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:#ffffff; font-family:monospace; font-size:0.95rem; letter-spacing:1px;">94945708</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#ffffff;">Ettampitiya branch</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; border-top:1px dashed rgba(212,175,55,0.2); padding-top:0.45rem; margin-top:0.35rem; font-size:0.85rem;"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="cart-deposit-amount-display" style="color:var(--color-gold); font-size:1rem;">${bankAmountFormatted}</strong></div>
+                                    </div>
+                                    <span class="field-hint" style="margin-top:0.5rem;display:block;font-size:0.72rem;color:var(--color-text-muted);">Deposit at any Bank of Ceylon counter and attach the stamped cash deposit slip.</span>
+                                    <div class="form-group" style="margin-top:0.65rem; margin-bottom: 0;">
+                                        <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Cash Deposit Slip *</label>
+                                        <div class="file-upload-zone" id="cart-cash-slip-zone">
+                                            <div class="file-upload-icon">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                                            </div>
+                                            <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse deposit slip</span></div>
+                                            <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
+                                            <input type="file" id="cart-cash-slip" accept="image/*,.pdf" style="display:none;">
+                                        </div>
+                                        <div id="cart-cash-slip-preview" class="slip-preview" style="display:none;"></div>
+                                    </div>
+                                    <button type="submit" id="btn-submit-cart-slip" class="btn btn-primary" style="margin-top: 0.85rem; padding: 0.85rem 1.5rem; font-size: 0.92rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 4px 18px rgba(212,175,55,0.25);">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                        <span id="cart-slip-btn-text">Submit Cash Deposit Slip &bull; ${formattedGrandTotal}</span>
+                                    </button>
+                                </div>
+
+                                <!-- PayPal Panel -->
+                                <div id="cart-pay-panel-paypal" class="pay-panel pay-panel-paypal">
+                                    <div style="background: linear-gradient(135deg, rgba(0,121,193,0.12) 0%, rgba(4,14,8,0.92) 100%); border: 1.5px solid rgba(0,121,193,0.45); border-radius: 8px; padding: 1.15rem;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.5rem;">
+                                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                <svg width="22" height="22" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
+                                                <strong style="color: #ffffff; font-size: 0.95rem;">PayPal &bull; Instant Online Settlement</strong>
+                                            </div>
+                                            <div style="display: flex; gap: 4px; align-items: center;">
+                                                <span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-weight: 600;">PayPal</span>
+                                                <span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-weight: 600;">Visa</span>
+                                                <span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-weight: 600;">Mastercard</span>
+                                                <span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-weight: 600;">AMEX</span>
+                                            </div>
+                                        </div>
+                                        <p style="font-size: 0.78rem; color: #d1d5db; line-height: 1.45; margin: 0 0 0.75rem 0;">
+                                            Pay securely in USD via your PayPal account or International Credit / Debit Card. Instant booking into the estate master ledger and automatic luxury certificate generation.
+                                        </p>
+                                        <div style="background: rgba(0,0,0,0.35); border-radius: 6px; padding: 0.55rem 0.85rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-size: 0.76rem; color: #9ca3af;">USD Settlement Amount:</span>
+                                            <strong id="cart-paypal-amount-display" style="font-size: 1.05rem; color: #38bdf8; font-family: monospace;">${currInfo.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`}</strong>
+                                        </div>
+                                        <div id="cart-paypal-button-container" class="paypal-smart-container" style="min-height: 44px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    })()}
+                </form>
 
                 <!-- Clear Cart link -->
-                <div style="text-align: center; margin-top: -0.5rem;">
+                <div style="text-align: center; margin-top: -0.25rem;">
                     <button type="button" id="btn-clear-cart" style="background: none; border: none; color: var(--color-text-muted); font-size: 0.75rem; cursor: pointer; text-decoration: underline;">
                         ${_t('btn_clear_cart', 'Empty Entire Reserve Bag')}
                     </button>

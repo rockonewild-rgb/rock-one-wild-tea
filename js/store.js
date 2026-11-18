@@ -457,6 +457,81 @@ const CURRENCIES = {
     AED: { code: 'AED', symbol: 'AED ', rate: 3.67, decimals: 2, label: 'AED (د.إ)', symbolPosition: 'prefix' }
 };
 
+const COUNTRY_CURRENCY_MAP = {
+    'Sri Lanka': { code: 'LKR', symbol: 'Rs ', rate: 305.0, decimals: 0, name: 'Sri Lankan Rupee', flag: '🇱🇰' },
+    'United States': { code: 'USD', symbol: '$', rate: 1.0, decimals: 2, name: 'US Dollar', flag: '🇺🇸' },
+    'United Kingdom': { code: 'GBP', symbol: '£', rate: 0.79, decimals: 2, name: 'British Pound', flag: '🇬🇧' },
+    'Australia': { code: 'AUD', symbol: 'A$', rate: 1.53, decimals: 2, name: 'Australian Dollar', flag: '🇦🇺' },
+    'Canada': { code: 'CAD', symbol: 'C$', rate: 1.39, decimals: 2, name: 'Canadian Dollar', flag: '🇨🇦' },
+    'Germany': { code: 'EUR', symbol: '€', rate: 0.92, decimals: 2, name: 'Euro', flag: '🇩🇪' },
+    'France': { code: 'EUR', symbol: '€', rate: 0.92, decimals: 2, name: 'Euro', flag: '🇫🇷' },
+    'Japan': { code: 'JPY', symbol: '¥', rate: 155.0, decimals: 0, name: 'Japanese Yen', flag: '🇯🇵' },
+    'United Arab Emirates': { code: 'AED', symbol: 'AED ', rate: 3.67, decimals: 2, name: 'UAE Dirham', flag: '🇦🇪' },
+    'Singapore': { code: 'SGD', symbol: 'S$', rate: 1.35, decimals: 2, name: 'Singapore Dollar', flag: '🇸🇬' },
+    'India': { code: 'INR', symbol: '₹', rate: 84.50, decimals: 2, name: 'Indian Rupee', flag: '🇮🇳' },
+    'Switzerland': { code: 'CHF', symbol: 'CHF ', rate: 0.90, decimals: 2, name: 'Swiss Franc', flag: '🇨🇭' },
+    'China': { code: 'CNY', symbol: '¥', rate: 7.24, decimals: 2, name: 'Chinese Yuan', flag: '🇨🇳' },
+    'Worldwide': { code: 'USD', symbol: '$', rate: 1.0, decimals: 2, name: 'US Dollar (International)', flag: '🌐' }
+};
+
+if (typeof window !== 'undefined') {
+    window.COUNTRY_CURRENCY_MAP = COUNTRY_CURRENCY_MAP;
+    window.getCountryCurrency = function(countryName) {
+        if (!countryName) return COUNTRY_CURRENCY_MAP['Sri Lanka'];
+        for (const [key, val] of Object.entries(COUNTRY_CURRENCY_MAP)) {
+            if (countryName.toLowerCase().includes(key.toLowerCase())) {
+                return val;
+            }
+        }
+        return COUNTRY_CURRENCY_MAP['Worldwide'];
+    };
+
+    window.formatAmountInCurrency = function(amountUSD, countryOrCurr) {
+        let curr = countryOrCurr;
+        if (typeof countryOrCurr === 'string') {
+            curr = window.getCountryCurrency ? window.getCountryCurrency(countryOrCurr) : null;
+        }
+        if (!curr) curr = { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 };
+
+        const converted = Math.round(Number(amountUSD || 0) * curr.rate * (curr.decimals === 0 ? 1 : 100)) / (curr.decimals === 0 ? 1 : 100);
+        const formattedNum = converted.toLocaleString('en-US', {
+            minimumFractionDigits: curr.decimals,
+            maximumFractionDigits: curr.decimals
+        });
+
+        if (curr.code === 'LKR') return `Rs ${formattedNum} LKR`;
+        if (curr.code === 'USD') return `$${formattedNum} USD`;
+        if (curr.code === 'GBP') return `£${formattedNum} GBP`;
+        if (curr.code === 'EUR') return `€${formattedNum} EUR`;
+        if (curr.code === 'AUD') return `A$${formattedNum} AUD`;
+        if (curr.code === 'CAD') return `C$${formattedNum} CAD`;
+        if (curr.code === 'JPY') return `¥${formattedNum} JPY`;
+        if (curr.code === 'CHF') return `${formattedNum} CHF`;
+        if (curr.code === 'AED') return `${formattedNum} AED`;
+        if (curr.code === 'SGD') return `S$${formattedNum} SGD`;
+        if (curr.code === 'INR') return `₹${formattedNum} INR`;
+        if (curr.code === 'CNY') return `¥${formattedNum} CNY`;
+        return `${curr.symbol}${formattedNum} ${curr.code}`;
+    };
+
+    window.calculateShippingFee = function(subtotalUSD, country, itemDefinedShipping = null) {
+        const isDomestic = !country || country === 'Sri Lanka' || country.toLowerCase().includes('sri lanka');
+        subtotalUSD = Number(subtotalUSD || 0);
+
+        if (itemDefinedShipping !== null && itemDefinedShipping !== undefined && Number(itemDefinedShipping) > 0) {
+            return Number(itemDefinedShipping);
+        }
+
+        if (isDomestic) {
+            // Domestic Sri Lanka Post EMS Express: Rs 650 (~$2.13 USD), complimentary for orders >= $80 USD
+            return subtotalUSD >= 80 ? 0 : 2.13;
+        } else {
+            // International Sri Lanka Post EMS Priority Air Courier: $15.00 USD, complimentary for orders >= $150 USD
+            return subtotalUSD >= 150 ? 0 : 15.0;
+        }
+    };
+}
+
 class TeaFactoryStore {
     constructor() {
         this.storageKey = 'tea_factory_store_state';
@@ -2682,19 +2757,42 @@ Direct Desk: +94 76 789 7817 (Voice) | +94 77 320 9950 (WhatsApp) | rockonewild@
 
     getCartSubtotal() {
         if (!this.state.cart || !Array.isArray(this.state.cart)) return 0;
-        return this.state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        return this.state.cart.reduce((sum, item) => sum + ((parseFloat(item.price) || 0) * (item.quantity || 1)), 0);
+    }
+
+    getCartShippingTotal(country = null) {
+        if (!this.state.cart || !Array.isArray(this.state.cart) || this.state.cart.length === 0) return 0;
+        const itemShip = this.state.cart.reduce((sum, item) => {
+            const ship = Number(item.shippingCharge !== undefined ? item.shippingCharge : (item.shippingFee || 0)) || 0;
+            return sum + (ship * (item.quantity || 1));
+        }, 0);
+        if (itemShip > 0) return itemShip;
+
+        const subtotal = this.getCartSubtotal();
+        const activeCountry = country || (typeof window !== 'undefined' ? (window.lastSelectedCheckoutCountry || 'Sri Lanka') : 'Sri Lanka');
+        if (typeof window !== 'undefined' && window.calculateShippingFee) {
+            return window.calculateShippingFee(subtotal, activeCountry);
+        }
+        return activeCountry === 'Sri Lanka' ? (subtotal >= 80 ? 0 : 2.13) : (subtotal >= 150 ? 0 : 15.0);
+    }
+
+    getCartGrandTotal(country = null) {
+        return this.getCartSubtotal() + this.getCartShippingTotal(country);
     }
 
     getCartTotalCount() {
         if (!this.state.cart || !Array.isArray(this.state.cart)) return 0;
-        return this.state.cart.reduce((count, item) => count + item.quantity, 0);
+        return this.state.cart.reduce((count, item) => count + (parseInt(item.quantity) || 1), 0);
     }
 
-    checkoutCart(customerData, paymentMethod = 'bank') {
+    checkoutCart(customerData, paymentMethod = 'bank', slipImage = '', preferredDate = '') {
         const cart = this.getCart();
         if (cart.length === 0) return { success: false, message: "Your reserve cart is empty." };
 
-        const totalUSD = this.getCartSubtotal();
+        const country = customerData.country || (typeof window !== 'undefined' ? (window.lastSelectedCheckoutCountry || 'Sri Lanka') : 'Sri Lanka');
+        const subtotalUSD = this.getCartSubtotal();
+        const shippingUSD = this.getCartShippingTotal(country);
+        const totalUSD = subtotalUSD + shippingUSD;
         const dateNow = new Date();
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         
@@ -2705,48 +2803,78 @@ Direct Desk: +94 76 789 7817 (Voice) | +94 77 320 9950 (WhatsApp) | rockonewild@
         const deliveryRange = `${deliveryStart.toLocaleDateString('en-US', options)} - ${deliveryEnd.toLocaleDateString('en-US', options)}`;
 
         const orderId = `ORD-CART-${Date.now().toString().slice(-6)}`;
-        const activeCurr = this.getActiveCurrency();
+        const activeCurr = customerData.currency || this.getActiveCurrency();
+        const currRate = Number(customerData.currencyRate) || 1.0;
+        const convertedTotal = customerData.convertedTotal !== undefined ? customerData.convertedTotal : Math.round(totalUSD * currRate * 100) / 100;
         const formattedTotal = this.formatCurrency(totalUSD);
+        const formattedSubtotal = this.formatCurrency(subtotalUSD);
+        const formattedShipping = shippingUSD > 0 ? this.formatCurrency(shippingUSD) : 'Complimentary';
 
-        const itemsBreakdown = cart.map(item => ({
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            formattedPrice: this.formatCurrency(item.price),
-            quantity: item.quantity,
-            totalPrice: item.price * item.quantity,
-            formattedTotalPrice: this.formatCurrency(item.price * item.quantity),
-            weight: item.weight,
-            image: item.image,
-            giftOptions: item.giftOptions
-        }));
+        const itemsBreakdown = cart.map(item => {
+            const itemPrice = parseFloat(item.price) || 0;
+            const itemShipping = Number(item.shippingCharge !== undefined ? item.shippingCharge : (item.shippingFee || 0)) || 0;
+            const itemQty = item.quantity || 1;
+            return {
+                id: item.id,
+                name: item.name,
+                price: itemPrice,
+                shippingCharge: itemShipping,
+                shippingFee: itemShipping,
+                formattedPrice: this.formatCurrency(itemPrice),
+                formattedShipping: itemShipping > 0 ? this.formatCurrency(itemShipping) : 'Complimentary',
+                quantity: itemQty,
+                totalPrice: itemPrice * itemQty,
+                totalShipping: itemShipping * itemQty,
+                formattedTotalPrice: this.formatCurrency(itemPrice * itemQty),
+                weight: item.weight,
+                image: item.image,
+                giftOptions: item.giftOptions
+            };
+        });
 
-        const isBank = true;
-        const isOnline = paymentMethod === 'online';
+        const isCOD = paymentMethod === 'cod';
+        const isPayPal = paymentMethod === 'paypal';
 
         // 1. Create order record in state.orders
         const newOrder = {
             id: orderId,
             boxName: `Multi-Item Reserve Batch (${cart.length} item${cart.length > 1 ? 's' : ''})`,
             items: itemsBreakdown,
+            subtotal: subtotalUSD,
+            shippingFee: shippingUSD,
             price: totalUSD,
             currency: activeCurr,
+            currencyRate: currRate,
+            convertedTotal: convertedTotal,
             formattedPrice: formattedTotal,
-            customerName: customerData.name,
+            formattedSubtotal: formattedSubtotal,
+            formattedShipping: formattedShipping,
+            customerName: customerData.name || `${customerData.firstName || ''} ${customerData.lastName || ''}`.trim() || 'Valued Collector',
+            firstName: customerData.firstName || '',
+            lastName: customerData.lastName || '',
             email: customerData.email,
             phone: customerData.phone || '',
             address: customerData.address || '',
-            country: customerData.country || 'International Delivery',
+            street: customerData.street || '',
+            suite: customerData.suite || '',
+            city: customerData.city || '',
+            postalCode: customerData.postalCode || '',
+            region: customerData.region || '',
+            country: country,
+            shippingMethod: customerData.shippingMethod || (isCOD ? 'cod' : 'ems_express'),
+            preferredDate: preferredDate || customerData.preferredDate || '',
             createdAt: dateNow.toLocaleDateString('en-US', { ...options, hour: '2-digit', minute: '2-digit' }),
             deliveryRange: deliveryRange,
             paymentMethod: paymentMethod,
-            paymentLink: isOnline ? `https://checkout.stripe.com/pay/mock_rockonewildtea_${orderId.toLowerCase()}` : '',
-            bankName: "Bank of Ceylon (Kandy Main Branch)",
-            accountName: "Rock One Wild Tea (Pvt) Ltd",
-            accountNo: "0083-1001-5271-8843",
+            paymentStatus: isCOD ? 'pending_cod' : (isPayPal ? 'Paid & Confirmed' : 'pending_deposit'),
+            slipImage: slipImage || customerData.slipImage || '',
+            bankName: "Bank of Ceylon",
+            accountName: "Rock one wild tea",
+            accountNo: "94945708",
+            branch: "Ettampitiya branch",
             referenceNote: orderId,
-            ownerNote: customerData.notes || "Order placed via Multi-Item Connoisseur Reserve Basket.",
-            status: "Order Created"
+            ownerNote: customerData.notes || (isCOD ? "Cash on Delivery via Sri Lanka Post EMS" : "Order placed via Multi-Item Connoisseur Reserve Basket."),
+            status: isCOD ? "Order Confirmed (COD)" : (isPayPal ? "Paid & Confirmed" : "Order Created")
         };
 
         if (!this.state.orders) this.state.orders = [];
@@ -2758,16 +2886,23 @@ Direct Desk: +94 76 789 7817 (Voice) | +94 77 320 9950 (WhatsApp) | rockonewild@
             type: 'product',
             productName: `Multi-Item Batch (${cart.reduce((s, c) => s + c.quantity, 0)} items)`,
             items: itemsBreakdown,
+            subtotal: subtotalUSD,
+            shippingFee: shippingUSD,
             price: totalUSD,
             currency: activeCurr,
             formattedPrice: formattedTotal,
-            customerName: customerData.name,
+            formattedShipping: formattedShipping,
+            customerName: newOrder.customerName,
             email: customerData.email,
             phone: customerData.phone || '',
             bookingDate: dateNow.toLocaleDateString('en-US', { ...options, hour: '2-digit', minute: '2-digit' }),
             deliveryRange: deliveryRange,
             address: customerData.address || '',
-            status: "Order Created",
+            country: country,
+            shippingMethod: newOrder.shippingMethod,
+            paymentMethod: paymentMethod,
+            paymentStatus: newOrder.paymentStatus,
+            status: newOrder.status,
             message: customerData.notes || "",
             socialChannel: "Web Basket"
         };
@@ -2995,6 +3130,43 @@ Rock One Wild Tea Sanctuary Concierge Team
         } catch (e) {
             console.warn('🌿 [Store] Sync notice:', e.message);
         }
+    }
+
+    // ── Patron / Customer User Session Management ──
+    getCurrentUser() {
+        try {
+            if (typeof localStorage === 'undefined') return null;
+            const raw = localStorage.getItem('tea_factory_patron_user');
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    setCurrentUser(userObj) {
+        try {
+            if (typeof localStorage !== 'undefined') {
+                if (userObj) {
+                    localStorage.setItem('tea_factory_patron_user', JSON.stringify(userObj));
+                } else {
+                    localStorage.removeItem('tea_factory_patron_user');
+                }
+            }
+        } catch (e) {}
+        return userObj;
+    }
+
+    clearCurrentUser() {
+        try {
+            if (typeof localStorage !== 'undefined') {
+                localStorage.removeItem('tea_factory_patron_user');
+            }
+        } catch (e) {}
+    }
+
+    isCustomerLoggedIn() {
+        const user = this.getCurrentUser();
+        return !!(user && user.email);
     }
 }
 

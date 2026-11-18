@@ -140,7 +140,7 @@
     </g>
     <text x="200" y="165" fill="#f6e27a" font-family="'Cinzel', Georgia, serif" font-size="12" font-weight="700" letter-spacing="2" text-anchor="middle">BANK DEPOSIT SLIP RECORD</text>
     <text x="200" y="185" fill="#81c784" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">VERIFIED TRANSACTION ATTACHMENT</text>
-    <text x="200" y="205" fill="#a0b0a5" font-family="'EB Garamond', serif" font-size="11" font-style="italic" text-anchor="middle">Commercial Bank · 0083-1001-5271-8843</text>
+    <text x="200" y="205" fill="#a0b0a5" font-family="'EB Garamond', serif" font-size="11" font-style="italic" text-anchor="middle">Bank of Ceylon · 94945708 (Ettampitiya)</text>
 </svg>`);
         },
 
@@ -276,6 +276,14 @@
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 0. Enforce strict manual scroll restoration so page refresh / loading always lands at the top Hero slideshow
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+
     // 1. Core State
     let activeTab = 'home';
     let currentDrawerContext = null; // { type: 'box'|'tour', id: number }
@@ -293,6 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedOrderSlipBase64 = '';
     let selectedTourSlipBase64 = '';
     let selectedProdSlipBase64 = '';
+    let selectedBoxSlipBase64 = '';
     let activeAdminSubTab = 'audits';
 
     // 2. Select DOM Elements
@@ -356,6 +365,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     if (window.location.hash === '#admin') {
         setTimeout(() => switchTab('admin'), 250);
+    }
+
+    // Direct Payment Link / QR Code Navigation (e.g. ?pay=ENQ-01-01-1234)
+    const urlParams = new URLSearchParams(window.location.search);
+    const payBookingId = urlParams.get('pay');
+    if (payBookingId) {
+        setTimeout(() => {
+            if (typeof openQuotedBoxCheckoutDrawer === 'function') {
+                openQuotedBoxCheckoutDrawer(payBookingId);
+            }
+        }, 400);
     }
 
     function switchTab(tabId) {
@@ -559,14 +579,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="admin-login-logo-box">
                         <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" class="admin-login-logo" onerror="window.handleImageError && window.handleImageError(this, 'logo')">
                     </div>
-                    <h2 class="admin-login-title">Concierge Authentication</h2>
+                    <h2 class="admin-login-title">Admin Authentication</h2>
                     <p class="admin-login-subtitle">Access restricted to authorized estate operators.</p>
                     
                     <form id="admin-login-form" class="admin-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
                         <div class="form-group" style="text-align: left;">
-                            <label for="admin-passcode" class="admin-login-label">Estate Passcode</label>
+                            <label for="admin-passcode" class="admin-login-label">Admin Passcode</label>
                             <div class="admin-login-input-wrapper">
-                                <input type="password" id="admin-passcode" placeholder="Enter staff passcode" autocomplete="current-password" class="admin-login-input" required>
+                                <input type="password" id="admin-passcode" placeholder="Enter master admin passcode" autocomplete="current-password" class="admin-login-input" required>
                                 <button type="button" id="toggle-admin-passcode-btn" class="admin-login-eye-btn" title="Show/Hide Passcode">
                                     <svg id="passcode-eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -575,7 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </button>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary w-full admin-login-btn">Unlock Console</button>
+                        <button type="submit" class="btn btn-primary w-full admin-login-btn">Unlock Admin Panel</button>
                     </form>
                 </div>
             </div>
@@ -720,7 +740,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </svg>
                     </div>
                     <h3 style="font-family: var(--font-serif); font-size: 1.45rem; margin: 0; color: #ffffff;">Update Passcode</h3>
-                    <p style="font-size: 0.78rem; color: var(--color-text-muted); margin: 0.35rem 0 0 0;">Set a new access passcode for Concierge Operations.</p>
+                    <p style="font-size: 0.78rem; color: var(--color-text-muted); margin: 0.35rem 0 0 0;">Set a new access passcode for Admin Panel.</p>
                 </div>
 
                 <!-- Form -->
@@ -801,9 +821,537 @@ document.addEventListener('DOMContentLoaded', () => {
             const ok = window.TeaFactoryStore.setAdminPasscode(newInput);
             if (ok) {
                 closeModal();
-                showToast("Passcode Updated", "Your new Concierge Operations passcode has been saved.", "success");
+                showToast("Passcode Updated", "Your new Admin Panel passcode has been saved.", "success");
             } else {
                 showToast("Save Error", "Could not update passcode. Please try again.", "error");
+            }
+        });
+    }
+
+    // ─── User Accounts & Staff Desk Modals ────────────────────────────────────
+
+    function showCreateUserModal() {
+        const existing = document.getElementById('create-user-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'create-user-modal';
+        modal.style.cssText = `
+            position: fixed; inset: 0; z-index: 10000;
+            background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: center; padding: 1rem;
+            animation: fadeInModal 0.25s ease-out; box-sizing: border-box;
+        `;
+
+        modal.innerHTML = `
+            <div style="
+                background: linear-gradient(135deg, rgba(8, 22, 14, 0.98) 0%, rgba(4, 12, 7, 0.99) 100%);
+                border: 1.5px solid rgba(212, 175, 55, 0.55);
+                box-shadow: 0 25px 80px rgba(0,0,0,0.95), 0 0 35px rgba(212, 175, 55, 0.2);
+                border-radius: 20px; max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto;
+                padding: clamp(1.5rem, 3vh, 2.25rem); color: #ffffff; position: relative; box-sizing: border-box;
+            ">
+                <!-- Close Button -->
+                <button type="button" class="btn-modal-close" style="
+                    position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.06);
+                    border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 34px; height: 34px; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center; cursor: pointer;
+                ">&times;</button>
+
+                <!-- Header -->
+                <div style="text-align: center; margin-bottom: 1.75rem;">
+                    <div style="
+                        width: 58px; height: 58px; border-radius: 50%; background: rgba(212, 175, 55, 0.15);
+                        border: 1.5px solid var(--color-gold); display: inline-flex; align-items: center; justify-content: center;
+                        color: var(--color-gold); margin-bottom: 0.75rem; box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+                    ">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <line x1="19" y1="8" x2="19" y2="14"></line>
+                            <line x1="22" y1="11" x2="16" y2="11"></line>
+                        </svg>
+                    </div>
+                    <h3 style="font-family: var(--font-serif); font-size: 1.45rem; margin: 0; color: #ffffff;">Create New User Account</h3>
+                    <p style="font-size: 0.8rem; color: var(--color-text-muted); margin: 0.35rem 0 0 0;">
+                        Provision a staff, manager, or sommelier identity authenticated by their Email ID.
+                    </p>
+                </div>
+
+                <!-- Form -->
+                <form id="create-user-form" style="display: flex; flex-direction: column; gap: 1.15rem;">
+                    <!-- Email ID (Primary Identity) -->
+                    <div>
+                        <label style="display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 700; margin-bottom: 0.4rem;">
+                            <span>Email ID (Primary Identity) *</span>
+                            <span style="font-size: 0.65rem; color: #86efac; font-weight: 600; text-transform: none;">Used for Sign In &amp; Alerts</span>
+                        </label>
+                        <input type="email" id="new-user-email" placeholder="e.g. sommelier@rockonewild.com" required style="
+                            width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1.5px solid rgba(212,175,55,0.4);
+                            border-radius: 8px; padding: 0.75rem 1rem; color: #ffffff; font-size: 0.95rem; outline: none;
+                        ">
+                    </div>
+
+                    <!-- Full Name -->
+                    <div>
+                        <label style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 700; margin-bottom: 0.4rem;">
+                            Full Name *
+                        </label>
+                        <input type="text" id="new-user-name" placeholder="e.g. Samantha Fernando" required style="
+                            width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1.5px solid rgba(255,255,255,0.15);
+                            border-radius: 8px; padding: 0.75rem 1rem; color: #ffffff; font-size: 0.95rem; outline: none;
+                        ">
+                    </div>
+
+                    <!-- Role & Status Grid -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 700; margin-bottom: 0.4rem;">
+                                Assigned Role
+                            </label>
+                            <select id="new-user-role" style="
+                                width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1.5px solid rgba(255,255,255,0.15);
+                                border-radius: 8px; padding: 0.75rem 0.85rem; color: #ffffff; font-size: 0.88rem; outline: none; cursor: pointer;
+                            ">
+                                <option value="staff" selected>Staff Member</option>
+                                <option value="sommelier">Tea Sommelier</option>
+                                <option value="concierge">Master Concierge</option>
+                                <option value="manager">Estate Manager</option>
+                                <option value="admin">Administrator</option>
+                                <option value="patron">Connoisseur Patron</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 700; margin-bottom: 0.4rem;">
+                                Account Status
+                            </label>
+                            <select id="new-user-status" style="
+                                width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1.5px solid rgba(255,255,255,0.15);
+                                border-radius: 8px; padding: 0.75rem 0.85rem; color: #ffffff; font-size: 0.88rem; outline: none; cursor: pointer;
+                            ">
+                                <option value="active" selected>Active (Immediate Login)</option>
+                                <option value="pending">Pending Review</option>
+                                <option value="suspended">Suspended</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Password with Generator -->
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                            <label style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 700;">
+                                Account Password
+                            </label>
+                            <button type="button" id="btn-generate-password" style="
+                                background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.4);
+                                color: var(--color-gold); font-size: 0.7rem; font-weight: 700; border-radius: 4px;
+                                padding: 2px 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem;
+                            ">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path><path d="M16 21h5v-5"></path></svg>
+                                Auto-Generate Strong
+                            </button>
+                        </div>
+                        <div style="position: relative;">
+                            <input type="password" id="new-user-password" placeholder="Leave blank to auto-generate secure password" style="
+                                width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1.5px solid rgba(255,255,255,0.15);
+                                border-radius: 8px; padding: 0.75rem 2.5rem 0.75rem 1rem; color: #ffffff; font-size: 0.95rem; outline: none;
+                            ">
+                            <button type="button" id="btn-toggle-new-password" style="
+                                position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
+                                background: none; border: none; color: #94a3b8; cursor: pointer; display: flex; align-items: center; padding: 0;
+                            " title="Show/Hide Password">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                        </div>
+                        <span style="display: block; font-size: 0.72rem; color: #94a3b8; margin-top: 0.35rem;">
+                            Minimum 6 characters. If left empty, an encrypted secure password will be automatically generated.
+                        </span>
+                    </div>
+
+                    <!-- Phone / WhatsApp -->
+                    <div>
+                        <label style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 700; margin-bottom: 0.4rem;">
+                            Phone / WhatsApp (Optional)
+                        </label>
+                        <input type="text" id="new-user-phone" placeholder="e.g. +94 77 123 4567" style="
+                            width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1.5px solid rgba(255,255,255,0.15);
+                            border-radius: 8px; padding: 0.75rem 1rem; color: #ffffff; font-size: 0.95rem; outline: none;
+                        ">
+                    </div>
+
+                    <!-- Dispatch Credentials Email Checkbox -->
+                    <div style="background: rgba(212,175,55,0.06); border: 1px solid rgba(212,175,55,0.22); border-radius: 8px; padding: 0.85rem 1rem;">
+                        <label style="display: flex; align-items: flex-start; gap: 0.65rem; cursor: pointer; margin: 0;">
+                            <input type="checkbox" id="new-user-send-invite" checked style="accent-color: var(--color-gold); width: 17px; height: 17px; margin-top: 2px;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.85rem; font-weight: 600; color: #ffffff;">Send Welcome &amp; Credentials Email</div>
+                                <div style="font-size: 0.72rem; color: #cbd5e1; margin-top: 0.15rem; line-height: 1.4;">
+                                    Dispatches an official luxury estate onboarding email to the user's Email ID via Resend containing their access credentials and estate portal link.
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Modal Actions -->
+                    <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 0.75rem;">
+                        <button type="button" class="btn btn-outline btn-modal-cancel" style="padding: 0.65rem 1.25rem; font-size: 0.82rem;">Cancel</button>
+                        <button type="submit" id="btn-submit-create-user" class="btn btn-primary" style="padding: 0.65rem 1.5rem; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.45rem;">
+                            <span>Create Account</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        function closeModal() { modal.remove(); }
+        modal.querySelector('.btn-modal-close').addEventListener('click', closeModal);
+        modal.querySelector('.btn-modal-cancel').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        // Auto Generate Password button
+        const genBtn = modal.querySelector('#btn-generate-password');
+        const passInput = modal.querySelector('#new-user-password');
+        genBtn.addEventListener('click', () => {
+            const chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%&*';
+            let pass = '';
+            for (let i = 0; i < 10; i++) {
+                pass += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            passInput.value = pass;
+            passInput.type = 'text';
+            showToast("Password Generated", `Temporary password: ${pass}`, "info", 4000);
+        });
+
+        // Toggle Password visibility
+        const toggleBtn = modal.querySelector('#btn-toggle-new-password');
+        toggleBtn.addEventListener('click', () => {
+            passInput.type = passInput.type === 'password' ? 'text' : 'password';
+        });
+
+        // Form Submit
+        const form = modal.querySelector('#create-user-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = (modal.querySelector('#new-user-email').value || '').trim();
+            const fullName = (modal.querySelector('#new-user-name').value || '').trim();
+            const role = modal.querySelector('#new-user-role').value;
+            const status = modal.querySelector('#new-user-status').value;
+            const phone = (modal.querySelector('#new-user-phone').value || '').trim();
+            const password = passInput.value.trim();
+            const sendInvite = modal.querySelector('#new-user-send-invite').checked;
+
+            const submitBtn = modal.querySelector('#btn-submit-create-user');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+                <span>Provisioning Account...</span>
+            `;
+
+            try {
+                const res = await window.TeaFactoryAPI.createUser({
+                    email,
+                    full_name: fullName,
+                    role,
+                    status,
+                    phone,
+                    password,
+                    send_invite_email: sendInvite
+                });
+
+                if (res && res.success) {
+                    window.TeaFactoryStore.addUser(res.user);
+                    closeModal();
+                    showToast(
+                        "User Account Created", 
+                        `Account for ${res.user.email} (${res.user.role.toUpperCase()}) provisioned successfully.${res.email_dispatched ? ' Credentials sent via email.' : ''}`, 
+                        "success"
+                    );
+                    renderTabContent('admin');
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<span>Create Account</span>`;
+                    showToast("Account Creation Failed", (res && res.error) || "Could not create user account.", "error");
+                }
+            } catch (err) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<span>Create Account</span>`;
+                showToast("Connection Error", err.message, "error");
+            }
+        });
+    }
+
+    function showEditUserModal(user) {
+        const existing = document.getElementById('edit-user-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'edit-user-modal';
+        modal.style.cssText = `
+            position: fixed; inset: 0; z-index: 10000;
+            background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: center; padding: 1rem;
+            animation: fadeInModal 0.25s ease-out; box-sizing: border-box;
+        `;
+
+        modal.innerHTML = `
+            <div style="
+                background: linear-gradient(135deg, rgba(8, 22, 14, 0.98) 0%, rgba(4, 12, 7, 0.99) 100%);
+                border: 1.5px solid rgba(212, 175, 55, 0.55);
+                box-shadow: 0 25px 80px rgba(0,0,0,0.95), 0 0 35px rgba(212, 175, 55, 0.2);
+                border-radius: 20px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;
+                padding: clamp(1.5rem, 3vh, 2.25rem); color: #ffffff; position: relative; box-sizing: border-box;
+            ">
+                <!-- Close Button -->
+                <button type="button" class="btn-modal-close" style="
+                    position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.06);
+                    border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 34px; height: 34px; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center; cursor: pointer;
+                ">&times;</button>
+
+                <!-- Header -->
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="
+                        width: 54px; height: 54px; border-radius: 50%; background: rgba(212, 175, 55, 0.15);
+                        border: 1.5px solid var(--color-gold); display: inline-flex; align-items: center; justify-content: center;
+                        color: var(--color-gold); margin-bottom: 0.75rem;
+                    ">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </div>
+                    <h3 style="font-family: var(--font-serif); font-size: 1.35rem; margin: 0; color: #ffffff;">Edit User Profile</h3>
+                    <p style="font-size: 0.8rem; color: var(--color-text-muted); margin: 0.25rem 0 0 0;">
+                        Update account role, phone, and permissions for ${user.email}.
+                    </p>
+                </div>
+
+                <!-- Form -->
+                <form id="edit-user-form" style="display: flex; flex-direction: column; gap: 1.15rem;">
+                    <!-- Email ID (Readonly) -->
+                    <div>
+                        <label style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 700; margin-bottom: 0.35rem;">
+                            Email ID (Primary Identity)
+                        </label>
+                        <input type="email" value="${user.email}" disabled style="
+                            width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.35); border: 1.5px solid rgba(255,255,255,0.08);
+                            border-radius: 8px; padding: 0.75rem 1rem; color: #94a3b8; font-size: 0.95rem; cursor: not-allowed;
+                        ">
+                    </div>
+
+                    <!-- Full Name -->
+                    <div>
+                        <label style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 700; margin-bottom: 0.35rem;">
+                            Full Name
+                        </label>
+                        <input type="text" id="edit-user-name" value="${user.full_name || ''}" required style="
+                            width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1.5px solid rgba(255,255,255,0.15);
+                            border-radius: 8px; padding: 0.75rem 1rem; color: #ffffff; font-size: 0.95rem; outline: none;
+                        ">
+                    </div>
+
+                    <!-- Role & Status -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 700; margin-bottom: 0.35rem;">
+                                Assigned Role
+                            </label>
+                            <select id="edit-user-role" style="
+                                width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1.5px solid rgba(255,255,255,0.15);
+                                border-radius: 8px; padding: 0.75rem 0.85rem; color: #ffffff; font-size: 0.88rem; outline: none; cursor: pointer;
+                            ">
+                                <option value="staff" ${user.role === 'staff' ? 'selected' : ''}>Staff Member</option>
+                                <option value="sommelier" ${user.role === 'sommelier' ? 'selected' : ''}>Tea Sommelier</option>
+                                <option value="concierge" ${user.role === 'concierge' ? 'selected' : ''}>Master Concierge</option>
+                                <option value="manager" ${user.role === 'manager' ? 'selected' : ''}>Estate Manager</option>
+                                <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Administrator</option>
+                                <option value="patron" ${user.role === 'patron' ? 'selected' : ''}>Connoisseur Patron</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 700; margin-bottom: 0.35rem;">
+                                Status
+                            </label>
+                            <select id="edit-user-status" style="
+                                width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1.5px solid rgba(255,255,255,0.15);
+                                border-radius: 8px; padding: 0.75rem 0.85rem; color: #ffffff; font-size: 0.88rem; outline: none; cursor: pointer;
+                            ">
+                                <option value="active" ${user.status === 'active' ? 'selected' : ''}>Active</option>
+                                <option value="pending" ${user.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                <option value="suspended" ${user.status === 'suspended' ? 'selected' : ''}>Suspended</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Phone / WhatsApp -->
+                    <div>
+                        <label style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 700; margin-bottom: 0.35rem;">
+                            Phone / WhatsApp
+                        </label>
+                        <input type="text" id="edit-user-phone" value="${user.phone || ''}" placeholder="e.g. +94 77 123 4567" style="
+                            width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1.5px solid rgba(255,255,255,0.15);
+                            border-radius: 8px; padding: 0.75rem 1rem; color: #ffffff; font-size: 0.95rem; outline: none;
+                        ">
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 0.5rem;">
+                        <button type="button" class="btn btn-outline btn-modal-cancel" style="padding: 0.65rem 1.25rem; font-size: 0.82rem;">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.5rem; font-size: 0.85rem; font-weight: 700;">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        function closeModal() { modal.remove(); }
+        modal.querySelector('.btn-modal-close').addEventListener('click', closeModal);
+        modal.querySelector('.btn-modal-cancel').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        const form = modal.querySelector('#edit-user-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fullName = modal.querySelector('#edit-user-name').value.trim();
+            const role = modal.querySelector('#edit-user-role').value;
+            const status = modal.querySelector('#edit-user-status').value;
+            const phone = modal.querySelector('#edit-user-phone').value.trim();
+
+            const updates = { full_name: fullName, role, status, phone };
+
+            try {
+                const res = await window.TeaFactoryAPI.updateUser(user.id, updates);
+                if (res && res.success) {
+                    window.TeaFactoryStore.updateUser(user.id, res.user || updates);
+                    closeModal();
+                    showToast("Profile Updated", `Account for ${user.email} updated successfully.`, "success");
+                    renderTabContent('admin');
+                } else {
+                    showToast("Update Failed", (res && res.error) || "Could not update user.", "error");
+                }
+            } catch (err) {
+                showToast("Connection Error", err.message, "error");
+            }
+        });
+    }
+
+    function showResetUserPasswordModal(user) {
+        const existing = document.getElementById('reset-user-password-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'reset-user-password-modal';
+        modal.style.cssText = `
+            position: fixed; inset: 0; z-index: 10000;
+            background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: center; padding: 1rem;
+            animation: fadeInModal 0.25s ease-out; box-sizing: border-box;
+        `;
+
+        modal.innerHTML = `
+            <div style="
+                background: linear-gradient(135deg, rgba(8, 22, 14, 0.98) 0%, rgba(4, 12, 7, 0.99) 100%);
+                border: 1.5px solid rgba(212, 175, 55, 0.55);
+                box-shadow: 0 25px 80px rgba(0,0,0,0.95), 0 0 35px rgba(212, 175, 55, 0.2);
+                border-radius: 20px; max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto;
+                padding: clamp(1.5rem, 3vh, 2.25rem); color: #ffffff; position: relative; box-sizing: border-box;
+            ">
+                <!-- Close Button -->
+                <button type="button" class="btn-modal-close" style="
+                    position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.06);
+                    border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 34px; height: 34px; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center; cursor: pointer;
+                ">&times;</button>
+
+                <!-- Header -->
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="
+                        width: 54px; height: 54px; border-radius: 50%; background: rgba(212, 175, 55, 0.15);
+                        border: 1.5px solid var(--color-gold); display: inline-flex; align-items: center; justify-content: center;
+                        color: var(--color-gold); margin-bottom: 0.75rem;
+                    ">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <h3 style="font-family: var(--font-serif); font-size: 1.35rem; margin: 0; color: #ffffff;">Reset Password</h3>
+                    <p style="font-size: 0.8rem; color: var(--color-text-muted); margin: 0.25rem 0 0 0;">
+                        Assign a new password for ${user.full_name || 'User'} (${user.email}).
+                    </p>
+                </div>
+
+                <!-- Form -->
+                <form id="reset-user-pass-form" style="display: flex; flex-direction: column; gap: 1.15rem;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                            <label style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); font-weight: 700;">
+                                New Password
+                            </label>
+                            <button type="button" id="btn-gen-reset-pass" style="
+                                background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.4);
+                                color: var(--color-gold); font-size: 0.7rem; font-weight: 700; border-radius: 4px;
+                                padding: 2px 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem;
+                            ">
+                                Generate Random
+                            </button>
+                        </div>
+                        <div style="position: relative;">
+                            <input type="text" id="reset-pass-val" required minlength="6" placeholder="Enter new password (min. 6 chars)" style="
+                                width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1.5px solid rgba(255,255,255,0.15);
+                                border-radius: 8px; padding: 0.75rem 1rem; color: #ffffff; font-size: 0.95rem; outline: none;
+                            ">
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(212,175,55,0.06); border: 1px solid rgba(212,175,55,0.22); border-radius: 8px; padding: 0.75rem 0.9rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin: 0; font-size: 0.82rem; color: #fff;">
+                            <input type="checkbox" id="reset-pass-send-email" checked style="accent-color: var(--color-gold); width: 16px; height: 16px;">
+                            <span>Email updated credentials to ${user.email}</span>
+                        </label>
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 0.5rem;">
+                        <button type="button" class="btn btn-outline btn-modal-cancel" style="padding: 0.65rem 1.25rem; font-size: 0.82rem;">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.5rem; font-size: 0.85rem; font-weight: 700;">Reset Password</button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        function closeModal() { modal.remove(); }
+        modal.querySelector('.btn-modal-close').addEventListener('click', closeModal);
+        modal.querySelector('.btn-modal-cancel').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        const genBtn = modal.querySelector('#btn-gen-reset-pass');
+        const passVal = modal.querySelector('#reset-pass-val');
+        genBtn.addEventListener('click', () => {
+            const chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%&*';
+            let pass = '';
+            for (let i = 0; i < 10; i++) {
+                pass += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            passVal.value = pass;
+        });
+
+        // Pre-fill with a generated password
+        genBtn.click();
+
+        const form = modal.querySelector('#reset-user-pass-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = passVal.value.trim();
+            const sendEmail = modal.querySelector('#reset-pass-send-email').checked;
+
+            try {
+                const res = await window.TeaFactoryAPI.resetUserPassword(user.id, newPassword, sendEmail);
+                if (res && res.success) {
+                    closeModal();
+                    showToast("Password Reset", `Password for ${user.email} updated successfully.${sendEmail ? ' Credentials emailed.' : ''}`, "success");
+                } else {
+                    showToast("Reset Failed", (res && res.error) || "Unable to reset password.", "error");
+                }
+            } catch (err) {
+                showToast("Connection Error", err.message, "error");
             }
         });
     }
@@ -1025,7 +1573,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ─── Luxury Universal Deletion & Removal Confirmation Modal ───────────────
-    function showDeleteConfirmModal({ title = 'Confirm Deletion', subtitle = 'Estate Concierge Operations', itemName = '', message = 'Are you sure you want to delete this record? This action cannot be undone.', confirmText = 'Delete & Remove', onConfirm }) {
+    function showDeleteConfirmModal({ title = 'Confirm Deletion', subtitle = 'Estate Admin Panel', itemName = '', message = 'Are you sure you want to delete this record? This action cannot be undone.', confirmText = 'Delete & Remove', onConfirm }) {
         const existing = document.getElementById('universal-delete-modal');
         if (existing) existing.remove();
 
@@ -1351,95 +1899,983 @@ document.addEventListener('DOMContentLoaded', () => {
         }, duration);
     }
 
+    // Stage-specific Currency Switcher (Stage 1: Product, Stage 2: Tour, Stage 3: Gift Box)
+    window.switchStageCurrency = function(currencyCode) {
+        const code = (currencyCode || '').toUpperCase();
+        if (!window.TeaFactoryStore || !window.TeaFactoryStore.setActiveCurrency(code)) return;
+
+        // 1. Sync global currency dropdown switchers
+        const desktopSel = document.getElementById('currency-switcher');
+        const mobileSel = document.getElementById('mobile-currency-switcher');
+        if (desktopSel) desktopSel.value = code;
+        if (mobileSel) mobileSel.value = code;
+
+        // 2. Sync Floating Prefs
+        if (typeof syncFloatingPrefsWidget === 'function') {
+            syncFloatingPrefsWidget();
+        }
+
+        // 3. Update Cart Badges
+        if (window.appUpdateCartBadges) window.appUpdateCartBadges();
+
+        // 4. If Cart Drawer is open, re-render it
+        const cartOverlay = document.getElementById('cart-drawer-overlay');
+        if (cartOverlay && cartOverlay.classList.contains('open')) {
+            if (window.UIComponents && window.UIComponents.renderCartDrawer) {
+                window.UIComponents.renderCartDrawer('cart-drawer-body');
+                if (window.appBindCartDrawerEvents) window.appBindCartDrawerEvents();
+            }
+        }
+
+        // 5. If a Main Stage Drawer is open, refresh it preserving typed fields
+        if (currentDrawerContext && currentDrawerContext.type) {
+            const savedInputs = {};
+            if (drawerFormContainer) {
+                drawerFormContainer.querySelectorAll('input, select, textarea').forEach(el => {
+                    if (el.id && el.type !== 'file') {
+                        savedInputs[el.id] = el.value;
+                    }
+                });
+            }
+
+            openDrawer(currentDrawerContext.type, currentDrawerContext.id, currentDrawerContext.data);
+
+            if (drawerFormContainer) {
+                Object.keys(savedInputs).forEach(id => {
+                    const el = drawerFormContainer.querySelector(`#${id}`);
+                    if (el) el.value = savedInputs[id];
+                });
+            }
+        }
+
+        // 6. Update background view
+        if (typeof renderTabContent === 'function') {
+            const currentTab = window.TeaFactoryStore.getActiveTab ? window.TeaFactoryStore.getActiveTab() : 'catalog';
+            renderTabContent(currentTab);
+        }
+
+        showToast("Currency Updated", `Settlement currency set to ${code}.`, "info");
+    };
+
     // 5. Drawer Controls
     function openDrawer(type, id, data = {}) {
+        const signedInUser = window.TeaFactoryStore && window.TeaFactoryStore.getCurrentUser
+            ? window.TeaFactoryStore.getCurrentUser()
+            : null;
+
+        const prefillUser = (nameId, emailId, phoneId) => {
+            if (!signedInUser) return;
+            const nEl = document.getElementById(nameId);
+            const eEl = document.getElementById(emailId);
+            const pEl = document.getElementById(phoneId);
+            if (nEl && !nEl.value && signedInUser.full_name) nEl.value = signedInUser.full_name;
+            if (eEl && signedInUser.email) {
+                eEl.value = signedInUser.email;
+                eEl.readOnly = true;
+                eEl.style.opacity = '0.88';
+            }
+            if (pEl && !pEl.value && signedInUser.phone) pEl.value = signedInUser.phone;
+        };
+
         currentDrawerContext = { type, id, data };
         drawerOverlay.classList.add('active');
 
-        if (type === 'box') {
+        if (type === 'box' || type === 'box_quoted_pay') {
+            const isQuotedPay = type === 'box_quoted_pay';
+            const booking = isQuotedPay ? data : null;
+
             const boxes = window.TeaFactoryStore.getBoxes();
-            const box = boxes.find(b => b.id === id);
-            const season = window.TeaFactoryStore.getCurrentSeason();
-
+            const box = isQuotedPay 
+                ? { id: booking.boxId || booking.id, name: booking.boxName, image: booking.image || 'images/Gift Box.jpeg', price: booking.quotedPrice || booking.price || 150 }
+                : (boxes.find(b => b.id === id) || { id, name: `Gift Box #${String(id).padStart(2, '0')}`, image: 'images/Gift Box.jpeg', price: 150.00 });
+            
+            const season = window.TeaFactoryStore.getCurrentSeason() || { name: 'Royal Emerald Reserve', seriesNumber: 1 };
             const boxMinDate = new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0];
+            
+            const unitPriceUSD = Number(box.price) || 150.00;
+            const selectedCountry = window.lastSelectedCheckoutCountry || 'Sri Lanka';
+            const isSriLanka = selectedCountry === 'Sri Lanka';
+            const currInfo = window.getCountryCurrency ? window.getCountryCurrency(selectedCountry) : (isSriLanka ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
 
-            drawerTitle.innerText = `Inquire: ${box.name}`;
+            let currentBoxQty = isQuotedPay ? (booking.quantity || 1) : 1;
+            let subtotalUSD = unitPriceUSD * currentBoxQty;
+            let shippingUSD = isQuotedPay && booking.quotedShipping !== undefined 
+                ? booking.quotedShipping 
+                : (window.calculateShippingFee ? window.calculateShippingFee(subtotalUSD, selectedCountry) : (isSriLanka ? 2.13 : 15.0));
+            let grandTotalUSD = subtotalUSD + shippingUSD;
+
+            let formattedSubtotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(subtotalUSD, currInfo) : `$${subtotalUSD.toFixed(2)}`;
+            let formattedShipping = shippingUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(shippingUSD, currInfo) : `$${shippingUSD.toFixed(2)}`) : 'Complimentary';
+            let formattedGrandTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(grandTotalUSD, currInfo) : `$${grandTotalUSD.toFixed(2)}`;
+            let grandTotalLKR = Math.round(grandTotalUSD * 305);
+
+            selectedBoxSlipBase64 = '';
+            drawerTitle.innerText = isQuotedPay ? `Checkout: ${booking.boxName}` : `Collector Chest: ${box.name}`;
+
+            const signedUser = window.TeaFactoryStore && window.TeaFactoryStore.getCurrentUser ? window.TeaFactoryStore.getCurrentUser() : null;
+            let defaultFirstName = '';
+            let defaultLastName = '';
+            if (signedUser && signedUser.full_name) {
+                const parts = signedUser.full_name.trim().split(' ');
+                defaultFirstName = parts[0] || '';
+                defaultLastName = parts.slice(1).join(' ') || '';
+            } else if (isQuotedPay && booking.customerName) {
+                const parts = booking.customerName.trim().split(' ');
+                defaultFirstName = parts[0] || '';
+                defaultLastName = parts.slice(1).join(' ') || '';
+            }
+            const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
             drawerFormContainer.innerHTML = `
-                <div class="booking-summary-box">
-                    <div class="summary-row"><span>Selected Item:</span><span>${box.name}</span></div>
-                    <div class="summary-row"><span>Series:</span><span>${season.name} (Series ${season.seriesNumber})</span></div>
-                    <div class="summary-row total" style="margin-top:0.5rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:0.5rem;"><span>Series Allocation:</span><span>${window.TeaFactoryStore.formatCurrency(box.price || 150.00)}</span></div>
-                    <div style="margin-top:0.75rem; padding: 0.5rem; background: rgba(212,175,55,0.08); border: 1px dashed var(--color-gold); border-radius: 4px; font-size: 0.75rem; color: var(--color-gold); font-weight: 500; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                        Collector Reserve Scarcity: Only 3 numbered chests remaining in this season's series
-                    </div>
-                </div>
-
-                <form id="box-booking-form" class="admin-form">
-                    <div class="form-group">
-                        <label for="cust-name">Full Name</label>
-                        <input type="text" id="cust-name" placeholder="Lord Archibald Sterling" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="cust-email">Email Address</label>
-                        <input type="email" id="cust-email" placeholder="sterling@heritage.com" required>
-                        <span class="field-hint">Enquiry reply and catalog details will be dispatched here.</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="cust-phone">WhatsApp / Phone Number</label>
-                        <input type="tel" id="cust-phone" placeholder="+94 77 123 4567" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="cust-pref-date">Preferred Delivery Date</label>
-                        <div class="date-input-wrapper">
-                            <input type="date" id="cust-pref-date" min="${boxMinDate}" value="${boxMinDate}" required>
-                            <span class="date-calendar-icon" aria-hidden="true">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                            </span>
+                <div class="cart-drawer-inner" style="display: flex; flex-direction: column; gap: 1.15rem; padding-bottom: 2rem;">
+                    
+                    <!-- 1. ORDER SUMMARY & ALLOCATIONS CARD -->
+                    <div class="cart-step-card" style="background: rgba(4,14,8,0.78); border: 1.5px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 1.15rem; box-shadow: 0 4px 18px rgba(0,0,0,0.35);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.6rem; margin-bottom: 0.75rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                                <span>1. Collector Chest Allocation</span>
+                            </div>
+                            <span style="font-size: 0.72rem; color: #86efac; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 0.15rem 0.55rem; font-weight: 600;">${isQuotedPay ? 'Quotation Approved' : 'Numbered Reserve'}</span>
                         </div>
-                        <span class="field-hint">Specify your preferred date of arrival (minimum 3 days from today).</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="box-social-channel">Preferred Reply Channel</label>
-                        <select id="box-social-channel">
-                            <option value="WhatsApp">WhatsApp Message</option>
-                            <option value="Email">Email Response</option>
-                        </select>
+
+                        <!-- Chest Overview -->
+                        <div style="display: flex; gap: 1rem; align-items: flex-start; padding-bottom: 0.85rem; border-bottom: 1px solid rgba(212,175,55,0.15);">
+                            <div style="width: 76px; height: 76px; border-radius: 10px; overflow: hidden; background: rgba(0,0,0,0.5); border: 1.5px solid rgba(212,175,55,0.35); flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                                <img src="${box.image || 'images/Gift Box.jpeg'}" alt="${box.name}" style="width: 100%; height: 100%; object-fit: contain;" onerror="window.handleImageError &amp;&amp; window.handleImageError(this, 'box')" loading="lazy" decoding="async">
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem; flex-wrap: wrap;">
+                                    <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.3); padding: 0.15rem 0.5rem; border-radius: 4px;">Series ${season.seriesNumber} &bull; ${season.name}</span>
+                                    <span style="font-size: 0.65rem; color: #a3b8ad; font-weight: 600;">Solid Teak Chest</span>
+                                </div>
+                                <h4 style="margin: 0 0 0.25rem 0; font-family: var(--font-serif); font-size: 1.05rem; color: #ffffff; line-height: 1.3;">${box.name}</h4>
+                                <div style="font-size: 0.72rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 0.5rem;">
+                                    <span>500g Assortment</span>
+                                    <span>&bull;</span>
+                                    <span id="box-order-unit-price" style="color: var(--color-gold); font-weight: 600;">${window.formatAmountInCurrency ? window.formatAmountInCurrency(unitPriceUSD, currInfo) : '$' + unitPriceUSD.toFixed(2)} / chest</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stepper -->
+                        ${!isQuotedPay ? `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px dashed rgba(212,175,55,0.2);">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Quantity Allocation:</span>
+                                <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.5);">
+                                    <button type="button" id="box-qty-minus" style="background: none; border: none; color: var(--color-gold); width: 28px; height: 28px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">-</button>
+                                    <span id="box-qty-val" style="width: 32px; text-align: center; font-size: 0.82rem; font-weight: 700; color: #fff;">1</span>
+                                    <button type="button" id="box-qty-plus" style="background: none; border: none; color: var(--color-gold); width: 28px; height: 28px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">+</button>
+                                </div>
+                            </div>
+                        ` : `
+                            <div style="padding: 0.55rem 0; border-bottom: 1px dashed rgba(212,175,55,0.2); font-size: 0.75rem; display: flex; justify-content: space-between;">
+                                <span style="color: var(--color-text-muted);">Quotation Reference:</span>
+                                <strong style="color: var(--color-gold); font-family: monospace;">${booking.id}</strong>
+                            </div>
+                        `}
+
+                        <!-- Financial Breakdown -->
+                        <div style="margin-top: 0.65rem; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.82rem;">
+                            <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
+                                <span>Collector Chest Subtotal</span>
+                                <strong id="box-summary-subtotal" style="color: #ffffff;">${formattedSubtotal}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
+                                <span id="box-summary-shipping-label">${isSriLanka ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS International Priority Air'}</span>
+                                <span id="box-summary-shipping" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-weight: 600;">${formattedShipping}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid rgba(212,175,55,0.25); padding-top: 0.55rem; margin-top: 0.25rem;">
+                                <div>
+                                    <strong id="box-summary-total-title" style="font-size: 0.95rem; color: #ffffff;">Total Due (${currInfo.code})</strong>
+                                </div>
+                                <strong id="box-summary-total" style="font-size: 1.35rem; color: var(--color-gold); font-family: var(--font-serif);">${formattedGrandTotal}</strong>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Bespoke Gift Packaging & Presentation Accordion -->
-                    ${window.UIComponents.renderBespokeGiftOptions('box')}
-
-                    <div class="form-group" style="margin-top: 1.25rem;">
-                        <label for="cust-enquiry-msg">Enquiry Message</label>
-                        <textarea id="cust-enquiry-msg" rows="3" required>Hello Rock One Wild Tea team, I would like to inquire about the availability, collection details, and delivery options for ${box.name} of the "${season.name}" series. Please let me know the process to finalize.</textarea>
+                    <!-- 2. PATRON ACCOUNT / GUEST BANNER -->
+                    <div class="cart-step-card" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.95rem 1.15rem;">
+                        ${signedUser ? `
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
+                                    <div>
+                                        <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Patron Collector: <span style="color: var(--color-gold);">${esc(signedUser.full_name || signedUser.email)}</span></div>
+                                        <div style="font-size: 0.7rem; color: #86efac;">${esc(signedUser.email)} &bull; Certificate Registered</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); openDrawer('${type}', '${id}', ${JSON.stringify(data)});" style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: rgba(255,255,255,0.2); color: var(--color-text-muted);">
+                                    Switch Account
+                                </button>
+                            </div>
+                        ` : `
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 210px;">
+                                    <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.2rem;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                        <span>Direct Checkout Active (No Sign-In Required)</span>
+                                    </div>
+                                    <p style="font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.4; margin: 0;">
+                                        Order your teak chest immediately as a guest. Or sign in to link with your patron ledger.
+                                    </p>
+                                </div>
+                                <button type="button" id="box-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: var(--color-gold); color: var(--color-gold); white-space: nowrap;">
+                                    Sign In / Register
+                                </button>
+                            </div>
+                        `}
                     </div>
-                </form>
-            `;
 
-            drawerFooter.innerHTML = `
-                <div style="display: flex; gap: 0.75rem; width: 100%; flex-wrap: wrap;">
-                    <button type="button" id="box-enquiry-whatsapp-btn" class="btn btn-primary" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #fff; font-weight:600;">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.247 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.992-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.443-4.436-9.884-9.888-9.884-5.447 0-9.885 4.437-9.889 9.885-.001 2.016.52 3.49 1.37 4.975l-.997 3.641 3.731-.978z"/></svg>
-                        WhatsApp Inquiry
-                    </button>
-                    <button type="button" id="box-enquiry-email-btn" class="btn btn-outline" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight:600; color: var(--color-gold); border-color: rgba(212,175,55,0.3)">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                        Email Inquiry
-                    </button>
+                    <!-- 3. FORM: DESTINATION, RECIPIENT & ADDRESS -->
+                    <form id="box-checkout-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- Destination Section -->
+                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                <span>2. Delivery Destination</span>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                <!-- Country Selector -->
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="box-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Destination Country *</label>
+                                    <select class="form-input" id="box-cust-country" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                        <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>🇱🇰 Sri Lanka (LKR Rs)</option>
+                                        <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>🇺🇸 United States (USD $)</option>
+                                        <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom (GBP £)</option>
+                                        <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>🇦🇺 Australia (AUD A$)</option>
+                                        <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>🇨🇦 Canada (CAD C$)</option>
+                                        <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>🇩🇪 Germany (EUR €)</option>
+                                        <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>🇫🇷 France (EUR €)</option>
+                                        <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>🇯🇵 Japan (JPY ¥)</option>
+                                        <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>🇦🇪 United Arab Emirates (AED)</option>
+                                        <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>🇸🇬 Singapore (SGD S$)</option>
+                                        <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>🇮🇳 India (INR ₹)</option>
+                                        <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>🇨🇭 Switzerland (CHF)</option>
+                                        <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>🇨🇳 China (CNY ¥)</option>
+                                        <option value="Worldwide" ${selectedCountry === 'Worldwide' ? 'selected' : ''}>🌐 Rest of World (USD $)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Dynamic Region Container -->
+                                <div class="form-group" style="margin-bottom: 0;" id="box-region-container">
+                                    ${isSriLanka ? `
+                                        <label class="form-label" for="box-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Region / Province *</label>
+                                        <select class="form-input" id="box-cust-region" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                            <option value="Western Province (Colombo, Gampaha, Kalutara)">Western Province (Colombo, Gampaha)</option>
+                                            <option value="Central Province (Kandy, Nuwara Eliya, Matale)">Central Province (Kandy, Nuwara Eliya)</option>
+                                            <option value="Uva Province (Badulla, Bandarawela, Ettampitiya)" selected>Uva Province (Badulla, Ettampitiya)</option>
+                                            <option value="Southern Province (Galle, Matara, Hambantota)">Southern Province (Galle, Matara)</option>
+                                            <option value="Sabaragamuwa Province (Ratnapura, Kegalle)">Sabaragamuwa Province (Ratnapura)</option>
+                                            <option value="North Western Province (Kurunegala, Puttalam)">North Western Province (Kurunegala)</option>
+                                            <option value="North Central Province (Anuradhapura, Polonnaruwa)">North Central Province (Anuradhapura)</option>
+                                            <option value="Northern Province (Jaffna, Kilinochchi, Vavuniya)">Northern Province (Jaffna)</option>
+                                            <option value="Eastern Province (Batticaloa, Trincomalee, Ampara)">Eastern Province (Batticaloa, Trincomalee)</option>
+                                        </select>
+                                    ` : `
+                                        <label class="form-label" for="box-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">State / Province / County *</label>
+                                        <input class="form-input" type="text" id="box-cust-region" placeholder="e.g. California / London / Tokyo" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
+                                    `}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recipient Details Section -->
+                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                <span>3. Recipient &amp; Delivery Address</span>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="box-cust-firstname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">First Name *</label>
+                                    <input class="form-input" type="text" id="box-cust-firstname" value="${esc(defaultFirstName)}" required placeholder="e.g. Ruwan" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="box-cust-lastname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Last Name *</label>
+                                    <input class="form-input" type="text" id="box-cust-lastname" value="${esc(defaultLastName)}" required placeholder="e.g. Perera" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="box-cust-email" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Email Address *</label>
+                                    <input class="form-input" type="email" id="box-cust-email" value="${esc(signedUser ? signedUser.email : (isQuotedPay ? booking.email : ''))}" required placeholder="name@domain.com" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="box-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Mobile / WhatsApp *</label>
+                                    <input class="form-input" type="tel" id="box-cust-phone" value="${esc(signedUser ? signedUser.phone : (isQuotedPay ? booking.phone : ''))}" required placeholder="+94 77 123 4567" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 0.75rem;">
+                                <label class="form-label" for="box-cust-address" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Street Address *</label>
+                                <input class="form-input" type="text" id="box-cust-address" value="${esc(signedUser ? signedUser.address : (isQuotedPay ? booking.address : ''))}" required placeholder="House No., Street Name, Neighborhood" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 0.75rem;">
+                                <label class="form-label" for="box-cust-suite" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7);">Apartment / Suite / Unit / Floor (Optional)</label>
+                                <input class="form-input" type="text" id="box-cust-suite" placeholder="e.g. Apt 4B, Level 2" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="box-cust-city" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">City / Town *</label>
+                                    <input class="form-input" type="text" id="box-cust-city" required placeholder="e.g. Colombo / Badulla" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="box-cust-postal" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Postal / ZIP Code *</label>
+                                    <input class="form-input" type="text" id="box-cust-postal" required placeholder="e.g. 00100" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="box-pref-date" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Preferred Dispatch Date *</label>
+                                    <input class="form-input" type="date" id="box-pref-date" min="${boxMinDate}" value="${boxMinDate}" required style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="box-cust-notes" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Courier Notes</label>
+                                    <input class="form-input" type="text" id="box-cust-notes" placeholder="e.g. Call before arrival" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                            </div>
+
+                            <!-- Bespoke Wax Seal & Monogram -->
+                            ${window.UIComponents.renderBespokeGiftOptions('box')}
+                        </div>
+
+                        <!-- Section: Shipping Method & Courier Charges -->
+                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                                <span>4. Shipping Method &amp; Courier Charges</span>
+                            </div>
+
+                            <div id="box-shipping-methods-container" style="display: flex; flex-direction: column; gap: 0.65rem;">
+                                <!-- Option 1: Sri Lanka Post EMS Express (Pre-paid) -->
+                                <label class="shipping-option-card active" id="box-shipping-card-ems" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid var(--color-gold); border-radius: 8px; background: rgba(212,175,55,0.08); cursor: pointer;">
+                                    <input type="radio" name="box-shipping-method" value="ems_express" id="box-ship-ems" checked style="margin-top: 0.2rem; accent-color: var(--color-gold);">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
+                                            <strong id="box-shipping-ems-title" style="color: #ffffff; font-size: 0.88rem;">${isSriLanka ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air'}</strong>
+                                            <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                                <span style="font-size: 0.72rem; color: #86efac; font-weight: 700;">Tracked Dispatch</span>
+                                                <span id="box-shipping-ems-price-pill" style="font-size: 0.78rem; color: var(--color-gold); font-weight: 700; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; padding: 0.2rem 0.55rem;">${formattedShipping}</span>
+                                            </div>
+                                        </div>
+                                        <p id="box-shipping-ems-desc" style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
+                                            ${isSriLanka ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
+                                        </p>
+                                    </div>
+                                </label>
+
+                                <!-- Option 2: Cash on Delivery (COD) - Sri Lanka Only -->
+                                <label class="shipping-option-card" id="box-shipping-card-cod" style="display: ${isSriLanka ? 'flex' : 'none'}; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 8px; background: rgba(0,0,0,0.3); cursor: pointer;">
+                                    <input type="radio" name="box-shipping-method" value="cod" id="box-ship-cod" style="margin-top: 0.2rem; accent-color: #25d366;">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
+                                            <strong style="color: #ffffff; font-size: 0.88rem; display: flex; align-items: center; gap: 0.4rem;">
+                                                <span>Cash on Delivery (COD)</span>
+                                                <span style="font-size: 0.62rem; padding: 0.1rem 0.45rem; border-radius: 3px; background: rgba(37,211,102,0.2); color: #4ade80; font-weight: 700;">SRI LANKA ONLY</span>
+                                            </strong>
+                                            <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                                <span style="font-size: 0.72rem; color: #4ade80; font-weight: 700;">Pay at Doorstep</span>
+                                                <span id="box-shipping-cod-price-pill" style="font-size: 0.78rem; color: #4ade80; font-weight: 700; background: rgba(37,211,102,0.15); border: 1px solid rgba(37,211,102,0.35); border-radius: 6px; padding: 0.2rem 0.55rem;">${formattedShipping}</span>
+                                            </div>
+                                        </div>
+                                        <p style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
+                                            Pay cash to the Sri Lanka Post courier upon receiving your tea package. No upfront digital transaction required.
+                                        </p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Courier Shipping Breakdown Note -->
+                            <div style="margin-top: 0.65rem; padding: 0.65rem 0.85rem; background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.25); border-radius: 8px; font-size: 0.72rem; color: #cbd5e1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem;">
+                                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                    <span>Standard Insured Courier Dispatch:</span>
+                                </div>
+                                <span id="box-shipping-rate-note" style="color: var(--color-gold); font-weight: 600;">${isSriLanka ? 'Rs 650 LKR (Complimentary over $80)' : (window.formatAmountInCurrency ? window.formatAmountInCurrency(15, currInfo) : '$15.00') + ' International EMS (Complimentary over $150)'}</span>
+                            </div>
+                        </div>
+
+                        <!-- Section: Payment Method & Order Confirmation -->
+                        <div class="cart-step-card" id="box-payment-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                <span>5. Payment Method &amp; Order Confirmation</span>
+                            </div>
+
+                            <!-- COD Panel (Sri Lanka Only) -->
+                            <div id="box-pay-panel-cod" style="display: none;">
+                                <div style="background: rgba(37,211,102,0.08); border: 1.5px solid rgba(37,211,102,0.4); border-radius: 10px; padding: 1.15rem; text-align: center; margin-bottom: 1rem;">
+                                    <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(37,211,102,0.15); border: 1.5px solid #25d366; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto; color: #25d366;">
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                    </div>
+                                    <h4 style="color: #4ade80; font-size: 1.05rem; margin-bottom: 0.35rem; font-weight: 700;">Cash on Delivery (COD) Selected</h4>
+                                    <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5; margin: 0 0 0.85rem 0;">
+                                        No online payment is needed now. The Sri Lanka Post EMS courier will collect the cash amount upon parcel handover.
+                                    </p>
+                                    <div style="background: rgba(0,0,0,0.45); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.65rem 1rem; display: inline-flex; align-items: center; gap: 0.75rem;">
+                                        <span style="font-size: 0.78rem; color: #9ca3af;">Amount Payable to Courier:</span>
+                                        <strong id="box-cod-amount-display" style="font-size: 1.25rem; color: var(--color-gold); font-family: monospace;">Rs ${grandTotalLKR.toLocaleString()} LKR</strong>
+                                    </div>
+                                </div>
+
+                                <button type="submit" id="btn-submit-box-cod" class="btn btn-primary" style="padding: 0.95rem 1.5rem; font-size: 0.95rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; box-shadow: 0 4px 18px rgba(37,211,102,0.3);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <span id="box-cod-btn-text">Confirm Order via Cash on Delivery (COD) &bull; Rs ${grandTotalLKR.toLocaleString()} LKR</span>
+                                </button>
+                            </div>
+
+                            <!-- Pre-Paid Panels -->
+                            <div id="box-pay-panel-prepaid">
+                                <div class="payment-method-tabs" style="margin-bottom: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.35rem;">
+                                    <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
+                                        Bank Transfer (Live)
+                                    </button>
+                                    <button type="button" class="pay-tab" data-method="slip" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                        Cash Deposit Slip (Live)
+                                    </button>
+                                    <button type="button" class="pay-tab" data-method="paypal" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(0,121,193,0.5);">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
+                                        <span style="font-weight:700;"><span style="color:#0079C1;">Pay</span><span style="color:#00457C;">Pal</span></span>
+                                        <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(0,121,193,0.2); color:#38bdf8; font-weight:700;">LIVE</span>
+                                    </button>
+                                </div>
+
+                                <!-- Method A: Direct Bank Transfer -->
+                                <div id="pay-panel-bank" class="pay-panel active" style="margin-top: 0.5rem;">
+                                    <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.85rem; font-size: 0.8rem; margin-bottom: 0.75rem;">
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#fff;">Bank of Ceylon</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:#fff;">Rock one wild tea</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:var(--color-gold); font-family:monospace; font-size:0.95rem;">94945708</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#fff;">Ettampitiya branch</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; padding-top:0.4rem; border-top:1px dashed rgba(212,175,55,0.2);"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="box-bank-amount-display" style="color:var(--color-gold); font-size:1.05rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong></div>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0.75rem;">
+                                        <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Bank Transfer Slip *</label>
+                                        <div class="file-upload-zone" id="box-bank-slip-zone">
+                                            <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
+                                            <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse receipt</span></div>
+                                            <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
+                                            <input type="file" id="box-bank-slip" accept="image/*,.pdf" style="display:none;">
+                                        </div>
+                                        <div id="box-bank-slip-preview" class="slip-preview" style="display:none;"></div>
+                                    </div>
+                                    <button type="submit" id="btn-submit-box-bank" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                        <span id="box-bank-btn-text">Place Bank Transfer Order &bull; ${formattedGrandTotal}</span>
+                                    </button>
+                                </div>
+
+                                <!-- Method B: Cash Deposit Slip -->
+                                <div id="pay-panel-slip" class="pay-panel" style="margin-top: 0.5rem;">
+                                    <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.85rem; font-size: 0.8rem; margin-bottom: 0.75rem;">
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#fff;">Bank of Ceylon</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:#fff;">Rock one wild tea</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:var(--color-gold); font-family:monospace; font-size:0.95rem;">94945708</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#fff;">Ettampitiya branch</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; padding-top:0.4rem; border-top:1px dashed rgba(212,175,55,0.2);"><span style="color:var(--color-text-muted);">Exact Deposit Amount:</span><strong id="box-deposit-amount-display" style="color:var(--color-gold); font-size:1.05rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong></div>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0.75rem;">
+                                        <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Cash Deposit Slip *</label>
+                                        <div class="file-upload-zone" id="box-cash-slip-zone">
+                                            <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
+                                            <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse deposit slip</span></div>
+                                            <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
+                                            <input type="file" id="box-cash-slip" accept="image/*,.pdf" style="display:none;">
+                                        </div>
+                                        <div id="box-cash-slip-preview" class="slip-preview" style="display:none;"></div>
+                                    </div>
+                                    <button type="submit" id="btn-submit-box-slip" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                        <span id="box-slip-btn-text">Submit Cash Deposit Slip &bull; ${formattedGrandTotal}</span>
+                                    </button>
+                                </div>
+
+                                <!-- Method C: PayPal / Cards -->
+                                <div id="pay-panel-paypal" class="pay-panel" style="margin-top: 0.5rem;">
+                                    <div style="background: rgba(0, 121, 193, 0.06); border: 1.5px solid rgba(0, 121, 193, 0.35); border-radius: 10px; padding: 1.15rem; margin-bottom: 0.75rem;">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.3rem;">
+                                            <strong style="color: #ffffff; font-size: 0.95rem;">Instant PayPal &amp; International Cards</strong>
+                                            <span style="background: rgba(0,121,193,0.2); color: #38bdf8; font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 4px; text-transform: uppercase;">Instant Clearance</span>
+                                        </div>
+                                        <p style="font-size: 0.76rem; color: #cbd5e1; line-height: 1.45; margin: 0 0 0.75rem 0;">
+                                            Settle immediately with your PayPal balance, Visa, Mastercard, or AMEX. Your official Allocation Certificate signed by CEO Prasanga will be activated instantly.
+                                        </p>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0.75rem; background: rgba(0,0,0,0.4); border-radius: 6px; margin-bottom: 0.85rem;">
+                                            <span style="font-size: 0.75rem; color: #9ca3af;">PayPal Settlement Total:</span>
+                                            <strong id="box-paypal-amount-display" style="font-size: 1rem; color: var(--color-gold); font-family: monospace;">${currInfo.code === 'USD' ? '$' + grandTotalUSD.toFixed(2) + ' USD' : formattedGrandTotal + ' ($' + grandTotalUSD.toFixed(2) + ' USD)'}</strong>
+                                        </div>
+                                        <div id="box-paypal-button-container" class="paypal-smart-container" style="min-height: 44px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             `;
 
-            bindBespokeGiftEvents('box');
-            document.getElementById('box-enquiry-whatsapp-btn').addEventListener('click', () => handleBoxEnquirySubmit('WhatsApp'));
-            document.getElementById('box-enquiry-email-btn').addEventListener('click', () => handleBoxEnquirySubmit('Email'));
+            drawerFooter.innerHTML = '';
 
+            // Render Success Screen for Collector Box Order
+            const renderBoxOrderConfirmationSuccess = (order, paymentMethod) => {
+                const isCOD = paymentMethod === 'cod';
+                const isPayPal = paymentMethod === 'paypal';
+
+                drawerFormContainer.innerHTML = `
+                    <div class="cart-success-view" style="text-align: center; padding: 2.25rem 1rem;">
+                        <div style="width: 76px; height: 76px; border-radius: 50%; background: ${isCOD ? 'rgba(37,211,102,0.15)' : 'rgba(212,175,55,0.12)'}; border: 2px solid ${isCOD ? '#25d366' : 'var(--color-gold)'}; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.15rem auto; color: ${isCOD ? '#25d366' : 'var(--color-gold)'};">
+                            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <span class="season-badge" style="background: ${isCOD ? 'rgba(37,211,102,0.2)' : 'rgba(212,175,55,0.15)'}; color: ${isCOD ? '#4ade80' : 'var(--color-gold)'}; font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                            ${isCOD ? 'Cash on Delivery • Order Confirmed' : (isPayPal ? 'Paid • Instant PayPal Clearance' : 'Allocation Reserved • Receipt Attached')}
+                        </span>
+                        <h3 style="font-family: var(--font-serif); font-size: 1.5rem; color: #ffffff; margin: 0.75rem 0 0.25rem 0;">Collector Chest Allocated</h3>
+                        <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.5rem;">
+                            Thank you, ${order.customerName}. Your numbered chest reservation for ${order.boxName} has been officially recorded.
+                        </p>
+
+                        <div style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 1.15rem; margin-bottom: 1.25rem; text-align: left;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Allocation Reference ID</span>
+                                <strong style="font-family: monospace; color: var(--color-gold); font-size: 0.95rem;">${order.id}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Collector Chest</span>
+                                <span style="color: #ffffff; font-size: 0.85rem;">${order.boxName} &bull; Series ${season.seriesNumber}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Delivery Destination</span>
+                                <span style="color: #ffffff; font-size: 0.85rem; text-align: right; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${order.country} &bull; ${order.city || ''}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Courier Method</span>
+                                <span style="color: #86efac; font-size: 0.82rem; font-weight: 600;">
+                                    ${order.shippingMethod === 'cod' ? 'Sri Lanka Post EMS (Cash on Delivery)' : (order.country === 'Sri Lanka' ? 'Sri Lanka Post EMS Express' : 'Sri Lanka Post EMS International Priority Air')}
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Amount</span>
+                                <strong style="color: var(--color-gold); font-size: 1.1rem;">${order.formattedPrice}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Payment Mode</span>
+                                <span style="color: ${isCOD ? '#4ade80' : 'var(--color-gold)'}; font-size: 0.85rem; font-weight: 700;">
+                                    ${isCOD ? 'Cash on Delivery (Pay upon delivery)' : (isPayPal ? 'PayPal / International Card' : 'Bank of Ceylon Deposit')}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Executive Director & CEO Verification Seal -->
+                        <div style="background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.35); border-radius: 10px; padding: 0.9rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+                            <div style="text-align: left;">
+                                <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold); font-weight: 700; display: block;">Executive Sign-Off &bull; Verified</span>
+                                <div style="font-size: 0.76rem; color: #d1d5db; margin-top: 2px;">Allocation registered in estate ledger</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <img src="images/ceo_signature_gold.png" alt="Director &amp; CEO Signature" style="height: 34px; object-fit: contain; display: block; margin: 0 0 2px auto;" onerror="this.onerror=null; this.src='images/ceo_signature.png';" />
+                                <div style="font-size: 0.76rem; font-weight: 700; color: #ffffff;">Prasanga</div>
+                                <div style="font-size: 0.65rem; color: var(--color-gold);">Director &amp; CEO</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <button type="button" class="btn btn-outline btn-box-success-cert" style="padding: 0.8rem; font-size: 0.85rem; border-color: rgba(212,175,55,0.5); color: var(--color-gold); display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: rgba(0,0,0,0.35);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                                Download Collector Allocation Certificate (PDF)
+                            </button>
+                            <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge%2C%20I%20have%20ordered%20Collector%20Chest%20${order.id}%20(${encodeURIComponent(order.boxName)})%20for%20${encodeURIComponent(order.formattedPrice)}%20via%20${encodeURIComponent(isCOD ? 'Cash on Delivery' : 'Pre-paid EMS')}.%20Please%20confirm%20my%20dispatch." target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; font-weight: 700;">
+                                <span>Notify Concierge on WhatsApp</span>
+                            </a>
+                            <button type="button" class="btn btn-outline" onclick="closeDrawer(); window.appSwitchTab ? window.appSwitchTab('boxes') : (document.getElementById('nav-boxes') &amp;&amp; document.getElementById('nav-boxes').click())" style="padding: 0.8rem; font-size: 0.85rem; border-color: rgba(255,255,255,0.25); color: #fff;">
+                                Return to Collector Chest Gallery &rarr;
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                drawerFormContainer.querySelector('.btn-box-success-cert')?.addEventListener('click', () => {
+                    generateAllocationCertificate(order);
+                });
+            };
+
+            // Dynamic Currency & Pricing Update
+            const updateBoxPricing = () => {
+                const country = document.getElementById('box-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+                window.lastSelectedCheckoutCountry = country;
+                const isLK = country === 'Sri Lanka';
+                const cur = window.getCountryCurrency ? window.getCountryCurrency(country) : (isLK ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
+
+                subtotalUSD = unitPriceUSD * currentBoxQty;
+                shippingUSD = isQuotedPay && booking.quotedShipping !== undefined 
+                    ? booking.quotedShipping 
+                    : (window.calculateShippingFee ? window.calculateShippingFee(subtotalUSD, country) : (isLK ? 2.13 : 15.0));
+                grandTotalUSD = subtotalUSD + shippingUSD;
+
+                formattedSubtotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(subtotalUSD, cur) : `$${subtotalUSD.toFixed(2)}`;
+                formattedShipping = shippingUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(shippingUSD, cur) : `$${shippingUSD.toFixed(2)}`) : 'Complimentary';
+                formattedGrandTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(grandTotalUSD, cur) : `$${grandTotalUSD.toFixed(2)}`;
+                grandTotalLKR = Math.round(grandTotalUSD * 305);
+
+                const unitPriceEl = document.getElementById('box-order-unit-price');
+                if (unitPriceEl && window.formatAmountInCurrency) {
+                    unitPriceEl.textContent = `${window.formatAmountInCurrency(unitPriceUSD, cur)} / chest`;
+                }
+                const subEl = document.getElementById('box-summary-subtotal');
+                if (subEl) subEl.textContent = formattedSubtotal;
+                const shipLabel = document.getElementById('box-summary-shipping-label');
+                if (shipLabel) shipLabel.textContent = isLK ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS International Priority Air';
+                const shipEl = document.getElementById('box-summary-shipping');
+                if (shipEl) {
+                    shipEl.textContent = formattedShipping;
+                    shipEl.style.color = shippingUSD > 0 ? '#86efac' : 'var(--color-gold)';
+                }
+                const totalTitle = document.getElementById('box-summary-total-title');
+                if (totalTitle) totalTitle.textContent = `Total Due (${cur.code})`;
+                const totalEl = document.getElementById('box-summary-total');
+                if (totalEl) totalEl.textContent = formattedGrandTotal;
+
+                const emsTitle = document.getElementById('box-shipping-ems-title');
+                if (emsTitle) emsTitle.textContent = isLK ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air';
+                const emsDesc = document.getElementById('box-shipping-ems-desc');
+                if (emsDesc) emsDesc.textContent = isLK ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.';
+                const emsPill = document.getElementById('box-shipping-ems-price-pill');
+                if (emsPill) emsPill.textContent = formattedShipping;
+
+                const codCard = document.getElementById('box-shipping-card-cod');
+                const emsRadio = document.getElementById('box-ship-ems');
+                const codPill = document.getElementById('box-shipping-cod-price-pill');
+                if (codPill) codPill.textContent = formattedShipping;
+
+                if (isLK) {
+                    if (codCard) codCard.style.display = 'flex';
+                } else {
+                    if (codCard) codCard.style.display = 'none';
+                    if (emsRadio) emsRadio.checked = true;
+                    syncBoxShippingSelection();
+                }
+
+                const rateNote = document.getElementById('box-shipping-rate-note');
+                if (rateNote) {
+                    rateNote.textContent = isLK 
+                        ? 'Rs 650 LKR (Complimentary over $80)' 
+                        : (window.formatAmountInCurrency ? window.formatAmountInCurrency(15, cur) : '$15.00') + ' International EMS (Complimentary over $150)';
+                }
+
+                const codAmt = document.getElementById('box-cod-amount-display');
+                if (codAmt) codAmt.textContent = `Rs ${grandTotalLKR.toLocaleString()} LKR`;
+                const codBtn = document.getElementById('box-cod-btn-text');
+                if (codBtn) codBtn.textContent = `Confirm Order via Cash on Delivery (COD) • Rs ${grandTotalLKR.toLocaleString()} LKR`;
+
+                const bankAmt = document.getElementById('box-bank-amount-display');
+                if (bankAmt) {
+                    bankAmt.innerHTML = isLK ? `Rs ${grandTotalLKR.toLocaleString()} LKR` : `${formattedGrandTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>`;
+                }
+                const bankBtn = document.getElementById('box-bank-btn-text');
+                if (bankBtn) bankBtn.textContent = `Place Bank Transfer Order • ${formattedGrandTotal}`;
+
+                const depAmt = document.getElementById('box-deposit-amount-display');
+                if (depAmt) {
+                    depAmt.innerHTML = isLK ? `Rs ${grandTotalLKR.toLocaleString()} LKR` : `${formattedGrandTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>`;
+                }
+                const slipBtn = document.getElementById('box-slip-btn-text');
+                if (slipBtn) slipBtn.textContent = `Submit Cash Deposit Slip • ${formattedGrandTotal}`;
+
+                const ppAmt = document.getElementById('box-paypal-amount-display');
+                if (ppAmt) {
+                    ppAmt.textContent = cur.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`;
+                }
+
+                // Dynamic region container
+                const regionCont = document.getElementById('box-region-container');
+                if (regionCont) {
+                    if (isLK) {
+                        if (!regionCont.querySelector('select')) {
+                            regionCont.innerHTML = `
+                                <label class="form-label" for="box-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Region / Province *</label>
+                                <select class="form-input" id="box-cust-region" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                    <option value="Western Province (Colombo, Gampaha, Kalutara)">Western Province (Colombo, Gampaha)</option>
+                                    <option value="Central Province (Kandy, Nuwara Eliya, Matale)">Central Province (Kandy, Nuwara Eliya)</option>
+                                    <option value="Uva Province (Badulla, Bandarawela, Ettampitiya)" selected>Uva Province (Badulla, Ettampitiya)</option>
+                                    <option value="Southern Province (Galle, Matara, Hambantota)">Southern Province (Galle, Matara)</option>
+                                    <option value="Sabaragamuwa Province (Ratnapura, Kegalle)">Sabaragamuwa Province (Ratnapura)</option>
+                                    <option value="North Western Province (Kurunegala, Puttalam)">North Western Province (Kurunegala)</option>
+                                    <option value="North Central Province (Anuradhapura, Polonnaruwa)">North Central Province (Anuradhapura)</option>
+                                    <option value="Northern Province (Jaffna, Kilinochchi, Vavuniya)">Northern Province (Jaffna)</option>
+                                    <option value="Eastern Province (Batticaloa, Trincomalee, Ampara)">Eastern Province (Batticaloa, Trincomalee)</option>
+                                </select>
+                            `;
+                        }
+                    } else {
+                        if (!regionCont.querySelector('input')) {
+                            regionCont.innerHTML = `
+                                <label class="form-label" for="box-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">State / Province / County *</label>
+                                <input class="form-input" type="text" id="box-cust-region" placeholder="e.g. California / London / Tokyo" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
+                            `;
+                        }
+                    }
+                }
+
+                const activeTab = document.querySelector('#box-checkout-form .pay-tab.active');
+                if (activeTab && activeTab.getAttribute('data-method') === 'paypal') {
+                    initBoxPayPal();
+                }
+            };
+
+            const syncBoxShippingSelection = () => {
+                const selectedMethod = document.querySelector('input[name="box-shipping-method"]:checked')?.value || 'ems_express';
+                const codCard = document.getElementById('box-shipping-card-cod');
+                const emsCard = document.getElementById('box-shipping-card-ems');
+                const codPanel = document.getElementById('box-pay-panel-cod');
+                const prepaidPanel = document.getElementById('box-pay-panel-prepaid');
+
+                if (selectedMethod === 'cod') {
+                    if (codCard) {
+                        codCard.style.border = '1.5px solid #25d366';
+                        codCard.style.background = 'rgba(37,211,102,0.1)';
+                    }
+                    if (emsCard) {
+                        emsCard.style.border = '1.5px solid rgba(255,255,255,0.15)';
+                        emsCard.style.background = 'rgba(0,0,0,0.3)';
+                    }
+                    if (codPanel) codPanel.style.display = 'block';
+                    if (prepaidPanel) prepaidPanel.style.display = 'none';
+                } else {
+                    if (emsCard) {
+                        emsCard.style.border = '1.5px solid var(--color-gold)';
+                        emsCard.style.background = 'rgba(212,175,55,0.08)';
+                    }
+                    if (codCard) {
+                        codCard.style.border = '1.5px solid rgba(255,255,255,0.15)';
+                        codCard.style.background = 'rgba(0,0,0,0.3)';
+                    }
+                    if (codPanel) codPanel.style.display = 'none';
+                    if (prepaidPanel) prepaidPanel.style.display = 'block';
+                }
+            };
+
+            // Stepper (if not quoted pay)
+            if (!isQuotedPay) {
+                const minusBtn = document.getElementById('box-qty-minus');
+                const plusBtn = document.getElementById('box-qty-plus');
+                const qtyVal = document.getElementById('box-qty-val');
+
+                if (minusBtn) {
+                    minusBtn.onclick = () => {
+                        if (currentBoxQty > 1) {
+                            currentBoxQty--;
+                            if (qtyVal) qtyVal.textContent = currentBoxQty;
+                            updateBoxPricing();
+                        }
+                    };
+                }
+                if (plusBtn) {
+                    plusBtn.onclick = () => {
+                        currentBoxQty++;
+                        if (qtyVal) qtyVal.textContent = currentBoxQty;
+                        updateBoxPricing();
+                    };
+                }
+            }
+
+            const countryInput = document.getElementById('box-cust-country');
+            if (countryInput) countryInput.onchange = updateBoxPricing;
+
+            drawerFormContainer.querySelectorAll('input[name="box-shipping-method"]').forEach(r => {
+                r.onchange = syncBoxShippingSelection;
+            });
+
+            bindPaymentTabs('box-checkout-form');
+            bindBespokeGiftEvents('box');
+            bindFileUpload('box-bank-slip', 'box-bank-slip-zone', 'box-bank-slip-preview', (b64) => {
+                selectedBoxSlipBase64 = b64;
+            });
+            bindFileUpload('box-cash-slip', 'box-cash-slip-zone', 'box-cash-slip-preview', (b64) => {
+                selectedBoxSlipBase64 = b64;
+            });
+
+            // Wire PayPal
+            const initBoxPayPal = () => {
+                const container = document.getElementById('box-paypal-button-container');
+                if (!container || !window.TeaFactoryPayPal) return;
+
+                const orderRef = isQuotedPay ? booking.id : `ORD-BOX-${Date.now()}`;
+
+                window.TeaFactoryPayPal.renderButtons({
+                    containerId: 'box-paypal-button-container',
+                    orderId: orderRef,
+                    amount: grandTotalUSD,
+                    currency: 'USD',
+                    description: `${box.name} (${currentBoxQty} Chest${currentBoxQty > 1 ? 's' : ''})`,
+                    onValidate: () => {
+                        const form = document.getElementById('box-checkout-form');
+                        if (!form || !form.checkValidity()) {
+                            if (form) form.reportValidity();
+                            return false;
+                        }
+                        return true;
+                    },
+                    onSuccess: async ({ paypalOrderId, captureData }) => {
+                        const firstName = document.getElementById('box-cust-firstname')?.value?.trim() || '';
+                        const lastName = document.getElementById('box-cust-lastname')?.value?.trim() || '';
+                        const customerName = `${firstName} ${lastName}`.trim() || 'Collector';
+                        const email = document.getElementById('box-cust-email')?.value?.trim() || '';
+                        const phone = document.getElementById('box-cust-phone')?.value?.trim() || '';
+                        const street = document.getElementById('box-cust-address')?.value?.trim() || '';
+                        const suite = document.getElementById('box-cust-suite')?.value?.trim() || '';
+                        const city = document.getElementById('box-cust-city')?.value?.trim() || '';
+                        const postal = document.getElementById('box-cust-postal')?.value?.trim() || '';
+                        const region = document.getElementById('box-cust-region')?.value?.trim() || '';
+                        const country = document.getElementById('box-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+                        const prefDate = document.getElementById('box-pref-date')?.value || '';
+                        const notes = document.getElementById('box-cust-notes')?.value?.trim() || '';
+                        
+                        const isGift = document.getElementById('box-enable-gift')?.checked || false;
+                        const giftWax = document.getElementById('box-wax-val')?.value || 'Imperial Gold';
+                        const giftMonogram = document.getElementById('box-monogram-input')?.value?.trim().toUpperCase() || '';
+                        const giftMsg = document.getElementById('box-gift-msg')?.value?.trim() || '';
+
+                        const fullAddress = `${street}${suite ? ', ' + suite : ''}, ${city}, ${region ? region + ', ' : ''}${postal}, ${country}`;
+
+                        const result = window.TeaFactoryStore.bookBox(box.id, {
+                            name: customerName,
+                            email,
+                            phone,
+                            address: fullAddress,
+                            country,
+                            city,
+                            message: notes,
+                            quantity: currentBoxQty,
+                            preferredDate: prefDate,
+                            giftPackaging: isGift,
+                            waxSealColor: isGift ? giftWax : '',
+                            monogramInitials: isGift ? giftMonogram : '',
+                            giftMessage: isGift ? giftMsg : '',
+                            paymentMethod: 'paypal',
+                            slipImage: ''
+                        });
+
+                        if (result && result.success) {
+                            const order = result.booking;
+                            order.boxName = box.name;
+                            order.formattedPrice = formattedGrandTotal;
+                            window.TeaFactoryStore.markOrderPaidByPayPal(order.id, captureData || { id: paypalOrderId });
+                            window.TeaFactoryStore.saveRecentOrderId(order.id);
+
+                            showToast("Chest Allocated!", `Allocation Certificate for ${order.id} is confirmed!`, "success");
+                            renderBoxOrderConfirmationSuccess(order, 'paypal');
+                        }
+                    }
+                });
+            };
+
+            const boxPaypalTab = drawerFormContainer.querySelector('.pay-tab[data-method="paypal"]');
+            if (boxPaypalTab) {
+                boxPaypalTab.addEventListener('click', () => {
+                    setTimeout(initBoxPayPal, 50);
+                });
+            }
+
+            // Box Checkout Submission
+            const handleBoxCheckoutSubmit = (e) => {
+                if (e) e.preventDefault();
+                const form = document.getElementById('box-checkout-form');
+                if (!form || !form.checkValidity()) {
+                    if (form) form.reportValidity();
+                    return;
+                }
+
+                const shippingMethod = document.querySelector('input[name="box-shipping-method"]:checked')?.value || 'ems_express';
+                const activeTabBtn = form.querySelector('.pay-tab.active');
+                const selectedMethod = activeTabBtn ? activeTabBtn.getAttribute('data-method') : 'bank';
+                const paymentMethod = shippingMethod === 'cod' ? 'cod' : selectedMethod;
+
+                if (paymentMethod === 'paypal') {
+                    showToast("PayPal Active", "Please use the official PayPal button above to complete checkout.", "info");
+                    return;
+                }
+
+                const firstName = document.getElementById('box-cust-firstname')?.value?.trim() || '';
+                const lastName = document.getElementById('box-cust-lastname')?.value?.trim() || '';
+                const customerName = `${firstName} ${lastName}`.trim() || 'Collector';
+                const email = document.getElementById('box-cust-email')?.value?.trim() || '';
+                const phone = document.getElementById('box-cust-phone')?.value?.trim() || '';
+                const street = document.getElementById('box-cust-address')?.value?.trim() || '';
+                const suite = document.getElementById('box-cust-suite')?.value?.trim() || '';
+                const city = document.getElementById('box-cust-city')?.value?.trim() || '';
+                const postal = document.getElementById('box-cust-postal')?.value?.trim() || '';
+                const region = document.getElementById('box-cust-region')?.value?.trim() || '';
+                const country = document.getElementById('box-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+                const prefDate = document.getElementById('box-pref-date')?.value || '';
+                const notes = document.getElementById('box-cust-notes')?.value?.trim() || '';
+                
+                const isGift = document.getElementById('box-enable-gift')?.checked || false;
+                const giftWax = document.getElementById('box-wax-val')?.value || 'Imperial Gold';
+                const giftMonogram = document.getElementById('box-monogram-input')?.value?.trim().toUpperCase() || '';
+                const giftMsg = document.getElementById('box-gift-msg')?.value?.trim() || '';
+
+                const fullAddress = `${street}${suite ? ', ' + suite : ''}, ${city}, ${region ? region + ', ' : ''}${postal}, ${country}`;
+
+                const slipImg = selectedBoxSlipBase64 || 
+                    document.getElementById('box-bank-slip-zone')?.dataset?.fileBase64 || 
+                    document.getElementById('box-cash-slip-zone')?.dataset?.fileBase64 || '';
+
+                if (paymentMethod !== 'cod' && !slipImg) {
+                    showToast("Deposit Receipt Required", "Please attach your bank transfer or deposit slip to confirm your chest allocation.", "warning");
+                    return;
+                }
+
+                const result = window.TeaFactoryStore.bookBox(box.id, {
+                    name: customerName,
+                    email,
+                    phone,
+                    address: fullAddress,
+                    country,
+                    city,
+                    message: notes,
+                    quantity: currentBoxQty,
+                    preferredDate: prefDate,
+                    giftPackaging: isGift,
+                    waxSealColor: isGift ? giftWax : '',
+                    monogramInitials: isGift ? giftMonogram : '',
+                    giftMessage: giftMsg,
+                    paymentMethod,
+                    shippingMethod,
+                    slipImage: slipImg
+                });
+
+                if (result && result.success) {
+                    const order = result.booking;
+                    order.boxName = box.name;
+                    order.city = city;
+                    order.country = country;
+                    order.shippingMethod = shippingMethod;
+                    order.formattedPrice = paymentMethod === 'cod' ? `Rs ${grandTotalLKR.toLocaleString()} LKR` : formattedGrandTotal;
+
+                    window.TeaFactoryStore.saveRecentOrderId(order.id);
+
+                    showToast("Chest Allocated!", `Allocation Certificate for ${order.id} is confirmed!`, "success");
+                    renderBoxOrderConfirmationSuccess(order, paymentMethod);
+                } else {
+                    showToast("Allocation Failed", result?.message || "Could not reserve collector chest.", "error");
+                }
+            };
+
+            const boxForm = document.getElementById('box-checkout-form');
+            if (boxForm) boxForm.onsubmit = handleBoxCheckoutSubmit;
+
+            document.getElementById('box-guest-signin-btn')?.addEventListener('click', () => {
+                if (typeof window.requireCustomerAuth === 'function') {
+                    window.requireCustomerAuth('Sign in or register to record your collector chest in your patron history.', () => {
+                        openDrawer(type, id, data);
+                    });
+                }
+            });
         } else if (type === 'tour') {
             const timeSlot = data.timeSlot || '09:30 AM';
             selectedTourSlipBase64 = '';
@@ -1448,398 +2884,1595 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Get selected package details
             const selectedPkgCard = document.querySelector('.package-card.selected');
-            const pkgName = selectedPkgCard ? selectedPkgCard.getAttribute('data-package') : '01. Gongfu-Style Black Tea Brewing Experience';
-            const pkgPrice = parseFloat(selectedPkgCard ? selectedPkgCard.getAttribute('data-price') : 4.754) || 4.754;
-            const pkgDeposit = parseFloat(selectedPkgCard ? selectedPkgCard.getAttribute('data-deposit') : 4.754) || 4.754;
-            const lkrPerGuest = 1450;
+            const pkgName = data.package || (selectedPkgCard ? selectedPkgCard.getAttribute('data-package') : '01. Gongfu-Style Black Tea Brewing Experience');
+            const lkrPerGuest = data.price_lkr || (selectedPkgCard ? (parseFloat(selectedPkgCard.getAttribute('data-price-lkr')) || 1450) : 1450);
+            const baseUsdPerGuest = data.price || (selectedPkgCard ? parseFloat(selectedPkgCard.getAttribute('data-price')) : (lkrPerGuest / 305)) || (lkrPerGuest / 305);
+
+            const selectedCountry = window.lastSelectedCheckoutCountry || 'Sri Lanka';
+            const isSriLanka = selectedCountry === 'Sri Lanka';
+            const currInfo = window.getCountryCurrency ? window.getCountryCurrency(selectedCountry) : (isSriLanka ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
+
+            let tourGuests = 1;
+            let transportFeeUSD = 0; // 0 for Self-Drive, 25 for Concierge Transfer
+            let tourSubtotalUSD = baseUsdPerGuest * tourGuests;
+            let tourGrandTotalUSD = tourSubtotalUSD + transportFeeUSD;
+
+            let formattedPerGuest = window.formatAmountInCurrency ? window.formatAmountInCurrency(baseUsdPerGuest, currInfo) : `$${baseUsdPerGuest.toFixed(2)}`;
+            let formattedTourTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(tourGrandTotalUSD, currInfo) : `$${tourGrandTotalUSD.toFixed(2)}`;
+            let tourGrandTotalLKR = Math.round(tourGrandTotalUSD * 305);
 
             drawerTitle.innerText = `Book Tour: ${pkgName}`;
 
+            const signedUser = window.TeaFactoryStore && window.TeaFactoryStore.getCurrentUser ? window.TeaFactoryStore.getCurrentUser() : null;
+            let defaultFirstName = '';
+            let defaultLastName = '';
+            if (signedUser && signedUser.full_name) {
+                const parts = signedUser.full_name.trim().split(' ');
+                defaultFirstName = parts[0] || '';
+                defaultLastName = parts.slice(1).join(' ') || '';
+            }
+            const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
             drawerFormContainer.innerHTML = `
-                <div class="booking-summary-box">
-                    <div class="summary-row"><span>Experience:</span><strong style="color:var(--color-gold);">${pkgName}</strong></div>
-                    <div class="summary-row"><span>Time Slot:</span><span>${timeSlot} (Approx. 1.5 – 2 Hours)</span></div>
-                    <div class="summary-row"><span>Operating Days:</span><span style="color:#86efac;">Monday – Saturday (9:00 AM – 5:00 PM)</span></div>
-                    <div class="summary-row"><span>Guests:</span><strong id="summary-guest-count" style="color:var(--color-white);">1 Guest</strong></div>
-                    <div class="summary-row"><span>Experience Fee:</span><span id="summary-total-price">LKR 1,450 <small>(${window.TeaFactoryStore.formatCurrency(pkgPrice)})</small></span></div>
-                    <div class="summary-row total"><span>Total Payable:</span><span id="tour-total-deposit" style="color:var(--color-gold);">LKR 1,450 <small>(${window.TeaFactoryStore.formatCurrency(pkgDeposit)})</small></span></div>
-                </div>
-
-                <form id="tour-booking-form" class="admin-form">
-                    <div class="form-group">
-                        <label for="tour-cust-name">Full Name *</label>
-                        <input type="text" id="tour-cust-name" placeholder="Your Full Name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tour-cust-email">Email Address *</label>
-                        <input type="email" id="tour-cust-email" placeholder="your.email@example.com" required>
-                        <span class="field-hint">Seat confirmation &amp; boarding pass will be dispatched here.</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="tour-cust-phone">WhatsApp / Contact Number *</label>
-                        <input type="tel" id="tour-cust-phone" placeholder="+94 77 123 4567" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tour-date-input">Tour Date (Monday – Saturday) *</label>
-                        <div class="date-input-wrapper">
-                            <input type="date" id="tour-date-input" min="${tourMinDate}" value="${tourMinDate}" required>
-                            <span class="date-calendar-icon" aria-hidden="true">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                            </span>
+                <div class="cart-drawer-inner" style="display: flex; flex-direction: column; gap: 1.15rem; padding-bottom: 2rem;">
+                    
+                    <!-- 1. TOUR EXPERIENCE SUMMARY -->
+                    <div class="cart-step-card" style="background: rgba(4,14,8,0.78); border: 1.5px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 1.15rem; box-shadow: 0 4px 18px rgba(0,0,0,0.35);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.6rem; margin-bottom: 0.75rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                <span>1. Experience Summary</span>
+                            </div>
+                            <span style="font-size: 0.72rem; color: #86efac; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 0.15rem 0.55rem; font-weight: 600;">Mon &ndash; Sat &bull; Open</span>
                         </div>
-                        <span class="field-hint" id="tour-date-hint">Advance booking required. Factory is closed on Sundays and public holidays.</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="tour-guests">Number of Guests (Max 10 / Tour) *</label>
-                        <input type="number" id="tour-guests" value="1" min="1" max="10" required>
-                        <span class="field-hint">Each tour is limited to 10 visitors to ensure a personal and relaxed experience. No minimum guests.</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="tour-dietary">Special Requests / Dietary Notes (Optional)</label>
-                        <input type="text" id="tour-dietary" placeholder="e.g. Vegetarian, Gluten-Free, Special occasion">
-                    </div>
-                    <div class="form-group">
-                        <label for="tour-transport">Estate Transfer Transport</label>
-                        <select id="tour-transport">
-                            <option value="No">No (Self-driving to Rock One Wild Tea Estate, Ettampitiya)</option>
-                            <option value="Ella">Yes (Pick-up arrangement from Ella)</option>
-                            <option value="Badulla">Yes (Pick-up arrangement from Badulla / Bandarawela)</option>
-                            <option value="Nuwara Eliya">Yes (Pick-up arrangement from Nuwara Eliya)</option>
-                            <option value="Kandy">Yes (Pick-up arrangement from Kandy)</option>
-                            <option value="Colombo">Yes (Private transfer from Colombo)</option>
-                        </select>
-                    </div>
 
-                    <!-- Deposit Payment Method Switcher -->
-                    <div class="form-group">
-                        <label>Payment Settlement Mode (Live: Bank Deposit &amp; Slip Upload)</label>
-                        <div class="payment-method-tabs">
-                            <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
-                                Bank Transfer (Live)
-                            </button>
-                            <button type="button" class="pay-tab" data-method="slip" style="display:inline-flex; align-items:center; gap:0.35rem;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                Cash Deposit Slip (Live)
-                            </button>
-                            <button type="button" class="pay-tab" data-method="card" style="display:inline-flex; align-items:center; gap:0.35rem; opacity: 0.85;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                Card / Gateway <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(212,175,55,0.25); color:var(--color-gold); font-weight:700;">SOON</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Method A: Direct Bank Transfer with Slip Attachment (Active Default) -->
-                    <div id="pay-panel-bank" class="pay-panel active">
-                        <div class="bank-details-block">
-                            <div class="bank-detail-row"><span>Bank Name:</span><strong>Bank of Ceylon</strong></div>
-                            <div class="bank-detail-row"><span>Account Name:</span><strong>Rock One Wild Tea (Pvt) Ltd</strong></div>
-                            <div class="bank-detail-row"><span>Account No:</span><strong>0083-1001-5271-8843</strong></div>
-                            <div class="bank-detail-row"><span>Branch:</span><strong>Kandy Main Branch</strong></div>
-                            <div class="bank-detail-row" style="border-top:1px dashed rgba(255,255,255,0.08);padding-top:0.4rem;margin-top:0.4rem;">
-                                <span>Deposit Required:</span><strong id="bank-deposit-display" style="color:var(--color-gold);">$${pkgDeposit.toFixed(2)} USD</strong>
+                        <div style="margin-bottom: 0.85rem;">
+                            <h4 style="margin: 0 0 0.35rem 0; font-family: var(--font-serif); font-size: 1.05rem; color: #ffffff; line-height: 1.35;">${pkgName}</h4>
+                            <div style="display: flex; gap: 0.85rem; font-size: 0.75rem; color: var(--color-text-muted); flex-wrap: wrap;">
+                                <span>Time Slot: <strong style="color: #fff;">${timeSlot}</strong></span>
+                                <span>&bull;</span>
+                                <span>Duration: <strong style="color: #fff;">Approx. 1.5 &ndash; 2 Hours</strong></span>
+                                <span>&bull;</span>
+                                <span style="color: #86efac;">Sunday Closed for Maintenance</span>
                             </div>
                         </div>
-                        <span class="field-hint" style="margin-top:0.75rem;display:block;">Transfer the deposit and attach your payment receipt / transfer screenshot below.</span>
-                        <div class="form-group" style="margin-top:1rem;">
-                            <label>Upload Bank Transfer Slip / Screenshot *</label>
-                            <div class="file-upload-zone" id="tour-bank-slip-zone">
-                                <div class="file-upload-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-                                </div>
-                                <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse receipt</span></div>
-                                <div class="file-upload-hint">JPG, PNG or PDF — Max 5MB</div>
-                                <input type="file" id="tour-bank-slip" accept="image/*,.pdf" style="display:none;">
-                            </div>
-                            <div id="tour-bank-slip-preview" class="slip-preview" style="display:none;"></div>
-                        </div>
-                    </div>
 
-                    <!-- Method B: Cash Deposit at Bank with Slip Attachment -->
-                    <div id="pay-panel-slip" class="pay-panel">
-                        <div class="mock-card-notice" style="background:rgba(212,175,55,0.07);border-color:rgba(212,175,55,0.2);">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.8" style="flex-shrink:0;"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
+                        <!-- Guest Count Stepper -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-top: 1px dashed rgba(212,175,55,0.2); border-bottom: 1px dashed rgba(212,175,55,0.2);">
                             <div>
-                                <div style="font-weight:600;color:var(--color-gold);margin-bottom:0.3rem;">Cash Deposit at Bank of Ceylon</div>
-                                <div style="font-size:0.8rem;color:var(--color-text-muted);">Deposit the deposit amount at any islandwide branch and attach the bank teller cash slip.</div>
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted); display: block;">Number of Guests:</span>
+                                <span id="tour-rate-per-guest" style="font-size: 0.72rem; color: var(--color-gold);">${formattedPerGuest} per guest</span>
+                            </div>
+                            <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.5);">
+                                <button type="button" id="tour-qty-minus" style="background: none; border: none; color: var(--color-gold); width: 28px; height: 28px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">-</button>
+                                <span id="tour-qty-val" style="width: 32px; text-align: center; font-size: 0.82rem; font-weight: 700; color: #fff;">1</span>
+                                <button type="button" id="tour-qty-plus" style="background: none; border: none; color: var(--color-gold); width: 28px; height: 28px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">+</button>
                             </div>
                         </div>
-                        <div class="bank-details-block" style="margin-top:1rem;">
-                            <div class="bank-detail-row"><span>Account Name:</span><strong>Rock One Wild Tea (Pvt) Ltd</strong></div>
-                            <div class="bank-detail-row"><span>Account No:</span><strong>0083-1001-5271-8843</strong></div>
-                            <div class="bank-detail-row"><span>Deposit Amount:</span><strong id="cash-deposit-display" style="color:var(--color-gold);">${window.TeaFactoryStore.formatCurrency(pkgDeposit)}</strong></div>
-                        </div>
-                        <div class="form-group" style="margin-top:1rem;">
-                            <label>Upload Cash Deposit Slip *</label>
-                            <div class="file-upload-zone" id="tour-cash-slip-zone">
-                                <div class="file-upload-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+
+                        <!-- Financial Total Breakdown -->
+                        <div style="margin-top: 0.65rem; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.82rem;">
+                            <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
+                                <span>Experience Subtotal</span>
+                                <strong id="tour-summary-subtotal" style="color: #ffffff;">${formattedTourTotal}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
+                                <span>Estate Transport</span>
+                                <span id="tour-summary-transport" style="color: var(--color-gold); font-weight: 600;">Complimentary Arrival</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid rgba(212,175,55,0.25); padding-top: 0.55rem; margin-top: 0.25rem;">
+                                <div>
+                                    <strong id="tour-summary-total-title" style="font-size: 0.95rem; color: #ffffff;">Total Payable (${currInfo.code})</strong>
                                 </div>
-                                <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse slip</span></div>
-                                <div class="file-upload-hint">JPG, PNG or PDF — Max 5MB</div>
-                                <input type="file" id="tour-cash-slip" accept="image/*,.pdf" style="display:none;">
+                                <strong id="tour-summary-total" style="font-size: 1.35rem; color: var(--color-gold); font-family: var(--font-serif);">${formattedTourTotal}</strong>
                             </div>
-                            <div id="tour-cash-slip-preview" class="slip-preview" style="display:none;"></div>
                         </div>
                     </div>
 
-                    <!-- Method C: Card / Online Gateway (Coming Soon Notice) -->
-                    <div id="pay-panel-card" class="pay-panel">
-                        <div class="mock-card-notice" style="background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.35); border-radius: 8px; padding: 1.25rem;">
-                            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
-                                <span style="background: rgba(212,175,55,0.2); color: var(--color-gold); font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;">Coming Soon</span>
-                                <strong style="color: var(--color-white); font-size: 0.92rem;">Online Card Gateway in Preparation</strong>
+                    <!-- 2. PATRON ACCOUNT / GUEST BANNER -->
+                    <div class="cart-step-card" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.95rem 1.15rem;">
+                        ${signedUser ? `
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
+                                    <div>
+                                        <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Patron Visitor: <span style="color: var(--color-gold);">${esc(signedUser.full_name || signedUser.email)}</span></div>
+                                        <div style="font-size: 0.7rem; color: #86efac;">${esc(signedUser.email)} &bull; Boarding Pass auto-linked</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); openDrawer('tour', '${id}', ${JSON.stringify(data)}); " style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: rgba(255,255,255,0.2); color: var(--color-text-muted);">
+                                    Switch Account
+                                </button>
                             </div>
-                            <p style="font-size: 0.82rem; color: var(--color-text-muted); line-height: 1.5; margin: 0 0 1rem 0;">
-                                Direct credit &amp; debit card processing (Visa, Mastercard, AMEX) is currently being integrated. To book your tour slots immediately, please use the live <strong>Bank Transfer</strong> or <strong>Cash Deposit Slip</strong> options.
-                            </p>
-                            <button type="button" class="btn btn-outline" onclick="window.switchDrawerPayTab('tour-booking-form', 'bank')" style="font-size: 0.78rem; padding: 0.45rem 0.9rem; color: var(--color-gold); border-color: rgba(212,175,55,0.4);">
-                                &larr; Switch to Bank Transfer &amp; Slip Upload (Live)
+                        ` : `
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 210px;">
+                                    <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.2rem;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                        <span>Direct Booking Active (Sign-In Optional)</span>
+                                    </div>
+                                    <p style="font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.4; margin: 0;">
+                                        You can reserve seats immediately as a visitor. Or sign in to sync with your patron history.
+                                    </p>
+                                </div>
+                                <button type="button" id="tour-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: var(--color-gold); color: var(--color-gold); white-space: nowrap;">
+                                    Sign In / Register
+                                </button>
+                            </div>
+                        `}
+                    </div>
+
+                    <!-- 3. FORM: VISITOR ORIGIN & CONTACT -->
+                    <form id="tour-checkout-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- Country of Origin & Currency -->
+                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                <span>2. Visitor Origin Country &amp; Settlement Currency</span>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label" for="tour-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Visitor Origin Country *</label>
+                                <select class="form-input" id="tour-cust-country" style="font-size: 0.85rem; padding: 0.65rem 0.75rem;">
+                                    <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>🇱🇰 Sri Lanka (LKR Rs)</option>
+                                    <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>🇺🇸 United States (USD $)</option>
+                                    <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom (GBP £)</option>
+                                    <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>🇦🇺 Australia (AUD A$)</option>
+                                    <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>🇨🇦 Canada (CAD C$)</option>
+                                    <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>🇩🇪 Germany (EUR €)</option>
+                                    <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>🇫🇷 France (EUR €)</option>
+                                    <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>🇯🇵 Japan (JPY ¥)</option>
+                                    <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>🇦🇪 United Arab Emirates (AED)</option>
+                                    <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>🇸🇬 Singapore (SGD S$)</option>
+                                    <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>🇮🇳 India (INR ₹)</option>
+                                    <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>🇨🇭 Switzerland (CHF)</option>
+                                    <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>🇨🇳 China (CNY ¥)</option>
+                                    <option value="Worldwide" ${selectedCountry === 'Worldwide' ? 'selected' : ''}>🌐 Rest of World (USD $)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Primary Guest Details -->
+                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                <span>3. Primary Guest &amp; Schedule Details</span>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="tour-cust-firstname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">First Name *</label>
+                                    <input class="form-input" type="text" id="tour-cust-firstname" value="${esc(defaultFirstName)}" required placeholder="e.g. David" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="tour-cust-lastname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Last Name *</label>
+                                    <input class="form-input" type="text" id="tour-cust-lastname" value="${esc(defaultLastName)}" required placeholder="e.g. Miller" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="tour-cust-email" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Email (For Gate Pass) *</label>
+                                    <input class="form-input" type="email" id="tour-cust-email" value="${esc(signedUser ? signedUser.email : '')}" required placeholder="name@domain.com" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="tour-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">WhatsApp / Mobile *</label>
+                                    <input class="form-input" type="tel" id="tour-cust-phone" value="${esc(signedUser ? signedUser.phone : '')}" required placeholder="+94 77 123 4567" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="tour-date-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Tour Date (Mon &ndash; Sat) *</label>
+                                    <input class="form-input" type="date" id="tour-date-input" min="${tourMinDate}" value="${tourMinDate}" required style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="tour-time-slot" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Arrival Time Slot *</label>
+                                    <select class="form-input" id="tour-time-slot" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        <option value="09:30 AM" ${timeSlot === '09:30 AM' ? 'selected' : ''}>09:30 AM Morning Tasting</option>
+                                        <option value="11:30 AM" ${timeSlot === '11:30 AM' ? 'selected' : ''}>11:30 AM Midday Harvest Walk</option>
+                                        <option value="02:00 PM" ${timeSlot === '02:00 PM' ? 'selected' : ''}>02:00 PM Afternoon Masterclass</option>
+                                        <option value="03:30 PM" ${timeSlot === '03:30 PM' ? 'selected' : ''}>03:30 PM Sunset Gongfu Session</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label" for="tour-dietary" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Dietary &amp; Experience Notes</label>
+                                <input class="form-input" type="text" id="tour-dietary" placeholder="e.g. Gluten-free tea pairings, anniversary visit" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                            </div>
+                        </div>
+
+                        <!-- Estate Transfer & Transport Selection -->
+                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                                <span>4. Estate Transport &amp; Arrival</span>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                                <!-- Option 1: Self-Drive / Independent Arrival -->
+                                <label class="shipping-option-card active" id="tour-transport-card-self" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid var(--color-gold); border-radius: 8px; background: rgba(212,175,55,0.08); cursor: pointer;">
+                                    <input type="radio" name="tour-transport-option" value="self" id="tour-trans-self" checked style="margin-top: 0.2rem; accent-color: var(--color-gold);">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
+                                            <strong style="color: #ffffff; font-size: 0.88rem;">Independent Arrival &bull; Factory Gate</strong>
+                                            <span style="font-size: 0.72rem; color: var(--color-gold); font-weight: 700; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.3); border-radius: 6px; padding: 0.2rem 0.55rem;">Complimentary</span>
+                                        </div>
+                                        <p style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
+                                            Self-drive, taxi, or tuk-tuk arrival directly at the Rock One Tea Factory Gate in Ettampitiya, Badulla. Reserved estate parking provided.
+                                        </p>
+                                    </div>
+                                </label>
+
+                                <!-- Option 2: Estate Concierge Chauffeur Transfer -->
+                                <label class="shipping-option-card" id="tour-transport-card-chauffeur" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 8px; background: rgba(0,0,0,0.3); cursor: pointer;">
+                                    <input type="radio" name="tour-transport-option" value="chauffeur" id="tour-trans-chauffeur" style="margin-top: 0.2rem; accent-color: var(--color-gold);">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
+                                            <strong style="color: #ffffff; font-size: 0.88rem;">Concierge Chauffeur Transfer (Roundtrip)</strong>
+                                            <span id="tour-transport-surcharge-pill" style="font-size: 0.72rem; color: #86efac; font-weight: 700; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 6px; padding: 0.2rem 0.55rem;">+ ${window.formatAmountInCurrency ? window.formatAmountInCurrency(25, currInfo) : '$25.00'}</span>
+                                        </div>
+                                        <p style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
+                                            Private estate chauffeur pick-up &amp; drop-off from your hotel or station in Ella, Haputale, Bandarawela, Badulla, or Nuwara Eliya.
+                                        </p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method Section -->
+                        <div class="cart-step-card" id="tour-payment-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                <span>5. Payment Method &amp; Gate Pass Issuance</span>
+                            </div>
+
+                            <div class="payment-method-tabs" style="margin-bottom: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.35rem;">
+                                <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
+                                    Bank Transfer (Live)
+                                </button>
+                                <button type="button" class="pay-tab" data-method="slip" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                    Cash Deposit Slip (Live)
+                                </button>
+                                <button type="button" class="pay-tab" data-method="paypal" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(0,121,193,0.5);">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
+                                    <span style="font-weight:700;"><span style="color:#0079C1;">Pay</span><span style="color:#00457C;">Pal</span></span>
+                                    <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(0,121,193,0.2); color:#38bdf8; font-weight:700;">LIVE</span>
+                                </button>
+                            </div>
+
+                            <!-- Method A: Bank Transfer -->
+                            <div id="pay-panel-bank" class="pay-panel active" style="margin-top: 0.5rem;">
+                                <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.85rem; font-size: 0.8rem; margin-bottom: 0.75rem;">
+                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#fff;">Bank of Ceylon</strong></div>
+                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:#fff;">Rock one wild tea</strong></div>
+                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:var(--color-gold); font-family:monospace; font-size:0.95rem;">94945708</strong></div>
+                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#fff;">Ettampitiya branch</strong></div>
+                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; padding-top:0.4rem; border-top:1px dashed rgba(212,175,55,0.2);"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="tour-bank-amount-display" style="color:var(--color-gold); font-size:1.05rem;">${isSriLanka ? 'Rs ' + tourGrandTotalLKR.toLocaleString() + ' LKR' : formattedTourTotal}</strong></div>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0.75rem;">
+                                    <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Bank Transfer Receipt *</label>
+                                    <div class="file-upload-zone" id="tour-bank-slip-zone">
+                                        <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
+                                        <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse receipt</span></div>
+                                        <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
+                                        <input type="file" id="tour-bank-slip" accept="image/*,.pdf" style="display:none;">
+                                    </div>
+                                    <div id="tour-bank-slip-preview" class="slip-preview" style="display:none;"></div>
+                                </div>
+                                <button type="submit" id="btn-submit-tour-bank" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                    <span id="tour-bank-btn-text">Confirm Booking via Bank Transfer &bull; ${formattedTourTotal}</span>
+                                </button>
+                            </div>
+
+                            <!-- Method B: Cash Deposit Slip -->
+                            <div id="pay-panel-slip" class="pay-panel" style="margin-top: 0.5rem;">
+                                <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.85rem; font-size: 0.8rem; margin-bottom: 0.75rem;">
+                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#fff;">Bank of Ceylon</strong></div>
+                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:#fff;">Rock one wild tea</strong></div>
+                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:var(--color-gold); font-family:monospace; font-size:0.95rem;">94945708</strong></div>
+                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#fff;">Ettampitiya branch</strong></div>
+                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; padding-top:0.4rem; border-top:1px dashed rgba(212,175,55,0.2);"><span style="color:var(--color-text-muted);">Exact Deposit Amount:</span><strong id="tour-deposit-amount-display" style="color:var(--color-gold); font-size:1.05rem;">${isSriLanka ? 'Rs ' + tourGrandTotalLKR.toLocaleString() + ' LKR' : formattedTourTotal}</strong></div>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0.75rem;">
+                                    <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Cash Deposit Slip *</label>
+                                    <div class="file-upload-zone" id="tour-cash-slip-zone">
+                                        <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
+                                        <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse deposit slip</span></div>
+                                        <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
+                                        <input type="file" id="tour-cash-slip" accept="image/*,.pdf" style="display:none;">
+                                    </div>
+                                    <div id="tour-cash-slip-preview" class="slip-preview" style="display:none;"></div>
+                                </div>
+                                <button type="submit" id="btn-submit-tour-slip" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                    <span id="tour-slip-btn-text">Submit Cash Deposit Slip &bull; ${formattedTourTotal}</span>
+                                </button>
+                            </div>
+
+                            <!-- Method C: PayPal -->
+                            <div id="pay-panel-paypal" class="pay-panel" style="margin-top: 0.5rem;">
+                                <div style="background: rgba(0, 121, 193, 0.06); border: 1.5px solid rgba(0, 121, 193, 0.35); border-radius: 10px; padding: 1.15rem; margin-bottom: 0.75rem;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.3rem;">
+                                        <strong style="color: #ffffff; font-size: 0.95rem;">Instant PayPal &amp; International Cards</strong>
+                                        <span style="background: rgba(0,121,193,0.2); color: #38bdf8; font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 4px; text-transform: uppercase;">Instant Boarding Pass</span>
+                                    </div>
+                                    <p style="font-size: 0.76rem; color: #cbd5e1; line-height: 1.45; margin: 0 0 0.75rem 0;">
+                                        Secure your private estate tasting instantly. Your official Gate Pass endorsed by CEO Prasanga will be generated immediately.
+                                    </p>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0.75rem; background: rgba(0,0,0,0.4); border-radius: 6px; margin-bottom: 0.85rem;">
+                                        <span style="font-size: 0.75rem; color: #9ca3af;">PayPal Settlement Total:</span>
+                                        <strong id="tour-paypal-amount-display" style="font-size: 1rem; color: var(--color-gold); font-family: monospace;">${currInfo.code === 'USD' ? '$' + tourGrandTotalUSD.toFixed(2) + ' USD' : formattedTourTotal + ' ($' + tourGrandTotalUSD.toFixed(2) + ' USD)'}</strong>
+                                    </div>
+                                    <div id="tour-paypal-button-container" class="paypal-smart-container" style="min-height: 44px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            `;
+
+            drawerFooter.innerHTML = '';
+
+            // Gate Pass Release View for Tour Booking
+            const renderTourConfirmationSuccess = (booking, paymentMethod) => {
+                const isPayPal = paymentMethod === 'paypal';
+
+                drawerFormContainer.innerHTML = `
+                    <div class="cart-success-view" style="text-align: center; padding: 2.25rem 1rem;">
+                        <div style="width: 76px; height: 76px; border-radius: 50%; background: rgba(212,175,55,0.12); border: 2px solid var(--color-gold); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.15rem auto; color: var(--color-gold);">
+                            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <span class="season-badge" style="background: rgba(212,175,55,0.15); color: var(--color-gold); font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                            ${isPayPal ? 'Paid • Instant Gate Pass Release' : 'Reservation Pending Clearance • Gate Pass Issued'}
+                        </span>
+                        <h3 style="font-family: var(--font-serif); font-size: 1.5rem; color: #ffffff; margin: 0.75rem 0 0.25rem 0;">Private Tour Reserved</h3>
+                        <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.5rem;">
+                            Thank you, ${booking.customerName}. Your private estate visit has been entered into the visitor log.
+                        </p>
+
+                        <div style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 1.15rem; margin-bottom: 1.25rem; text-align: left;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Gate Pass / Booking ID</span>
+                                <strong style="font-family: monospace; color: var(--color-gold); font-size: 0.95rem;">${booking.id}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Experience</span>
+                                <strong style="color: #ffffff; font-size: 0.85rem; text-align: right; max-width: 210px;">${booking.packageName}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Tour Date &amp; Time</span>
+                                <span style="color: #86efac; font-size: 0.85rem; font-weight: 600;">${booking.date || booking.tourDate} at ${booking.timeSlot}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Guests Reserved</span>
+                                <span style="color: #ffffff; font-size: 0.85rem;">${booking.guests || 1} Guest${(booking.guests || 1) > 1 ? 's' : ''}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Amount</span>
+                                <strong style="color: var(--color-gold); font-size: 1.1rem;">${booking.formattedPrice}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Operating Days</span>
+                                <span style="color: #cbd5e1; font-size: 0.82rem;">Monday &ndash; Saturday (9:00 AM &ndash; 5:00 PM)</span>
+                            </div>
+                        </div>
+
+                        <!-- Executive Director & CEO Verification Seal -->
+                        <div style="background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.35); border-radius: 10px; padding: 0.9rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+                            <div style="text-align: left;">
+                                <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold); font-weight: 700; display: block;">Gate Pass Endorsed &bull; CEO Sign-Off</span>
+                                <div style="font-size: 0.76rem; color: #d1d5db; margin-top: 2px;">Admit to Rock One Estate &amp; Tasting Pavilion</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <img src="images/ceo_signature_gold.png" alt="Director &amp; CEO Signature" style="height: 34px; object-fit: contain; display: block; margin: 0 0 2px auto;" onerror="this.onerror=null; this.src='images/ceo_signature.png';" />
+                                <div style="font-size: 0.76rem; font-weight: 700; color: #ffffff;">Prasanga</div>
+                                <div style="font-size: 0.65rem; color: var(--color-gold);">Director &amp; CEO</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <button type="button" class="btn btn-outline btn-tour-download-pdf" style="padding: 0.8rem; font-size: 0.85rem; border-color: rgba(212,175,55,0.5); color: var(--color-gold); display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: rgba(0,0,0,0.35);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                                Download Estate Gate Pass (PDF)
+                            </button>
+                            <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20booked%20Private%20Tour%20${booking.id}%20(${encodeURIComponent(booking.packageName)})%20for%20${booking.guests}%20guests%20on%20${booking.date || booking.tourDate}.%20Please%20confirm%20my%20gate%20clearance." target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; font-weight: 700;">
+                                <span>Notify Concierge on WhatsApp</span>
+                            </a>
+                            <button type="button" class="btn btn-outline" onclick="closeDrawer(); window.appSwitchTab ? window.appSwitchTab('tour') : (document.getElementById('nav-tour') &amp;&amp; document.getElementById('nav-tour').click())" style="padding: 0.8rem; font-size: 0.85rem; border-color: rgba(255,255,255,0.25); color: #fff;">
+                                View Tour Master Schedule &rarr;
                             </button>
                         </div>
                     </div>
-                </form>
-            `;
+                `;
 
-            drawerFooter.innerHTML = `
-                <button type="button" id="submit-tour-booking-btn" class="btn btn-primary w-full">
-                    Confirm Tour Slots &amp; Submit
-                </button>
-            `;
-
-            // Live Guest Calculations
-            const guestsInput = document.getElementById('tour-guests');
-            if (guestsInput) {
-                guestsInput.addEventListener('input', () => {
-                    const g = Math.max(1, Math.min(10, parseInt(guestsInput.value) || 1));
-                    const totalP = g * pkgPrice;
-                    const totalD = g * pkgDeposit;
-                    const totalLkr = g * lkrPerGuest;
-
-                    const guestCountEl = document.getElementById('summary-guest-count');
-                    if (guestCountEl) guestCountEl.innerText = `${g} ${g === 1 ? 'Guest' : 'Guests'}`;
-
-                    const totalPriceEl = document.getElementById('summary-total-price');
-                    if (totalPriceEl) totalPriceEl.innerHTML = `LKR ${totalLkr.toLocaleString()} <small>(${window.TeaFactoryStore.formatCurrency(totalP)})</small>`;
-
-                    const totalPayableEl = document.getElementById('tour-total-deposit');
-                    if (totalPayableEl) totalPayableEl.innerHTML = `LKR ${totalLkr.toLocaleString()} <small>(${window.TeaFactoryStore.formatCurrency(totalD)})</small>`;
-
-                    const bDisp = document.getElementById('bank-deposit-display');
-                    const cDisp = document.getElementById('cash-deposit-display');
-                    if (bDisp) bDisp.innerText = `LKR ${totalLkr.toLocaleString()} (${window.TeaFactoryStore.formatCurrency(totalD)})`;
-                    if (cDisp) cDisp.innerText = `LKR ${totalLkr.toLocaleString()} (${window.TeaFactoryStore.formatCurrency(totalD)})`;
+                drawerFormContainer.querySelector('.btn-tour-download-pdf')?.addEventListener('click', () => {
+                    generateGatePassPDF(booking);
                 });
+            };
+
+            // Dynamic Tour Pricing & Currency Updates
+            const updateTourPricing = () => {
+                const country = document.getElementById('tour-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+                window.lastSelectedCheckoutCountry = country;
+                const isLK = country === 'Sri Lanka';
+                const cur = window.getCountryCurrency ? window.getCountryCurrency(country) : (isLK ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
+                
+                const transportOpt = document.querySelector('input[name="tour-transport-option"]:checked')?.value || 'self';
+                transportFeeUSD = transportOpt === 'chauffeur' ? 25.0 : 0.0;
+                tourSubtotalUSD = baseUsdPerGuest * tourGuests;
+                tourGrandTotalUSD = tourSubtotalUSD + transportFeeUSD;
+
+                formattedPerGuest = window.formatAmountInCurrency ? window.formatAmountInCurrency(baseUsdPerGuest, cur) : `$${baseUsdPerGuest.toFixed(2)}`;
+                const formattedSub = window.formatAmountInCurrency ? window.formatAmountInCurrency(tourSubtotalUSD, cur) : `$${tourSubtotalUSD.toFixed(2)}`;
+                formattedTourTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(tourGrandTotalUSD, cur) : `$${tourGrandTotalUSD.toFixed(2)}`;
+                tourGrandTotalLKR = Math.round(tourGrandTotalUSD * 305);
+
+                const ratePerGuestEl = document.getElementById('tour-rate-per-guest');
+                if (ratePerGuestEl) ratePerGuestEl.textContent = `${formattedPerGuest} per guest`;
+                const subEl = document.getElementById('tour-summary-subtotal');
+                if (subEl) subEl.textContent = formattedSub;
+                const transEl = document.getElementById('tour-summary-transport');
+                if (transEl) {
+                    transEl.textContent = transportFeeUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(transportFeeUSD, cur) : '$25.00') : 'Complimentary Arrival';
+                    transEl.style.color = transportFeeUSD > 0 ? '#86efac' : 'var(--color-gold)';
+                }
+                const totalTitle = document.getElementById('tour-summary-total-title');
+                if (totalTitle) totalTitle.textContent = `Total Payable (${cur.code})`;
+                const totalEl = document.getElementById('tour-summary-total');
+                if (totalEl) totalEl.textContent = formattedTourTotal;
+
+                const transPill = document.getElementById('tour-transport-surcharge-pill');
+                if (transPill && window.formatAmountInCurrency) {
+                    transPill.textContent = `+ ${window.formatAmountInCurrency(25, cur)}`;
+                }
+
+                const bankAmt = document.getElementById('tour-bank-amount-display');
+                if (bankAmt) {
+                    bankAmt.innerHTML = isLK ? `Rs ${tourGrandTotalLKR.toLocaleString()} LKR` : `${formattedTourTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${tourGrandTotalLKR.toLocaleString()} LKR)</span>`;
+                }
+                const bankBtn = document.getElementById('tour-bank-btn-text');
+                if (bankBtn) bankBtn.textContent = `Confirm Booking via Bank Transfer • ${formattedTourTotal}`;
+
+                const depAmt = document.getElementById('tour-deposit-amount-display');
+                if (depAmt) {
+                    depAmt.innerHTML = isLK ? `Rs ${tourGrandTotalLKR.toLocaleString()} LKR` : `${formattedTourTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${tourGrandTotalLKR.toLocaleString()} LKR)</span>`;
+                }
+                const slipBtn = document.getElementById('tour-slip-btn-text');
+                if (slipBtn) slipBtn.textContent = `Submit Cash Deposit Slip • ${formattedTourTotal}`;
+
+                const ppAmt = document.getElementById('tour-paypal-amount-display');
+                if (ppAmt) {
+                    ppAmt.textContent = cur.code === 'USD' ? `$${tourGrandTotalUSD.toFixed(2)} USD` : `${formattedTourTotal} ($${tourGrandTotalUSD.toFixed(2)} USD)`;
+                }
+
+                const activeTab = document.querySelector('#tour-checkout-form .pay-tab.active');
+                if (activeTab && activeTab.getAttribute('data-method') === 'paypal') {
+                    initTourPayPal();
+                }
+            };
+
+            // Stepper
+            const minusBtn = document.getElementById('tour-qty-minus');
+            const plusBtn = document.getElementById('tour-qty-plus');
+            const qtyVal = document.getElementById('tour-qty-val');
+
+            if (minusBtn) {
+                minusBtn.onclick = () => {
+                    if (tourGuests > 1) {
+                        tourGuests--;
+                        if (qtyVal) qtyVal.textContent = tourGuests;
+                        updateTourPricing();
+                    }
+                };
+            }
+            if (plusBtn) {
+                plusBtn.onclick = () => {
+                    if (tourGuests < 10) {
+                        tourGuests++;
+                        if (qtyVal) qtyVal.textContent = tourGuests;
+                        updateTourPricing();
+                    }
+                };
             }
 
-            // Sunday closure guidance on date picker
+            const countryInput = document.getElementById('tour-cust-country');
+            if (countryInput) countryInput.onchange = updateTourPricing;
+
+            drawerFormContainer.querySelectorAll('input[name="tour-transport-option"]').forEach(r => {
+                r.onchange = () => {
+                    const selfCard = document.getElementById('tour-transport-card-self');
+                    const chaufCard = document.getElementById('tour-transport-card-chauffeur');
+                    if (r.value === 'chauffeur') {
+                        if (chaufCard) { chaufCard.style.border = '1.5px solid var(--color-gold)'; chaufCard.style.background = 'rgba(212,175,55,0.08)'; }
+                        if (selfCard) { selfCard.style.border = '1.5px solid rgba(255,255,255,0.15)'; selfCard.style.background = 'rgba(0,0,0,0.3)'; }
+                    } else {
+                        if (selfCard) { selfCard.style.border = '1.5px solid var(--color-gold)'; selfCard.style.background = 'rgba(212,175,55,0.08)'; }
+                        if (chaufCard) { chaufCard.style.border = '1.5px solid rgba(255,255,255,0.15)'; chaufCard.style.background = 'rgba(0,0,0,0.3)'; }
+                    }
+                    updateTourPricing();
+                };
+            });
+
+            // Date validation (Reject Sunday)
             const dateInput = document.getElementById('tour-date-input');
-            const dateHint = document.getElementById('tour-date-hint');
             if (dateInput) {
-                dateInput.addEventListener('change', () => {
+                dateInput.onchange = () => {
                     if (dateInput.value) {
-                        const chosen = new Date(dateInput.value + 'T00:00:00');
-                        if (chosen.getDay() === 0) { // Sunday
-                            if (dateHint) {
-                                dateHint.innerHTML = '<span style="color:#ef4444; font-weight:600;">⚠️ The factory is closed on Sundays for family & processing. Please select a Monday – Saturday date.</span>';
-                            }
-                        } else {
-                            if (dateHint) {
-                                dateHint.innerHTML = '<span style="color:#86efac;">✓ Operating day confirmed (Monday – Saturday, 9:00 AM – 5:00 PM).</span>';
-                            }
+                        const d = new Date(dateInput.value + 'T00:00:00');
+                        if (d.getDay() === 0) { // Sunday
+                            showToast("Estate Closed on Sunday", "Rock One Tea Factory operates Monday through Saturday (9:00 AM – 5:00 PM). Please select a Monday through Saturday date.", "warning");
+                            const nextDay = new Date(d.getTime() + 86400000).toISOString().split('T')[0];
+                            dateInput.value = nextDay;
+                        }
+                    }
+                };
+            }
+
+            bindPaymentTabs('tour-checkout-form');
+            bindFileUpload('tour-bank-slip', 'tour-bank-slip-zone', 'tour-bank-slip-preview', (b64) => {
+                selectedTourSlipBase64 = b64;
+            });
+            bindFileUpload('tour-cash-slip', 'tour-cash-slip-zone', 'tour-cash-slip-preview', (b64) => {
+                selectedTourSlipBase64 = b64;
+            });
+
+            // Wire PayPal
+            const initTourPayPal = () => {
+                const container = document.getElementById('tour-paypal-button-container');
+                if (!container || !window.TeaFactoryPayPal) return;
+
+                window.TeaFactoryPayPal.renderButtons({
+                    containerId: 'tour-paypal-button-container',
+                    orderId: `GP-TOUR-${Date.now()}`,
+                    amount: tourGrandTotalUSD,
+                    currency: 'USD',
+                    description: `${pkgName} (${tourGuests} Guest${tourGuests > 1 ? 's' : ''})`,
+                    onValidate: () => {
+                        const form = document.getElementById('tour-checkout-form');
+                        if (!form || !form.checkValidity()) {
+                            if (form) form.reportValidity();
+                            return false;
+                        }
+                        return true;
+                    },
+                    onSuccess: async ({ paypalOrderId, captureData }) => {
+                        const firstName = document.getElementById('tour-cust-firstname')?.value?.trim() || '';
+                        const lastName = document.getElementById('tour-cust-lastname')?.value?.trim() || '';
+                        const customerName = `${firstName} ${lastName}`.trim() || 'Visitor';
+                        const email = document.getElementById('tour-cust-email')?.value?.trim() || '';
+                        const phone = document.getElementById('tour-cust-phone')?.value?.trim() || '';
+                        const tourDate = document.getElementById('tour-date-input')?.value || '';
+                        const slot = document.getElementById('tour-time-slot')?.value || timeSlot;
+                        const dietary = document.getElementById('tour-dietary')?.value || 'None';
+                        const transport = document.querySelector('input[name="tour-transport-option"]:checked')?.value || 'self';
+                        const country = document.getElementById('tour-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+
+                        const result = window.TeaFactoryStore.bookTour({
+                            packageName: pkgName,
+                            name: customerName,
+                            email,
+                            phone,
+                            country,
+                            guests: tourGuests,
+                            date: tourDate,
+                            timeSlot: slot,
+                            dietaryNotes: dietary,
+                            transportOption: transport === 'chauffeur' ? 'Estate Chauffeur Pick-up' : 'Independent Arrival',
+                            paymentMethod: 'paypal',
+                            priceUSD: tourGrandTotalUSD,
+                            formattedPrice: formattedTourTotal,
+                            slipImage: ''
+                        });
+
+                        if (result && result.success) {
+                            const booking = result.booking;
+                            window.TeaFactoryStore.markTourPaidByPayPal(booking.id, captureData || { id: paypalOrderId });
+                            window.TeaFactoryStore.saveRecentOrderId(booking.id);
+
+                            showToast("Tour Reserved!", `Gate Pass ${booking.id} has been issued and endorsed.`, "success");
+                            renderTourConfirmationSuccess(booking, 'paypal');
                         }
                     }
                 });
+            };
+
+            const tourPaypalTab = drawerFormContainer.querySelector('.pay-tab[data-method="paypal"]');
+            if (tourPaypalTab) {
+                tourPaypalTab.addEventListener('click', () => {
+                    setTimeout(initTourPayPal, 50);
+                });
             }
 
-            // Bind Payment Tabs & File Dropzones
-            bindPaymentTabs('tour-booking-form');
-            bindFileUpload('tour-bank-slip', 'tour-bank-slip-zone', 'tour-bank-slip-preview');
-            bindFileUpload('tour-cash-slip', 'tour-cash-slip-zone', 'tour-cash-slip-preview');
+            // Tour Checkout Form Submit (Bank Transfer & Slip)
+            const handleTourCheckoutSubmit = (e) => {
+                if (e) e.preventDefault();
+                const form = document.getElementById('tour-checkout-form');
+                if (!form || !form.checkValidity()) {
+                    if (form) form.reportValidity();
+                    return;
+                }
 
-            // Capture file into selectedTourSlipBase64
-            ['tour-bank-slip', 'tour-cash-slip'].forEach(inputId => {
-                const inp = document.getElementById(inputId);
-                if (inp) {
-                    inp.addEventListener('change', () => {
-                        if (inp.files.length > 0) {
-                            const reader = new FileReader();
-                            reader.onload = (ev) => { selectedTourSlipBase64 = ev.target.result; };
-                            reader.readAsDataURL(inp.files[0]);
-                        }
+                const activeTabBtn = form.querySelector('.pay-tab.active');
+                const paymentMethod = activeTabBtn ? activeTabBtn.getAttribute('data-method') : 'bank';
+
+                if (paymentMethod === 'paypal') {
+                    showToast("PayPal Active", "Please use the official PayPal button above to complete your booking.", "info");
+                    return;
+                }
+
+                const slipImg = selectedTourSlipBase64 || 
+                    document.getElementById('tour-bank-slip-zone')?.dataset?.fileBase64 || 
+                    document.getElementById('tour-cash-slip-zone')?.dataset?.fileBase64 || '';
+
+                if (!slipImg) {
+                    showToast("Receipt Required", "Please attach your bank transfer or deposit slip to confirm your Gate Pass.", "warning");
+                    return;
+                }
+
+                const firstName = document.getElementById('tour-cust-firstname')?.value?.trim() || '';
+                const lastName = document.getElementById('tour-cust-lastname')?.value?.trim() || '';
+                const customerName = `${firstName} ${lastName}`.trim() || 'Visitor';
+                const email = document.getElementById('tour-cust-email')?.value?.trim() || '';
+                const phone = document.getElementById('tour-cust-phone')?.value?.trim() || '';
+                const tourDate = document.getElementById('tour-date-input')?.value || '';
+                const slot = document.getElementById('tour-time-slot')?.value || timeSlot;
+                const dietary = document.getElementById('tour-dietary')?.value || 'None';
+                const transport = document.querySelector('input[name="tour-transport-option"]:checked')?.value || 'self';
+                const country = document.getElementById('tour-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+
+                const result = window.TeaFactoryStore.bookTour({
+                    packageName: pkgName,
+                    name: customerName,
+                    email,
+                    phone,
+                    country,
+                    guests: tourGuests,
+                    date: tourDate,
+                    timeSlot: slot,
+                    dietaryNotes: dietary,
+                    transportOption: transport === 'chauffeur' ? 'Estate Chauffeur Pick-up' : 'Independent Arrival',
+                    paymentMethod,
+                    priceUSD: tourGrandTotalUSD,
+                    formattedPrice: formattedTourTotal,
+                    slipImage: slipImg
+                });
+
+                if (result && result.success) {
+                    const booking = result.booking;
+                    booking.formattedPrice = formattedTourTotal;
+                    window.TeaFactoryStore.saveRecentOrderId(booking.id);
+
+                    showToast("Gate Pass Issued!", `Tour booking ${booking.id} confirmed.`, "success");
+                    renderTourConfirmationSuccess(booking, paymentMethod);
+                } else {
+                    showToast("Booking Failed", result?.message || "Could not reserve private tour.", "error");
+                }
+            };
+
+            const tourForm = document.getElementById('tour-checkout-form');
+            if (tourForm) tourForm.onsubmit = handleTourCheckoutSubmit;
+
+            document.getElementById('tour-guest-signin-btn')?.addEventListener('click', () => {
+                if (typeof window.requireCustomerAuth === 'function') {
+                    window.requireCustomerAuth('Sign in or register to track your tour boarding pass in your patron ledger.', () => {
+                        openDrawer('tour', id, data);
                     });
                 }
             });
-
-            // Bind submit btn
-            document.getElementById('submit-tour-booking-btn').addEventListener('click', handleTourBookingSubmit);
-        
         } else if (type === 'product') {
             const products = window.TeaFactoryStore.getProducts();
-            const product = products.find(p => p.id === id);
+            const product = products.find(p => p.id === id) || { id, name: 'Single-Estate Tea', price: 28.00, weight: '100g', category: 'Single-Estate Tea', leafGrade: 'Silver Tips', flavorProfile: 'Honey, Orchid, Velvet Wood' };
             const prodMinDate = new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0];
+            const unitPriceUSD = Number(product.price) || 0;
+            const itemDefinedShipping = Number(product.shippingCharge !== undefined ? product.shippingCharge : (product.shippingFee || 0)) || 0;
+            
+            const selectedCountry = window.lastSelectedCheckoutCountry || 'Sri Lanka';
+            const isSriLanka = selectedCountry === 'Sri Lanka';
+            const currInfo = window.getCountryCurrency ? window.getCountryCurrency(selectedCountry) : (isSriLanka ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
+            
+            let currentQuickQty = 1;
+            let subtotalUSD = unitPriceUSD * currentQuickQty;
+            let shippingUSD = window.calculateShippingFee ? window.calculateShippingFee(subtotalUSD, selectedCountry, itemDefinedShipping) : (isSriLanka ? 2.13 : 15.0);
+            let grandTotalUSD = subtotalUSD + shippingUSD;
+
+            let formattedSubtotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(subtotalUSD, currInfo) : `$${subtotalUSD.toFixed(2)}`;
+            let formattedShipping = shippingUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(shippingUSD, currInfo) : `$${shippingUSD.toFixed(2)}`) : 'Complimentary';
+            let formattedGrandTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(grandTotalUSD, currInfo) : `$${grandTotalUSD.toFixed(2)}`;
+            let grandTotalLKR = Math.round(grandTotalUSD * 305);
 
             drawerTitle.innerText = `Order: ${product.name}`;
+            selectedProdSlipBase64 = '';
+
+            const signedUser = window.TeaFactoryStore && window.TeaFactoryStore.getCurrentUser ? window.TeaFactoryStore.getCurrentUser() : null;
+            let defaultFirstName = '';
+            let defaultLastName = '';
+            if (signedUser && signedUser.full_name) {
+                const parts = signedUser.full_name.trim().split(' ');
+                defaultFirstName = parts[0] || '';
+                defaultLastName = parts.slice(1).join(' ') || '';
+            }
+            const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
             drawerFormContainer.innerHTML = `
-                <div class="booking-summary-box">
-                    <div class="summary-row"><span>Product:</span><span>${product.name}</span></div>
-                    <div class="summary-row"><span>Leaf Grade:</span><strong style="color: var(--color-gold);">${product.leafGrade}</strong></div>
-                    <div class="summary-row"><span>Flavor Profile:</span><span style="font-size: 0.75rem; color: var(--color-text-muted);">${product.flavorProfile}</span></div>
-                    <div class="summary-row" style="border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 0.5rem; margin-top: 0.5rem;">
-                        <span style="font-size: 0.7rem; color: var(--color-text-muted);">Sommelier Brewing Guide:</span>
-                        <span style="font-size: 0.7rem; color: var(--color-gold); font-weight: 500; display: inline-flex; align-items: center; gap: 0.35rem;">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg> ${product.steepTemp} | 
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> ${product.steepTime}
-                        </span>
+                <div class="cart-drawer-inner" style="display: flex; flex-direction: column; gap: 1.15rem; padding-bottom: 2rem;">
+                    
+                    <!-- 1. ORDER SUMMARY & ALLOCATIONS CARD -->
+                    <div class="cart-step-card" style="background: rgba(4,14,8,0.78); border: 1.5px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 1.15rem; box-shadow: 0 4px 18px rgba(0,0,0,0.35);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.6rem; margin-bottom: 0.75rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                                <span>1. Order Summary &amp; Allocations</span>
+                            </div>
+                            <span style="font-size: 0.72rem; color: #86efac; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 0.15rem 0.55rem; font-weight: 600;">Single-Estate Reserve</span>
+                        </div>
+
+                        <!-- Product Overview -->
+                        <div style="display: flex; gap: 1rem; align-items: flex-start; padding-bottom: 0.85rem; border-bottom: 1px solid rgba(212,175,55,0.15);">
+                            <div style="width: 72px; height: 72px; border-radius: 10px; overflow: hidden; background: rgba(0,0,0,0.5); border: 1.5px solid rgba(212,175,55,0.35); flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                                <img src="${product.image || 'images/Product.jpeg'}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: contain;" onerror="window.handleImageError &amp;&amp; window.handleImageError(this, 'product')" loading="lazy" decoding="async">
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem; flex-wrap: wrap;">
+                                    <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.3); padding: 0.15rem 0.5rem; border-radius: 4px;">${product.category || 'Single-Estate Tea'}</span>
+                                    <span style="font-size: 0.65rem; color: #a3b8ad; font-weight: 600;">${product.leafGrade || 'Montane Flush'}</span>
+                                </div>
+                                <h4 style="margin: 0 0 0.25rem 0; font-family: var(--font-serif); font-size: 1.05rem; color: #ffffff; line-height: 1.3;">${product.name}</h4>
+                                <div style="font-size: 0.72rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 0.5rem;">
+                                    <span>${product.weight || '100g'} Tin</span>
+                                    <span>&bull;</span>
+                                    <span id="quick-order-unit-price" style="color: var(--color-gold); font-weight: 600;">${window.formatAmountInCurrency ? window.formatAmountInCurrency(unitPriceUSD, currInfo) : '$' + unitPriceUSD.toFixed(2)} / tin</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quantity Stepper -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px dashed rgba(212,175,55,0.2);">
+                            <span style="font-size: 0.8rem; color: var(--color-text-muted);">Quantity Allocation:</span>
+                            <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.5);">
+                                <button type="button" id="quick-order-qty-minus" style="background: none; border: none; color: var(--color-gold); width: 28px; height: 28px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">-</button>
+                                <span id="quick-order-qty-val" style="width: 32px; text-align: center; font-size: 0.82rem; font-weight: 700; color: #fff;">1</span>
+                                <button type="button" id="quick-order-qty-plus" style="background: none; border: none; color: var(--color-gold); width: 28px; height: 28px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">+</button>
+                            </div>
+                        </div>
+
+                        <!-- Subtotal & Shipping Breakdown -->
+                        <div style="margin-top: 0.65rem; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.82rem;">
+                            <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
+                                <span>Items Allocation Subtotal</span>
+                                <strong id="quick-summary-subtotal" style="color: #ffffff;">${formattedSubtotal}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
+                                <span id="quick-summary-shipping-label">${isSriLanka ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS International Priority Air'}</span>
+                                <span id="quick-summary-shipping" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-weight: 600;">${formattedShipping}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid rgba(212,175,55,0.25); padding-top: 0.55rem; margin-top: 0.25rem;">
+                                <div>
+                                    <strong id="quick-summary-total-title" style="font-size: 0.95rem; color: #ffffff;">Total Due (${currInfo.code})</strong>
+                                </div>
+                                <strong id="quick-summary-total" style="font-size: 1.35rem; color: var(--color-gold); font-family: var(--font-serif);">${formattedGrandTotal}</strong>
+                            </div>
+                        </div>
                     </div>
-                    <div class="summary-row" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem; margin-top: 0.5rem;"><span>Weight:</span><span>${product.weight} Premium Tin</span></div>
-                    <div class="summary-row total"><span>Unit Price:</span><span>${window.TeaFactoryStore.formatCurrency(product.price)}</span></div>
+
+                    <!-- 2. PATRON ACCOUNT / GUEST CHECKOUT BANNER -->
+                    <div class="cart-step-card" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.95rem 1.15rem;">
+                        ${signedUser ? `
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
+                                    <div>
+                                        <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Patron Account: <span style="color: var(--color-gold);">${esc(signedUser.full_name || signedUser.email)}</span></div>
+                                        <div style="font-size: 0.7rem; color: #86efac;">${esc(signedUser.email)} &bull; Linked to Estate Master Ledger</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); openDrawer('product', '${id}');" style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: rgba(255,255,255,0.2); color: var(--color-text-muted);">
+                                    Switch Account
+                                </button>
+                            </div>
+                        ` : `
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 210px;">
+                                    <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.2rem;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                        <span>Guest Checkout Active (No Sign-In Required)</span>
+                                    </div>
+                                    <p style="font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.4; margin: 0;">
+                                        You can order immediately as an anonymous guest. Or sign in to save your allocation in the patron portal.
+                                    </p>
+                                </div>
+                                <button type="button" id="quick-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: var(--color-gold); color: var(--color-gold); white-space: nowrap;">
+                                    Sign In / Register
+                                </button>
+                            </div>
+                        `}
+                    </div>
+
+                    <!-- 3. FORM: DESTINATION, RECIPIENT & ADDRESS -->
+                    <form id="quick-checkout-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- Destination Section -->
+                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                <span>2. Delivery Destination</span>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                <!-- Country Selector -->
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="quick-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Destination Country *</label>
+                                    <select class="form-input" id="quick-cust-country" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                        <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>🇱🇰 Sri Lanka (LKR Rs)</option>
+                                        <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>🇺🇸 United States (USD $)</option>
+                                        <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom (GBP £)</option>
+                                        <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>🇦🇺 Australia (AUD A$)</option>
+                                        <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>🇨🇦 Canada (CAD C$)</option>
+                                        <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>🇩🇪 Germany (EUR €)</option>
+                                        <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>🇫🇷 France (EUR €)</option>
+                                        <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>🇯🇵 Japan (JPY ¥)</option>
+                                        <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>🇦🇪 United Arab Emirates (AED)</option>
+                                        <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>🇸🇬 Singapore (SGD S$)</option>
+                                        <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>🇮🇳 India (INR ₹)</option>
+                                        <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>🇨🇭 Switzerland (CHF)</option>
+                                        <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>🇨🇳 China (CNY ¥)</option>
+                                        <option value="Worldwide" ${selectedCountry === 'Worldwide' ? 'selected' : ''}>🌐 Rest of World (USD $)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Dynamic Region Container -->
+                                <div class="form-group" style="margin-bottom: 0;" id="quick-region-container">
+                                    ${isSriLanka ? `
+                                        <label class="form-label" for="quick-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Region / Province *</label>
+                                        <select class="form-input" id="quick-cust-region" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                            <option value="Western Province (Colombo, Gampaha, Kalutara)">Western Province (Colombo, Gampaha)</option>
+                                            <option value="Central Province (Kandy, Nuwara Eliya, Matale)">Central Province (Kandy, Nuwara Eliya)</option>
+                                            <option value="Uva Province (Badulla, Bandarawela, Ettampitiya)" selected>Uva Province (Badulla, Ettampitiya)</option>
+                                            <option value="Southern Province (Galle, Matara, Hambantota)">Southern Province (Galle, Matara)</option>
+                                            <option value="Sabaragamuwa Province (Ratnapura, Kegalle)">Sabaragamuwa Province (Ratnapura)</option>
+                                            <option value="North Western Province (Kurunegala, Puttalam)">North Western Province (Kurunegala)</option>
+                                            <option value="North Central Province (Anuradhapura, Polonnaruwa)">North Central Province (Anuradhapura)</option>
+                                            <option value="Northern Province (Jaffna, Kilinochchi, Vavuniya)">Northern Province (Jaffna)</option>
+                                            <option value="Eastern Province (Batticaloa, Trincomalee, Ampara)">Eastern Province (Batticaloa, Trincomalee)</option>
+                                        </select>
+                                    ` : `
+                                        <label class="form-label" for="quick-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">State / Province / County *</label>
+                                        <input class="form-input" type="text" id="quick-cust-region" placeholder="e.g. California / London / Tokyo" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
+                                    `}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recipient Details Section -->
+                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                <span>3. Recipient &amp; Delivery Address</span>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="quick-cust-firstname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">First Name *</label>
+                                    <input class="form-input" type="text" id="quick-cust-firstname" value="${esc(defaultFirstName)}" required placeholder="e.g. Ruwan" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="quick-cust-lastname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Last Name *</label>
+                                    <input class="form-input" type="text" id="quick-cust-lastname" value="${esc(defaultLastName)}" required placeholder="e.g. Perera" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="quick-cust-email" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Email Address *</label>
+                                    <input class="form-input" type="email" id="quick-cust-email" value="${esc(signedUser ? signedUser.email : '')}" required placeholder="name@domain.com" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="quick-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Mobile / WhatsApp *</label>
+                                    <input class="form-input" type="tel" id="quick-cust-phone" value="${esc(signedUser ? signedUser.phone : '')}" required placeholder="+94 77 123 4567" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 0.75rem;">
+                                <label class="form-label" for="quick-cust-address" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Street Address *</label>
+                                <input class="form-input" type="text" id="quick-cust-address" value="${esc(signedUser ? signedUser.address : '')}" required placeholder="House No., Street Name, Neighborhood" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 0.75rem;">
+                                <label class="form-label" for="quick-cust-suite" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7);">Apartment / Suite / Unit / Floor (Optional)</label>
+                                <input class="form-input" type="text" id="quick-cust-suite" placeholder="e.g. Apt 4B, Level 2" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="quick-cust-city" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">City / Town *</label>
+                                    <input class="form-input" type="text" id="quick-cust-city" required placeholder="e.g. Colombo / Badulla" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="quick-cust-postal" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Postal / ZIP Code *</label>
+                                    <input class="form-input" type="text" id="quick-cust-postal" required placeholder="e.g. 00100" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="quick-pref-date" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Preferred Dispatch Date *</label>
+                                    <input class="form-input" type="date" id="quick-pref-date" min="${prodMinDate}" value="${prodMinDate}" required style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="quick-cust-notes" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Courier Notes</label>
+                                    <input class="form-input" type="text" id="quick-cust-notes" placeholder="e.g. Call before arrival" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+                            </div>
+
+                            <!-- Bespoke Gift Packaging Accordion -->
+                            ${window.UIComponents.renderBespokeGiftOptions('quick')}
+                        </div>
+
+                        <!-- Section: Shipping Method & Courier Charges -->
+                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                                <span>4. Shipping Method &amp; Courier Charges</span>
+                            </div>
+
+                            <div id="quick-shipping-methods-container" style="display: flex; flex-direction: column; gap: 0.65rem;">
+                                <!-- Option 1: Sri Lanka Post EMS Express (Pre-paid) -->
+                                <label class="shipping-option-card active" id="quick-shipping-card-ems" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid var(--color-gold); border-radius: 8px; background: rgba(212,175,55,0.08); cursor: pointer;">
+                                    <input type="radio" name="quick-shipping-method" value="ems_express" id="quick-ship-ems" checked style="margin-top: 0.2rem; accent-color: var(--color-gold);">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
+                                            <strong id="quick-shipping-ems-title" style="color: #ffffff; font-size: 0.88rem;">${isSriLanka ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air'}</strong>
+                                            <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                                <span style="font-size: 0.72rem; color: #86efac; font-weight: 700;">Tracked Dispatch</span>
+                                                <span id="quick-shipping-ems-price-pill" style="font-size: 0.78rem; color: var(--color-gold); font-weight: 700; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; padding: 0.2rem 0.55rem;">${formattedShipping}</span>
+                                            </div>
+                                        </div>
+                                        <p id="quick-shipping-ems-desc" style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
+                                            ${isSriLanka ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
+                                        </p>
+                                    </div>
+                                </label>
+
+                                <!-- Option 2: Cash on Delivery (COD) - Sri Lanka Only -->
+                                <label class="shipping-option-card" id="quick-shipping-card-cod" style="display: ${isSriLanka ? 'flex' : 'none'}; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 8px; background: rgba(0,0,0,0.3); cursor: pointer;">
+                                    <input type="radio" name="quick-shipping-method" value="cod" id="quick-ship-cod" style="margin-top: 0.2rem; accent-color: #25d366;">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
+                                            <strong style="color: #ffffff; font-size: 0.88rem; display: flex; align-items: center; gap: 0.4rem;">
+                                                <span>Cash on Delivery (COD)</span>
+                                                <span style="font-size: 0.62rem; padding: 0.1rem 0.45rem; border-radius: 3px; background: rgba(37,211,102,0.2); color: #4ade80; font-weight: 700;">SRI LANKA ONLY</span>
+                                            </strong>
+                                            <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                                <span style="font-size: 0.72rem; color: #4ade80; font-weight: 700;">Pay at Doorstep</span>
+                                                <span id="quick-shipping-cod-price-pill" style="font-size: 0.78rem; color: #4ade80; font-weight: 700; background: rgba(37,211,102,0.15); border: 1px solid rgba(37,211,102,0.35); border-radius: 6px; padding: 0.2rem 0.55rem;">${formattedShipping}</span>
+                                            </div>
+                                        </div>
+                                        <p style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
+                                            Pay cash to the Sri Lanka Post courier upon receiving your tea package. No upfront digital transaction required.
+                                        </p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Courier Shipping Breakdown Note -->
+                            <div style="margin-top: 0.65rem; padding: 0.65rem 0.85rem; background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.25); border-radius: 8px; font-size: 0.72rem; color: #cbd5e1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem;">
+                                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                    <span>Standard Insured Courier Dispatch:</span>
+                                </div>
+                                <span id="quick-shipping-rate-note" style="color: var(--color-gold); font-weight: 600;">${isSriLanka ? 'Rs 650 LKR (Complimentary over $80)' : (window.formatAmountInCurrency ? window.formatAmountInCurrency(15, currInfo) : '$15.00') + ' International EMS (Complimentary over $150)'}</span>
+                            </div>
+                        </div>
+
+                        <!-- Section: Payment Method & Order Confirmation -->
+                        <div class="cart-step-card" id="quick-payment-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                <span>5. Payment Method &amp; Order Confirmation</span>
+                            </div>
+
+                            <!-- COD Panel (Sri Lanka Only) -->
+                            <div id="quick-pay-panel-cod" style="display: none;">
+                                <div style="background: rgba(37,211,102,0.08); border: 1.5px solid rgba(37,211,102,0.4); border-radius: 10px; padding: 1.15rem; text-align: center; margin-bottom: 1rem;">
+                                    <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(37,211,102,0.15); border: 1.5px solid #25d366; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto; color: #25d366;">
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                    </div>
+                                    <h4 style="color: #4ade80; font-size: 1.05rem; margin-bottom: 0.35rem; font-weight: 700;">Cash on Delivery (COD) Selected</h4>
+                                    <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5; margin: 0 0 0.85rem 0;">
+                                        No online payment is needed now. The Sri Lanka Post EMS courier will collect the cash amount upon parcel handover.
+                                    </p>
+                                    <div style="background: rgba(0,0,0,0.45); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.65rem 1rem; display: inline-flex; align-items: center; gap: 0.75rem;">
+                                        <span style="font-size: 0.78rem; color: #9ca3af;">Amount Payable to Courier:</span>
+                                        <strong id="quick-cod-amount-display" style="font-size: 1.25rem; color: var(--color-gold); font-family: monospace;">Rs ${grandTotalLKR.toLocaleString()} LKR</strong>
+                                    </div>
+                                </div>
+
+                                <button type="submit" id="btn-submit-quick-cod" class="btn btn-primary" style="padding: 0.95rem 1.5rem; font-size: 0.95rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; box-shadow: 0 4px 18px rgba(37,211,102,0.3);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <span id="quick-cod-btn-text">Confirm Order via Cash on Delivery (COD) &bull; Rs ${grandTotalLKR.toLocaleString()} LKR</span>
+                                </button>
+                            </div>
+
+                            <!-- Pre-Paid Panels -->
+                            <div id="quick-pay-panel-prepaid">
+                                <div class="payment-method-tabs" style="margin-bottom: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.35rem;">
+                                    <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
+                                        Bank Transfer (Live)
+                                    </button>
+                                    <button type="button" class="pay-tab" data-method="slip" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                        Cash Deposit Slip (Live)
+                                    </button>
+                                    <button type="button" class="pay-tab" data-method="paypal" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(0,121,193,0.5);">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
+                                        <span style="font-weight:700;"><span style="color:#0079C1;">Pay</span><span style="color:#00457C;">Pal</span></span>
+                                        <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(0,121,193,0.2); color:#38bdf8; font-weight:700;">LIVE</span>
+                                    </button>
+                                </div>
+
+                                <!-- Method A: Direct Bank Transfer -->
+                                <div id="pay-panel-bank" class="pay-panel active" style="margin-top: 0.5rem;">
+                                    <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.85rem; font-size: 0.8rem; margin-bottom: 0.75rem;">
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#fff;">Bank of Ceylon</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:#fff;">Rock one wild tea</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:var(--color-gold); font-family:monospace; font-size:0.95rem;">94945708</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#fff;">Ettampitiya branch</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; padding-top:0.4rem; border-top:1px dashed rgba(212,175,55,0.2);"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="quick-bank-amount-display" style="color:var(--color-gold); font-size:1.05rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong></div>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0.75rem;">
+                                        <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Bank Transfer Slip *</label>
+                                        <div class="file-upload-zone" id="quick-bank-slip-zone">
+                                            <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
+                                            <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse receipt</span></div>
+                                            <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
+                                            <input type="file" id="quick-bank-slip" accept="image/*,.pdf" style="display:none;">
+                                        </div>
+                                        <div id="quick-bank-slip-preview" class="slip-preview" style="display:none;"></div>
+                                    </div>
+                                    <button type="submit" id="btn-submit-quick-bank" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                        <span id="quick-bank-btn-text">Place Bank Transfer Order &bull; ${formattedGrandTotal}</span>
+                                    </button>
+                                </div>
+
+                                <!-- Method B: Cash Deposit Slip -->
+                                <div id="pay-panel-slip" class="pay-panel" style="margin-top: 0.5rem;">
+                                    <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.85rem; font-size: 0.8rem; margin-bottom: 0.75rem;">
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#fff;">Bank of Ceylon</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:#fff;">Rock one wild tea</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:var(--color-gold); font-family:monospace; font-size:0.95rem;">94945708</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#fff;">Ettampitiya branch</strong></div>
+                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; padding-top:0.4rem; border-top:1px dashed rgba(212,175,55,0.2);"><span style="color:var(--color-text-muted);">Exact Deposit Amount:</span><strong id="quick-deposit-amount-display" style="color:var(--color-gold); font-size:1.05rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong></div>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0.75rem;">
+                                        <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Cash Deposit Slip *</label>
+                                        <div class="file-upload-zone" id="quick-cash-slip-zone">
+                                            <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
+                                            <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse deposit slip</span></div>
+                                            <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
+                                            <input type="file" id="quick-cash-slip" accept="image/*,.pdf" style="display:none;">
+                                        </div>
+                                        <div id="quick-cash-slip-preview" class="slip-preview" style="display:none;"></div>
+                                    </div>
+                                    <button type="submit" id="btn-submit-quick-slip" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                        <span id="quick-slip-btn-text">Submit Cash Deposit Slip &bull; ${formattedGrandTotal}</span>
+                                    </button>
+                                </div>
+
+                                <!-- Method C: PayPal / Credit Cards -->
+                                <div id="pay-panel-paypal" class="pay-panel" style="margin-top: 0.5rem;">
+                                    <div style="background: rgba(0, 121, 193, 0.06); border: 1.5px solid rgba(0, 121, 193, 0.35); border-radius: 10px; padding: 1.15rem; margin-bottom: 0.75rem;">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.3rem;">
+                                            <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                                <strong style="color: #ffffff; font-size: 0.95rem;">Instant PayPal &amp; International Cards</strong>
+                                            </div>
+                                            <span style="background: rgba(0,121,193,0.2); color: #38bdf8; font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 4px; text-transform: uppercase;">Instant Clearance</span>
+                                        </div>
+                                        <p style="font-size: 0.76rem; color: #cbd5e1; line-height: 1.45; margin: 0 0 0.75rem 0;">
+                                            Settle immediately with your PayPal balance, Visa, Mastercard, or AMEX. Your Luxury Allocation Certificate signed by CEO Prasanga will be activated instantly.
+                                        </p>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0.75rem; background: rgba(0,0,0,0.4); border-radius: 6px; margin-bottom: 0.85rem;">
+                                            <span style="font-size: 0.75rem; color: #9ca3af;">PayPal Settlement Total:</span>
+                                            <strong id="quick-paypal-amount-display" style="font-size: 1rem; color: var(--color-gold); font-family: monospace;">${currInfo.code === 'USD' ? '$' + grandTotalUSD.toFixed(2) + ' USD' : formattedGrandTotal + ' ($' + grandTotalUSD.toFixed(2) + ' USD)'}</strong>
+                                        </div>
+                                        <div id="quick-paypal-button-container" class="paypal-smart-container" style="min-height: 44px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-
-                <form id="prod-booking-form" class="admin-form">
-                    <div class="form-group">
-                        <label for="prod-cust-name">Full Name</label>
-                        <input type="text" id="prod-cust-name" placeholder="Lady Charlotte Ashworth" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="prod-cust-email">Email Address</label>
-                        <input type="email" id="prod-cust-email" placeholder="charlotte@heritage.com" required>
-                        <span class="field-hint">Order confirmation will be dispatched here.</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="prod-cust-phone">WhatsApp / Phone Number</label>
-                        <input type="tel" id="prod-cust-phone" placeholder="+94 77 123 4567" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="prod-pref-date">Preferred Delivery Date</label>
-                        <div class="date-input-wrapper">
-                            <input type="date" id="prod-pref-date" min="${prodMinDate}" value="${prodMinDate}" required>
-                            <span class="date-calendar-icon" aria-hidden="true">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                            </span>
-                        </div>
-                        <span class="field-hint">Specify your preferred delivery dispatch date.</span>
-                    </div>
-
-                    <!-- Bespoke Gift Packaging & Presentation Accordion -->
-                    ${window.UIComponents.renderBespokeGiftOptions('prod')}
-
-                    <div class="form-group" style="margin-top:1.25rem;">
-                        <label>Payment Method (Live: Bank Deposit &amp; Slip Upload)</label>
-                        <div class="payment-method-tabs">
-                            <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
-                                Bank Transfer (Live)
-                            </button>
-                            <button type="button" class="pay-tab" data-method="slip" style="display:inline-flex; align-items:center; gap:0.35rem;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                Cash Deposit Slip (Live)
-                            </button>
-                            <button type="button" class="pay-tab" data-method="card" style="display:inline-flex; align-items:center; gap:0.35rem; opacity: 0.85;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                Card Payment <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(212,175,55,0.25); color:var(--color-gold); font-weight:700;">SOON</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Method A: Direct Bank Transfer with Slip Attachment (Active Default) -->
-                    <div id="pay-panel-bank" class="pay-panel active">
-                        <div class="bank-details-block">
-                            <div class="bank-detail-row"><span>Bank Name:</span><strong>Bank of Ceylon</strong></div>
-                            <div class="bank-detail-row"><span>Account Name:</span><strong>Rock One Wild Tea (Pvt) Ltd</strong></div>
-                            <div class="bank-detail-row"><span>Account No:</span><strong>0083-1001-5271-8843</strong></div>
-                            <div class="bank-detail-row"><span>Branch:</span><strong>Kandy Main Branch</strong></div>
-                            <div class="bank-detail-row"><span>Amount Due:</span><strong>${window.TeaFactoryStore.formatCurrency(product.price)}</strong></div>
-                        </div>
-                        <span class="field-hint" style="margin-top:0.75rem;display:block;">After transferring, upload your payment slip below to confirm.</span>
-                        <div class="form-group" style="margin-top:1rem;">
-                            <label>Upload Bank Transfer Slip *</label>
-                            <div class="file-upload-zone" id="prod-bank-slip-zone">
-                                <div class="file-upload-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-                                </div>
-                                <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse file</span></div>
-                                <div class="file-upload-hint">JPG, PNG or PDF — Max 5MB</div>
-                                <input type="file" id="prod-bank-slip" accept="image/*,.pdf" style="display:none;">
-                            </div>
-                            <div id="prod-slip-preview" class="slip-preview" style="display:none;"></div>
-                        </div>
-                    </div>
-
-                    <!-- Method B: Cash Deposit at Bank with Slip Attachment -->
-                    <div id="pay-panel-slip" class="pay-panel">
-                        <div class="mock-card-notice" style="background:rgba(212,175,55,0.07);border-color:rgba(212,175,55,0.2);">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.8" style="flex-shrink:0;"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
-                            <div>
-                                <div style="font-weight:600;color:var(--color-gold);margin-bottom:0.3rem;">Cash Deposit at Bank of Ceylon</div>
-                                <div style="font-size:0.8rem;color:var(--color-text-muted);">Deposit the amount at any Bank of Ceylon branch and upload your cash deposit slip for verification.</div>
-                            </div>
-                        </div>
-                        <div class="bank-details-block" style="margin-top:1rem;">
-                            <div class="bank-detail-row"><span>Account Name:</span><strong>Rock One Wild Tea (Pvt) Ltd</strong></div>
-                            <div class="bank-detail-row"><span>Account No:</span><strong>0083-1001-5271-8843</strong></div>
-                            <div class="bank-detail-row"><span>Amount:</span><strong>${window.TeaFactoryStore.formatCurrency(product.price)}</strong></div>
-                        </div>
-                        <div class="form-group" style="margin-top:1rem;">
-                            <label>Upload Cash Deposit Slip *</label>
-                            <div class="file-upload-zone" id="prod-cash-slip-zone">
-                                <div class="file-upload-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-                                </div>
-                                <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse file</span></div>
-                                <div class="file-upload-hint">JPG, PNG or PDF — Max 5MB</div>
-                                <input type="file" id="prod-cash-slip" accept="image/*,.pdf" style="display:none;">
-                            </div>
-                            <div id="prod-cash-slip-preview" class="slip-preview" style="display:none;"></div>
-                        </div>
-                    </div>
-
-                    <!-- Method C: Card / Online Gateway (Coming Soon Notice) -->
-                    <div id="pay-panel-card" class="pay-panel">
-                        <div class="mock-card-notice" style="background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.35); border-radius: 8px; padding: 1.25rem;">
-                            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
-                                <span style="background: rgba(212,175,55,0.2); color: var(--color-gold); font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px;">Coming Soon</span>
-                                <strong style="color: var(--color-white); font-size: 0.92rem;">Online Card Gateway in Preparation</strong>
-                            </div>
-                            <p style="font-size: 0.82rem; color: var(--color-text-muted); line-height: 1.5; margin: 0 0 1rem 0;">
-                                Direct online card checkout is currently being integrated. To place your order immediately, please use <strong>Bank Transfer</strong> or <strong>Cash Deposit Slip</strong> upload.
-                            </p>
-                            <button type="button" class="btn btn-outline" onclick="window.switchDrawerPayTab('prod-booking-form', 'bank')" style="font-size: 0.78rem; padding: 0.45rem 0.9rem; color: var(--color-gold); border-color: rgba(212,175,55,0.4);">
-                                &larr; Switch to Bank Transfer &amp; Slip Upload (Live)
-                            </button>
-                        </div>
-                    </div>
-                </form>
             `;
 
-            drawerFooter.innerHTML = `
-                <button type="button" id="submit-prod-booking-btn" class="btn btn-primary w-full">
-                    Confirm Order & Submit
-                </button>
-            `;
+            drawerFooter.innerHTML = '';
 
-            selectedProdSlipBase64 = '';
-            bindPaymentTabs('prod-booking-form');
-            bindBespokeGiftEvents('prod');
-            bindFileUpload('prod-bank-slip', 'prod-bank-slip-zone', 'prod-slip-preview', (b64) => {
+            // Render Success Screen for Quick Product Order
+            const renderQuickOrderConfirmationSuccess = (order, paymentMethod) => {
+                const isCOD = paymentMethod === 'cod';
+                const isPayPal = paymentMethod === 'paypal';
+
+                drawerFormContainer.innerHTML = `
+                    <div class="cart-success-view" style="text-align: center; padding: 2.25rem 1rem;">
+                        <div style="width: 76px; height: 76px; border-radius: 50%; background: ${isCOD ? 'rgba(37,211,102,0.15)' : 'rgba(212,175,55,0.12)'}; border: 2px solid ${isCOD ? '#25d366' : 'var(--color-gold)'}; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.15rem auto; color: ${isCOD ? '#25d366' : 'var(--color-gold)'};">
+                            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <span class="season-badge" style="background: ${isCOD ? 'rgba(37,211,102,0.2)' : 'rgba(212,175,55,0.15)'}; color: ${isCOD ? '#4ade80' : 'var(--color-gold)'}; font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                            ${isCOD ? 'Cash on Delivery • Order Confirmed' : (isPayPal ? 'Paid • Instant PayPal Clearance' : 'Allocation Reserved • Slip Attached')}
+                        </span>
+                        <h3 style="font-family: var(--font-serif); font-size: 1.5rem; color: #ffffff; margin: 0.75rem 0 0.25rem 0;">Allocation Registered</h3>
+                        <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.5rem;">
+                            Thank you, ${order.customerName}. Your reserve order for ${order.productName} has been entered into the estate master ledger.
+                        </p>
+
+                        <div style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 1.15rem; margin-bottom: 1.25rem; text-align: left;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Order Reference ID</span>
+                                <strong style="font-family: monospace; color: var(--color-gold); font-size: 0.95rem;">${order.id}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Tea Allocation</span>
+                                <span style="color: #ffffff; font-size: 0.85rem;">${order.productName} (${order.weight || '100g'}) x${order.quantity || 1}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Delivery Destination</span>
+                                <span style="color: #ffffff; font-size: 0.85rem; text-align: right; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${order.country} &bull; ${order.city || ''}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Courier Method</span>
+                                <span style="color: #86efac; font-size: 0.82rem; font-weight: 600;">
+                                    ${order.shippingMethod === 'cod' ? 'Sri Lanka Post EMS (Cash on Delivery)' : (order.country === 'Sri Lanka' ? 'Sri Lanka Post EMS Express' : 'Sri Lanka Post EMS International Priority Air')}
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Amount</span>
+                                <strong style="color: var(--color-gold); font-size: 1.1rem;">${order.formattedPrice}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Payment Mode</span>
+                                <span style="color: ${isCOD ? '#4ade80' : 'var(--color-gold)'}; font-size: 0.85rem; font-weight: 700;">
+                                    ${isCOD ? 'Cash on Delivery (Pay upon delivery)' : (isPayPal ? 'PayPal / International Card' : 'Bank of Ceylon Deposit')}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Executive Director & CEO Verification Seal -->
+                        <div style="background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.35); border-radius: 10px; padding: 0.9rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+                            <div style="text-align: left;">
+                                <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold); font-weight: 700; display: block;">Executive Sign-Off &bull; Verified</span>
+                                <div style="font-size: 0.76rem; color: #d1d5db; margin-top: 2px;">Allocation registered in estate ledger</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <img src="images/ceo_signature_gold.png" alt="Director &amp; CEO Signature" style="height: 34px; object-fit: contain; display: block; margin: 0 0 2px auto;" onerror="this.onerror=null; this.src='images/ceo_signature.png';" />
+                                <div style="font-size: 0.76rem; font-weight: 700; color: #ffffff;">Prasanga</div>
+                                <div style="font-size: 0.65rem; color: var(--color-gold);">Director &amp; CEO</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <button type="button" class="btn btn-outline btn-quick-success-cert" style="padding: 0.8rem; font-size: 0.85rem; border-color: rgba(212,175,55,0.5); color: var(--color-gold); display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: rgba(0,0,0,0.35);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                                Download Luxury Allocation Certificate (PDF)
+                            </button>
+                            <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge%2C%20I%20have%20placed%20Order%20${order.id}%20for%20${encodeURIComponent(order.formattedPrice)}%20via%20${encodeURIComponent(isCOD ? 'Cash on Delivery' : 'Pre-paid EMS')}.%20Please%20confirm%20my%20dispatch." target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; font-weight: 700;">
+                                <span>Notify Concierge on WhatsApp</span>
+                            </a>
+                            <button type="button" class="btn btn-outline" onclick="closeDrawer(); window.appSwitchTab ? window.appSwitchTab('order') : (document.getElementById('nav-order') &amp;&amp; document.getElementById('nav-order').click())" style="padding: 0.8rem; font-size: 0.85rem; border-color: rgba(255,255,255,0.25); color: #fff;">
+                                View in "My Order &amp; Pay" Desk &rarr;
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                drawerFormContainer.querySelector('.btn-quick-success-cert')?.addEventListener('click', () => {
+                    generateAllocationCertificate(order);
+                });
+            };
+
+            // Dynamic Currency & Shipping Calculation
+            const updateQuickPricing = () => {
+                const country = document.getElementById('quick-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+                window.lastSelectedCheckoutCountry = country;
+                const isLK = country === 'Sri Lanka';
+                const cur = window.getCountryCurrency ? window.getCountryCurrency(country) : (isLK ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
+                
+                subtotalUSD = unitPriceUSD * currentQuickQty;
+                shippingUSD = window.calculateShippingFee ? window.calculateShippingFee(subtotalUSD, country, itemDefinedShipping) : (isLK ? 2.13 : 15.0);
+                grandTotalUSD = subtotalUSD + shippingUSD;
+
+                formattedSubtotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(subtotalUSD, cur) : `$${subtotalUSD.toFixed(2)}`;
+                formattedShipping = shippingUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(shippingUSD, cur) : `$${shippingUSD.toFixed(2)}`) : 'Complimentary';
+                formattedGrandTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(grandTotalUSD, cur) : `$${grandTotalUSD.toFixed(2)}`;
+                grandTotalLKR = Math.round(grandTotalUSD * 305);
+
+                const unitPriceEl = document.getElementById('quick-order-unit-price');
+                if (unitPriceEl && window.formatAmountInCurrency) {
+                    unitPriceEl.textContent = `${window.formatAmountInCurrency(unitPriceUSD, cur)} / tin`;
+                }
+                const subEl = document.getElementById('quick-summary-subtotal');
+                if (subEl) subEl.textContent = formattedSubtotal;
+                const shipLabel = document.getElementById('quick-summary-shipping-label');
+                if (shipLabel) shipLabel.textContent = isLK ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS International Priority Air';
+                const shipEl = document.getElementById('quick-summary-shipping');
+                if (shipEl) {
+                    shipEl.textContent = formattedShipping;
+                    shipEl.style.color = shippingUSD > 0 ? '#86efac' : 'var(--color-gold)';
+                }
+                const totalTitle = document.getElementById('quick-summary-total-title');
+                if (totalTitle) totalTitle.textContent = `Total Due (${cur.code})`;
+                const totalEl = document.getElementById('quick-summary-total');
+                if (totalEl) totalEl.textContent = formattedGrandTotal;
+
+                const emsTitle = document.getElementById('quick-shipping-ems-title');
+                if (emsTitle) emsTitle.textContent = isLK ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air';
+                const emsDesc = document.getElementById('quick-shipping-ems-desc');
+                if (emsDesc) emsDesc.textContent = isLK ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.';
+                const emsPill = document.getElementById('quick-shipping-ems-price-pill');
+                if (emsPill) emsPill.textContent = formattedShipping;
+
+                const codCard = document.getElementById('quick-shipping-card-cod');
+                const emsRadio = document.getElementById('quick-ship-ems');
+                const codPill = document.getElementById('quick-shipping-cod-price-pill');
+                if (codPill) codPill.textContent = formattedShipping;
+
+                if (isLK) {
+                    if (codCard) codCard.style.display = 'flex';
+                } else {
+                    if (codCard) codCard.style.display = 'none';
+                    if (emsRadio) emsRadio.checked = true;
+                    syncQuickShippingSelection();
+                }
+
+                const rateNote = document.getElementById('quick-shipping-rate-note');
+                if (rateNote) {
+                    rateNote.textContent = isLK 
+                        ? 'Rs 650 LKR (Complimentary over $80)' 
+                        : (window.formatAmountInCurrency ? window.formatAmountInCurrency(15, cur) : '$15.00') + ' International EMS (Complimentary over $150)';
+                }
+
+                const codAmt = document.getElementById('quick-cod-amount-display');
+                if (codAmt) codAmt.textContent = `Rs ${grandTotalLKR.toLocaleString()} LKR`;
+                const codBtn = document.getElementById('quick-cod-btn-text');
+                if (codBtn) codBtn.textContent = `Confirm Order via Cash on Delivery (COD) • Rs ${grandTotalLKR.toLocaleString()} LKR`;
+
+                const bankAmt = document.getElementById('quick-bank-amount-display');
+                if (bankAmt) {
+                    bankAmt.innerHTML = isLK ? `Rs ${grandTotalLKR.toLocaleString()} LKR` : `${formattedGrandTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>`;
+                }
+                const bankBtn = document.getElementById('quick-bank-btn-text');
+                if (bankBtn) bankBtn.textContent = `Place Bank Transfer Order • ${formattedGrandTotal}`;
+
+                const depAmt = document.getElementById('quick-deposit-amount-display');
+                if (depAmt) {
+                    depAmt.innerHTML = isLK ? `Rs ${grandTotalLKR.toLocaleString()} LKR` : `${formattedGrandTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>`;
+                }
+                const slipBtn = document.getElementById('quick-slip-btn-text');
+                if (slipBtn) slipBtn.textContent = `Submit Cash Deposit Slip • ${formattedGrandTotal}`;
+
+                const ppAmt = document.getElementById('quick-paypal-amount-display');
+                if (ppAmt) {
+                    ppAmt.textContent = cur.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`;
+                }
+
+                // Dynamic region container
+                const regionCont = document.getElementById('quick-region-container');
+                if (regionCont) {
+                    if (isLK) {
+                        if (!regionCont.querySelector('select')) {
+                            regionCont.innerHTML = `
+                                <label class="form-label" for="quick-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Region / Province *</label>
+                                <select class="form-input" id="quick-cust-region" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                    <option value="Western Province (Colombo, Gampaha, Kalutara)">Western Province (Colombo, Gampaha)</option>
+                                    <option value="Central Province (Kandy, Nuwara Eliya, Matale)">Central Province (Kandy, Nuwara Eliya)</option>
+                                    <option value="Uva Province (Badulla, Bandarawela, Ettampitiya)" selected>Uva Province (Badulla, Ettampitiya)</option>
+                                    <option value="Southern Province (Galle, Matara, Hambantota)">Southern Province (Galle, Matara)</option>
+                                    <option value="Sabaragamuwa Province (Ratnapura, Kegalle)">Sabaragamuwa Province (Ratnapura)</option>
+                                    <option value="North Western Province (Kurunegala, Puttalam)">North Western Province (Kurunegala)</option>
+                                    <option value="North Central Province (Anuradhapura, Polonnaruwa)">North Central Province (Anuradhapura)</option>
+                                    <option value="Northern Province (Jaffna, Kilinochchi, Vavuniya)">Northern Province (Jaffna)</option>
+                                    <option value="Eastern Province (Batticaloa, Trincomalee, Ampara)">Eastern Province (Batticaloa, Trincomalee)</option>
+                                </select>
+                            `;
+                        }
+                    } else {
+                        if (!regionCont.querySelector('input')) {
+                            regionCont.innerHTML = `
+                                <label class="form-label" for="quick-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">State / Province / County *</label>
+                                <input class="form-input" type="text" id="quick-cust-region" placeholder="e.g. California / London / Tokyo" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
+                            `;
+                        }
+                    }
+                }
+
+                // Re-render PayPal if open
+                const activeTab = document.querySelector('#quick-checkout-form .pay-tab.active');
+                if (activeTab && activeTab.getAttribute('data-method') === 'paypal') {
+                    initQuickPayPal();
+                }
+            };
+
+            const syncQuickShippingSelection = () => {
+                const selectedMethod = document.querySelector('input[name="quick-shipping-method"]:checked')?.value || 'ems_express';
+                const codCard = document.getElementById('quick-shipping-card-cod');
+                const emsCard = document.getElementById('quick-shipping-card-ems');
+                const codPanel = document.getElementById('quick-pay-panel-cod');
+                const prepaidPanel = document.getElementById('quick-pay-panel-prepaid');
+
+                if (selectedMethod === 'cod') {
+                    if (codCard) {
+                        codCard.style.border = '1.5px solid #25d366';
+                        codCard.style.background = 'rgba(37,211,102,0.1)';
+                    }
+                    if (emsCard) {
+                        emsCard.style.border = '1.5px solid rgba(255,255,255,0.15)';
+                        emsCard.style.background = 'rgba(0,0,0,0.3)';
+                    }
+                    if (codPanel) codPanel.style.display = 'block';
+                    if (prepaidPanel) prepaidPanel.style.display = 'none';
+                } else {
+                    if (emsCard) {
+                        emsCard.style.border = '1.5px solid var(--color-gold)';
+                        emsCard.style.background = 'rgba(212,175,55,0.08)';
+                    }
+                    if (codCard) {
+                        codCard.style.border = '1.5px solid rgba(255,255,255,0.15)';
+                        codCard.style.background = 'rgba(0,0,0,0.3)';
+                    }
+                    if (codPanel) codPanel.style.display = 'none';
+                    if (prepaidPanel) prepaidPanel.style.display = 'block';
+                }
+            };
+
+            // Stepper
+            const minusBtn = document.getElementById('quick-order-qty-minus');
+            const plusBtn = document.getElementById('quick-order-qty-plus');
+            const qtyVal = document.getElementById('quick-order-qty-val');
+
+            if (minusBtn) {
+                minusBtn.onclick = () => {
+                    if (currentQuickQty > 1) {
+                        currentQuickQty--;
+                        if (qtyVal) qtyVal.textContent = currentQuickQty;
+                        updateQuickPricing();
+                    }
+                };
+            }
+            if (plusBtn) {
+                plusBtn.onclick = () => {
+                    currentQuickQty++;
+                    if (qtyVal) qtyVal.textContent = currentQuickQty;
+                    updateQuickPricing();
+                };
+            }
+
+            const countryInput = document.getElementById('quick-cust-country');
+            if (countryInput) {
+                countryInput.onchange = updateQuickPricing;
+            }
+
+            drawerFormContainer.querySelectorAll('input[name="quick-shipping-method"]').forEach(r => {
+                r.onchange = syncQuickShippingSelection;
+            });
+
+            bindPaymentTabs('quick-checkout-form');
+            bindBespokeGiftEvents('quick');
+            bindFileUpload('quick-bank-slip', 'quick-bank-slip-zone', 'quick-bank-slip-preview', (b64) => {
                 selectedProdSlipBase64 = b64;
             });
-            bindFileUpload('prod-cash-slip', 'prod-cash-slip-zone', 'prod-cash-slip-preview', (b64) => {
+            bindFileUpload('quick-cash-slip', 'quick-cash-slip-zone', 'quick-cash-slip-preview', (b64) => {
                 selectedProdSlipBase64 = b64;
             });
-            document.getElementById('submit-prod-booking-btn')?.addEventListener('click', handleProductBookingSubmit);
-        
+
+            // Wire PayPal
+            const initQuickPayPal = () => {
+                const container = document.getElementById('quick-paypal-button-container');
+                if (!container || !window.TeaFactoryPayPal) return;
+
+                window.TeaFactoryPayPal.renderButtons({
+                    containerId: 'quick-paypal-button-container',
+                    orderId: `ORD-PROD-${Date.now()}`,
+                    amount: grandTotalUSD,
+                    currency: 'USD',
+                    description: `${product.name} (${currentQuickQty} Tin${currentQuickQty > 1 ? 's' : ''})`,
+                    onValidate: () => {
+                        const form = document.getElementById('quick-checkout-form');
+                        if (!form || !form.checkValidity()) {
+                            if (form) form.reportValidity();
+                            return false;
+                        }
+                        return true;
+                    },
+                    onSuccess: async ({ paypalOrderId, captureData }) => {
+                        const firstName = document.getElementById('quick-cust-firstname')?.value?.trim() || '';
+                        const lastName = document.getElementById('quick-cust-lastname')?.value?.trim() || '';
+                        const customerName = `${firstName} ${lastName}`.trim() || 'Guest Patron';
+                        const email = document.getElementById('quick-cust-email')?.value?.trim() || '';
+                        const phone = document.getElementById('quick-cust-phone')?.value?.trim() || '';
+                        const street = document.getElementById('quick-cust-address')?.value?.trim() || '';
+                        const suite = document.getElementById('quick-cust-suite')?.value?.trim() || '';
+                        const city = document.getElementById('quick-cust-city')?.value?.trim() || '';
+                        const postal = document.getElementById('quick-cust-postal')?.value?.trim() || '';
+                        const region = document.getElementById('quick-cust-region')?.value?.trim() || '';
+                        const country = document.getElementById('quick-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+                        const prefDate = document.getElementById('quick-pref-date')?.value || '';
+                        const notes = document.getElementById('quick-cust-notes')?.value?.trim() || '';
+                        
+                        const isGift = document.getElementById('quick-enable-gift')?.checked || false;
+                        const giftWax = document.getElementById('quick-wax-val')?.value || 'Imperial Gold';
+                        const giftMonogram = document.getElementById('quick-monogram-input')?.value?.trim().toUpperCase() || '';
+                        const giftMsg = document.getElementById('quick-gift-msg')?.value?.trim() || '';
+
+                        const fullAddress = `${street}${suite ? ', ' + suite : ''}, ${city}, ${region ? region + ', ' : ''}${postal}, ${country}`;
+
+                        const result = window.TeaFactoryStore.bookProduct(product.id, {
+                            name: customerName,
+                            email,
+                            phone,
+                            address: fullAddress,
+                            country,
+                            city,
+                            notes,
+                            quantity: currentQuickQty,
+                            preferredDate: prefDate,
+                            giftPackaging: isGift,
+                            waxSealColor: isGift ? giftWax : '',
+                            monogramInitials: isGift ? giftMonogram : '',
+                            giftMessage: isGift ? giftMsg : '',
+                            paymentMethod: 'paypal',
+                            slipImage: ''
+                        });
+
+                        if (result && result.success) {
+                            const order = result.booking;
+                            window.TeaFactoryStore.markOrderPaidByPayPal(order.id, captureData || { id: paypalOrderId });
+                            window.TeaFactoryStore.saveRecentOrderId(order.id);
+
+                            if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.createOrder === 'function') {
+                                window.TeaFactoryAPI.createOrder({
+                                    id: order.id,
+                                    customer_name: customerName,
+                                    customer_email: email,
+                                    customer_phone: phone,
+                                    shipping_address: fullAddress,
+                                    subtotal_usd: subtotalUSD,
+                                    shipping_usd: shippingUSD,
+                                    total_usd: grandTotalUSD,
+                                    currency_code: currInfo.code,
+                                    total_in_currency: grandTotalUSD,
+                                    payment_method: 'paypal',
+                                    bespoke_notes: notes,
+                                    items: [{ id: product.id, name: product.name, quantity: currentQuickQty, price: unitPriceUSD, shippingCharge: shippingUSD }]
+                                }).catch(e => console.warn('Order sync:', e.message));
+                            }
+
+                            showToast("Order Confirmed!", `Allocation Certificate for ${order.id} is certified and ready!`, "success");
+                            renderQuickOrderConfirmationSuccess(order, 'paypal');
+                        }
+                    }
+                });
+            };
+
+            const prodPaypalTab = drawerFormContainer.querySelector('.pay-tab[data-method="paypal"]');
+            if (prodPaypalTab) {
+                prodPaypalTab.addEventListener('click', () => {
+                    setTimeout(initQuickPayPal, 50);
+                });
+            }
+
+            // Quick Checkout Submission for COD, Bank Transfer, Deposit Slip
+            const handleQuickCheckoutFormSubmit = (e) => {
+                if (e) e.preventDefault();
+                const form = document.getElementById('quick-checkout-form');
+                if (!form || !form.checkValidity()) {
+                    if (form) form.reportValidity();
+                    return;
+                }
+
+                const shippingMethod = document.querySelector('input[name="quick-shipping-method"]:checked')?.value || 'ems_express';
+                const activeTabBtn = form.querySelector('.pay-tab.active');
+                const selectedMethod = activeTabBtn ? activeTabBtn.getAttribute('data-method') : 'bank';
+                const paymentMethod = shippingMethod === 'cod' ? 'cod' : selectedMethod;
+
+                if (paymentMethod === 'paypal') {
+                    showToast("PayPal Active", "Please use the official PayPal button above to complete checkout.", "info");
+                    return;
+                }
+
+                const firstName = document.getElementById('quick-cust-firstname')?.value?.trim() || '';
+                const lastName = document.getElementById('quick-cust-lastname')?.value?.trim() || '';
+                const customerName = `${firstName} ${lastName}`.trim() || 'Guest Patron';
+                const email = document.getElementById('quick-cust-email')?.value?.trim() || '';
+                const phone = document.getElementById('quick-cust-phone')?.value?.trim() || '';
+                const street = document.getElementById('quick-cust-address')?.value?.trim() || '';
+                const suite = document.getElementById('quick-cust-suite')?.value?.trim() || '';
+                const city = document.getElementById('quick-cust-city')?.value?.trim() || '';
+                const postal = document.getElementById('quick-cust-postal')?.value?.trim() || '';
+                const region = document.getElementById('quick-cust-region')?.value?.trim() || '';
+                const country = document.getElementById('quick-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+                const prefDate = document.getElementById('quick-pref-date')?.value || '';
+                const notes = document.getElementById('quick-cust-notes')?.value?.trim() || '';
+                
+                const isGift = document.getElementById('quick-enable-gift')?.checked || false;
+                const giftWax = document.getElementById('quick-wax-val')?.value || 'Imperial Gold';
+                const giftMonogram = document.getElementById('quick-monogram-input')?.value?.trim().toUpperCase() || '';
+                const giftMsg = document.getElementById('quick-gift-msg')?.value?.trim() || '';
+
+                const fullAddress = `${street}${suite ? ', ' + suite : ''}, ${city}, ${region ? region + ', ' : ''}${postal}, ${country}`;
+
+                const slipImg = selectedProdSlipBase64 || 
+                    document.getElementById('quick-bank-slip-zone')?.dataset?.fileBase64 || 
+                    document.getElementById('quick-cash-slip-zone')?.dataset?.fileBase64 || '';
+
+                if (paymentMethod !== 'cod' && !slipImg) {
+                    showToast("Deposit Receipt Required", "Please attach your bank transfer or deposit slip to confirm your allocation.", "warning");
+                    return;
+                }
+
+                const result = window.TeaFactoryStore.bookProduct(product.id, {
+                    name: customerName,
+                    email,
+                    phone,
+                    address: fullAddress,
+                    country,
+                    city,
+                    notes,
+                    quantity: currentQuickQty,
+                    preferredDate: prefDate,
+                    giftPackaging: isGift,
+                    waxSealColor: isGift ? giftWax : '',
+                    monogramInitials: isGift ? giftMonogram : '',
+                    giftMessage: isGift ? giftMsg : '',
+                    paymentMethod,
+                    shippingMethod,
+                    slipImage: slipImg
+                });
+
+                if (result && result.success) {
+                    const order = result.booking;
+                    order.city = city;
+                    order.country = country;
+                    order.shippingMethod = shippingMethod;
+                    order.formattedPrice = paymentMethod === 'cod' ? `Rs ${grandTotalLKR.toLocaleString()} LKR` : formattedGrandTotal;
+
+                    window.TeaFactoryStore.saveRecentOrderId(order.id);
+
+                    if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.createOrder === 'function') {
+                        window.TeaFactoryAPI.createOrder({
+                            id: order.id,
+                            customer_name: customerName,
+                            customer_email: email,
+                            customer_phone: phone,
+                            shipping_address: fullAddress,
+                            subtotal_usd: subtotalUSD,
+                            shipping_usd: shippingUSD,
+                            total_usd: grandTotalUSD,
+                            currency_code: currInfo.code,
+                            total_in_currency: grandTotalUSD,
+                            payment_method: paymentMethod,
+                            bespoke_notes: notes,
+                            items: [{ id: product.id, name: product.name, quantity: currentQuickQty, price: unitPriceUSD, shippingCharge: shippingUSD }]
+                        }).catch(e => console.warn('Order sync:', e.message));
+                    }
+
+                    showToast("Order Confirmed!", `Allocation Certificate for ${order.id} is verified and issued.`, "success");
+                    renderQuickOrderConfirmationSuccess(order, paymentMethod);
+                } else {
+                    showToast("Order Failed", result?.message || "Could not register allocation.", "error");
+                }
+            };
+
+            const quickForm = document.getElementById('quick-checkout-form');
+            if (quickForm) {
+                quickForm.onsubmit = handleQuickCheckoutFormSubmit;
+            }
+
+            document.getElementById('quick-guest-signin-btn')?.addEventListener('click', () => {
+                if (typeof window.requireCustomerAuth === 'function') {
+                    window.requireCustomerAuth('Sign in or register to record your tea reserve in your patron dashboard.', () => {
+                        openDrawer('product', id);
+                    });
+                }
+            });
         } else if (type === 'review') {
             drawerTitle.innerText = "Rate & Review Your Experience";
             let selectedRating = 5;
@@ -1986,6 +4619,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    window.openDrawer = openDrawer;
+    window.appOpenProductDrawer = (productId) => openDrawer('product', productId);
+
     function bindReviewEvents() {
         const btn = document.getElementById('btn-write-review');
         if (btn) {
@@ -2002,6 +4638,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const btnModeYt = document.getElementById('btn-cinema-mode-yt');
         const btnModeHtml5 = document.getElementById('btn-cinema-mode-html5');
         const chapterCards = document.querySelectorAll('.cinema-chapter-card');
+        const facade = document.getElementById('cinema-poster-facade');
+
+        function activateCinemaPlayer(ytStart = 0) {
+            if (facade) {
+                facade.style.opacity = '0';
+                setTimeout(() => { facade.style.display = 'none'; }, 350);
+            }
+            if (ytWrapper && ytWrapper.style.display !== 'none' && iframe) {
+                const baseSrc = iframe.getAttribute('data-src') || 'https://www.youtube-nocookie.com/embed/kYJqK9oP64U?enablejsapi=1&rel=0&modestbranding=1&color=white&playsinline=1';
+                iframe.src = `${baseSrc}&start=${ytStart}&autoplay=1`;
+            }
+            if (html5Wrapper && html5Wrapper.style.display !== 'none' && video) {
+                video.currentTime = ytStart;
+                video.play().catch(e => console.log('Video play error:', e));
+            }
+        }
+
+        if (facade) {
+            facade.onclick = () => activateCinemaPlayer(0);
+        }
 
         // Engine Switching
         if (btnModeYt && btnModeHtml5) {
@@ -2028,6 +4684,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnModeYt.style.color = 'var(--color-text-muted)';
                 if (html5Wrapper) html5Wrapper.style.display = 'block';
                 if (ytWrapper) ytWrapper.style.display = 'none';
+                if (facade) {
+                    facade.style.opacity = '0';
+                    setTimeout(() => { facade.style.display = 'none'; }, 350);
+                }
                 if (video) {
                     video.play().catch(e => console.log('HTML5 play blocked', e));
                 }
@@ -2042,6 +4702,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const ytStart = parseInt(card.dataset.ytStart || '0', 10);
                 const html5Time = parseFloat(card.dataset.time || '0');
+
+                if (facade && facade.style.display !== 'none') {
+                    activateCinemaPlayer(ytStart);
+                    return;
+                }
 
                 // If YouTube is active
                 if (ytWrapper && ytWrapper.style.display !== 'none' && iframe) {
@@ -2077,6 +4742,280 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 5a. Quoted Collector Gift Box Checkout Drawer & Handlers
+    function openQuotedBoxCheckoutDrawer(bookingId) {
+        if (!bookingId) return;
+        const booking = window.TeaFactoryStore.getBookingById(bookingId);
+        if (!booking) {
+            showToast("Quotation Not Found", "The requested collector gift box enquiry or quotation reference was not found.", "error");
+            return;
+        }
+
+        if (booking.status === 'Payment Confirmed' || booking.status === 'Verified') {
+            showToast("Payment Already Confirmed", `Your payment for ${booking.boxName} has already been verified and confirmed!`, "success");
+            switchTab('order');
+            setTimeout(() => {
+                const idInput = document.getElementById('order-id-input');
+                if (idInput) idInput.value = booking.id;
+                const orderData = window.TeaFactoryStore.getOrderById(booking.id);
+                if (orderData) renderOrderDetails(orderData);
+            }, 300);
+            return;
+        }
+
+        openDrawer('box_quoted_pay', booking.id, booking);
+    }
+    window.openQuotedBoxCheckoutDrawer = openQuotedBoxCheckoutDrawer;
+
+    function handleQuotedBoxPaymentSubmit(bookingId) {
+        const form = document.getElementById('quoted-box-checkout-form');
+        if (!form) return;
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const name = document.getElementById('quoted-cust-name')?.value?.trim() || '';
+        const email = document.getElementById('quoted-cust-email')?.value?.trim() || '';
+        const phone = document.getElementById('quoted-cust-phone')?.value?.trim() || '';
+        const address = document.getElementById('quoted-cust-address')?.value?.trim() || '';
+        const country = document.getElementById('quoted-cust-country')?.value || 'Sri Lanka (Domestic Express)';
+        const notes = document.getElementById('quoted-cust-notes')?.value?.trim() || '';
+
+        if (!name || !email || !phone || !address) {
+            showToast("Missing Information", "Please enter your full name, email, contact phone, and shipping address.", "error");
+            return;
+        }
+
+        const activeTabBtn = form.querySelector('.pay-tab.active');
+        const paymentMethod = activeTabBtn ? activeTabBtn.getAttribute('data-method') : 'bank';
+
+        if (paymentMethod === 'paypal') {
+            showToast("PayPal Payment", "Please click the yellow PayPal button above to complete your instant payment.", "info");
+            return;
+        }
+
+        if (paymentMethod === 'card') {
+            showToast("Card Gateway Coming Soon", "Please select Bank Transfer or Cash Deposit Slip and attach your receipt to confirm your order.", "info");
+            return;
+        }
+
+        const slipImg = selectedBoxSlipBase64 || 
+            document.getElementById('quoted-box-bank-slip-zone')?.dataset?.fileBase64 || 
+            document.getElementById('quoted-box-cash-slip-zone')?.dataset?.fileBase64 || '';
+
+        const result = window.TeaFactoryStore.payQuotedBox(bookingId, { 
+            name, 
+            email, 
+            phone, 
+            address,
+            country,
+            notes,
+            paymentMethod,
+            slipImage: slipImg
+        });
+
+        if (result.success) {
+            const booking = result.booking;
+
+            // Trigger backend API and Resend Email Dispatch to Customer & Estate Owner
+            if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.createOrder === 'function') {
+                window.TeaFactoryAPI.createOrder({
+                    id: booking.id,
+                    customer_name: booking.customerName,
+                    customer_email: booking.email,
+                    customer_phone: booking.phone,
+                    shipping_address: `${booking.address || address}, ${booking.country || country}`,
+                    subtotal_usd: booking.quotedPrice !== undefined ? booking.quotedPrice : booking.price,
+                    shipping_usd: booking.quotedShipping || 0,
+                    total_usd: booking.quotedTotal || booking.price,
+                    currency_code: booking.currency || 'USD',
+                    total_in_currency: booking.quotedTotal || booking.price,
+                    payment_method: paymentMethod || 'bank',
+                    bespoke_notes: `Collector Gift Box Quoted Payment: ${booking.boxName} | Quoted Total: $${booking.quotedTotal}${notes ? ' | Notes: ' + notes : ''}`,
+                    items: [{
+                        id: `BOX-${booking.boxId || '1'}`,
+                        name: `${booking.boxName} (${booking.seasonName} • Series ${booking.seriesNumber || 1})`,
+                        image: booking.image || 'images/Gift Box.jpeg',
+                        weight: 'Solid Light-Wood Teak Chest (500g Assortment)',
+                        category: 'Numbered Collector Chest',
+                        quantity: 1,
+                        price: booking.quotedPrice !== undefined ? booking.quotedPrice : booking.price,
+                        shippingCharge: booking.quotedShipping || 0,
+                        totalPrice: booking.quotedTotal || booking.price,
+                        giftOptions: {
+                            waxSeal: booking.waxSealColor,
+                            monogram: booking.monogramInitials,
+                            message: booking.giftMessage
+                        }
+                    }]
+                }).catch(err => console.warn('API quoted box payment order dispatch notice:', err.message));
+            }
+
+            showToast(
+                "Payment Slip Submitted",
+                `Thank you, ${booking.customerName}! Your payment receipt for ${booking.boxName} has been submitted for verification. Confirmation email dispatched.`,
+                'success'
+            );
+
+            closeDrawer();
+
+            // Refresh gift catalog view
+            if (typeof window.UIComponents !== 'undefined' && typeof window.UIComponents.renderSeriesSelector === 'function') {
+                window.UIComponents.renderSeriesSelector('gifts-container');
+                window.UIComponents.renderSeriesSelector('home-gifts-container');
+            }
+
+            // Seamlessly navigate to My Order page
+            switchTab('order');
+            setTimeout(() => {
+                const idInput = document.getElementById('order-id-input');
+                if (idInput) idInput.value = booking.id;
+                const orderData = window.TeaFactoryStore.getOrderById(booking.id);
+                if (orderData) {
+                    renderOrderDetails(orderData);
+                } else {
+                    const trackBtn = document.getElementById('track-order-btn');
+                    if (trackBtn) trackBtn.click();
+                }
+            }, 300);
+        } else {
+            showToast("Payment Error", result.message || "Failed to process gift box payment.", "error");
+        }
+    }
+    window.handleQuotedBoxPaymentSubmit = handleQuotedBoxPaymentSubmit;
+
+    // 5b. Box Direct Purchase Submission handler (Legacy Fallback)
+    function handleBoxPurchaseSubmit() {
+        const form = document.getElementById('box-purchase-form');
+        if (!form) return;
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const name = document.getElementById('box-purchase-cust-name')?.value?.trim() || '';
+        const email = document.getElementById('box-purchase-cust-email')?.value?.trim() || '';
+        const phone = document.getElementById('box-purchase-cust-phone')?.value?.trim() || '';
+        const address = document.getElementById('box-purchase-cust-address')?.value?.trim() || '';
+        const country = document.getElementById('box-purchase-cust-country')?.value || 'Sri Lanka (Domestic Express)';
+        const preferredDate = document.getElementById('box-purchase-pref-date')?.value || '';
+        const notes = document.getElementById('box-purchase-cust-notes')?.value?.trim() || '';
+        const isGift = document.getElementById('box_purchase-enable-gift')?.checked || false;
+        const giftWax = document.getElementById('box_purchase-wax-val')?.value || 'Imperial Gold';
+        const giftMonogram = document.getElementById('box_purchase-monogram-input')?.value?.trim().toUpperCase() || '';
+        const giftMsg = document.getElementById('box_purchase-gift-msg')?.value?.trim() || '';
+
+        if (!name || !email || !phone || !address) {
+            showToast("Missing Information", "Please enter your full name, email, contact phone, and shipping address.", "error");
+            return;
+        }
+
+        const activeTabBtn = form.querySelector('.pay-tab.active');
+        const paymentMethod = activeTabBtn ? activeTabBtn.getAttribute('data-method') : 'bank';
+
+        if (paymentMethod === 'paypal') {
+            showToast("PayPal Payment", "Please click the yellow PayPal button above to complete your instant payment.", "info");
+            return;
+        }
+
+        if (paymentMethod === 'card') {
+            showToast("Card Gateway Coming Soon", "Please select Bank Transfer or Cash Deposit Slip and attach your receipt to confirm your order.", "info");
+            const bankTab = form.querySelector('.pay-tab[data-method="bank"]');
+            if (bankTab) bankTab.click();
+            return;
+        }
+
+        const slipImg = selectedBoxSlipBase64 || 
+            document.getElementById('box-purchase-bank-slip-zone')?.dataset?.fileBase64 || 
+            document.getElementById('box-purchase-cash-slip-zone')?.dataset?.fileBase64 || '';
+
+        const boxId = currentDrawerContext ? currentDrawerContext.id : null;
+        const result = window.TeaFactoryStore.purchaseBox(boxId, { 
+            name, 
+            email, 
+            phone, 
+            address,
+            country,
+            notes,
+            preferredDate,
+            giftPackaging: isGift,
+            waxSealColor: isGift ? giftWax : '',
+            monogramInitials: isGift ? giftMonogram : '',
+            giftMessage: isGift ? giftMsg : '',
+            paymentMethod,
+            slipImage: slipImg
+        });
+
+        if (result.success) {
+            const booking = result.booking;
+
+            // Trigger backend API and Resend Email Dispatch to Customer & Estate Owner
+            if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.createOrder === 'function') {
+                window.TeaFactoryAPI.createOrder({
+                    id: booking.id,
+                    customer_name: booking.customerName,
+                    customer_email: booking.email,
+                    customer_phone: booking.phone,
+                    shipping_address: `${booking.address || address}, ${booking.country || country}`,
+                    subtotal_usd: booking.subtotal !== undefined ? booking.subtotal : booking.price,
+                    shipping_usd: 0,
+                    total_usd: booking.price,
+                    currency_code: booking.currency || 'USD',
+                    total_in_currency: booking.price,
+                    payment_method: paymentMethod || 'bank',
+                    bespoke_notes: `Collector Gift Box Direct Purchase: ${booking.productName || booking.boxName}${notes ? ' | Notes: ' + notes : ''}${preferredDate ? ' | Preferred Dispatch: ' + preferredDate : ''}`,
+                    items: [{
+                        id: `BOX-${booking.boxId}`,
+                        name: booking.productName || booking.boxName,
+                        image: booking.image || 'images/Gift Box.jpeg',
+                        weight: booking.weight || 'Solid Light-Wood Teak Chest',
+                        category: 'Numbered Collector Chest',
+                        quantity: 1,
+                        price: booking.unitPrice !== undefined ? booking.unitPrice : booking.price,
+                        shippingCharge: 0,
+                        totalPrice: booking.price,
+                        giftOptions: {
+                            waxSeal: booking.waxSealColor,
+                            monogram: booking.monogramInitials,
+                            message: booking.giftMessage
+                        }
+                    }]
+                }).catch(err => console.warn('API box purchase order dispatch notice:', err.message));
+            }
+
+            showToast(
+                "Order Confirmed",
+                `${booking.boxName} reserved and registered under your name. Confirmation email dispatched.`,
+                'success'
+            );
+
+            closeDrawer();
+
+            // Refresh gift catalog view if currently visible
+            if (typeof window.UIComponents !== 'undefined' && typeof window.UIComponents.renderSeriesSelector === 'function') {
+                window.UIComponents.renderSeriesSelector('gifts-container');
+                window.UIComponents.renderSeriesSelector('home-gifts-container');
+            }
+
+            // Seamlessly navigate to My Order page and display newly placed order
+            switchTab('order');
+            setTimeout(() => {
+                const idInput = document.getElementById('order-id-input');
+                if (idInput) idInput.value = booking.id;
+                const orderData = window.TeaFactoryStore.getOrderById(booking.id);
+                if (orderData) {
+                    renderOrderDetails(orderData);
+                } else {
+                    const trackBtn = document.getElementById('track-order-btn');
+                    if (trackBtn) trackBtn.click();
+                }
+            }, 300);
+        } else {
+            showToast("Reservation Notice", result.message || "Failed to process gift box reservation.", "error");
+        }
+    }
+
     // 6. Box Enquiry Submission handler
     function handleBoxEnquirySubmit(channel) {
         const form = document.getElementById('box-booking-form');
@@ -2097,6 +5036,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const giftMsg = document.getElementById('box-gift-msg')?.value?.trim() || '';
 
         const boxId = currentDrawerContext ? currentDrawerContext.id : null;
+        const prefCurr = document.getElementById('cust-preferred-curr')?.value || window.TeaFactoryStore.getActiveCurrency();
         const result = window.TeaFactoryStore.bookBox(boxId, { 
             name, 
             email, 
@@ -2104,6 +5044,7 @@ document.addEventListener('DOMContentLoaded', () => {
             socialChannel: channel, 
             preferredDate,
             message,
+            preferredCurrency: prefCurr,
             giftPackaging: isGift,
             waxSealColor: isGift ? giftWax : '',
             monogramInitials: isGift ? giftMonogram : '',
@@ -2127,7 +5068,8 @@ document.addEventListener('DOMContentLoaded', () => {
                              `• Name: ${booking.customerName}\n` +
                              `• Email: ${booking.email}\n` +
                              `• Phone: ${booking.phone}\n` +
-                             `• Preferred Arrival Date: ${booking.preferredDate || 'Not Specified'}\n\n`;
+                             `• Preferred Arrival Date: ${booking.preferredDate || 'Not Specified'}\n` +
+                             `• Preferred Quotation Currency: ${prefCurr === 'LKR' ? 'LKR (Rs)' : 'USD ($)'}\n\n`;
             if (booking.giftPackaging) {
                 baseText += `*Bespoke Presentation:*\n` +
                             `• Artisan Wax Seal: ${booking.waxSealColor || 'Imperial Gold'}\n` +
@@ -2185,6 +5127,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const paymentMethod = activeTabBtn ? activeTabBtn.getAttribute('data-method') : 'bank';
         const socialChannel = document.getElementById('tour-social-channel')?.value || 'WhatsApp';
 
+        if (paymentMethod === 'paypal') {
+            showToast("PayPal Payment", "Please click the yellow PayPal button above to complete your instant payment.", "info");
+            return;
+        }
+
         if (paymentMethod === 'card') {
             showToast("Card Gateway Coming Soon", "Please select Bank Transfer or Cash Deposit Slip and attach your receipt to confirm your booking.", "info");
             const bankTab = form.querySelector('.pay-tab[data-method="bank"]');
@@ -2233,7 +5180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result.success) {
             const booking = result.booking;
 
-            // Sync to backend API (Supabase & SQLite)
+            // Sync to backend API (Supabase & SQLite) - Automatically notifies rockonewild@gmail.com
             if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.bookTour === 'function') {
                 window.TeaFactoryAPI.bookTour({
                     id: booking.id,
@@ -2244,12 +5191,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     guest_email: booking.email,
                     guest_phone: booking.phone,
                     guest_count: booking.guests,
+                    package_name: booking.packageName,
+                    total_price: booking.totalPrice || totalPrice,
+                    currency_code: 'USD',
+                    total_in_currency: totalLkr,
+                    payment_method: paymentMethod,
                     notes: `Package: ${booking.packageName}. Dietary: ${booking.dietaryNotes}. Transport: ${booking.transportRequired}`,
                     slip_image: booking.slipImage || ''
                 }).catch(err => console.warn('API tour booking sync notice:', err.message));
             }
 
-            if (paymentMethod === 'card') {
+            if (paymentMethod === 'paypal') {
+            showToast("PayPal Payment", "Please click the yellow PayPal button above to complete your instant payment.", "info");
+            return;
+        }
+
+        if (paymentMethod === 'card') {
                 showToast(
                     "Tour Reserved & Confirmed!", 
                     `Boarding pass ${booking.id} reserved for ${guests} guests on ${tourDate || timeSlot}. Confirmation sent to ${email}.`, 
@@ -2257,8 +5214,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 );
             } else {
                 showToast(
-                    "Tour Booking Confirmed!", 
-                    `Boarding pass ${booking.id} created for ${guests} ${guests === 1 ? 'guest' : 'guests'} (${timeSlot}). Confirmation email dispatched to ${email}.`, 
+                    "Tour Deposit Submitted!", 
+                    `Booking ${booking.id} received. Estate Concierge desk notified at rockonewild@gmail.com. Your Gate Pass will be emailed automatically once payment is verified.`, 
                     'success'
                 );
             }
@@ -2320,15 +5277,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = document.getElementById('prod-cust-name')?.value?.trim() || '';
         const email = document.getElementById('prod-cust-email')?.value?.trim() || '';
         const phone = document.getElementById('prod-cust-phone')?.value?.trim() || '';
+        const address = document.getElementById('prod-cust-address')?.value?.trim() || '';
+        const country = document.getElementById('prod-cust-country')?.value || 'Sri Lanka (Domestic Express)';
         const preferredDate = document.getElementById('prod-pref-date')?.value || '';
+        const notes = document.getElementById('prod-cust-notes')?.value?.trim() || '';
         const socialChannel = document.getElementById('prod-social-channel')?.value || 'WhatsApp';
         const isGift = document.getElementById('prod-enable-gift')?.checked || false;
         const giftWax = document.getElementById('prod-wax-val')?.value || 'Imperial Gold';
         const giftMonogram = document.getElementById('prod-monogram-input')?.value?.trim().toUpperCase() || '';
         const giftMsg = document.getElementById('prod-gift-msg')?.value?.trim() || '';
 
+        if (!name || !email || !phone || !address) {
+            showToast("Missing Information", "Please enter your full name, email, contact phone, and shipping address.", "error");
+            return;
+        }
+
         const activeTabBtn = form.querySelector('.pay-tab.active');
         const paymentMethod = activeTabBtn ? activeTabBtn.getAttribute('data-method') : 'bank';
+
+        if (paymentMethod === 'paypal') {
+            showToast("PayPal Payment", "Please click the yellow PayPal button above to complete your instant payment.", "info");
+            return;
+        }
 
         if (paymentMethod === 'card') {
             showToast("Card Gateway Coming Soon", "Please select Bank Transfer or Cash Deposit Slip and attach your receipt to confirm your order.", "info");
@@ -2342,10 +5312,15 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('prod-cash-slip-zone')?.dataset?.fileBase64 || '';
 
         const productId = currentDrawerContext ? currentDrawerContext.id : null;
+        const quantity = parseInt(document.getElementById('quick-order-qty-val')?.innerText, 10) || 1;
         const result = window.TeaFactoryStore.bookProduct(productId, { 
             name, 
             email, 
             phone, 
+            address,
+            country,
+            notes,
+            quantity,
             socialChannel, 
             preferredDate,
             giftPackaging: isGift,
@@ -2366,18 +5341,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     customer_name: booking.customerName,
                     customer_email: booking.email,
                     customer_phone: booking.phone,
-                    shipping_address: 'Standard International Delivery',
-                    subtotal_usd: booking.price,
+                    shipping_address: `${booking.address || address}, ${booking.country || country}`,
+                    subtotal_usd: booking.subtotal !== undefined ? booking.subtotal : (booking.unitPrice * (booking.quantity || 1)),
+                    shipping_usd: booking.shippingFee || 0,
                     total_usd: booking.price,
                     currency_code: booking.currency || 'USD',
                     total_in_currency: booking.price,
-                    payment_method: 'bank',
-                    bespoke_notes: `Direct Product Reservation: ${booking.productName} (${booking.weight || ''})`,
+                    payment_method: paymentMethod || 'bank',
+                    bespoke_notes: `Direct Product Reservation: ${booking.productName} (${booking.weight || ''}) x${booking.quantity || 1}${notes ? ' | Notes: ' + notes : ''}${preferredDate ? ' | Preferred Dispatch: ' + preferredDate : ''}`,
                     items: [{
                         id: productId,
                         name: booking.productName,
-                        quantity: 1,
-                        price: booking.price,
+                        image: booking.image || 'images/Product.jpeg',
+                        weight: booking.weight,
+                        category: booking.category,
+                        leafGrade: booking.leafGrade,
+                        quantity: booking.quantity || quantity,
+                        price: booking.unitPrice !== undefined ? booking.unitPrice : booking.price,
+                        shippingCharge: booking.shippingFee || 0,
+                        totalPrice: booking.price,
                         giftOptions: {
                             waxSeal: booking.waxSealColor,
                             monogram: booking.monogramInitials,
@@ -2451,7 +5433,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 panels.forEach(p => p.classList.remove('active'));
                 tab.classList.add('active');
                 const method = tab.getAttribute('data-method');
-                const panel = form.querySelector(`#pay-panel-${method}`);
+                const panel = form.querySelector(`#pay-panel-${method}`) || form.querySelector(`[id$="pay-panel-${method}"]`) || form.querySelector(`.pay-panel-${method}`);
                 if (panel) panel.classList.add('active');
             });
         });
@@ -2558,6 +5540,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cartOverlay = document.getElementById('cart-drawer-overlay');
                 if (cartOverlay && cartOverlay.classList.contains('open')) {
                     window.UIComponents.renderCartDrawer('cart-drawer-body');
+                    if (window.appBindCartDrawerEvents) window.appBindCartDrawerEvents();
                 }
                 showToast("Currency Updated", `Store pricing now displaying in ${newCurrency}.`, "success");
                 renderTabContent(activeTab);
@@ -2596,6 +5579,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cartOverlay = document.getElementById('cart-drawer-overlay');
                 if (cartOverlay && cartOverlay.classList.contains('open') && window.UIComponents.renderCartDrawer) {
                     window.UIComponents.renderCartDrawer('cart-drawer-body');
+                    if (window.appBindCartDrawerEvents) window.appBindCartDrawerEvents();
                 }
                 if (window.appSyncChatbotLanguage) {
                     window.appSyncChatbotLanguage();
@@ -2686,6 +5670,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const cartOverlay = document.getElementById('cart-drawer-overlay');
                     if (cartOverlay && cartOverlay.classList.contains('open') && window.UIComponents.renderCartDrawer) {
                         window.UIComponents.renderCartDrawer('cart-drawer-body');
+                        if (window.appBindCartDrawerEvents) window.appBindCartDrawerEvents();
                     }
                     if (window.appSyncChatbotLanguage) {
                         window.appSyncChatbotLanguage();
@@ -2709,6 +5694,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const cartOverlay = document.getElementById('cart-drawer-overlay');
                     if (cartOverlay && cartOverlay.classList.contains('open')) {
                         window.UIComponents.renderCartDrawer('cart-drawer-body');
+                        if (window.appBindCartDrawerEvents) window.appBindCartDrawerEvents();
                     }
                     showToast("Currency Updated", `Store pricing now displaying in ${curr}.`, "success");
                     renderTabContent(activeTab);
@@ -2910,7 +5896,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     let badgeClass = 'status-available';
                     if (boxStatus === 'Booked') {
                         badgeClass = 'status-booked';
-                    } else if (boxStatus === 'Enquiry Pending') {
+                    } else if (boxStatus === 'Enquiry Pending' || boxStatus === 'Pending Verification') {
                         badgeClass = 'status-pending';
                     }
                     badge.className = `box-badge ${badgeClass}`;
@@ -2926,9 +5912,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (actionContainer) {
-                    let buttonHtml = `<button class="btn btn-primary btn-book-box" data-id="${boxId}" style="width: 100%;">Enquire Now</button>`;
+                    let buttonHtml = `<button class="btn btn-primary btn-book-box" data-id="${boxId}" style="width: 100%;">Enquire &amp; Purchase</button>`;
                     if (boxStatus === 'Booked') {
                         buttonHtml = `<button class="btn btn-secondary" disabled style="width: 100%;">Reserved</button>`;
+                    } else if (boxStatus === 'Pending Verification') {
+                        buttonHtml = `<button class="btn btn-warning btn-book-box" data-id="${boxId}" style="width: 100%; background: rgba(212,175,55,0.12); border-color: var(--color-gold); color: var(--color-gold);">View / Purchase Allocation</button>`;
                     } else if (boxStatus === 'Enquiry Pending') {
                         buttonHtml = `<button class="btn btn-warning btn-book-box" data-id="${boxId}" style="width: 100%; background: rgba(212,175,55,0.12); border-color: var(--color-gold); color: var(--color-gold);">Inquire Again</button>`;
                     }
@@ -3088,6 +6076,441 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ─── Collector Gift Box Quotation Builder Modal ─────────────────────────
+    function showBoxQuoteBuilderModal(bookingId) {
+        const booking = window.TeaFactoryStore.getBookingById(bookingId);
+        if (!booking) {
+            showToast("Record Not Found", "Enquiry record could not be found.", "error");
+            return;
+        }
+
+        const existing = document.getElementById('box-quote-builder-modal');
+        if (existing) existing.remove();
+
+        const defaultBoxPrice = booking.quotedPrice !== null && booking.quotedPrice !== undefined ? booking.quotedPrice : 150;
+        const defaultBoxPriceLkr = booking.quotedPriceLkr || Math.round(defaultBoxPrice * 305);
+        const defaultShipping = booking.quotedShipping !== null && booking.quotedShipping !== undefined ? booking.quotedShipping : 0;
+        const defaultShippingLkr = booking.quotedShippingLkr !== undefined ? booking.quotedShippingLkr : Math.round(defaultShipping * 305);
+        const defaultTotal = defaultBoxPrice + defaultShipping;
+        const defaultTotalLkr = defaultBoxPriceLkr + defaultShippingLkr;
+        const defaultValidity = booking.quoteValidity || '7 Days';
+        const defaultNotes = booking.quoteNotes || (booking.giftPackaging ? `Includes Bespoke ${booking.waxSealColor || 'Imperial Gold'} Wax Seal, Custom Monogram "${booking.monogramInitials || ''}", & Calligraphic Card.` : 'Includes Certificate of Authenticity deed.');
+
+        let origin = (typeof window !== 'undefined' && window.location) ? window.location.origin : 'http://localhost:3000';
+        let path = (typeof window !== 'undefined' && window.location) ? window.location.pathname : '/';
+        const currentPayLink = booking.paymentLink || `${origin}${path}?pay=${booking.id}`;
+        const currentQrUrl = booking.qrCodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=240x240&color=d4af37&bgcolor=040e08&data=${encodeURIComponent(currentPayLink)}`;
+
+        const modal = document.createElement('div');
+        modal.id = 'box-quote-builder-modal';
+        modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);padding:1rem;';
+        modal.innerHTML = `
+            <div style="background:var(--color-bg-card,#0a1a0e);border:1px solid rgba(212,175,55,0.4);border-radius:12px;max-width:580px;width:100%;max-height:92vh;overflow-y:auto;padding:1.75rem;box-shadow:0 20px 60px rgba(0,0,0,0.8);">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;">
+                    <div>
+                        <div style="font-size:0.7rem;text-transform:uppercase;color:var(--color-gold);font-weight:700;letter-spacing:1px;margin-bottom:0.25rem;">Concierge Quotation &amp; QR Desk</div>
+                        <h3 style="margin:0;color:#fff;font-family:var(--font-serif);font-size:1.35rem;">Formulate Bespoke Price &amp; Link</h3>
+                        <div style="font-size:0.75rem;color:#94a3b8;margin-top:0.2rem;">Enquiry Ref: <strong style="color:var(--color-gold);">${booking.id}</strong> &bull; Client: <strong style="color:#fff;">${booking.customerName}</strong></div>
+                    </div>
+                    <button type="button" id="close-quote-modal-btn" style="background:none;border:none;color:#94a3b8;font-size:1.5rem;cursor:pointer;padding:0 0.5rem;line-height:1;">&times;</button>
+                </div>
+
+                <!-- Client Inquiry Snapshot -->
+                <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:0.85rem;margin-bottom:1.25rem;font-size:0.78rem;line-height:1.5;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:0.25rem;">
+                        <span style="color:#94a3b8;">Chest Selection:</span>
+                        <strong style="color:#fff;">${booking.boxName} (${booking.seasonName})</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:0.25rem;">
+                        <span style="color:#94a3b8;">Client Contact:</span>
+                        <span style="color:#cbd5e1;">${booking.email} &bull; ${booking.phone}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:0.25rem;">
+                        <span style="color:#94a3b8;">Bespoke Options:</span>
+                        <span style="color:var(--color-gold);">${booking.waxSealColor || 'Imperial Gold'} Seal &bull; Monogram: ${booking.monogramInitials || 'None'}</span>
+                    </div>
+                    ${booking.message ? `<div style="margin-top:0.35rem;padding-top:0.35rem;border-top:1px dashed rgba(255,255,255,0.08);color:#cbd5e1;font-style:italic;">"${booking.message}"</div>` : ''}
+                </div>
+
+                <form id="quote-builder-form" style="display:flex;flex-direction:column;gap:1rem;">
+                    <!-- Quoted Box Price with Currency Dropdown -->
+                    <div style="display:grid;grid-template-columns:130px 1fr;gap:0.75rem;align-items:start;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label style="font-size:0.72rem;font-weight:600;text-transform:uppercase;color:var(--color-gold);letter-spacing:0.5px;">Currency *</label>
+                            <select id="qb-box-currency" class="form-input" style="font-weight:700;color:var(--color-gold);">
+                                <option value="USD" selected>USD ($)</option>
+                                <option value="LKR">LKR (Rs)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label id="qb-box-amount-label" style="font-size:0.72rem;font-weight:600;text-transform:uppercase;color:var(--color-gold);letter-spacing:0.5px;">Quoted Box Price *</label>
+                            <input class="form-input" type="number" id="qb-box-amount" min="0" step="0.01" value="${defaultBoxPrice}" required style="font-size:0.95rem;font-weight:700;color:var(--color-gold);">
+                            <div id="qb-box-counterpart" style="font-size:0.7rem;color:#86efac;font-weight:600;margin-top:0.3rem;">
+                                ≈ Rs ${defaultBoxPriceLkr.toLocaleString()} LKR (1 USD = 305 LKR)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Courier / Shipping with Currency Dropdown -->
+                    <div style="display:grid;grid-template-columns:130px 1fr;gap:0.75rem;align-items:start;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label style="font-size:0.72rem;font-weight:600;text-transform:uppercase;color:var(--color-gold);letter-spacing:0.5px;">Currency</label>
+                            <select id="qb-shipping-currency" class="form-input" style="font-weight:700;color:var(--color-gold);">
+                                <option value="USD" selected>USD ($)</option>
+                                <option value="LKR">LKR (Rs)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label id="qb-shipping-amount-label" style="font-size:0.72rem;font-weight:600;text-transform:uppercase;color:var(--color-gold);letter-spacing:0.5px;">Courier / Shipping</label>
+                            <input class="form-input" type="number" id="qb-shipping-amount" min="0" step="0.01" value="${defaultShipping > 0 ? defaultShipping : ''}" placeholder="0 for Complimentary" style="font-size:0.95rem;font-weight:600;">
+                            <div id="qb-shipping-counterpart" style="font-size:0.7rem;color:#86efac;font-weight:600;margin-top:0.3rem;">
+                                ${defaultShippingLkr > 0 ? `≈ Rs ${defaultShippingLkr.toLocaleString()} LKR` : 'Complimentary Express Courier'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden fields preserving dual currency storage compatibility -->
+                    <input type="hidden" id="qb-box-price" value="${defaultBoxPrice}">
+                    <input type="hidden" id="qb-box-price-lkr" value="${defaultBoxPriceLkr}">
+                    <input type="hidden" id="qb-shipping-fee" value="${defaultShipping}">
+                    <input type="hidden" id="qb-shipping-fee-lkr" value="${defaultShippingLkr}">
+
+                    <!-- Live Calculated Total -->
+                    <div style="background:linear-gradient(135deg,rgba(212,175,55,0.12),rgba(4,14,8,0.9));border:1px solid rgba(212,175,55,0.4);border-radius:8px;padding:0.75rem 1rem;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <span style="font-size:0.75rem;color:#cbd5e1;text-transform:uppercase;letter-spacing:1px;">Formulated Total Quoted:</span>
+                            <div style="font-size:0.68rem;color:#94a3b8;">Dual USD &amp; LKR charged to customer at checkout.</div>
+                        </div>
+                        <div id="qb-total-display" style="font-size:1.25rem;font-weight:800;color:var(--color-gold);text-align:right;">
+                            $${defaultTotal.toFixed(2)} USD <span style="font-size:0.95rem;color:#86efac;font-weight:600;">&bull; Rs ${defaultTotalLkr.toLocaleString()} LKR</span>
+                        </div>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label style="font-size:0.72rem;font-weight:600;text-transform:uppercase;color:var(--color-gold);letter-spacing:0.5px;">Quote Validity</label>
+                            <select class="form-input" id="qb-validity">
+                                <option value="3 Days" ${defaultValidity === '3 Days' ? 'selected' : ''}>3 Days</option>
+                                <option value="7 Days" ${defaultValidity === '7 Days' ? 'selected' : ''}>7 Days (Standard)</option>
+                                <option value="14 Days" ${defaultValidity === '14 Days' ? 'selected' : ''}>14 Days</option>
+                                <option value="30 Days" ${defaultValidity === '30 Days' ? 'selected' : ''}>30 Days</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label style="font-size:0.72rem;font-weight:600;text-transform:uppercase;color:var(--color-gold);letter-spacing:0.5px;">Preferred Reply Channel</label>
+                            <input class="form-input" type="text" readonly value="${booking.socialChannel || 'WhatsApp'}" style="opacity:0.85;">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label style="font-size:0.72rem;font-weight:600;text-transform:uppercase;color:var(--color-gold);letter-spacing:0.5px;">Curator Inclusions &amp; Curation Notes</label>
+                        <textarea class="form-input" id="qb-notes" rows="2" placeholder="e.g. Includes brass infuser, 24K gold foil seal, & Deed of Authenticity">${defaultNotes}</textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width:100%;padding:0.75rem;background:linear-gradient(135deg,#d4af37,#aa820a);color:#040e08;font-weight:700;font-size:0.92rem;display:flex;align-items:center;justify-content:center;gap:0.4rem;box-shadow:0 4px 15px rgba(212,175,55,0.3);">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Save &amp; Generate Payment Link + QR Code
+                    </button>
+                </form>
+
+                <!-- Generated Assets Output Box -->
+                <div id="qb-result-box" style="${booking.quotedTotal ? 'display:block;' : 'display:none;'}margin-top:1.25rem;padding:1rem;background:rgba(0,0,0,0.6);border:1px solid rgba(212,175,55,0.3);border-radius:10px;">
+                    <div style="font-size:0.75rem;font-weight:700;color:var(--color-gold);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.4rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Quotation Formulated &bull; Scannable QR &amp; Checkout Link Ready
+                    </div>
+
+                    <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
+                        <div style="background:#040e08;padding:0.45rem;border-radius:8px;border:1.5px solid rgba(212,175,55,0.4);flex-shrink:0;">
+                            <img id="qb-result-qr" src="${currentQrUrl}" alt="Checkout QR" style="width:110px;height:110px;display:block;">
+                        </div>
+                        <div style="flex:1;min-width:200px;">
+                            <label style="font-size:0.68rem;color:#94a3b8;display:block;margin-bottom:0.25rem;">Direct Checkout Payment Link:</label>
+                            <div style="display:flex;gap:0.4rem;">
+                                <input id="qb-result-link" class="form-input" type="text" readonly value="${currentPayLink}" style="font-size:0.75rem;font-family:monospace;background:rgba(0,0,0,0.8);color:#60a5fa;">
+                                <button type="button" id="qb-copy-link-btn" class="btn btn-outline" style="font-size:0.75rem;padding:0.4rem 0.75rem;color:var(--color-gold);border-color:rgba(212,175,55,0.4);white-space:nowrap;">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                        <button type="button" id="qb-send-whatsapp-btn" class="btn btn-primary" style="flex:1;background:#25d366;border-color:#25d366;color:#fff;font-weight:600;font-size:0.75rem;padding:0.5rem;display:flex;align-items:center;justify-content:center;gap:0.35rem;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.247 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.992-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.443-4.436-9.884-9.888-9.884-5.447 0-9.885 4.437-9.889 9.885-.001 2.016.52 3.49 1.37 4.975l-.997 3.641 3.731-.978z"/></svg>
+                            Dispatch WhatsApp
+                        </button>
+                        <button type="button" id="qb-send-email-btn" class="btn btn-outline" style="flex:1;color:#f59e0b;border-color:rgba(245,158,11,0.4);font-weight:600;font-size:0.75rem;padding:0.5rem;display:flex;align-items:center;justify-content:center;gap:0.35rem;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            Dispatch Email
+                        </button>
+                        <a id="qb-preview-checkout-btn" href="${currentPayLink}" target="_blank" class="btn btn-outline" style="color:#94a3b8;border-color:rgba(148,163,184,0.3);font-size:0.75rem;padding:0.5rem 0.85rem;display:flex;align-items:center;justify-content:center;gap:0.35rem;text-decoration:none;">
+                            Open Checkout &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        document.getElementById('close-quote-modal-btn')?.addEventListener('click', () => modal.remove());
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.remove();
+        });
+
+        const boxCurrSelect = document.getElementById('qb-box-currency');
+        const boxAmountInput = document.getElementById('qb-box-amount');
+        const boxCounterpart = document.getElementById('qb-box-counterpart');
+
+        const shipCurrSelect = document.getElementById('qb-shipping-currency');
+        const shipAmountInput = document.getElementById('qb-shipping-amount');
+        const shipCounterpart = document.getElementById('qb-shipping-counterpart');
+
+        const boxPriceInput = document.getElementById('qb-box-price');
+        const boxPriceLkrInput = document.getElementById('qb-box-price-lkr');
+        const shippingInput = document.getElementById('qb-shipping-fee');
+        const shippingLkrInput = document.getElementById('qb-shipping-fee-lkr');
+        const totalDisplay = document.getElementById('qb-total-display');
+
+        const syncQuoteValues = () => {
+            const bCurr = boxCurrSelect?.value || 'USD';
+            const bRaw = parseFloat(boxAmountInput?.value) || 0;
+            let bUsd = 0, bLkr = 0;
+            if (bCurr === 'USD') {
+                bUsd = bRaw;
+                bLkr = Math.round(bRaw * 305);
+                if (boxCounterpart) boxCounterpart.innerHTML = `≈ Rs ${bLkr.toLocaleString()} LKR`;
+                if (boxAmountInput) boxAmountInput.step = "0.01";
+            } else {
+                bLkr = Math.round(bRaw);
+                bUsd = parseFloat((bRaw / 305).toFixed(2));
+                if (boxCounterpart) boxCounterpart.innerHTML = `≈ $${bUsd.toFixed(2)} USD`;
+                if (boxAmountInput) boxAmountInput.step = "1";
+            }
+            if (boxPriceInput) boxPriceInput.value = bUsd.toFixed(2);
+            if (boxPriceLkrInput) boxPriceLkrInput.value = bLkr;
+
+            const sCurr = shipCurrSelect?.value || 'USD';
+            const sRawVal = shipAmountInput?.value;
+            const sRaw = parseFloat(sRawVal) || 0;
+            let sUsd = 0, sLkr = 0;
+            if (!sRawVal || sRaw === 0) {
+                sUsd = 0;
+                sLkr = 0;
+                if (shipCounterpart) shipCounterpart.innerHTML = 'Complimentary Express Courier';
+            } else if (sCurr === 'USD') {
+                sUsd = sRaw;
+                sLkr = Math.round(sRaw * 305);
+                if (shipCounterpart) shipCounterpart.innerHTML = `≈ Rs ${sLkr.toLocaleString()} LKR`;
+                if (shipAmountInput) shipAmountInput.step = "0.01";
+            } else {
+                sLkr = Math.round(sRaw);
+                sUsd = parseFloat((sRaw / 305).toFixed(2));
+                if (shipCounterpart) shipCounterpart.innerHTML = `≈ $${sUsd.toFixed(2)} USD`;
+                if (shipAmountInput) shipAmountInput.step = "1";
+            }
+            if (shippingInput) shippingInput.value = sUsd > 0 ? sUsd.toFixed(2) : '0';
+            if (shippingLkrInput) shippingLkrInput.value = sLkr;
+
+            const totUsd = bUsd + sUsd;
+            const totLkr = bLkr + sLkr;
+            if (totalDisplay) {
+                totalDisplay.innerHTML = `$${totUsd.toFixed(2)} USD <span style="font-size:0.95rem;color:#86efac;font-weight:600;">&bull; Rs ${totLkr.toLocaleString()} LKR</span>`;
+            }
+        };
+
+        boxAmountInput?.addEventListener('input', syncQuoteValues);
+        boxCurrSelect?.addEventListener('change', () => {
+            const curVal = parseFloat(boxAmountInput?.value);
+            if (!isNaN(curVal) && curVal > 0) {
+                if (boxCurrSelect.value === 'LKR') {
+                    boxAmountInput.value = Math.round(curVal * 305);
+                } else {
+                    boxAmountInput.value = (curVal / 305).toFixed(2);
+                }
+            }
+            syncQuoteValues();
+        });
+
+        shipAmountInput?.addEventListener('input', syncQuoteValues);
+        shipCurrSelect?.addEventListener('change', () => {
+            const curVal = parseFloat(shipAmountInput?.value);
+            if (!isNaN(curVal) && curVal > 0) {
+                if (shipCurrSelect.value === 'LKR') {
+                    shipAmountInput.value = Math.round(curVal * 305);
+                } else {
+                    shipAmountInput.value = (curVal / 305).toFixed(2);
+                }
+            }
+            syncQuoteValues();
+        });
+
+        // Form Submission
+        document.getElementById('quote-builder-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const price = parseFloat(boxPriceInput.value) || 0;
+            const priceLkr = parseFloat(boxPriceLkrInput?.value) || Math.round(price * 305);
+            const shipping = parseFloat(shippingInput.value) || 0;
+            const shippingLkr = parseFloat(shippingLkrInput?.value) || Math.round(shipping * 305);
+            const notes = document.getElementById('qb-notes')?.value?.trim() || '';
+            const validity = document.getElementById('qb-validity')?.value || '7 Days';
+
+            const res = window.TeaFactoryStore.setBoxQuotation(bookingId, {
+                price,
+                priceLkr,
+                shipping,
+                shippingLkr,
+                notes,
+                validity
+            });
+
+            if (res.success) {
+                const totUsd = res.booking.quotedTotal || (price + shipping);
+                const totLkr = Math.round(totUsd * 305);
+                showToast("Quotation Formulated!", `Quotation for ${res.booking.boxName} saved: $${totUsd.toFixed(2)} USD (Rs ${totLkr.toLocaleString()} LKR). Payment link & QR generated.`, "success");
+                
+                const resultBox = document.getElementById('qb-result-box');
+                const resultQr = document.getElementById('qb-result-qr');
+                const resultLink = document.getElementById('qb-result-link');
+                const previewBtn = document.getElementById('qb-preview-checkout-btn');
+
+                if (resultBox) resultBox.style.display = 'block';
+                if (resultQr) resultQr.src = res.booking.qrCodeUrl;
+                if (resultLink) resultLink.value = res.booking.paymentLink;
+                if (previewBtn) previewBtn.href = res.booking.paymentLink;
+
+                renderTabContent('admin');
+            } else {
+                showToast("Error", res.message, "error");
+            }
+        });
+
+        document.getElementById('qb-copy-link-btn')?.addEventListener('click', () => {
+            const linkInput = document.getElementById('qb-result-link');
+            if (linkInput && linkInput.value) {
+                navigator.clipboard.writeText(linkInput.value).then(() => {
+                    showToast("Checkout Link Copied!", "Share this link with your client.", "success");
+                }).catch(() => {
+                    linkInput.select();
+                    document.execCommand('copy');
+                    showToast("Checkout Link Copied!", "Share this link with your client.", "success");
+                });
+            }
+        });
+
+        document.getElementById('qb-send-whatsapp-btn')?.addEventListener('click', () => {
+            const b = window.TeaFactoryStore.getBookingById(bookingId);
+            if (!b) return;
+            const totalUsd = b.quotedTotal || b.price || 150;
+            const totalLkr = Math.round(totalUsd * 305);
+            const boxUsd = b.quotedPrice || b.price || 150;
+            const boxLkr = Math.round(boxUsd * 305);
+            const shipUsd = b.quotedShipping || 0;
+            const shipLkr = Math.round(shipUsd * 305);
+            const text = `Dear ${b.customerName},\n\n` +
+                         `Greetings from Rock One Wild Tea Estate! Regarding your bespoke allocation enquiry for *${b.boxName}* (${b.seasonName}):\n\n` +
+                         `*Quotation Details (Multi-Currency Confirmed):*\n` +
+                         `• Chest Unit Price: $${boxUsd.toFixed(2)} USD (Rs ${boxLkr.toLocaleString()} LKR)\n` +
+                         `• Courier / Shipping: ${shipUsd > 0 ? `$${shipUsd.toFixed(2)} USD (Rs ${shipLkr.toLocaleString()} LKR)` : 'Complimentary Express Courier'}\n` +
+                         `• *Total Quoted Payable: $${totalUsd.toFixed(2)} USD (Rs ${totalLkr.toLocaleString()} LKR)*\n` +
+                         `• Quote Validity: ${b.quoteValidity || '7 Days'}\n` +
+                         (b.quoteNotes ? `• Curator Notes: ${b.quoteNotes}\n\n` : '\n') +
+                         `You may finalize your delivery details, attach your Bank of Ceylon payment deposit slip, and claim your numbered chest via your private checkout link:\n` +
+                         `🔗 ${b.paymentLink}\n\n` +
+                         `Warm regards,\nEstate Sommelier, Rock One Wild Tea`;
+            const phoneClean = (b.phone || '').replace(/[^0-9]/g, '');
+            const targetPhone = phoneClean || '94773209950';
+            window.open(`https://api.whatsapp.com/send?phone=${targetPhone}&text=${encodeURIComponent(text)}`, '_blank');
+        });
+
+        document.getElementById('qb-send-email-btn')?.addEventListener('click', () => {
+            const b = window.TeaFactoryStore.getBookingById(bookingId);
+            if (!b) return;
+            const totalUsd = b.quotedTotal || b.price || 150;
+            const totalLkr = Math.round(totalUsd * 305);
+            const boxUsd = b.quotedPrice || b.price || 150;
+            const boxLkr = Math.round(boxUsd * 305);
+            const shipUsd = b.quotedShipping || 0;
+            const shipLkr = Math.round(shipUsd * 305);
+            const text = `Dear ${b.customerName},\n\n` +
+                         `Greetings from Rock One Wild Tea Estate! Regarding your bespoke allocation enquiry for ${b.boxName} (${b.seasonName}):\n\n` +
+                         `Quotation Details (Multi-Currency Confirmed):\n` +
+                         `• Chest Unit Price: $${boxUsd.toFixed(2)} USD (Rs ${boxLkr.toLocaleString()} LKR)\n` +
+                         `• Courier / Express Handling: ${shipUsd > 0 ? `$${shipUsd.toFixed(2)} USD (Rs ${shipLkr.toLocaleString()} LKR)` : 'Complimentary Express Courier'}\n` +
+                         `• Total Quoted Payable: $${totalUsd.toFixed(2)} USD (Rs ${totalLkr.toLocaleString()} LKR)\n` +
+                         `• Quote Validity: ${b.quoteValidity || '7 Days'}\n` +
+                         (b.quoteNotes ? `• Curator Inclusions: ${b.quoteNotes}\n\n` : '\n') +
+                         `You may enter your shipping destination, attach your Bank of Ceylon deposit slip, and secure your numbered chest via your private checkout link below:\n\n` +
+                         `${b.paymentLink}\n\n` +
+                         `Warmest regards,\n` +
+                         `Rock One Wild Tea Estate Concierge\n` +
+                         `Ettampitiya, Uva Medium Region, Sri Lanka`;
+
+            showEmailServiceChooserModal({
+                to: b.email,
+                subject: `Bespoke Quotation & Checkout: ${b.boxName} ($${totalUsd.toFixed(2)} / Rs ${totalLkr.toLocaleString()})`,
+                body: text,
+                title: 'Dispatch Quotation to Client',
+                subtitle: `Quote for ${b.customerName} ($${totalUsd.toFixed(2)} USD • Rs ${totalLkr.toLocaleString()} LKR)`,
+                itemSummary: `${b.boxName} - $${totalUsd.toFixed(2)} USD (Rs ${totalLkr.toLocaleString()} LKR)`
+            });
+        });
+    }
+    window.showBoxQuoteBuilderModal = showBoxQuoteBuilderModal;
+
+    // ─── Scannable QR Code Modal ─────────────────────────────────────────────
+    function showQuoteQrModal(qrUrl, boxName, customerName, amount, payLink) {
+        const existing = document.getElementById('quote-qr-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'quote-qr-modal';
+        modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);padding:1rem;';
+        modal.innerHTML = `
+            <div style="background:var(--color-bg-card,#0a1a0e);border:1px solid rgba(212,175,55,0.4);border-radius:12px;max-width:440px;width:100%;padding:2rem;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.8);">
+                <div style="font-size:0.7rem;text-transform:uppercase;color:var(--color-gold);font-weight:700;letter-spacing:1px;margin-bottom:0.25rem;">Scannable Checkout Code</div>
+                <h3 style="margin:0 0 0.5rem 0;color:#fff;font-family:var(--font-serif);font-size:1.3rem;">${boxName || 'Collector Gift Box'}</h3>
+                <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:1.25rem;">Client: <strong style="color:#fff;">${customerName}</strong> &bull; Quoted: <strong style="color:var(--color-gold);">${amount}</strong></div>
+
+                <div style="background:#040e08;padding:1rem;border-radius:12px;border:2px solid rgba(212,175,55,0.5);display:inline-block;margin-bottom:1.25rem;box-shadow:0 8px 30px rgba(0,0,0,0.6);">
+                    <img src="${qrUrl}" alt="Checkout QR Code" style="width:200px;height:200px;display:block;">
+                </div>
+
+                <div style="font-size:0.75rem;color:#cbd5e1;line-height:1.4;margin-bottom:1.25rem;">
+                    Scan with any mobile camera to open the bespoke checkout drawer with pre-filled details, Bank of Ceylon info, and slip upload.
+                </div>
+
+                <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">
+                    <a href="${qrUrl}" download="RockOneWildTea-${(boxName||'Box').replace(/\s+/g,'_')}-QR.png" target="_blank" class="btn btn-primary" style="font-size:0.78rem;padding:0.5rem 1rem;background:linear-gradient(135deg,#d4af37,#aa820a);color:#040e08;font-weight:700;display:inline-flex;align-items:center;gap:0.35rem;text-decoration:none;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Download QR
+                    </a>
+                    <button type="button" id="copy-modal-pay-link-btn" class="btn btn-outline" style="font-size:0.78rem;padding:0.5rem 1rem;color:var(--color-gold);border-color:rgba(212,175,55,0.4);">
+                        Copy Link
+                    </button>
+                    <button type="button" id="close-qr-modal-btn" class="btn btn-outline" style="font-size:0.78rem;padding:0.5rem 1rem;color:#94a3b8;border-color:rgba(255,255,255,0.15);">
+                        Close
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        document.getElementById('close-qr-modal-btn')?.addEventListener('click', () => modal.remove());
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.remove();
+        });
+
+        document.getElementById('copy-modal-pay-link-btn')?.addEventListener('click', () => {
+            navigator.clipboard.writeText(payLink).then(() => {
+                showToast("Checkout Link Copied!", "Share with customer.", "success");
+            }).catch(() => {
+                showToast("Checkout Link Copied!", payLink, "success");
+            });
+        });
+    }
+    window.showQuoteQrModal = showQuoteQrModal;
+
     // ─── Convert Enquiry to Order Modal ──────────────────────────────────────
     function showConvertToOrderModal(bookingId, booking) {
         // Build an inline modal overlay
@@ -3131,15 +6554,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div id="co-bank-group">
                         <div class="form-group">
                             <label>Bank Name</label>
-                            <input type="text" id="co-bank-name" placeholder="e.g. Bank of Ceylon" value="Bank of Ceylon">
+                            <input type="text" id="co-bank-name" placeholder="Bank of Ceylon" value="Bank of Ceylon">
                         </div>
                         <div class="form-group">
                             <label>Account Name</label>
-                            <input type="text" id="co-acc-name" placeholder="Rock One Wild Tea (Pvt) Ltd" value="Rock One Wild Tea (Pvt) Ltd">
+                            <input type="text" id="co-acc-name" placeholder="Rock one wild tea" value="Rock one wild tea">
                         </div>
                         <div class="form-group">
                             <label>Account Number</label>
-                            <input type="text" id="co-acc-no" placeholder="0083-1001-5271-8843" value="0083-1001-5271-8843">
+                            <input type="text" id="co-acc-no" placeholder="94945708" value="94945708">
+                        </div>
+                        <div class="form-group">
+                            <label>Branch</label>
+                            <input type="text" id="co-branch" placeholder="Ettampitiya branch" value="Ettampitiya branch">
                         </div>
                         <div class="form-group">
                             <label>Reference Note for Customer</label>
@@ -3187,9 +6614,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 price: parseFloat(modal.querySelector('#co-price').value) || booking.price,
                 paymentMethod: modal.querySelector('#co-method').value,
                 paymentLink: modal.querySelector('#co-paylink').value.trim(),
-                bankName: modal.querySelector('#co-bank-name').value.trim(),
-                accountName: modal.querySelector('#co-acc-name').value.trim(),
-                accountNo: modal.querySelector('#co-acc-no').value.trim(),
+                bankName: modal.querySelector('#co-bank-name').value.trim() || 'Bank of Ceylon',
+                accountName: modal.querySelector('#co-acc-name').value.trim() || 'Rock one wild tea',
+                accountNo: modal.querySelector('#co-acc-no').value.trim() || '94945708',
+                branch: modal.querySelector('#co-branch')?.value.trim() || 'Ettampitiya branch',
                 referenceNote: modal.querySelector('#co-ref').value.trim(),
                 ownerNote: modal.querySelector('#co-note').value.trim()
             };
@@ -3447,7 +6875,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                     </div>
                     <span style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; color: var(--color-gold); font-weight: 700; margin-bottom: 0.35rem;">
-                        Concierge Operations Desk
+                        Admin Panel Console
                     </span>
                     <h3 style="font-family: var(--font-serif); font-size: 1.55rem; margin: 0; color: #ffffff;">Approve &amp; Confirm Payment</h3>
                     <p style="font-size: 0.82rem; color: var(--color-text-muted); margin: 0.35rem 0 0 0;">Verify transaction funds &amp; authorize harvest allocation.</p>
@@ -3530,7 +6958,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = window.TeaFactoryStore.validateDepositSlip(transactionId, true, note);
             closeModal();
             if (res.success) {
-                showToast("Payment Approved & Confirmed", `Transaction ${transactionId} has been verified and marked as Paid.`, "success");
+                const isTour = target.type === 'tour' || target.category === 'tour' || transactionId.startsWith('TR-') || transactionId.startsWith('TB-');
+                if (isTour) {
+                    showToast("Payment Confirmed & Gate Pass Emailed!", `Payment verified for ${transactionId}. Official Estate Gate Pass has been automatically dispatched to ${custEmail}!`, "success");
+                } else {
+                    showToast("Payment Approved & Confirmed", `Transaction ${transactionId} has been verified and marked as Paid.`, "success");
+                }
                 if (typeof callback === 'function') callback();
                 else renderTabContent('admin');
             } else {
@@ -3864,32 +7297,89 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // ── Wire allocation certificate download button ──
-        const certBtn = document.getElementById('btn-cert-download');
-        if (certBtn) {
-            certBtn.addEventListener('click', () => {
-                const order = window.TeaFactoryStore.getOrderById(orderId);
+        // ── Initialize PayPal buttons for order settlement if container exists ──
+        const paypalContainer = document.getElementById('order-detail-paypal-container');
+        if (paypalContainer && window.TeaFactoryPayPal) {
+            const currentOrder = window.TeaFactoryStore.getOrderById(orderId);
+            if (currentOrder && currentOrder.status !== 'Paid & Confirmed' && currentOrder.status !== 'Payment Confirmed' && currentOrder.status !== 'Verified') {
+                const rawAmount = Number(currentOrder.price) || 0;
+                window.TeaFactoryPayPal.renderButtons({
+                    containerId: 'order-detail-paypal-container',
+                    orderId: currentOrder.id,
+                    amount: rawAmount > 0 ? rawAmount : 50,
+                    currency: 'USD',
+                    description: `Settlement for Order ${currentOrder.id}`,
+                    onSuccess: (captureData) => {
+                        showToast('Payment Successful', 'Your payment was processed. Order is confirmed!', 'success');
+                        const updated = window.TeaFactoryStore.getOrderById(orderId);
+                        if (updated) {
+                            window.UIComponents.renderOrderDetails(updated);
+                            bindOrderSlipEvents(updated.id);
+                        }
+                    }
+                });
+            }
+        }
+
+        // ── Wire allocation certificate & gate pass download buttons ──
+        document.querySelectorAll('.btn-cert-download, .btn-tour-cert-download, #btn-cert-download').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = btn.getAttribute('data-order-id') || orderId;
+                const order = window.TeaFactoryStore.getOrderById(targetId);
                 if (order) generateAllocationCertificate(order);
             });
-        }
+        });
     }
 
     // ─── Luxury Allocation Certificate Generator (Print-to-PDF) ──────────────
+    const CEO_SIGNATURE_NAVY = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUwAAAB+CAYAAABPqyhNAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAMWklEQVR42u2dTY8cRxmA90fMz+CwP4A7QntoCc1hD5tDRzKBBs1hFrQgC2kwIzRS5MNeJsqgHEwCo0RNsigDZK0AkiETMoAhGLDjLGZJsBMHx5GHaJ0EYjNNasJk6K6u6q7q6o/n8CiKPNvTU1X99Ftfb220Nnc3AAAgHQoBAABhAgAgTAAAhAkAgDABABAmAADCBAAAS8J8bsGNBVcWnFnQEQQLugv2FgzEfwMKHgCaKsz7GRkJmVIRAFB7YXo5ZLnOWESkVAoA1E6YUbd6ZlCYq+KkYgCgNsKMutGHFmS5ZJ+KAYA6CNNfcKQgvZdEF9sTf+OL/58oStOncgCg6sIMFYW3JbnGQHTnj1OuQQUBQGWFGUWLdxWFqXrNAdIEgDoK09cYh9zSnEBKus5lKgkAqijMjoYwdzRvRBZpPkhFAUDVhNnVEKbujWynjGlSWQBQW2HuZLiZkeR656gsAKiSMAMNYZ7KeEMHRJkAgDDVuY4wAaDqwtwuSJinE675AhUGAFVauD5SFGY/543RLQeAyguzbXGmfJW3ESYA1CH5xt0ChHmAMAGgDsLsIUwAQJhmEwfnubERwgSAuiQQvo4wAQBhqnOnZS4Bh+recioNACp7pk+UH3OeILeHiDABAGF+cvfPoYWjJpj0AYBaHrOb1H1+I8c14yT8FBUGAFUXZmB44mfbYAYkAIBSCdP0VkbGLwGg1sI8NJhIOO6886tUFgDURZihIWGO6I4DQN2FmSS6L2suU5rRHQeApgrzmVb+Q9Z6VBQA1EmYSef9HGtc42miSwBogjC3c86Ufy/hb30qCQAQ5v94HlkCQJOEmWXxepS9/c2Ev/kmlQMATRSmp5lTc5eKAYCmCrOjOBse8SSVAgB1F+aGJM3bRIxH+imyHFMhANAUYYYSGUYL0qeSf2etJQA0SpgDjSN4l9xJGOMEAECYLBsCAISZvD2yart3iHgBwPrC9SMFUX4l5/c8u+Bdsdi9JyaRvJyz+0Mxxro+aXUk0taNxOe2aTAACNME/RRRzmOWF+nwrZTr/14I1NeIhqPZ+/cVI+KlONs0GgCEmYd2AeOVql39uRCnLOqcZJicWjJqaENZLgnzGbIAhJmPf1ses9zPILbzoqvdXYsKuzlkueRHDWsk/bVTPEMeHECYdiO/Ir4jLfKcp3xmIiLIvhDrkkgW78V8tu6NwxMvnSuK210BEGYK1xZcFKI5siTMVw1JU9bNDjTv6RsLPl/jhhF1v/9e4CoHb6Xb30HIWnyt9dER1J+jLKq1rCiQHDGRZwyzpyC9meIs/SovlqACuiKiHQg6JZiNT1se9rjB79pvVXf5mUvOJJRXmOHlz1I8R8KUPWwP57zuUPJQDVcik1BDmH3HhR+WcHIpbYz3zwa/Z97arPya3aLZWvAvhTI7U4AgvZjcELcRphlhXjBQQSoz8DoPYt+hlGYlnJGXLQ272TKTHMVLySmAMOWy/Idimb1kMerriWfsjYTvfgBh5t8eedfQ9dev+4uYJU6RjE4UGpWL2d6ehtAPC74vmSxPG1qaNNWcqPsOolTqkazzXUvCjOrwXsp3fxVhmtlPXtSPUl1nOXMwkVLGNZ9+ARFekDLG/JQQwkR8biYi3ipMrA3EDjSbGxsOUl4soSivqJx/aPG3/qDpPYIix8CK+lGHJUwAEsnyuqYw2wld2snK2K2JKGIsuYeu5TqZJvyGtmSTxHKi7ILCJgXZZouloLOWY1LS7KDA6P+wwAmXDkMo9RNmW6PLu5ROERHcLCVCmAkm4rjhtuIY49TCMEfc/Q3EGJrJXsfU0DjrOQO/WTeal9XnkWGJ3SrBkJKnGF0izIoJc5RhHabv8J5CxW7cniXpB5pjikup7xiQS8fgvfY0rvNawm9Tldy8wPHxfknG3zuSl8NU9FLON2F5kekLBg6F6UvGyWSN/G+W72uWU3R7Cg+oZ2kZUd5VBl1D0WWgMCuseq3bkjHttsGJF9/S2PKhA1EMJW3AY+F6NYU5TplAGUuyE21Zuqek89p/Z3hr6LjgqPy+KMt+xu74ULNN3VO4n46BNjoxOGk3sTRU4mJ1x4HhFzXCTBGETSktuSlZbN1e2Rsd95lTBQtzz8BY2frSn7z32RUP43XNbno3gzC7FpbTHBiaGBzl6IqbmjTzU+o6FPc5EmUcit8UWhq/zPvSR5gZhLnjaGlMoPC5fYuTUFnLYqz5cHqGewrRuOBxzu55N6dIdIYM3tXsBsteAusz3Tsxn/twJYo8bTgaDHMmmjG5RdIz8IJan/W/K3JEdJouzA1HwvQ0hgJOCj7iVzei9RT3zxc5478lIpi55pidl/A3qiJ5RrMMxoZ2Ns1SZLn+kkj6nTcylvdFQxm6RhaDkXGGZ3SckC7RR5jFdXtlwnw55rOXEhqXrXt7PWGrqB/TME8JWb6Q8HuOJQ/wBwU1mp9qTuTMMpZ3JyVqi/u3E81IWybNCynt2VMc5wssbCbQYZYz2szbK/MVeksHVZGmjYueOBDmhkaXaFLwpFRS9+qKaEhnV96+B+LztySTCIFkDC4oaE/zJY1hgTDjbO+NlPqcG1quNMwgoSONIZTA0hrZeUE7x/wc5bylcX/7TRXmJQNr5Uw1ronG/dm6ryDDA/lByhs4sDQzq8rjGo1etnB/pFGfJ2sP6Uhz95CM91v5E4L0LCZ58cV1+jHp/wLBQGGXW2jw2ZI9z1Ev6IkSrokupTCTGvIdB8Kcr1Vs0iTMNcf7tZN4LiEy3y5BFqa47/5rht+/ejrnMi/oO2J97PdbHx1wN4x5QNuSdbczTWl2DEyueQm9l6JzFgRit5hJaSYND8VN0r2eY/hg2ERh7jlai/mopOs7TJF5r+U+yUVctLaVoas/cSjMac5E0OvRZ/QAfiHjGtKhhb3SowxjojcdRU49gy/Vi5LrHGqu5T3OEL0jzJadPJOytG7TElRS9FD+ROEt21GMJOIa321HO5dUJBX9rlcMz3rLslM9nCE6i3sR/UxEvlmWQd10tHzGk7xUX9GUuIlJqMlaRqdKdsuLHrMr417yRxwUfFs0jED81894hO1I0pW3Ua8yOV3TeJB7ivuxfY3Z7p8nXOfTOY8OCTTr9WVHPZikscSpoa55nln6vsb1hk0T5rbDkLudYdFvXRPL/rJlJtfjoeJ5SX7G+toXsr26cmpnYOjwtj+2ynEmkksJ9CS9gp7FfK5pvzt0vDyuVMKUddu+VCJp1mXL1iBmS2NXs8yWUVWoIckilzPpnkDpqmsXONi4kXU88zjDC+m1lLZwWYjSV2hzv7Wch7USwkzbq/tICRKePspRrh/z9ZhlTKqElGPimN/6OsnPOH6JdAz1DJbX6q3QyfiCGpQowYhTYcoivLOt4nP5zcRM377jN30ZyTou1aXsUqXZK9EkhpeQWOUJh/e0XZLjY5wLc1TlxakN5E5L7VC2AWVVaXolTNP2T8WdVLUW5qAB44Z1Yzn211kZA1ymxWtbPOALio16TWwnLSK4apQwuwgToJTE7cT5lcP7CSowkWhdmAHCBKjUMjSX93TkcItvKYTZRpgApaRbwrmFwGCC4koKcwNhApSSwGE+BV1fdBDm5u5nabQAzmiXNB/loOCTEEonzBcTKuZTNFoAp7xaQjltV6FHWnSY/RiNFcA5s5LurmnHBFrfbpIwl0Q5DR+goQKUVpjPl2yc9S1xX082UZgAUB7i0vT9gXJBmACgJsw/US4IEwDUhPkXygVhAoCaMN+kXBAmAKgJ8yrlgjAB4P+JO3fox5QLwgSATaUUb/1Ws1IZIkwA2M16dEtTMuhHO5reXvndzyJMANjQzLoeNCSyjPvt5xAmAMQxLOExFa6j66hMthAmAMR1SZuadjEuIdBbOmnkaEAAzeKgwcJc/813dCe7aEAAzeIywvwvA5FSjllygJrzxVa2s7uTJj3ChpTbQ6zDBGgej7Wy5YrsVeUoCBauA4Apnl6R3XmNv3uPc7YQJkDT2GrFHzHhZZgdJ7pEmAC152yM/KYJ0kyS5ZxyRJgATWA/QYIzsVSmLbY7TiUnuBJdIkyA3aYk0ZDJ8NcL3pH8+5AyRJgATZPmJYkU79MVR5gAsPmJo2lHGrL8DWWGMAGaTjReeS9FlmPKCWECwObH53lHu3ZurYmyJ7rvlBHCBABAmAAACBMAAGECACBMAACgEAAAECYAAMIEAECYAAAIEwAAYQIAIEwAAFjjPzXq/hu74AiPAAAAAElFTkSuQmCC';
+    const CEO_SIGNATURE_GOLD = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUwAAAB+CAYAAABPqyhNAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAMV0lEQVR42u2d348bRx3A7w/iPS+8I3QPKyE/3MP1YZFCYUF+MKADRUgmtZClKg/34qpGfQgtWK1M71AN9KJSpEBdaiBQspA0PcLRkrQpaaoz1aUtbYKXjotrdmdndmd29sfn4aOqim+9npn97Hd+fWcj3Du1AQAA6VAIAAAIEwAAYQIAIEwAAIQJAIAwAQAQJgAAWBLmswtuLri64OyCtiBY0Fmws6Av/htQ8ADQVGHez8hQyJSKAIDaC9PLIct1RiIipVIAoHbCjLrVM4PCXBUnFQMAtRFm1I0+sCDLJbtUDADUQZj+gkMF6b0kutie+Btf/P9EUZo+lQMAVRfmWFF4m5Jr9EV3/ijlGlQQAFRWmFG0eFdRmKrX7CNNAKijMH2NcchNzQmkpOtcoZIAoIrCbGsIc1vzRmSR5hepKAComjA7GsLUvZGtlDFNKgsAaivM7Qw3M5Rc7zyVBQBVEmagIczTGW9onygTABCmOjcQJgBUXZhbBQnzTMI1X6DCAKBKC9eHisLs5bwxuuUAUHlhtizOlK/yNsIEgDok37hbgDD3ESYA1EGYXYQJAAjTbOLgPDc2RJgAUJcEwjcQJgAgTHWOQ3MJOFT3llNpAFDZM32i/JjzBLk9SIQJAAjz07t/DiwcNcGkDwDU8pjdpO7zGzmuGSfhp6gwAKi6MAPDEz9bBjMgAQCUSpimtzIyfgkAtRbmgcFEwnHnnV+jsgCgLsIcGxLmkO44ANRdmEmi+5rmMqUZ3XEAaKow98L8h6x1qSgAqJMwk877OdK4xtNElwDQBGFu5Zwp/2HC3/pUEgAgzP/xHLIEgCYJM8vi9Sh7+5sJf/NdKgcAmihMTzOn5tepGABoqjDbirPhEU9SKQBQd2FuSNK8TcR4pJ8iyxEVAgBNEeZYIsNoQfpU8u+stQSARgmzr3EE75LjhDFOAACEybIhAECYydsjq7Z7h4gXAKwvXD9UEOU3cn7PMwveFYvdu2ISycs5uz8QY6zrk1aHIm3dUHxuiwYDgDBN0EsR5TxmeZEOD6Vc/49CoL5GNBzN3r+vGBEvxdmi0QAgzDy0ChivVO3qz4U4ZVHnJMPk1JJhQxvKckmYz5AFIMx8fGh5zHI3g9guiK52Zy0q7OSQ5ZKfNqyR9NZO8Rzz4ADCtBv5FfEdaZHnPOUzExFB9oRYl0SyeC/ms3VvHJ546VxV3O4KgDBTuL7gkhDNoSVhvmpImrJudqB5T99Z8KUaN4yo+/2PAlc5eCvd/jZC1uJb4cdHUH+BsqjWsqJAcsREnjHMroL0Zoqz9Ku8WIIK6IiIti9ol2A2Pm152OMGv2s3rO7yM5ecTSivcYaXP0vxHAlT9rA9nPO6A8lDNViJTMYawuw5LvxxCSeX0sZ4/2Lwe+bhXuXX7BbN5oJ/K5TZ2QIE6cXkhriDMM0I86KBClKZgdd5EHsOpTQr4Yy8bGnYrdBMchQvJacAwpTL8p+KZfaSxaivK56xNxK++wGEmX975F1D11+/7q9iljhFMjpRaFQuZnu7GkI/KPi+ZLI8Y2hp0lRzou77iFKpR7LODywJM6rDeynf/U2EaWY/eVE/SnWd5czBREoZ13z6BUR4QcoY81NCCBPxuZmIeKswsdYXO9BsbmzYT3mxjEV5ReX8E4u/9cdN7xEUOQZW1I86KGECkEiWNzSF2Uro0k5Wxm5NRBEjyT10LNfJNOE3tCSbJJYTZRcVNinINlssBZ21HJOSZgcFRv8HBU64tBlCqZ8wWxpd3qV0iojgZikRwkwwEccNtxTHGKcWhjni7q8vxtBM9jqmhsZZzxv4zbrRvKw+Dw1L7HYJhpQ8xegSYVZMmMMM6zB9h/c0VuzG7ViSfqA5priU+rYBubQN3mtX4zqvJfw2VcnNCxwf75Vk/L0teTlMRS/lQhOWF5m+YOBQmL5knEzWyP9u+b5mOUW3o/CAepaWEeVdZdAxFF0GCrPCqte6IxnTbhmcePEtjS0fOBDFQNIGPBauV1OYo5QJlJEkO9GmpXtKOq/9D4a3ho4Kjsrvi7LsZeyODzTb1D2F+2kbaKMTg5N2E0tDJS5Wd+wbflEjzBRB2JTSkluSxdatlb3RcZ85XbAwdwyMla0v/cl7nx3xMN7Q7KZ3MgizY2E5zb6hicFhjq64qUkzP6Wux+I+h6KMx+I3jS2NX+Z96SPMDMLcdrQ0JlD43K7FSaisZTHSfDg9wz2FaFzwKGf3vJNTJDpDBu9qdoNlL4H1me7tmM99tBJFnjEcDY5zJpoxuUXSM/CCWp/1vytyRLSbLswNR8L0NIYCTgo+4lc3ovUU988XOeO/KSKYueaYnZfwN6oi2dMsg5GhnU2zFFmuvySSfufNjOV9yVCGrqHFYGSU4RkdJaRL9BFmcd1emTBfjvns5YTGZeveXk/YKurHNMzTQpYvJPyeI8kD/EFBjeYXmhM5s4zl3U6J2uL+7UQz0pZJ82JKe/YUx/kCC5sJdJjljDbz9sp8hd7SflWkaeOiJw6EuaHRJZoUPCmV1L26KhrSuZW37774/G3JJEIgGYMLCtrTfFljWGCccbb3Zkp9zg0tVxpkkNChxhBKYGmN7LygnWN+jnLe1Li/3aYK87KBtXKmGtdE4/5s3VeQ4YH8IOUNHFiamVXlcY1GL1u4P9Soz5O1h3SouXtIxvth/oQgXYtJXnxxnV5M+r9A0FfY5TY2+GzJnueoF/RECddEl1KYSQ352IEw52sVmzQJc93xfu0knk2IzLdKkIUp7rv/luH3r57OucwL+o5YH/uj8OMD7gYxD2hLsu52pinNtoHJNS+h91J0zoJA7BYzKc2k4aG4SbrXcwwfDJoozB1HazEflXR9Byky74buk1zERWubGbr6E4fCnOZMBL0efUYP4JczriEdWNgrPcwwJnrLUeTUNfhSvSS5zoHmWt6jDNE7wgzt5JmUpXWblqCSoofy5wpv2bZiJBHX+O442rmkIqnod71ieNZblp3q4QzRWdyL6HkR+WZZBnXL0fIZT/JSfUVT4iYmoSZrGZ0q2S0vesyujHvJH3FQ8C3RMALxXz/jEbZDSVfeRr3K5HRd40HuKu7H9jVmu3+ZcJ3P5jw6JNCs15cd9WCSxhKnhrrmeWbpexrXGzRNmFsOQ+5WhkW/dU0s++vQTK7HA8XzkvyM9bUrZHtt5dTOwNDhbWFYjjORXEqgK+kVdC3mc0373WPHy+NKJUxZt+2rJZJmXbZs9WO2NHY0y2wZVY01JFnkcibdEyhdde0CBxs3so5nHmV4Ib2W0hauCFH6Cm3u95bzsFZCmGl7dR8pQcLTRznK9RO+HbOMSZUx5Zg45re+TvJzjl8ibUM9g+W1uiu0M76g+iVKMOJUmLII71xYfC6/mZjp23X8pi8jWcelOpRdqjS7JZrE8BISqzzh8J62SnJ8jHNhDqu8OLWBHIdqh7L1KatK0y1hmrZ/Ke6kqrUw+w0YN6wby7G/9soY4DItXsviAV9QbNRrYjtpEcFVo4TZQZgApSRuJ85vHN5PUIGJROvCDBAmQKWWobm8p0OHW3xLIcwWwgQoJZ0Szi0EBhMUV1KYGwgToJQEDvMp6PqijTD3Tn2eRgvgjFZJ81H2Cz4JoXTCfDGhYj5DowVwyqsllNNWFXqkRYfZj9FYAZwzK+numlZMoPW9JglzSZTT8AEaKkBphflcycZZ3xL39WQThQkA5SEuTd+fKBeECQBqwvwz5YIwAUBNmH+lXBAmAKgJ803KBWECgJowr1EuCBMA/p+4c4d+RrkgTADYU0rx1gublcoQYQLAqaxHtzQlg360o+ntld/9DMIEgA3NrOtBQyLLuN9+HmECQByDEh5T4Tq6jspkE2ECQFyXtKlpF+MSAr2lk0aOBgTQLPYbLMz133ysO9lFAwJoFlcQ5n/pi5RyzJID1JyvhNnO7k6a9Bg3pNweZB0mQPN4LMyWK7JblaMgWLgOAKZ4ekV2FzT+7j3O2UKYAE1jM4w/YsLLMDtOdIkwAWrPuRj5TROkmSTLOeWIMAGawG6CBGdiqUxLbHecSk5wJbpEmACnmpJEQybD3y54R/LvA8oQYQI0TZqXJVK8T1ccYQLA3qeOph1qyPJ3lBnCBGg60XjlvRRZjignhAkAe5+c5x3t2rm9Jsqu6L5TRggTAABhAgAgTAAAhAkAgDABAIBCAABAmAAACBMAAGECACBMAACECQCAMAEAYI3/AABEWg1TVagbAAAAAElFTkSuQmCC';
+
     function generateAllocationCertificate(order) {
         if (!order) return;
 
+        const isTour      = order.type === 'tour' || order.category === 'tour' || (order.id && (order.id.startsWith('TR-') || order.id.startsWith('TB-'))) || Boolean(order.packageName || order.tourDate);
+        const isCOD       = order.paymentMethod === 'cod' || (order.status && order.status.includes('Cash on Delivery'));
         const isPaid      = order.status === 'Paid & Confirmed';
-        const isSlipSent  = order.status === 'Slip Submitted';
+        const isSlipSent  = order.status === 'Slip Submitted' || order.status === 'Pending Verification';
         const isAwaiting  = order.status === 'Awaiting Payment' || order.status === 'Order Created';
 
-        const statusColor = isPaid ? '#4caf50' : isSlipSent ? '#d4af37' : '#90caf9';
-        const statusLabel = order.status;
+        const statusColor = isPaid ? '#4caf50' : (isCOD ? '#2e7d32' : (isSlipSent ? '#d4af37' : '#90caf9'));
+        const statusLabel = isCOD ? 'Cash on Delivery (Pending Courier Handover)' : (order.status || 'Order Created');
         const issuedDate  = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
         const priceDisplay = order.formattedPrice || `USD ${(order.price || 0).toFixed(2)}`;
 
-        // Build items HTML (support both single gift box and multi-item cart orders)
+        const certTypeLabel = isTour ? 'Estate Tour Gate Pass &amp; Sanctuary Admission' : 'Connoisseur Allocation Certificate';
+        const certRecital = isTour ? `
+            This Official Gate Pass confirms and attests that the following reservation has been duly registered and authorized in the<br>
+            <strong>Rock One Wild Tea Estate Master Ledger</strong> and grants certified entry to the private highland estate and factory.
+        ` : `
+            This Certificate confirms and attests that the following allocation has been duly registered in the<br>
+            <strong>Rock One Wild Tea Estate Master Ledger</strong> and reserved under the name of the allocated party.
+        `;
+        const itemsSectionTitle = isTour ? 'Reserved Highland Experience — Master Ledger Record' : 'Allocated Reserve — Itemised Ledger Entry';
+        const totalSectionLabel = isTour ? 'Total Reservation Value' : 'Total Allocation Value';
+
+        // Build items HTML (support tour bookings, single gift box and multi-item cart orders)
         let itemsHtml = '';
-        if (order.items && Array.isArray(order.items) && order.items.length > 0) {
+        if (isTour) {
+            itemsHtml = `
+                <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid rgba(212,175,55,0.15); font-size: 12px; color: #1a0f00;">
+                        <strong style="font-family:'Cinzel', serif; font-size: 13px; color: #1a0f00;">${order.packageName || 'Master Tea Factory Tour &amp; Sommelier Cupping'}</strong>
+                        <div style="font-size: 11px; color: #5a3e00; margin-top: 3px;">
+                            Experience Date: <strong>${order.tourDate || 'Scheduled Date'}</strong> &bull; Slot: <strong>${order.timeSlot || 'Scheduled Time'}</strong>
+                        </div>
+                        <div style="font-size: 10px; color: #8b6914; margin-top: 2px;">
+                            Gannilawaththa, Wellawela, Ettampitiya (Elevation 1,240m) &bull; Gate Admission &amp; Cupping Included
+                        </div>
+                    </td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid rgba(212,175,55,0.15); text-align: center; font-size: 12px; color: #4a3a00;">${order.guestCount || order.guests || 1} Guests</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid rgba(212,175,55,0.15); text-align: right; font-size: 12px; color: #1a0f00; font-weight: 600;">${priceDisplay}</td>
+                </tr>
+            `;
+        } else if (order.items && Array.isArray(order.items) && order.items.length > 0) {
             itemsHtml = order.items.map(item => `
                 <tr>
                     <td style="padding: 8px 0; border-bottom: 1px solid rgba(212,175,55,0.15); font-size: 12px; color: #1a0f00;">${item.name || 'Tea Reserve Item'}${item.weight ? ` (${item.weight})` : ''}</td>
@@ -4204,17 +7694,43 @@ document.addEventListener('DOMContentLoaded', () => {
             text-align: center;
         }
 
+        .cert-signature-img-wrap {
+            height: 18mm;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            margin-bottom: 1.5mm;
+        }
+
+        .cert-signature-img-wrap img {
+            max-height: 18mm;
+            max-width: 58mm;
+            object-fit: contain;
+            display: block;
+        }
+
         .cert-signature-line {
             width: 100%;
             border-bottom: 1px solid #8b6914;
-            margin-bottom: 2mm;
+            margin-bottom: 1.5mm;
+        }
+
+        .cert-signature-name {
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: #1a0f00;
+            letter-spacing: 1.5px;
+            margin-top: 1mm;
+            text-transform: uppercase;
         }
 
         .cert-signature-title {
-            font-size: 9px;
-            letter-spacing: 2px;
+            font-size: 8.5px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
             color: #8b6914;
+            margin-top: 1mm;
         }
 
         .cert-wax-seal {
@@ -4345,39 +7861,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     <!-- Certificate type -->
     <div class="cert-type-banner">
-        <div class="cert-type-label">Connoisseur Allocation Certificate</div>
+        <div class="cert-type-label">${certTypeLabel}</div>
     </div>
 
     <!-- Opening recital -->
     <div class="cert-recital">
-        This Certificate confirms and attests that the following allocation has been duly registered in the<br>
-        <strong>Rock One Wild Tea Estate Master Ledger</strong> and reserved under the name of the allocated party.
+        ${certRecital}
     </div>
 
     <!-- Client & Order Details -->
     <div class="cert-details-block">
         <div class="cert-field-row">
-            <span class="cert-field-label">Allocated To</span>
-            <span class="cert-field-value">${order.customerName || '—'}</span>
+            <span class="cert-field-label">${isTour ? 'Lead Guest' : 'Allocated To'}</span>
+            <span class="cert-field-value">${order.customerName || order.guestName || order.name || '—'}</span>
         </div>
         <div class="cert-field-row">
             <span class="cert-field-label">Contact</span>
-            <span class="cert-field-value">${[order.email, order.phone].filter(Boolean).join(' · ') || '—'}</span>
+            <span class="cert-field-value">${[order.email || order.guestEmail, order.phone || order.guestPhone].filter(Boolean).join(' · ') || '—'}</span>
         </div>
         <div class="cert-field-row">
-            <span class="cert-field-label">Allocation ID</span>
+            <span class="cert-field-label">${isTour ? 'Gate Pass Ref' : 'Allocation ID'}</span>
             <span class="cert-field-value mono">${order.id}</span>
         </div>
+        ${isTour ? `
+        <div class="cert-field-row">
+            <span class="cert-field-label">Experience Date</span>
+            <span class="cert-field-value" style="color: #5a3e00;">${order.tourDate || '—'} &nbsp;(${order.timeSlot || '—'})</span>
+        </div>
+        <div class="cert-field-row">
+            <span class="cert-field-label">Party Size</span>
+            <span class="cert-field-value">${order.guestCount || order.guests || 1} ${Number(order.guestCount || order.guests || 1) === 1 ? 'Guest' : 'Guests'}</span>
+        </div>
+        ` : ''}
         <div class="cert-field-row">
             <span class="cert-field-label">Certificate Issued</span>
             <span class="cert-field-value">${issuedDate}</span>
         </div>
         <div class="cert-field-row">
-            <span class="cert-field-label">Order Registered</span>
+            <span class="cert-field-label">${isTour ? 'Booking Registered' : 'Order Registered'}</span>
             <span class="cert-field-value">${order.createdAt || '—'}</span>
         </div>
         <div class="cert-field-row">
-            <span class="cert-field-label">Allocation Status</span>
+            <span class="cert-field-label">${isTour ? 'Clearance Status' : 'Allocation Status'}</span>
             <span class="cert-status-badge" style="background:${statusColor}18; color:${statusColor}; border: 1px solid ${statusColor}50;">${statusLabel}</span>
         </div>
         ${order.deliveryRange ? `
@@ -4394,12 +7919,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     <!-- Allocated Items Table -->
     <div class="cert-items-section">
-        <div class="cert-items-section-title">Allocated Reserve — Itemised Ledger Entry</div>
+        <div class="cert-items-section-title">${itemsSectionTitle}</div>
         <table class="cert-items-table">
             <thead>
                 <tr>
-                    <th style="text-align:left; padding-left:4px;">Description</th>
-                    <th style="text-align:center; width: 25mm;">Qty</th>
+                    <th style="text-align:left; padding-left:4px;">${isTour ? 'Sanctuary Experience &amp; Schedule' : 'Description'}</th>
+                    <th style="text-align:center; width: 25mm;">${isTour ? 'Guests' : 'Qty'}</th>
                     <th style="text-align:right; padding-right:4px; width: 35mm;">Value</th>
                 </tr>
             </thead>
@@ -4408,7 +7933,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </tbody>
             <tfoot>
                 <tr class="cert-total-row">
-                    <td style="text-align:left; padding-left:4px;" colspan="2">Total Allocation Value</td>
+                    <td style="text-align:left; padding-left:4px;" colspan="2">${totalSectionLabel}</td>
                     <td style="text-align:right; padding-right:4px; color:#5a3e00;">${priceDisplay}</td>
                 </tr>
             </tfoot>
@@ -4419,7 +7944,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="cert-attestation">
         <div class="cert-ref-box">
             <div class="cert-ref-id">${order.id}</div>
-            <div class="cert-ref-label">Reference Number</div>
+            <div class="cert-ref-label">${isTour ? 'Gate Pass Reference' : 'Reference Number'}</div>
         </div>
 
         <div class="cert-wax-seal">
@@ -4427,9 +7952,12 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <div class="cert-signature-block">
-            <div style="height: 14mm;"></div>
+            <div class="cert-signature-img-wrap">
+                <img src="${CEO_SIGNATURE_NAVY}" alt="Director &amp; CEO Signature" />
+            </div>
             <div class="cert-signature-line"></div>
-            <div class="cert-signature-title">Estate Director, Rock One Wild Tea</div>
+            <div class="cert-signature-name">Prasanga</div>
+            <div class="cert-signature-title">Managing Director &amp; CEO, Rock One Wild Tea</div>
         </div>
     </div>
 
@@ -4463,6 +7991,22 @@ document.addEventListener('DOMContentLoaded', () => {
         certWindow.document.write(certHtml);
         certWindow.document.close();
     }
+    window.generateAllocationCertificate = generateAllocationCertificate;
+
+    // Global event delegation for certificate and gate pass download buttons
+    document.addEventListener('click', (e) => {
+        const certBtn = e.target.closest('.btn-cert-download, .btn-tour-cert-download, #btn-cert-download');
+        if (certBtn) {
+            e.preventDefault();
+            const orderId = certBtn.getAttribute('data-order-id') || document.getElementById('order-id-input')?.value?.trim();
+            if (orderId && window.TeaFactoryStore) {
+                const order = window.TeaFactoryStore.getOrderById(orderId);
+                if (order && typeof window.generateAllocationCertificate === 'function') {
+                    window.generateAllocationCertificate(order);
+                }
+            }
+        }
+    });
 
     // ─── Packaging Slip & Artisan Engraving Work Order Generator (Print-to-PDF) ─
     function generatePackingSlipWorkOrder(orderOrId) {
@@ -5226,13 +8770,11 @@ document.addEventListener('DOMContentLoaded', () => {
             resetForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const newName = document.getElementById('new-season-name').value;
-                const newPrice = parseFloat(document.getElementById('new-box-price').value);
-
-                const result = window.TeaFactoryStore.resetSeason(newName, newPrice);
+                const result = window.TeaFactoryStore.resetSeason(newName, 0);
                 if (result.success) {
                     showToast(
                         "Season Transitioned Successfully", 
-                        `Current active catalog set to "${result.newSeason.name}" (Series ${result.newSeason.seriesNumber}). Gift box grid reset.`, 
+                        `Current active catalog set to "${result.newSeason.name}" (Series ${result.newSeason.seriesNumber}). Gift box grid reset to Enquiry Only.`, 
                         'success'
                     );
                     renderTabContent('admin');
@@ -5780,13 +9322,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const editId = document.getElementById('box-edit-id').value;
                 const boxNum = parseInt(document.getElementById('box-num-input').value);
                 const name = document.getElementById('box-name-input').value.trim();
-                const price = parseFloat(document.getElementById('box-price-input').value);
                 const status = document.getElementById('box-status-input').value;
                 const desc = document.getElementById('box-desc-input').value.trim();
                 const image = selectedBoxImageBase64;
 
                 if (editId) {
-                    const updatedData = { name, price, status, desc };
+                    const updatedData = { name, status, desc };
                     if (image) updatedData.image = image;
                     window.TeaFactoryStore.updateBox(parseInt(editId), updatedData);
                     showToast("Gift Box Updated", `"${name}" specifications have been updated.`, "success");
@@ -5794,7 +9335,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.TeaFactoryStore.addBox({
                         id: boxNum,
                         name,
-                        price,
                         status,
                         desc,
                         image: image || "images/Gift Box.jpeg"
@@ -5820,7 +9360,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-id');
                 const name = btn.getAttribute('data-name');
-                const price = btn.getAttribute('data-price');
                 const status = btn.getAttribute('data-status');
                 const desc = btn.getAttribute('data-desc');
                 const image = btn.getAttribute('data-image');
@@ -5828,7 +9367,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const editIdInput = document.getElementById('box-edit-id');
                 const numInput = document.getElementById('box-num-input');
                 const nameInput = document.getElementById('box-name-input');
-                const priceInput = document.getElementById('box-price-input');
                 const statusInput = document.getElementById('box-status-input');
                 const descInput = document.getElementById('box-desc-input');
                 const titleEl = document.getElementById('giftbox-form-title');
@@ -5839,7 +9377,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (editIdInput) editIdInput.value = id;
                 if (numInput) { numInput.value = id; numInput.disabled = true; }
                 if (nameInput) nameInput.value = name;
-                if (priceInput) priceInput.value = parseFloat(price).toFixed(2);
                 if (statusInput) statusInput.value = status;
                 if (descInput) descInput.value = desc || '';
                 if (titleEl) titleEl.innerText = `Edit Gift Box #${String(id).padStart(2, '0')}`;
@@ -5949,12 +9486,94 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add / Edit Product Form Handler
         const addProductForm = document.getElementById('admin-add-product-form');
         if (addProductForm) {
+            // Live dual currency synchronization with currency dropdown
+            const prodCurrency = document.getElementById('prod-currency');
+            const prodAmountInput = document.getElementById('prod-amount-input');
+            const prodShippingAmountInput = document.getElementById('prod-shipping-amount-input');
+            const prodCounterpartPrice = document.getElementById('prod-counterpart-price');
+            const prodCounterpartShipping = document.getElementById('prod-counterpart-shipping');
+
+            const prodPrice = document.getElementById('prod-price');
+            const prodPriceLkr = document.getElementById('prod-price-lkr');
+            const prodShip = document.getElementById('prod-shipping');
+            const prodShipLkr = document.getElementById('prod-shipping-lkr');
+
+            const syncProductPricing = () => {
+                const curr = prodCurrency?.value || 'USD';
+                const pVal = parseFloat(prodAmountInput?.value);
+                let pUsd = 0, pLkr = 0;
+                if (!isNaN(pVal) && pVal >= 0) {
+                    if (curr === 'USD') {
+                        pUsd = pVal;
+                        pLkr = Math.round(pVal * 305);
+                        if (prodCounterpartPrice) prodCounterpartPrice.innerText = `≈ Rs ${pLkr.toLocaleString()} LKR`;
+                        if (prodAmountInput) prodAmountInput.step = "0.01";
+                    } else {
+                        pLkr = Math.round(pVal);
+                        pUsd = parseFloat((pVal / 305).toFixed(2));
+                        if (prodCounterpartPrice) prodCounterpartPrice.innerText = `≈ $${pUsd.toFixed(2)} USD`;
+                        if (prodAmountInput) prodAmountInput.step = "1";
+                    }
+                } else {
+                    if (prodCounterpartPrice) prodCounterpartPrice.innerText = curr === 'USD' ? '≈ Rs 0 LKR' : '≈ $0.00 USD';
+                }
+                if (prodPrice) prodPrice.value = pUsd.toFixed(2);
+                if (prodPriceLkr) prodPriceLkr.value = pLkr;
+
+                const sVal = parseFloat(prodShippingAmountInput?.value);
+                let sUsd = 0, sLkr = 0;
+                if (!isNaN(sVal) && sVal > 0) {
+                    if (curr === 'USD') {
+                        sUsd = sVal;
+                        sLkr = Math.round(sVal * 305);
+                        if (prodCounterpartShipping) prodCounterpartShipping.innerText = `≈ Rs ${sLkr.toLocaleString()} LKR`;
+                        if (prodShippingAmountInput) prodShippingAmountInput.step = "0.01";
+                    } else {
+                        sLkr = Math.round(sVal);
+                        sUsd = parseFloat((sVal / 305).toFixed(2));
+                        if (prodCounterpartShipping) prodCounterpartShipping.innerText = `≈ $${sUsd.toFixed(2)} USD`;
+                        if (prodShippingAmountInput) prodShippingAmountInput.step = "1";
+                    }
+                } else {
+                    if (prodCounterpartShipping) prodCounterpartShipping.innerText = 'Free / Complimentary';
+                }
+                if (prodShip) prodShip.value = sUsd > 0 ? sUsd.toFixed(2) : '0';
+                if (prodShipLkr) prodShipLkr.value = sLkr;
+            };
+
+            prodAmountInput?.addEventListener('input', syncProductPricing);
+            prodShippingAmountInput?.addEventListener('input', syncProductPricing);
+
+            prodCurrency?.addEventListener('change', () => {
+                const curP = parseFloat(prodAmountInput?.value);
+                if (!isNaN(curP) && curP > 0) {
+                    if (prodCurrency.value === 'LKR') {
+                        prodAmountInput.value = Math.round(curP * 305);
+                    } else {
+                        prodAmountInput.value = (curP / 305).toFixed(2);
+                    }
+                }
+                const curS = parseFloat(prodShippingAmountInput?.value);
+                if (!isNaN(curS) && curS > 0) {
+                    if (prodCurrency.value === 'LKR') {
+                        prodShippingAmountInput.value = Math.round(curS * 305);
+                    } else {
+                        prodShippingAmountInput.value = (curS / 305).toFixed(2);
+                    }
+                }
+                syncProductPricing();
+            });
+
             addProductForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const editId = document.getElementById('prod-edit-id').value;
                 const name = document.getElementById('prod-name').value.trim();
                 const category = document.getElementById('prod-category').value;
-                const price = parseFloat(document.getElementById('prod-price').value);
+                const subcategory = document.getElementById('prod-subcategory')?.value || 'Hot Tea (Gongfu style)';
+                const price = parseFloat(document.getElementById('prod-price').value) || 0;
+                const priceLkr = parseFloat(document.getElementById('prod-price-lkr')?.value) || Math.round(price * 305);
+                const shippingCharge = parseFloat(document.getElementById('prod-shipping')?.value) || 0;
+                const shippingLkr = parseFloat(document.getElementById('prod-shipping-lkr')?.value) || Math.round(shippingCharge * 305);
                 const weight = document.getElementById('prod-weight').value.trim();
                 const symbol = document.getElementById('prod-symbol').value;
                 const stock = document.getElementById('prod-stock').value;
@@ -5989,7 +9608,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 const productPayload = {
-                    name, category, price, weight, symbol, stock, desc, leafGrade, steepTemp, steepTime,
+                    name, category, subcategory, sub_category: subcategory, price, price_lkr: priceLkr,
+                    shippingCharge, shippingCharge_lkr: shippingLkr, shipping_lkr: shippingLkr,
+                    shippingFee: shippingCharge, shipping_fee_usd: shippingCharge, weight, symbol, stock, desc, leafGrade, steepTemp, steepTime,
                     flavorProfile: flavorProfile || (tastingNotes.length > 0 ? tastingNotes.join(', ') : 'Single-Estate Reserve'),
                     tastingNotes,
                     flavor_notes: tastingNotes,
@@ -6012,6 +9633,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 addProductForm.reset();
                 const editIdInput = document.getElementById('prod-edit-id');
                 if (editIdInput) editIdInput.value = '';
+                const pCurr = document.getElementById('prod-currency');
+                if (pCurr) pCurr.value = 'USD';
+                const pCat = document.getElementById('prod-category');
+                if (pCat) pCat.value = 'Black Tea';
+                const pSubCat = document.getElementById('prod-subcategory');
+                if (pSubCat) pSubCat.value = 'Hot Tea (Gongfu style)';
+                const pAmt = document.getElementById('prod-amount-input');
+                if (pAmt) pAmt.value = '';
+                const pShipAmt = document.getElementById('prod-shipping-amount-input');
+                if (pShipAmt) pShipAmt.value = '';
+                syncProductPricing();
                 if (prodImageZone) prodImageZone.classList.remove('has-file');
                 if (prodImagePreview) prodImagePreview.style.display = 'none';
 
@@ -6035,7 +9667,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const id = btn.getAttribute('data-id');
                 const name = btn.getAttribute('data-name');
                 const category = btn.getAttribute('data-category');
+                const subcategory = btn.getAttribute('data-subcategory') || 'Hot Tea (Gongfu style)';
                 const price = btn.getAttribute('data-price');
+                const priceLkr = btn.getAttribute('data-price-lkr') || Math.round((parseFloat(price) || 0) * 305);
+                const shipping = btn.getAttribute('data-shipping') || '0';
+                const shippingLkr = btn.getAttribute('data-shipping-lkr') || Math.round((parseFloat(shipping) || 0) * 305);
                 const weight = btn.getAttribute('data-weight');
                 const symbol = btn.getAttribute('data-symbol');
                 const stock = btn.getAttribute('data-stock');
@@ -6058,7 +9694,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const editIdInput = document.getElementById('prod-edit-id');
                 const nameInput = document.getElementById('prod-name');
                 const categoryInput = document.getElementById('prod-category');
+                const subcategoryInput = document.getElementById('prod-subcategory');
                 const priceInput = document.getElementById('prod-price');
+                const priceLkrInput = document.getElementById('prod-price-lkr');
+                const shippingInput = document.getElementById('prod-shipping');
+                const shippingLkrInput = document.getElementById('prod-shipping-lkr');
                 const weightInput = document.getElementById('prod-weight');
                 const symbolInput = document.getElementById('prod-symbol');
                 const stockInput = document.getElementById('prod-stock');
@@ -6077,7 +9717,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (editIdInput) editIdInput.value = id;
                 if (nameInput) nameInput.value = name;
                 if (categoryInput) categoryInput.value = category;
+                if (subcategoryInput) subcategoryInput.value = subcategory;
+                const pCurr = document.getElementById('prod-currency');
+                if (pCurr) pCurr.value = 'USD';
+                const pAmt = document.getElementById('prod-amount-input');
+                if (pAmt) pAmt.value = parseFloat(price).toFixed(2);
+                const pShipAmt = document.getElementById('prod-shipping-amount-input');
+                if (pShipAmt) pShipAmt.value = parseFloat(shipping) > 0 ? parseFloat(shipping).toFixed(2) : '';
                 if (priceInput) priceInput.value = parseFloat(price).toFixed(2);
+                if (priceLkrInput) priceLkrInput.value = priceLkr;
+                if (shippingInput) shippingInput.value = parseFloat(shipping) > 0 ? parseFloat(shipping).toFixed(2) : '';
+                if (shippingLkrInput) shippingLkrInput.value = parseFloat(shipping) > 0 ? shippingLkr : '';
+                const pCounterpart = document.getElementById('prod-counterpart-price');
+                if (pCounterpart) pCounterpart.innerText = `≈ Rs ${parseInt(priceLkr).toLocaleString()} LKR`;
+                const sCounterpart = document.getElementById('prod-counterpart-shipping');
+                if (sCounterpart) sCounterpart.innerText = parseFloat(shipping) > 0 ? `≈ Rs ${parseInt(shippingLkr).toLocaleString()} LKR` : 'Free / Complimentary';
                 if (weightInput) weightInput.value = weight;
                 if (symbolInput) symbolInput.value = symbol;
                 if (stockInput) stockInput.value = stock;
@@ -6130,6 +9784,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (addProductForm) addProductForm.reset();
                 const editIdInput = document.getElementById('prod-edit-id');
                 if (editIdInput) editIdInput.value = '';
+                const pCurr = document.getElementById('prod-currency');
+                if (pCurr) pCurr.value = 'USD';
+                const pCat = document.getElementById('prod-category');
+                if (pCat) pCat.value = 'Black Tea';
+                const pSubCat = document.getElementById('prod-subcategory');
+                if (pSubCat) pSubCat.value = 'Hot Tea (Gongfu style)';
+                const pAmt = document.getElementById('prod-amount-input');
+                if (pAmt) pAmt.value = '';
+                const pShipAmt = document.getElementById('prod-shipping-amount-input');
+                if (pShipAmt) pShipAmt.value = '';
+                const pCounterpart = document.getElementById('prod-counterpart-price');
+                if (pCounterpart) pCounterpart.innerText = '≈ Rs 13,725 LKR';
+                const sCounterpart = document.getElementById('prod-counterpart-shipping');
+                if (sCounterpart) sCounterpart.innerText = '≈ Rs 0 LKR';
                 const titleEl = document.getElementById('prod-form-title');
                 if (titleEl) titleEl.innerText = 'Introduce New Product';
                 const descEl = document.getElementById('prod-form-desc');
@@ -6206,7 +9874,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const bookingId = e.target.getAttribute('data-id');
                     showDeleteConfirmModal({
                         title: 'Complete Tour Reservation',
-                        subtitle: 'Concierge Operations',
+                        subtitle: 'Estate Admin Panel',
                         itemName: `Reservation ${bookingId}`,
                         message: `Mark reservation ${bookingId} as Completed & Fulfilled? This confirms tour execution and archival.`,
                         confirmText: 'Mark Completed',
@@ -6281,6 +9949,28 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // Re-send Gate Pass email to tour customer
+        document.querySelectorAll('.btn-resend-gatepass').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-id');
+                const email = btn.getAttribute('data-email') || '';
+                btn.disabled = true;
+                btn.innerHTML = `<span style="display:inline-block;animation:spin 1s linear infinite;">⟳</span> Sending...`;
+                showToast("Dispatching Gate Pass", `Sending official Gate Pass to ${email || 'guest'}...`, "info");
+                try {
+                    if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.sendTourGatePass === 'function') {
+                        await window.TeaFactoryAPI.sendTourGatePass(id);
+                    }
+                    showToast("Gate Pass Emailed!", `Official Gate Pass has been emailed to ${email || 'guest'}.`, "success");
+                } catch (err) {
+                    showToast("Email Notice", `Gate pass dispatch notice: ${err.message}`, "info");
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> Re-send Gate Pass`;
+                }
+            });
+        });
+
         // Mark as Paid & Confirmed (Legacy order cards)
         document.querySelectorAll('.btn-mark-order-paid').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -6324,6 +10014,103 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // ─── Gift Box Quotations & Payment Links Desk Bindings ───────────────
+        // Formulate Quotation Modal
+        document.querySelectorAll('.btn-open-quote-modal').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                if (id && typeof showBoxQuoteBuilderModal === 'function') {
+                    showBoxQuoteBuilderModal(id);
+                }
+            });
+        });
+
+        // 1-Click Copy Checkout Link
+        document.querySelectorAll('.btn-copy-quote-link').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const link = btn.getAttribute('data-link');
+                if (link) {
+                    navigator.clipboard.writeText(link).then(() => {
+                        showToast("Checkout Link Copied!", "Share this link with your customer for direct checkout.", "success");
+                    }).catch(() => {
+                        showToast("Checkout Link Copied!", link, "success");
+                    });
+                }
+            });
+        });
+
+        // View / Download Scannable QR Code Modal
+        document.querySelectorAll('.btn-view-quote-qr').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const qrUrl = btn.getAttribute('data-qr');
+                const boxName = btn.getAttribute('data-box');
+                const custName = btn.getAttribute('data-cust');
+                const amount = btn.getAttribute('data-amount');
+                const link = btn.getAttribute('data-link');
+                if (typeof showQuoteQrModal === 'function') {
+                    showQuoteQrModal(qrUrl, boxName, custName, amount, link);
+                }
+            });
+        });
+
+        // 1-Click WhatsApp Dispatch
+        document.querySelectorAll('.btn-dispatch-quote-whatsapp').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                const b = window.TeaFactoryStore.getBookingById(id);
+                if (!b) return;
+                const total = window.TeaFactoryStore.formatCurrency(b.quotedTotal || b.price);
+                const text = `Dear ${b.customerName},\n\n` +
+                             `Greetings from Rock One Wild Tea Estate! Regarding your bespoke allocation enquiry for *${b.boxName}* (${b.seasonName}):\n\n` +
+                             `*Quotation Details:*\n` +
+                             `• Chest Unit Price: ${window.TeaFactoryStore.formatCurrency(b.quotedPrice || b.price)}\n` +
+                             `• Courier / Shipping: ${b.quotedShipping > 0 ? window.TeaFactoryStore.formatCurrency(b.quotedShipping) : 'Complimentary Express'}\n` +
+                             `• *Total Quoted Payable: ${total}*\n` +
+                             `• Quote Validity: ${b.quoteValidity || '7 Days'}\n` +
+                             (b.quoteNotes ? `• Curator Notes: ${b.quoteNotes}\n\n` : '\n') +
+                             `You may finalize your delivery details, attach your payment deposit slip, and claim your numbered chest via your private checkout link:\n` +
+                             `🔗 ${b.paymentLink}\n\n` +
+                             `Warm regards,\nEstate Sommelier, Rock One Wild Tea`;
+                const phoneClean = (b.phone || '').replace(/[^0-9]/g, '');
+                const targetPhone = phoneClean || '94773209950';
+                window.open(`https://api.whatsapp.com/send?phone=${targetPhone}&text=${encodeURIComponent(text)}`, '_blank');
+            });
+        });
+
+        // 1-Click Email Dispatch
+        document.querySelectorAll('.btn-dispatch-quote-email').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                const b = window.TeaFactoryStore.getBookingById(id);
+                if (!b) return;
+                const total = window.TeaFactoryStore.formatCurrency(b.quotedTotal || b.price);
+                const text = `Dear ${b.customerName},\n\n` +
+                             `Greetings from Rock One Wild Tea Estate! Regarding your bespoke allocation enquiry for ${b.boxName} (${b.seasonName}):\n\n` +
+                             `Quotation Details:\n` +
+                             `• Chest Unit Price: ${window.TeaFactoryStore.formatCurrency(b.quotedPrice || b.price)}\n` +
+                             `• Courier / Express Handling: ${b.quotedShipping > 0 ? window.TeaFactoryStore.formatCurrency(b.quotedShipping) : 'Complimentary Express'}\n` +
+                             `• Total Quoted Payable: ${total}\n` +
+                             `• Quote Validity: ${b.quoteValidity || '7 Days'}\n` +
+                             (b.quoteNotes ? `• Curator Inclusions: ${b.quoteNotes}\n\n` : '\n') +
+                             `You may enter your shipping destination, attach your Bank of Ceylon deposit slip, and secure your numbered chest via your private checkout link below:\n\n` +
+                             `${b.paymentLink}\n\n` +
+                             `Warmest regards,\n` +
+                             `Rock One Wild Tea Estate Concierge\n` +
+                             `Ettampitiya, Uva Medium Region, Sri Lanka`;
+
+                if (typeof showEmailServiceChooserModal === 'function') {
+                    showEmailServiceChooserModal({
+                        to: b.email,
+                        subject: `Bespoke Quotation & Checkout: ${b.boxName} (${b.seasonName})`,
+                        body: text,
+                        title: 'Dispatch Quotation to Client',
+                        subtitle: `Quote for ${b.customerName} (${total})`,
+                        itemSummary: `${b.boxName} - ${total}`
+                    });
+                }
+            });
+        });
+
         // Print Packaging Slip & Engraving Work Order
         document.querySelectorAll('.btn-print-packing-slip').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -6338,6 +10125,50 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add / Edit Tour Time Slot Form Handler
         const addSlotForm = document.getElementById('admin-add-slot-form');
         if (addSlotForm) {
+            // Live dual currency synchronization with currency dropdown
+            const slotCurrency = document.getElementById('slot-currency');
+            const slotAmountInput = document.getElementById('slot-amount-input');
+            const slotCounterpartPrice = document.getElementById('slot-counterpart-price');
+            const priceLkrIn = document.getElementById('slot-price-input');
+            const priceUsdIn = document.getElementById('slot-price-usd');
+
+            const syncSlotPricing = () => {
+                const curr = slotCurrency?.value || 'LKR';
+                const val = parseFloat(slotAmountInput?.value);
+                let pLkr = 1450, pUsd = 4.75;
+                if (!isNaN(val) && val >= 0) {
+                    if (curr === 'LKR') {
+                        pLkr = Math.round(val);
+                        pUsd = parseFloat((val / 305).toFixed(2));
+                        if (slotCounterpartPrice) slotCounterpartPrice.innerText = `≈ $${pUsd.toFixed(2)} USD`;
+                        if (slotAmountInput) slotAmountInput.step = "1";
+                    } else {
+                        pUsd = val;
+                        pLkr = Math.round(val * 305);
+                        if (slotCounterpartPrice) slotCounterpartPrice.innerText = `≈ Rs ${pLkr.toLocaleString()} LKR`;
+                        if (slotAmountInput) slotAmountInput.step = "0.01";
+                    }
+                } else {
+                    if (slotCounterpartPrice) slotCounterpartPrice.innerText = curr === 'LKR' ? '≈ $0.00 USD' : '≈ Rs 0 LKR';
+                }
+                if (priceLkrIn) priceLkrIn.value = pLkr;
+                if (priceUsdIn) priceUsdIn.value = pUsd.toFixed(2);
+            };
+
+            slotAmountInput?.addEventListener('input', syncSlotPricing);
+
+            slotCurrency?.addEventListener('change', () => {
+                const curVal = parseFloat(slotAmountInput?.value);
+                if (!isNaN(curVal) && curVal > 0) {
+                    if (slotCurrency.value === 'USD') {
+                        slotAmountInput.value = (curVal / 305).toFixed(2);
+                    } else {
+                        slotAmountInput.value = Math.round(curVal * 305);
+                    }
+                }
+                syncSlotPricing();
+            });
+
             addSlotForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const editId = document.getElementById('slot-edit-id').value;
@@ -6346,7 +10177,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const status = document.getElementById('slot-status-input').value;
                 const capacity = parseInt(document.getElementById('slot-capacity-input')?.value) || 10;
                 const priceLkr = parseFloat(document.getElementById('slot-price-input')?.value) || 1450;
-                const priceUsd = priceLkr / 305;
+                const priceUsd = parseFloat(document.getElementById('slot-price-usd')?.value) || (priceLkr / 305);
 
                 if (editId) {
                     window.TeaFactoryStore.updateTourSlot(editId, {
@@ -6373,6 +10204,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 addSlotForm.reset();
                 const editIdInput = document.getElementById('slot-edit-id');
                 if (editIdInput) editIdInput.value = '';
+                const sCurr = document.getElementById('slot-currency');
+                if (sCurr) sCurr.value = 'LKR';
+                const sAmt = document.getElementById('slot-amount-input');
+                if (sAmt) sAmt.value = '1450';
+                syncSlotPricing();
                 renderTabContent('admin');
             });
 
@@ -6396,6 +10232,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const status = btn.getAttribute('data-status');
                 const capacity = btn.getAttribute('data-capacity') || '10';
                 const priceLkr = btn.getAttribute('data-price-lkr') || '1450';
+                const priceUsd = btn.getAttribute('data-price-usd') || (parseFloat(priceLkr) / 305).toFixed(2);
 
                 const editIdInput = document.getElementById('slot-edit-id');
                 const timeInput = document.getElementById('slot-time-input');
@@ -6403,6 +10240,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const statusInput = document.getElementById('slot-status-input');
                 const capacityInput = document.getElementById('slot-capacity-input');
                 const priceInput = document.getElementById('slot-price-input');
+                const priceUsdInput = document.getElementById('slot-price-usd');
                 const titleEl = document.getElementById('tour-slot-form-title');
                 const descEl = document.getElementById('tour-slot-form-desc');
                 const saveBtn = document.getElementById('btn-save-slot');
@@ -6413,7 +10251,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (packageInput) packageInput.value = packageType;
                 if (statusInput) statusInput.value = status;
                 if (capacityInput) capacityInput.value = capacity;
+                const sCurr = document.getElementById('slot-currency');
+                if (sCurr) sCurr.value = 'LKR';
+                const sAmt = document.getElementById('slot-amount-input');
+                if (sAmt) sAmt.value = priceLkr;
                 if (priceInput) priceInput.value = priceLkr;
+                if (priceUsdInput) priceUsdInput.value = priceUsd;
+                const sCounterpart = document.getElementById('slot-counterpart-price');
+                if (sCounterpart) sCounterpart.innerText = `≈ $${parseFloat(priceUsd).toFixed(2)} USD`;
                 if (titleEl) titleEl.innerText = `Edit Tour Slot #${String(id).padStart(2, '0')}`;
                 if (descEl) descEl.innerText = `Update schedule and package specifications for Slot #${id}.`;
                 if (saveBtn) saveBtn.innerText = 'Update Tour Slot';
@@ -6431,6 +10276,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (addSlotForm) addSlotForm.reset();
                 const editIdInput = document.getElementById('slot-edit-id');
                 if (editIdInput) editIdInput.value = '';
+                const sCurr = document.getElementById('slot-currency');
+                if (sCurr) sCurr.value = 'LKR';
+                const sAmt = document.getElementById('slot-amount-input');
+                if (sAmt) sAmt.value = '1450';
+                const sCounterpart = document.getElementById('slot-counterpart-price');
+                if (sCounterpart) sCounterpart.innerText = '≈ $4.75 USD';
                 const titleEl = document.getElementById('tour-slot-form-title');
                 if (titleEl) titleEl.innerText = 'Add / Configure Tour Slot';
                 const descEl = document.getElementById('tour-slot-form-desc');
@@ -6600,7 +10451,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             createdAt: b.bookingDate || 'Recent',
                             validatedAt: b.validatedAt || '',
                             validationNote: b.validationNote || '',
-                            bankDetails: 'Commercial Bank: 0083-1001-5271-8843',
+                            bankDetails: 'Bank of Ceylon: 94945708 (Ettampitiya branch)',
                             hasSlip: b.slipImage ? 'Yes' : 'No'
                         }))
                 ];
@@ -6834,6 +10685,151 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
         });
+
+        // ─── User Accounts & Staff Access Desk Events ────────────────────────
+        const openCreateUserBtn = document.getElementById('btn-open-create-user-modal');
+        if (openCreateUserBtn) {
+            openCreateUserBtn.addEventListener('click', () => {
+                showCreateUserModal();
+            });
+        }
+
+        // Edit User
+        const editUserBtns = document.querySelectorAll('.btn-edit-user');
+        editUserBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const userId = btn.getAttribute('data-user-id');
+                const users = (window.TeaFactoryStore && typeof window.TeaFactoryStore.getUsers === 'function') 
+                    ? window.TeaFactoryStore.getUsers() 
+                    : [];
+                const user = users.find(u => String(u.id) === String(userId));
+                if (user) {
+                    showEditUserModal(user);
+                } else {
+                    showToast("User Not Found", "Could not locate this account record.", "error");
+                }
+            });
+        });
+
+        // Reset Password
+        const resetPassBtns = document.querySelectorAll('.btn-reset-user-password');
+        resetPassBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const userId = btn.getAttribute('data-user-id');
+                const users = (window.TeaFactoryStore && typeof window.TeaFactoryStore.getUsers === 'function') 
+                    ? window.TeaFactoryStore.getUsers() 
+                    : [];
+                const user = users.find(u => String(u.id) === String(userId));
+                if (user) {
+                    showResetUserPasswordModal(user);
+                } else {
+                    showToast("User Not Found", "Could not locate this account record.", "error");
+                }
+            });
+        });
+
+        // Delete User
+        const deleteUserBtns = document.querySelectorAll('.btn-delete-user');
+        deleteUserBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const userId = btn.getAttribute('data-user-id');
+                const userName = btn.getAttribute('data-user-name') || 'Staff Member';
+                const userEmail = btn.getAttribute('data-user-email') || '';
+
+                if (userEmail.toLowerCase() === 'rockonewild@gmail.com') {
+                    showToast("Action Forbidden", "The primary Estate Owner account cannot be deleted.", "error");
+                    return;
+                }
+
+                showDeleteConfirmModal({
+                    title: 'Delete User Account',
+                    subtitle: 'User Accounts & Staff Access',
+                    itemName: `${userName} (${userEmail})`,
+                    message: `Are you sure you want to permanently delete the user account for "${userEmail}"? This user will immediately lose access to the system.`,
+                    confirmText: 'Delete User Account',
+                    onConfirm: async () => {
+                        try {
+                            const res = await window.TeaFactoryAPI.deleteUser(userId);
+                            if (res && res.success) {
+                                window.TeaFactoryStore.deleteUser(userId);
+                                showToast("Account Deleted", `User account for ${userEmail} was deleted successfully.`, "success");
+                                renderTabContent('admin');
+                            } else {
+                                showToast("Deletion Failed", (res && res.error) || "Unable to delete user.", "error");
+                            }
+                        } catch (err) {
+                            showToast("Error", err.message, "error");
+                        }
+                    }
+                });
+            });
+        });
+
+        // Copy User Email
+        const copyEmailBtns = document.querySelectorAll('.btn-copy-user-email');
+        copyEmailBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const email = btn.getAttribute('data-email');
+                if (!email) return;
+                const copySuccess = () => showToast("Copied to Clipboard", `Email ID "${email}" copied.`, "success", 2000);
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(email).then(copySuccess).catch(() => {
+                        const ta = document.createElement('textarea');
+                        ta.value = email;
+                        document.body.appendChild(ta);
+                        ta.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        copySuccess();
+                    });
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = email;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    copySuccess();
+                }
+            });
+        });
+
+        // Live Search & Filter in User Table
+        const userSearchInput = document.getElementById('users-search-input');
+        const userRoleFilter = document.getElementById('users-role-filter');
+        const userStatusFilter = document.getElementById('users-status-filter');
+
+        function applyUserFilters() {
+            const query = (userSearchInput ? userSearchInput.value : '').toLowerCase().trim();
+            const role = (userRoleFilter ? userRoleFilter.value : 'all').toLowerCase();
+            const status = (userStatusFilter ? userStatusFilter.value : 'all').toLowerCase();
+
+            const rows = document.querySelectorAll('.user-table-row');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const rowSearch = row.getAttribute('data-search-text') || '';
+                const rowRole = row.getAttribute('data-role') || '';
+                const rowStatus = row.getAttribute('data-status') || '';
+
+                const matchesQuery = !query || rowSearch.includes(query);
+                const matchesRole = (role === 'all') || (rowRole === role);
+                const matchesStatus = (status === 'all') || (rowStatus === status);
+
+                if (matchesQuery && matchesRole && matchesStatus) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        if (userSearchInput) userSearchInput.addEventListener('input', applyUserFilters);
+        if (userRoleFilter) userRoleFilter.addEventListener('change', applyUserFilters);
+        if (userStatusFilter) userStatusFilter.addEventListener('change', applyUserFilters);
     }
 
     // 7e. Announcement Image uploader helper
@@ -7207,14 +11203,44 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         const form = document.getElementById('common-enquiry-form') || document.getElementById('private-reserve-inquiry-form');
         if (!form) return;
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // Pre-fill signed-in patron details when available
+        const signedUser = window.TeaFactoryStore && window.TeaFactoryStore.getCurrentUser
+            ? window.TeaFactoryStore.getCurrentUser()
+            : null;
+        if (signedUser) {
+            const nameEl = document.getElementById('enq-fullname') || document.getElementById('inq-fullname');
+            const emailEl = document.getElementById('enq-email') || document.getElementById('inq-email');
+            const phoneEl = document.getElementById('enq-phone') || document.getElementById('inq-phone');
+            if (nameEl && !nameEl.value && signedUser.full_name) nameEl.value = signedUser.full_name;
+            if (emailEl && !emailEl.value && signedUser.email) emailEl.value = signedUser.email;
+            if (phoneEl && !phoneEl.value && signedUser.phone) phoneEl.value = signedUser.phone;
+        }
+
+        const handleEnquirySubmit = async (e) => {
+            if (e) e.preventDefault();
+
+            const serviceSelect = document.getElementById('enq-service');
+            const service = serviceSelect ? serviceSelect.value : 'Artisanal Pure Single-Estate Teas';
+            const lowerSvc = (service || '').toLowerCase();
+            if ((lowerSvc.includes('gift') || lowerSvc.includes('tour') || lowerSvc.includes('reserve')) &&
+                (!window.TeaFactoryStore || !window.TeaFactoryStore.isCustomerLoggedIn()) &&
+                typeof window.requireCustomerAuth === 'function') {
+                window.requireCustomerAuth(
+                    'Sign in with your Email ID is required to submit a gift chest or tour enquiry.',
+                    (u) => {
+                        const nEl = document.getElementById('enq-fullname') || document.getElementById('inq-fullname');
+                        const eEl = document.getElementById('enq-email') || document.getElementById('inq-email');
+                        if (nEl && !nEl.value && u.full_name) nEl.value = u.full_name;
+                        if (eEl && u.email) eEl.value = u.email;
+                        handleEnquirySubmit();
+                    }
+                );
+                return;
+            }
 
             const fullName = (document.getElementById('enq-fullname')?.value || document.getElementById('inq-fullname')?.value || '').trim();
             const email = (document.getElementById('enq-email')?.value || document.getElementById('inq-email')?.value || '').trim();
             const phone = (document.getElementById('enq-phone')?.value || document.getElementById('inq-phone')?.value || '').trim();
-            const serviceSelect = document.getElementById('enq-service');
-            const service = serviceSelect ? serviceSelect.value : 'Artisanal Pure Single-Estate Teas';
             const budgetSelect = document.getElementById('enq-budget');
             const budget = budgetSelect ? budgetSelect.value : 'Not Specified';
             const details = (document.getElementById('enq-details')?.value || document.getElementById('inq-notes')?.value || '').trim();
@@ -7265,7 +11291,9 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 showInquirySuccessModal(registeredInquiry);
                 form.reset();
             }, 600);
-        });
+        };
+
+        form.addEventListener('submit', handleEnquirySubmit);
     }
 
     function showInquirySuccessModal(inquiry) {
@@ -8849,108 +12877,527 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 };
             }
 
-            // 5. Submit Cart Order Checkout
+            // 4b. Cart Guest / Patron Sign-in Link
+            const cartGuestSigninBtn = document.getElementById('cart-guest-signin-btn');
+            if (cartGuestSigninBtn) {
+                cartGuestSigninBtn.onclick = () => {
+                    if (typeof window.requireCustomerAuth === 'function') {
+                        window.requireCustomerAuth(
+                            'Sign in with your Email ID to link this allocation to your patron master ledger profile.',
+                            () => {
+                                window.UIComponents.renderCartDrawer('cart-drawer-body');
+                                bindCartDrawerEvents();
+                            }
+                        );
+                    }
+                };
+            }
+
+            // 4c. Country Selection, Live Currency Conversion & Province Logic
             const checkoutForm = document.getElementById('cart-checkout-form');
+            const countryInput = document.getElementById('cart-cust-country');
+
+            const updateCheckoutCurrencyAndShipping = () => {
+                const country = countryInput ? countryInput.value : (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+                window.lastSelectedCheckoutCountry = country;
+                const isSriLanka = country === 'Sri Lanka';
+                const currInfo = window.getCountryCurrency ? window.getCountryCurrency(country) : (isSriLanka ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
+                
+                const subtotalUSD = window.TeaFactoryStore.getCartSubtotal();
+                const shippingUSD = window.TeaFactoryStore.getCartShippingTotal ? window.TeaFactoryStore.getCartShippingTotal(country) : 0;
+                const grandTotalUSD = window.TeaFactoryStore.getCartGrandTotal ? window.TeaFactoryStore.getCartGrandTotal(country) : (subtotalUSD + shippingUSD);
+                
+                const formattedSubtotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(subtotalUSD, currInfo) : `$${subtotalUSD.toFixed(2)}`;
+                const formattedShipping = shippingUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(shippingUSD, currInfo) : `$${shippingUSD.toFixed(2)}`) : 'Complimentary';
+                const formattedGrandTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(grandTotalUSD, currInfo) : `$${grandTotalUSD.toFixed(2)}`;
+                const grandTotalLKR = Math.round(grandTotalUSD * 305);
+
+                // 1. Update all cart item rows to the selected currency
+                body.querySelectorAll('.cart-item-row').forEach(row => {
+                    const unitUSD = Number(row.getAttribute('data-unit-usd') || 0);
+                    const lineUSD = Number(row.getAttribute('data-line-usd') || 0);
+                    const lineEl = row.querySelector('.cart-item-line-total');
+                    if (lineEl && window.formatAmountInCurrency) {
+                        lineEl.textContent = window.formatAmountInCurrency(lineUSD, currInfo);
+                    }
+                    const unitEl = row.querySelector('.cart-item-unit-price');
+                    if (unitEl && window.formatAmountInCurrency) {
+                        unitEl.textContent = `${window.formatAmountInCurrency(unitUSD, currInfo)} each`;
+                    }
+                });
+
+                // 2. Update Order Summary Breakdown
+                const subtotalEl = document.getElementById('cart-summary-subtotal');
+                if (subtotalEl) {
+                    subtotalEl.textContent = formattedSubtotal;
+                }
+                const shippingEl = document.getElementById('cart-summary-shipping');
+                if (shippingEl) {
+                    shippingEl.textContent = formattedShipping;
+                    shippingEl.style.color = shippingUSD > 0 ? '#86efac' : 'var(--color-gold)';
+                }
+                const shippingLabelEl = document.getElementById('cart-summary-shipping-label');
+                if (shippingLabelEl) {
+                    shippingLabelEl.textContent = isSriLanka ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS International Priority Air';
+                }
+                const totalEl = document.getElementById('cart-summary-total');
+                if (totalEl) {
+                    totalEl.textContent = formattedGrandTotal;
+                }
+                const totalTitleEl = document.getElementById('cart-summary-total-title');
+                if (totalTitleEl) {
+                    totalTitleEl.textContent = `Total Due (${currInfo.code})`;
+                }
+
+                // Update Section 4 Shipping Badges and Rate Note
+                const emsPricePill = document.getElementById('cart-shipping-ems-price-pill');
+                if (emsPricePill) {
+                    emsPricePill.textContent = formattedShipping;
+                }
+                const codPricePill = document.getElementById('cart-shipping-cod-price-pill');
+                if (codPricePill) {
+                    codPricePill.textContent = formattedShipping;
+                }
+                const rateNote = document.getElementById('cart-shipping-rate-note');
+                if (rateNote) {
+                    rateNote.textContent = isSriLanka 
+                        ? 'Rs 650 LKR (Complimentary over $80)' 
+                        : (window.formatAmountInCurrency ? window.formatAmountInCurrency(15, currInfo) : '$15.00') + ' International EMS (Complimentary over $150)';
+                }
+
+                // 3. Update COD Panel (Sri Lanka Only)
+                const codAmountDisplay = document.getElementById('cart-cod-amount-display');
+                if (codAmountDisplay) {
+                    codAmountDisplay.textContent = `Rs ${grandTotalLKR.toLocaleString()} LKR`;
+                }
+                const codBtnText = document.getElementById('cart-cod-btn-text');
+                if (codBtnText) {
+                    codBtnText.textContent = `Confirm Order via Cash on Delivery (COD) \u2022 Rs ${grandTotalLKR.toLocaleString()} LKR`;
+                }
+
+                // 4. Update Bank Transfer & Cash Deposit Panels
+                const bankDisplay = isSriLanka 
+                    ? `Rs ${grandTotalLKR.toLocaleString()} LKR` 
+                    : `${formattedGrandTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>`;
+                
+                const bankAmountDisplay = document.getElementById('cart-bank-amount-display');
+                if (bankAmountDisplay) {
+                    bankAmountDisplay.innerHTML = bankDisplay;
+                }
+                const bankBtnText = document.getElementById('cart-bank-btn-text');
+                if (bankBtnText) {
+                    bankBtnText.textContent = `Place Bank Transfer Order \u2022 ${formattedGrandTotal}`;
+                }
+
+                const depositAmountDisplay = document.getElementById('cart-deposit-amount-display');
+                if (depositAmountDisplay) {
+                    depositAmountDisplay.innerHTML = bankDisplay;
+                }
+                const slipBtnText = document.getElementById('cart-slip-btn-text');
+                if (slipBtnText) {
+                    slipBtnText.textContent = `Submit Cash Deposit Slip \u2022 ${formattedGrandTotal}`;
+                }
+
+                // 5. Update PayPal Display
+                const paypalAmountDisplay = document.getElementById('cart-paypal-amount-display');
+                if (paypalAmountDisplay) {
+                    paypalAmountDisplay.textContent = currInfo.code === 'USD' 
+                        ? `$${grandTotalUSD.toFixed(2)} USD` 
+                        : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`;
+                }
+
+                // 6. Update Region / Province field
+                const regionContainer = document.getElementById('cart-region-container');
+                if (regionContainer) {
+                    if (isSriLanka) {
+                        if (!regionContainer.querySelector('select')) {
+                            regionContainer.innerHTML = `
+                                <label class="form-label" for="cart-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Region / Province *</label>
+                                <select class="form-input" id="cart-cust-region" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                    <option value="Western Province (Colombo, Gampaha, Kalutara)">Western Province (Colombo, Gampaha)</option>
+                                    <option value="Central Province (Kandy, Nuwara Eliya, Matale)">Central Province (Kandy, Nuwara Eliya)</option>
+                                    <option value="Uva Province (Badulla, Bandarawela, Ettampitiya)" selected>Uva Province (Badulla, Ettampitiya)</option>
+                                    <option value="Southern Province (Galle, Matara, Hambantota)">Southern Province (Galle, Matara)</option>
+                                    <option value="Sabaragamuwa Province (Ratnapura, Kegalle)">Sabaragamuwa Province (Ratnapura)</option>
+                                    <option value="North Western Province (Kurunegala, Puttalam)">North Western Province (Kurunegala)</option>
+                                    <option value="North Central Province (Anuradhapura, Polonnaruwa)">North Central Province (Anuradhapura)</option>
+                                    <option value="Northern Province (Jaffna, Kilinochchi, Vavuniya)">Northern Province (Jaffna)</option>
+                                    <option value="Eastern Province (Batticaloa, Trincomalee, Ampara)">Eastern Province (Batticaloa, Trincomalee)</option>
+                                </select>
+                            `;
+                        }
+                    } else {
+                        if (!regionContainer.querySelector('input')) {
+                            regionContainer.innerHTML = `
+                                <label class="form-label" for="cart-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">State / Province / County *</label>
+                                <input class="form-input" type="text" id="cart-cust-region" placeholder="e.g. California / London / Tokyo" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
+                            `;
+                        }
+                    }
+                }
+
+                // 7. Update Shipping Options (Show COD only for Sri Lanka)
+                const codCard = document.getElementById('cart-shipping-card-cod');
+                const emsTitle = document.getElementById('cart-shipping-ems-title');
+                const emsDesc = document.getElementById('cart-shipping-ems-desc');
+                const emsRadio = document.getElementById('cart-ship-ems');
+
+                if (isSriLanka) {
+                    if (codCard) codCard.style.display = 'flex';
+                    if (emsTitle) emsTitle.textContent = 'Sri Lanka Post EMS Express (Pre-paid)';
+                    if (emsDesc) emsDesc.textContent = 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.';
+                } else {
+                    if (codCard) codCard.style.display = 'none';
+                    if (emsRadio) emsRadio.checked = true;
+                    if (emsTitle) emsTitle.textContent = 'Sri Lanka Post EMS International Priority Air Courier';
+                    if (emsDesc) emsDesc.textContent = 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end international tracking number. Estimated transit: 5-10 business days.';
+                    syncShippingSelection();
+                }
+            };
+
+            const syncShippingSelection = () => {
+                const selectedMethod = document.querySelector('input[name="cart-shipping-method"]:checked')?.value || 'ems_express';
+                const codCard = document.getElementById('cart-shipping-card-cod');
+                const emsCard = document.getElementById('cart-shipping-card-ems');
+                const codPanel = document.getElementById('cart-pay-panel-cod');
+                const prepaidPanel = document.getElementById('cart-pay-panel-prepaid');
+
+                if (selectedMethod === 'cod') {
+                    if (codCard) {
+                        codCard.style.border = '1.5px solid #25d366';
+                        codCard.style.background = 'rgba(37,211,102,0.1)';
+                    }
+                    if (emsCard) {
+                        emsCard.style.border = '1.5px solid rgba(255,255,255,0.15)';
+                        emsCard.style.background = 'rgba(0,0,0,0.3)';
+                    }
+                    if (codPanel) codPanel.style.display = 'block';
+                    if (prepaidPanel) prepaidPanel.style.display = 'none';
+                } else {
+                    if (emsCard) {
+                        emsCard.style.border = '1.5px solid var(--color-gold)';
+                        emsCard.style.background = 'rgba(212,175,55,0.08)';
+                    }
+                    if (codCard) {
+                        codCard.style.border = '1.5px solid rgba(255,255,255,0.15)';
+                        codCard.style.background = 'rgba(0,0,0,0.3)';
+                    }
+                    if (codPanel) codPanel.style.display = 'none';
+                    if (prepaidPanel) prepaidPanel.style.display = 'block';
+                }
+            };
+
+            if (countryInput) {
+                countryInput.onchange = updateCheckoutCurrencyAndShipping;
+                updateCheckoutCurrencyAndShipping();
+            }
+
+            body.querySelectorAll('input[name="cart-shipping-method"]').forEach(r => {
+                r.onchange = syncShippingSelection;
+            });
+
+            // 4d. Cart Slip Upload & Payment Tab Bindings
+            let selectedCartSlipBase64 = '';
+            bindPaymentTabs('cart-checkout-form');
+            bindFileUpload('cart-bank-slip', 'cart-bank-slip-zone', 'cart-slip-preview', (b64) => {
+                selectedCartSlipBase64 = b64;
+            });
+            bindFileUpload('cart-cash-slip', 'cart-cash-slip-zone', 'cart-cash-slip-preview', (b64) => {
+                selectedCartSlipBase64 = b64;
+            });
+
+            // Reusable Order Confirmation Renderer with CEO Signature
+            const renderOrderConfirmationSuccess = (bodyEl, order, paymentMethod, paypalRef = '') => {
+                if (!bodyEl || !order) return;
+                const isCOD = paymentMethod === 'cod';
+                const isPayPal = paymentMethod === 'paypal';
+
+                bodyEl.innerHTML = `
+                    <div class="cart-success-view" style="text-align: center; padding: 2.25rem 1rem;">
+                        <div style="width: 76px; height: 76px; border-radius: 50%; background: ${isCOD ? 'rgba(37,211,102,0.15)' : 'rgba(212,175,55,0.12)'}; border: 2px solid ${isCOD ? '#25d366' : 'var(--color-gold)'}; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.15rem auto; color: ${isCOD ? '#25d366' : 'var(--color-gold)'};">
+                            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <span class="season-badge" style="background: ${isCOD ? 'rgba(37,211,102,0.2)' : 'rgba(212,175,55,0.15)'}; color: ${isCOD ? '#4ade80' : 'var(--color-gold)'}; font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                            ${isCOD ? 'Cash on Delivery \u2022 Order Confirmed' : (isPayPal ? 'Paid \u2022 Instant PayPal Clearance' : 'Allocation Reserved \u2022 Slip Attached')}
+                        </span>
+                        <h3 style="font-family: var(--font-serif); font-size: 1.5rem; color: #ffffff; margin: 0.75rem 0 0.25rem 0;">Allocation Registered</h3>
+                        <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.5rem;">
+                            Thank you, ${order.customerName}. Your reserve order has been entered into the estate master ledger.
+                        </p>
+
+                        <div style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 1.15rem; margin-bottom: 1.25rem; text-align: left;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Order Reference ID</span>
+                                <strong style="font-family: monospace; color: var(--color-gold); font-size: 0.95rem;">${order.id}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Delivery Destination</span>
+                                <span style="color: #ffffff; font-size: 0.85rem; text-align: right; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${order.country} &bull; ${order.city || ''}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Courier Method</span>
+                                <span style="color: #86efac; font-size: 0.82rem; font-weight: 600;">
+                                    ${order.shippingMethod === 'cod' ? 'Sri Lanka Post EMS (Cash on Delivery)' : (order.country === 'Sri Lanka' ? 'Sri Lanka Post EMS Express' : 'Sri Lanka Post EMS International Priority Air')}
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Amount</span>
+                                <strong style="color: var(--color-gold); font-size: 1.1rem;">${order.formattedPrice}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Payment Mode</span>
+                                <span style="color: ${isCOD ? '#4ade80' : 'var(--color-gold)'}; font-size: 0.85rem; font-weight: 700;">
+                                    ${isCOD ? 'Cash on Delivery (Pay upon delivery)' : (isPayPal ? 'PayPal / International Card' : 'Bank of Ceylon Deposit')}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Executive Director & CEO Verification Seal -->
+                        <div style="background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.35); border-radius: 10px; padding: 0.9rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+                            <div style="text-align: left;">
+                                <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold); font-weight: 700; display: block;">Executive Sign-Off &bull; Verified</span>
+                                <div style="font-size: 0.76rem; color: #d1d5db; margin-top: 2px;">Allocation registered in estate ledger</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <img src="images/ceo_signature_gold.png" alt="Director &amp; CEO Signature" style="height: 34px; object-fit: contain; display: block; margin: 0 0 2px auto;" onerror="this.onerror=null; this.src='images/ceo_signature.png';" />
+                                <div style="font-size: 0.76rem; font-weight: 700; color: #ffffff;">Prasanga</div>
+                                <div style="font-size: 0.65rem; color: var(--color-gold);">Director &amp; CEO</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <button type="button" class="btn btn-outline btn-cart-success-cert" style="padding: 0.8rem; font-size: 0.85rem; border-color: rgba(212,175,55,0.5); color: var(--color-gold); display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: rgba(0,0,0,0.35);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                                Download Luxury Allocation Certificate (PDF)
+                            </button>
+                            <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge%2C%20I%20have%20placed%20Order%20${order.id}%20for%20${encodeURIComponent(order.formattedPrice)}%20via%20${encodeURIComponent(isCOD ? 'Cash on Delivery' : 'Pre-paid EMS')}.%20Please%20confirm%20my%20dispatch." target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; font-weight: 700;">
+                                <span>Notify Concierge on WhatsApp</span>
+                            </a>
+                            <button type="button" class="btn btn-outline" onclick="if(window.appCloseCart){window.appCloseCart()} window.appSwitchTab ? window.appSwitchTab('order') : (document.getElementById('nav-order') &amp;&amp; document.getElementById('nav-order').click())" style="padding: 0.8rem; font-size: 0.85rem; border-color: rgba(255,255,255,0.25); color: #fff;">
+                                View in "My Order &amp; Pay" Desk &rarr;
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                bodyEl.querySelector('.btn-cart-success-cert')?.addEventListener('click', () => {
+                    generateAllocationCertificate(order);
+                });
+            };
+
+            // 4e. Initialize PayPal button for Reserve Bag Cart Checkout
+            const initCartPayPal = () => {
+                const paypalContainer = document.getElementById('cart-paypal-button-container');
+                if (!paypalContainer || !window.TeaFactoryPayPal) return;
+
+                const cartItems = window.TeaFactoryStore.getCart();
+                if (!cartItems || cartItems.length === 0) return;
+
+                const cartSubtotal = cartItems.reduce((sum, item) => sum + ((Number(item.price) || 0) * (item.quantity || 1)), 0);
+                const cartShipping = cartSubtotal >= 100 || cartSubtotal === 0 ? 0 : 15;
+                const cartTotal = cartSubtotal + cartShipping;
+
+                window.TeaFactoryPayPal.renderButtons({
+                    containerId: 'cart-paypal-button-container',
+                    orderId: `CART-${Date.now()}`,
+                    amount: cartTotal,
+                    currency: 'USD',
+                    description: `Reserve Bag Allocation (${cartItems.length} items)`,
+                    items: cartItems.map(i => ({ name: i.name, quantity: i.quantity, price: i.price })),
+                    onValidate: () => {
+                        const firstName = document.getElementById('cart-cust-firstname')?.value?.trim();
+                        const lastName = document.getElementById('cart-cust-lastname')?.value?.trim();
+                        const email = document.getElementById('cart-cust-email')?.value?.trim();
+                        const phone = document.getElementById('cart-cust-phone')?.value?.trim();
+                        const street = document.getElementById('cart-cust-address')?.value?.trim();
+                        const city = document.getElementById('cart-cust-city')?.value?.trim();
+                        const postal = document.getElementById('cart-cust-postal')?.value?.trim();
+                        if (!firstName || !lastName || !email || !phone || !street || !city || !postal) {
+                            showToast("Details Required", "Please enter your first name, last name, email, phone, street address, city, and postal code before proceeding to PayPal.", "error");
+                            return false;
+                        }
+                        return true;
+                    },
+                    onSuccess: async ({ orderId, paypalOrderId, captureData }) => {
+                        const firstName = document.getElementById('cart-cust-firstname')?.value?.trim() || '';
+                        const lastName = document.getElementById('cart-cust-lastname')?.value?.trim() || '';
+                        const name = `${firstName} ${lastName}`.trim() || 'Valued Collector';
+                        const email = document.getElementById('cart-cust-email')?.value?.trim() || '';
+                        const phone = document.getElementById('cart-cust-phone')?.value?.trim() || '';
+                        const street = document.getElementById('cart-cust-address')?.value?.trim() || '';
+                        const suite = document.getElementById('cart-cust-suite')?.value?.trim() || '';
+                        const city = document.getElementById('cart-cust-city')?.value?.trim() || '';
+                        const postal = document.getElementById('cart-cust-postal')?.value?.trim() || '';
+                        const country = document.getElementById('cart-cust-country')?.value || 'Sri Lanka';
+                        const region = document.getElementById('cart-cust-region')?.value || '';
+                        const prefDate = document.getElementById('cart-pref-date')?.value || '';
+                        const notes = document.getElementById('cart-cust-notes')?.value?.trim() || '';
+                        const fullAddress = [suite, street, city, region, postal, country].filter(Boolean).join(', ');
+
+                        const custData = {
+                            firstName, lastName, name, email, phone, street, suite, city, postalCode: postal, country, region,
+                            address: fullAddress, notes, preferredDate: prefDate, shippingMethod: 'ems_express', paymentMethod: 'paypal',
+                            currency: 'USD', currencyRate: 1.0, convertedTotal: cartTotal
+                        };
+                        const checkoutRes = window.TeaFactoryStore.checkoutCart(custData, 'paypal', '', prefDate);
+
+                        if (checkoutRes && checkoutRes.success) {
+                            const order = checkoutRes.order;
+                            window.TeaFactoryStore.markOrderPaidByPayPal(order.id, captureData || { id: paypalOrderId });
+                            window.TeaFactoryStore.saveRecentOrderId(order.id);
+                            updateCartBadges();
+
+                            if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.createOrder === 'function') {
+                                window.TeaFactoryAPI.createOrder({
+                                    id: order.id,
+                                    customer_name: order.customerName,
+                                    customer_email: order.email,
+                                    customer_phone: order.phone,
+                                    shipping_address: order.address,
+                                    subtotal_usd: order.subtotal !== undefined ? order.subtotal : order.price,
+                                    shipping_usd: order.shippingFee || 0,
+                                    total_usd: order.price,
+                                    currency_code: 'USD',
+                                    currency_rate: 1.0,
+                                    total_in_currency: order.price,
+                                    payment_method: 'paypal',
+                                    payment_status: 'Paid & Confirmed',
+                                    bespoke_notes: `PayPal Ref: ${paypalOrderId}${notes ? ' | ' + notes : ''}`,
+                                    items: order.items || []
+                                }).catch(err => console.warn('API order dispatch notice:', err.message));
+                            }
+
+                            renderOrderConfirmationSuccess(body, order, 'paypal', paypalOrderId);
+                        }
+                    }
+                });
+            };
+
+            const cartPaypalTab = checkoutForm ? checkoutForm.querySelector('.pay-tab[data-method="paypal"]') : null;
+            if (cartPaypalTab) {
+                cartPaypalTab.addEventListener('click', () => {
+                    setTimeout(initCartPayPal, 50);
+                });
+            }
+
+            // 5. Checkout Form Submission (Handles COD, Bank Transfer, and Slip Upload for Guests & Patrons)
             if (checkoutForm) {
                 checkoutForm.onsubmit = (e) => {
                     e.preventDefault();
 
-                    const nameInput = document.getElementById('cart-cust-name');
-                    const emailInput = document.getElementById('cart-cust-email');
-                    const phoneInput = document.getElementById('cart-cust-phone');
-                    const addressInput = document.getElementById('cart-cust-address');
-                    const countryInput = document.getElementById('cart-cust-country');
-                    const payMethodInput = document.getElementById('cart-payment-method');
-                    const notesInput = document.getElementById('cart-cust-notes');
+                    const firstName = document.getElementById('cart-cust-firstname')?.value?.trim();
+                    const lastName = document.getElementById('cart-cust-lastname')?.value?.trim();
+                    const email = document.getElementById('cart-cust-email')?.value?.trim();
+                    const phone = document.getElementById('cart-cust-phone')?.value?.trim();
+                    const street = document.getElementById('cart-cust-address')?.value?.trim();
+                    const suite = document.getElementById('cart-cust-suite')?.value?.trim() || '';
+                    const city = document.getElementById('cart-cust-city')?.value?.trim();
+                    const postal = document.getElementById('cart-cust-postal')?.value?.trim();
+                    const country = document.getElementById('cart-cust-country')?.value || 'Sri Lanka';
+                    const region = document.getElementById('cart-cust-region')?.value || '';
+                    const prefDate = document.getElementById('cart-pref-date')?.value || '';
+                    const notes = document.getElementById('cart-cust-notes')?.value?.trim() || '';
 
-                    const name = nameInput ? nameInput.value.trim() : '';
-                    const email = emailInput ? emailInput.value.trim() : '';
-                    const phone = phoneInput ? phoneInput.value.trim() : '';
-                    const address = addressInput ? addressInput.value.trim() : '';
-                    const country = countryInput ? countryInput.value : 'International Delivery';
-                    const paymentMethod = payMethodInput ? payMethodInput.value : 'online';
-                    const notes = notesInput ? notesInput.value.trim() : '';
-
-                    if (!name || !email || !phone) {
-                        showToast("Please provide your name, email, and contact phone number.", "error");
+                    if (!firstName || !lastName || !email || !phone || !street || !city || !postal) {
+                        showToast("Missing Information", "Please enter your first name, last name, email, phone, street address, city, and postal code.", "error");
                         return;
                     }
 
-                    const custData = { name, email, phone, address, country, notes };
-                    const checkoutRes = window.TeaFactoryStore.checkoutCart(custData, paymentMethod);
+                    const selectedShipping = document.querySelector('input[name="cart-shipping-method"]:checked')?.value || 'ems_express';
+                    const isCOD = selectedShipping === 'cod';
 
-                    if (checkoutRes.success) {
+                    if (isCOD && country !== 'Sri Lanka') {
+                        showToast("Country Restriction", "Cash on Delivery is available exclusively for deliveries within Sri Lanka.", "error");
+                        return;
+                    }
+
+                    const activeCartTab = checkoutForm.querySelector('.pay-tab.active');
+                    const paymentMethod = isCOD ? 'cod' : (activeCartTab ? activeCartTab.getAttribute('data-method') : 'bank');
+
+                    if (paymentMethod === 'paypal') {
+                        showToast("PayPal Payment", "Please click the yellow PayPal button above to complete your instant payment.", "info");
+                        return;
+                    }
+
+                    let slipImg = '';
+                    if (!isCOD) {
+                        slipImg = selectedCartSlipBase64 || 
+                            document.getElementById('cart-bank-slip-zone')?.dataset?.fileBase64 || 
+                            document.getElementById('cart-cash-slip-zone')?.dataset?.fileBase64 || '';
+
+                        if (!slipImg) {
+                            showToast("Receipt Required", "Please attach your Bank of Ceylon deposit slip or transfer receipt.", "error");
+                            return;
+                        }
+                    }
+
+                    const fullAddress = [suite, street, city, region, postal, country].filter(Boolean).join(', ');
+                    const currInfo = window.getCountryCurrency ? window.getCountryCurrency(country) : (country === 'Sri Lanka' ? { code: 'LKR', rate: 305 } : { code: 'USD', rate: 1.0 });
+                    const subtotalUSD = window.TeaFactoryStore.getCartSubtotal();
+                    const shippingUSD = window.TeaFactoryStore.getCartShippingTotal ? window.TeaFactoryStore.getCartShippingTotal() : 0;
+                    const grandTotalUSD = subtotalUSD + shippingUSD;
+                    const convertedTotal = Math.round(grandTotalUSD * currInfo.rate * 100) / 100;
+
+                    const custData = {
+                        firstName,
+                        lastName,
+                        name: `${firstName} ${lastName}`.trim(),
+                        email,
+                        phone,
+                        street,
+                        suite,
+                        city,
+                        postalCode: postal,
+                        country,
+                        region,
+                        address: fullAddress,
+                        notes,
+                        preferredDate: prefDate,
+                        shippingMethod: selectedShipping,
+                        paymentMethod,
+                        currency: currInfo.code,
+                        currencyRate: currInfo.rate,
+                        convertedTotal: convertedTotal,
+                        slipImage: slipImg
+                    };
+
+                    const checkoutRes = window.TeaFactoryStore.checkoutCart(custData, paymentMethod, slipImg, prefDate);
+
+                    if (checkoutRes && checkoutRes.success) {
                         updateCartBadges();
                         const order = checkoutRes.order;
-
-                        // Persist this order ID to device memory for "My Order" quick lookup
                         window.TeaFactoryStore.saveRecentOrderId(order.id);
 
-                        // Trigger backend API and Resend Email Dispatch to Customer & Owner
                         if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.createOrder === 'function') {
                             window.TeaFactoryAPI.createOrder({
                                 id: order.id,
                                 customer_name: order.customerName,
                                 customer_email: order.email,
                                 customer_phone: order.phone,
-                                shipping_address: `${order.address || 'Standard Delivery'}, ${order.country || 'International'}`,
-                                subtotal_usd: order.price,
+                                shipping_address: order.address,
+                                subtotal_usd: order.subtotal !== undefined ? order.subtotal : order.price,
+                                shipping_usd: order.shippingFee || 0,
                                 total_usd: order.price,
-                                currency_code: order.currency || 'USD',
-                                total_in_currency: order.price,
-                                payment_method: order.paymentMethod || 'credit_card',
-                                bespoke_notes: order.ownerNote || '',
+                                currency_code: currInfo.code,
+                                currency_rate: currInfo.rate,
+                                total_in_currency: convertedTotal,
+                                payment_method: paymentMethod,
+                                payment_status: isCOD ? 'pending_cod' : 'pending_deposit',
+                                bespoke_notes: `${isCOD ? '[COD Order - Pay Courier Upon Delivery] ' : ''}${order.ownerNote || ''}${prefDate ? ' | Preferred Dispatch: ' + prefDate : ''}`,
                                 items: order.items || []
                             }).catch(err => console.warn('API order email dispatch notice:', err.message));
                         }
 
-                        // Display luxury order confirmation view in drawer
-                        body.innerHTML = `
-                            <div class="cart-success-view" style="text-align: center; padding: 2.5rem 1rem;">
-                                <div style="width: 76px; height: 76px; border-radius: 50%; background: rgba(37,211,102,0.12); border: 2px solid #25d366; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto; color: #25d366;">
-                                    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                </div>
-                                <span class="season-badge" style="background: rgba(212,175,55,0.15); color: var(--color-gold); font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">Order Confirmed</span>
-                                <h3 style="font-family: var(--font-serif); font-size: 1.5rem; color: #ffffff; margin: 0.75rem 0 0.25rem 0;">Allocation Reserved</h3>
-                                <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.5rem;">Thank you, ${order.customerName}. Your order has been registered in the estate master ledger.</p>
-
-                                <div style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; text-align: left;">
-                                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
-                                        <span style="font-size: 0.8rem; color: var(--color-text-muted);">Order ID</span>
-                                        <strong style="font-family: monospace; color: var(--color-gold); font-size: 0.95rem;">${order.id}</strong>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
-                                        <span style="font-size: 0.8rem; color: var(--color-text-muted);">Total Amount</span>
-                                        <strong style="color: #ffffff; font-size: 0.95rem;">${order.formattedPrice}</strong>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
-                                        <span style="font-size: 0.8rem; color: var(--color-text-muted);">Dispatch Range</span>
-                                        <span style="color: #ffffff; font-size: 0.85rem;">${order.deliveryRange}</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between;">
-                                        <span style="font-size: 0.8rem; color: var(--color-text-muted);">Payment Mode</span>
-                                        <span style="color: var(--color-gold); font-size: 0.85rem; font-weight: 600;">${order.paymentMethod === 'bank' ? 'Bank Cash Deposit' : 'Online Gateway'}</span>
-                                    </div>
-                                </div>
-
-                                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                                    <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge%2C%20I%20have%20placed%20Order%20${order.id}%20for%20${encodeURIComponent(order.formattedPrice)}.%20Please%20confirm%20my%20dispatch." target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; font-weight: 700;">
-                                        <span>Notify Concierge on WhatsApp</span>
-                                    </a>
-                                    <button type="button" class="btn btn-outline" onclick="if(window.appCloseCart){window.appCloseCart()} window.appSwitchTab ? window.appSwitchTab('order') : (document.getElementById('nav-order') &amp;&amp; document.getElementById('nav-order').click())" style="padding: 0.8rem; font-size: 0.85rem; border-color: rgba(255,255,255,0.25); color: #fff;">
-                                        View in "My Order &amp; Pay" Desk &rarr;
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-
-                        showToast(`Order ${order.id} placed successfully!`, "success");
+                        renderOrderConfirmationSuccess(body, order, paymentMethod, '');
+                        showToast(isCOD ? `Cash on Delivery Order ${order.id} confirmed!` : `Order ${order.id} placed successfully!`, "success");
                     } else {
-                        showToast(checkoutRes.message || "Failed to complete checkout.", "error");
+                        showToast(checkoutRes?.message || "Failed to complete checkout.", "error");
                     }
                 };
             }
         }
+
+        window.appBindCartDrawerEvents = bindCartDrawerEvents;
 
         // Initialize badges on load
         updateCartBadges();
@@ -9043,9 +13490,31 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 ? window.TeaFactoryStore.getUnreadAnnouncementsCount()
                 : 0;
 
+            const displayCount = unreadCount > 9 ? '9+' : unreadCount;
+            const navBadge = document.getElementById('nav-announcements-badge');
+            const mobileBadge = document.getElementById('nav-announcements-mobile-badge');
+
+            if (navBadge) {
+                if (unreadCount > 0) {
+                    navBadge.textContent = displayCount;
+                    navBadge.style.display = 'inline-flex';
+                } else {
+                    navBadge.style.display = 'none';
+                }
+            }
+
+            if (mobileBadge) {
+                if (unreadCount > 0) {
+                    mobileBadge.textContent = displayCount;
+                    mobileBadge.style.display = 'inline-flex';
+                } else {
+                    mobileBadge.style.display = 'none';
+                }
+            }
+
             if (floatingBulletinsBadge) {
                 if (unreadCount > 0) {
-                    floatingBulletinsBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+                    floatingBulletinsBadge.textContent = displayCount;
                     floatingBulletinsBadge.style.display = 'flex';
                     floatingBulletinsBadge.classList.remove('cart-badge-bump');
                     void floatingBulletinsBadge.offsetWidth; // trigger reflow
@@ -9336,6 +13805,475 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         }
     }
 
+    // ── Patron Email Authentication (Sign In / Register / Sign Out) ──
+    function initPatronAuth() {
+        const modal = document.getElementById('patron-auth-modal');
+        const backdrop = document.getElementById('patron-auth-backdrop');
+        const closeBtn = document.getElementById('patron-auth-close-btn');
+        const contextBanner = document.getElementById('patron-auth-context-banner');
+        const contextText = document.getElementById('patron-auth-context-text');
+
+        const authGoogleBtn = document.getElementById('auth-google-btn');
+        const authGoogleErr = document.getElementById('auth-google-error');
+
+        const tabSignIn = document.getElementById('auth-tab-signin');
+        const tabRegister = document.getElementById('auth-tab-register');
+        const formSignIn = document.getElementById('patron-signin-form');
+        const formRegister = document.getElementById('patron-register-form');
+
+        const signInEmail = document.getElementById('auth-signin-email');
+        const signInPw = document.getElementById('auth-signin-password');
+        const signInErr = document.getElementById('auth-signin-error');
+        const signInBtn = document.getElementById('auth-signin-submit-btn');
+
+        const regName = document.getElementById('auth-reg-name');
+        const regEmail = document.getElementById('auth-reg-email');
+        const regPhone = document.getElementById('auth-reg-phone');
+        const regPw = document.getElementById('auth-reg-password');
+        const regErr = document.getElementById('auth-register-error');
+        const regBtn = document.getElementById('auth-register-submit-btn');
+
+        const navSignInBtn = document.getElementById('nav-signin-btn');
+        const navUserPill = document.getElementById('nav-user-pill');
+        const navPatronTrigger = document.getElementById('nav-patron-trigger');
+        const navPatronDropdown = document.getElementById('nav-patron-dropdown');
+        const navUserAvatar = document.getElementById('nav-user-avatar');
+        const navUserLabel = document.getElementById('nav-user-label');
+        const dropdownUserAvatar = document.getElementById('dropdown-user-avatar');
+        const dropdownUserName = document.getElementById('dropdown-user-name');
+        const dropdownUserEmail = document.getElementById('dropdown-user-email');
+        const dropdownMyOrdersBtn = document.getElementById('dropdown-my-orders-btn');
+        const dropdownReserveBagBtn = document.getElementById('dropdown-reserve-bag-btn');
+        const navSignOutBtn = document.getElementById('nav-signout-btn');
+
+        const mobileAuthBtn = document.getElementById('mobile-auth-btn');
+        const mobileAuthTitle = document.getElementById('mobile-auth-title');
+        const mobileAuthDesc = document.getElementById('mobile-auth-desc');
+
+        let pendingAuthCallback = null;
+
+        function setError(el, msg) {
+            if (!el) return;
+            if (msg) {
+                el.textContent = msg;
+                el.style.display = 'block';
+            } else {
+                el.textContent = '';
+                el.style.display = 'none';
+            }
+        }
+
+        function switchAuthTab(tabName) {
+            setError(signInErr, '');
+            setError(regErr, '');
+            if (tabName === 'register') {
+                tabSignIn?.classList.remove('active');
+                tabSignIn?.setAttribute('aria-selected', 'false');
+                tabRegister?.classList.add('active');
+                tabRegister?.setAttribute('aria-selected', 'true');
+                if (formSignIn) formSignIn.style.display = 'none';
+                if (formRegister) formRegister.style.display = 'block';
+            } else {
+                tabRegister?.classList.remove('active');
+                tabRegister?.setAttribute('aria-selected', 'false');
+                tabSignIn?.classList.add('active');
+                tabSignIn?.setAttribute('aria-selected', 'true');
+                if (formRegister) formRegister.style.display = 'none';
+                if (formSignIn) formSignIn.style.display = 'block';
+            }
+        }
+
+        function updateAuthUI() {
+            const user = window.TeaFactoryStore && window.TeaFactoryStore.getCurrentUser
+                ? window.TeaFactoryStore.getCurrentUser()
+                : null;
+
+            if (user && user.email) {
+                if (navSignInBtn) navSignInBtn.style.display = 'none';
+                if (navUserPill) navUserPill.style.display = 'inline-flex';
+
+                const rawName = (user.full_name || '').trim();
+                const firstName = rawName ? rawName.split(' ')[0] : (user.email.split('@')[0] || 'Patron');
+                const initial = (firstName || user.email || 'P').trim().charAt(0).toUpperCase();
+
+                if (navUserAvatar) navUserAvatar.textContent = initial;
+                if (dropdownUserAvatar) dropdownUserAvatar.textContent = initial;
+
+                if (navUserLabel) {
+                    navUserLabel.textContent = firstName;
+                    navUserLabel.title = `Signed in as ${user.full_name || firstName} (${user.email})`;
+                }
+                if (dropdownUserName) dropdownUserName.textContent = user.full_name || firstName;
+                if (dropdownUserEmail) dropdownUserEmail.textContent = user.email;
+
+                if (mobileAuthBtn) mobileAuthBtn.classList.add('is-signed-in');
+                if (mobileAuthTitle) mobileAuthTitle.textContent = `Sign Out (${firstName})`;
+                if (mobileAuthDesc) mobileAuthDesc.textContent = `Signed in as ${user.full_name || firstName} • Tap to sign out`;
+            } else {
+                if (navSignInBtn) navSignInBtn.style.display = 'inline-flex';
+                if (navUserPill) navUserPill.style.display = 'none';
+                if (navPatronDropdown) {
+                    navPatronDropdown.classList.remove('active');
+                    navPatronTrigger?.setAttribute('aria-expanded', 'false');
+                }
+
+                if (mobileAuthBtn) mobileAuthBtn.classList.remove('is-signed-in');
+                if (mobileAuthTitle) mobileAuthTitle.textContent = 'Sign In / Register';
+                if (mobileAuthDesc) mobileAuthDesc.textContent = 'Sign in with Email ID to order & book';
+            }
+        }
+
+        function openAuthModal(contextMessage = '', onAuthenticated = null, initialTab = 'signin') {
+            if (!modal) return;
+            pendingAuthCallback = typeof onAuthenticated === 'function' ? onAuthenticated : null;
+
+            if (mobileMenuBtn && mobileNavDrawer) {
+                mobileMenuBtn.classList.remove('open');
+                mobileNavDrawer.classList.remove('open');
+            }
+
+            if (contextBanner && contextText) {
+                if (contextMessage) {
+                    contextText.textContent = contextMessage;
+                    contextBanner.style.display = 'flex';
+                } else {
+                    contextBanner.style.display = 'none';
+                }
+            }
+
+            switchAuthTab(initialTab);
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+
+            setTimeout(() => {
+                if (initialTab === 'register' && regName) regName.focus();
+                else if (signInEmail) signInEmail.focus();
+            }, 120);
+        }
+
+        function closeAuthModal(clearCallback = true) {
+            if (!modal) return;
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+            const cartOverlay = document.getElementById('cart-drawer-overlay');
+            if (!cartOverlay || !cartOverlay.classList.contains('open')) {
+                document.body.style.overflow = '';
+            }
+            if (clearCallback) pendingAuthCallback = null;
+        }
+
+        function requireCustomerAuth(contextMessage, onAuthenticated) {
+            const user = window.TeaFactoryStore && window.TeaFactoryStore.getCurrentUser
+                ? window.TeaFactoryStore.getCurrentUser()
+                : null;
+            if (user && user.email) {
+                if (typeof onAuthenticated === 'function') onAuthenticated(user);
+                return true;
+            }
+            openAuthModal(contextMessage, onAuthenticated, 'signin');
+            return false;
+        }
+
+        async function handleCustomerSignOut() {
+            try {
+                if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.logoutCustomer === 'function') {
+                    window.TeaFactoryAPI.logoutCustomer().catch(() => {});
+                }
+                if (window.TeaFactoryStore && typeof window.TeaFactoryStore.logoutCustomer === 'function') {
+                    window.TeaFactoryStore.logoutCustomer();
+                }
+            } catch (e) {}
+
+            // Clear any lingering staff console session on patron logout
+            isAdminAuthenticated = false;
+            try { sessionStorage.removeItem('tea_factory_admin_auth'); } catch(e){}
+            updateNavStaffVisibility();
+
+            if (navPatronDropdown) {
+                navPatronDropdown.classList.remove('active');
+                navPatronTrigger?.setAttribute('aria-expanded', 'false');
+            }
+
+            updateAuthUI();
+
+            // Refresh cart drawer checkout lock if open
+            const cartOverlay = document.getElementById('cart-drawer-overlay');
+            if (cartOverlay && cartOverlay.classList.contains('open') && window.UIComponents.renderCartDrawer) {
+                window.UIComponents.renderCartDrawer('cart-drawer-body');
+                if (window.appBindCartDrawerEvents) window.appBindCartDrawerEvents();
+            }
+
+            // Close active gated booking drawer if open
+            if (drawerOverlay && drawerOverlay.classList.contains('active') && currentDrawerContext && ['box', 'tour', 'product'].includes(currentDrawerContext.type)) {
+                closeDrawer();
+            }
+
+            showToast('Signed Out', 'You have been signed out of Rock One Wild Tea.', 'info');
+        }
+
+        function completeAuthentication(userObj, welcomeTitle) {
+            const savedUser = window.TeaFactoryStore.setCurrentUser(userObj);
+            const callbackToRun = pendingAuthCallback;
+            pendingAuthCallback = null;
+
+            closeAuthModal(false);
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+
+            if (navPatronDropdown) {
+                navPatronDropdown.classList.remove('active');
+                navPatronTrigger?.setAttribute('aria-expanded', 'false');
+            }
+
+            // Normal customer patrons / new users MUST NEVER have admin console access
+            isAdminAuthenticated = false;
+            try { sessionStorage.removeItem('tea_factory_admin_auth'); } catch(e){}
+            updateNavStaffVisibility();
+
+            updateAuthUI();
+
+            // Refresh Cart Drawer if currently open so prefilled checkout replaces auth gate
+            const cartOverlay = document.getElementById('cart-drawer-overlay');
+            if (cartOverlay && cartOverlay.classList.contains('open') && window.UIComponents.renderCartDrawer) {
+                window.UIComponents.renderCartDrawer('cart-drawer-body');
+                if (window.appBindCartDrawerEvents) window.appBindCartDrawerEvents();
+            }
+
+            showToast(welcomeTitle, `Signed in as ${savedUser.email}`, 'success');
+
+            if (typeof callbackToRun === 'function') {
+                setTimeout(() => callbackToRun(savedUser), 140);
+            }
+        }
+
+        // Bind tab toggles
+        tabSignIn?.addEventListener('click', () => switchAuthTab('signin'));
+        tabRegister?.addEventListener('click', () => switchAuthTab('register'));
+        document.getElementById('switch-to-register-btn')?.addEventListener('click', () => switchAuthTab('register'));
+        document.getElementById('switch-to-signin-btn')?.addEventListener('click', () => switchAuthTab('signin'));
+
+        // Password show/hide toggles
+        modal?.querySelectorAll('.patron-toggle-pw').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.getAttribute('data-target');
+                const input = targetId ? document.getElementById(targetId) : null;
+                if (!input) return;
+                input.type = input.type === 'password' ? 'text' : 'password';
+            });
+        });
+
+        // Sign In form submit
+        formSignIn?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            setError(signInErr, '');
+
+            const email = (signInEmail?.value || '').trim().toLowerCase();
+            const password = signInPw?.value || '';
+
+            if (!email || !password) {
+                setError(signInErr, 'Please enter both your Email ID and password.');
+                return;
+            }
+
+            if (signInBtn) {
+                signInBtn.disabled = true;
+                signInBtn.innerHTML = '<span>Signing In...</span>';
+            }
+
+            const res = await window.TeaFactoryAPI.loginCustomer({ email, password });
+
+            if (signInBtn) {
+                signInBtn.disabled = false;
+                signInBtn.innerHTML = '<span>Sign In with Email</span>';
+            }
+
+            if (res && res.success && res.user) {
+                if (signInPw) signInPw.value = '';
+                completeAuthentication({ ...res.user, token: res.token || '' }, 'Welcome Back');
+            } else {
+                setError(signInErr, (res && res.error) ? res.error : 'Incorrect Email ID or password.');
+            }
+        });
+
+        // Register form submit
+        formRegister?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            setError(regErr, '');
+
+            const full_name = (regName?.value || '').trim();
+            const email = (regEmail?.value || '').trim().toLowerCase();
+            const phone = (regPhone?.value || '').trim();
+            const password = regPw?.value || '';
+
+            if (!full_name || !email || !password) {
+                setError(regErr, 'Please enter your Full Name, Email ID, and Password.');
+                return;
+            }
+
+            if (password.length < 6) {
+                setError(regErr, 'Password must be at least 6 characters.');
+                return;
+            }
+
+            if (regBtn) {
+                regBtn.disabled = true;
+                regBtn.innerHTML = '<span>Creating Account...</span>';
+            }
+
+            const res = await window.TeaFactoryAPI.registerCustomer({ full_name, email, phone, password });
+
+            if (regBtn) {
+                regBtn.disabled = false;
+                regBtn.innerHTML = '<span>Create Account &amp; Sign In</span>';
+            }
+
+            if (res && res.success && res.user) {
+                if (regPw) regPw.value = '';
+                completeAuthentication({ ...res.user, token: res.token || '' }, 'Account Created');
+            } else {
+                setError(regErr, (res && res.error) ? res.error : 'Unable to register account. Please try again.');
+            }
+        });
+
+        // Navbar & Mobile Auth Triggers
+        navSignInBtn?.addEventListener('click', () => openAuthModal('', null, 'signin'));
+        navSignOutBtn?.addEventListener('click', handleCustomerSignOut);
+
+        // Patron Account Dropdown Toggle
+        navPatronTrigger?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!navPatronDropdown) return;
+            const isOpen = navPatronDropdown.classList.toggle('active');
+            navPatronTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        // Close Patron Dropdown on click outside
+        document.addEventListener('click', (e) => {
+            if (navPatronDropdown && navPatronDropdown.classList.contains('active')) {
+                if (!navUserPill || !navUserPill.contains(e.target)) {
+                    navPatronDropdown.classList.remove('active');
+                    navPatronTrigger?.setAttribute('aria-expanded', 'false');
+                }
+            }
+        });
+
+        // Close Patron Dropdown on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && navPatronDropdown && navPatronDropdown.classList.contains('active')) {
+                navPatronDropdown.classList.remove('active');
+                navPatronTrigger?.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // Patron Dropdown quick actions
+        dropdownMyOrdersBtn?.addEventListener('click', () => {
+            navPatronDropdown?.classList.remove('active');
+            navPatronTrigger?.setAttribute('aria-expanded', 'false');
+            document.getElementById('nav-order')?.click();
+        });
+
+        dropdownReserveBagBtn?.addEventListener('click', () => {
+            navPatronDropdown?.classList.remove('active');
+            navPatronTrigger?.setAttribute('aria-expanded', 'false');
+            if (typeof window.appOpenCartDrawer === 'function') {
+                window.appOpenCartDrawer();
+            } else {
+                document.getElementById('floating-cart-btn')?.click();
+            }
+        });
+        mobileAuthBtn?.addEventListener('click', () => {
+            if (window.TeaFactoryStore && window.TeaFactoryStore.isCustomerLoggedIn()) {
+                if (mobileMenuBtn && mobileNavDrawer) {
+                    mobileMenuBtn.classList.remove('open');
+                    mobileNavDrawer.classList.remove('open');
+                }
+                handleCustomerSignOut();
+            } else {
+                openAuthModal('', null, 'signin');
+            }
+        });
+
+        backdrop?.addEventListener('click', () => closeAuthModal(true));
+        closeBtn?.addEventListener('click', () => closeAuthModal(true));
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+                closeAuthModal(true);
+            }
+        });
+
+        window.addEventListener('rockone:authchange', updateAuthUI);
+
+        window.openPatronAuthModal = openAuthModal;
+        window.closePatronAuthModal = closeAuthModal;
+        window.requireCustomerAuth = requireCustomerAuth;
+        window.logoutPatron = handleCustomerSignOut;
+
+        // Google Sign In Trigger
+        authGoogleBtn?.addEventListener('click', async () => {
+            setError(authGoogleErr, '');
+            if (authGoogleBtn) {
+                authGoogleBtn.disabled = true;
+                authGoogleBtn.style.opacity = '0.75';
+            }
+
+            const res = await window.TeaFactoryAPI.getGoogleAuthUrl();
+            if (res && res.success && res.url) {
+                window.location.href = res.url;
+            } else {
+                if (authGoogleBtn) {
+                    authGoogleBtn.disabled = false;
+                    authGoogleBtn.style.opacity = '1';
+                }
+                const err = (res && res.error) ? res.error : 'Google Sign In is not yet enabled or configured in Supabase.';
+                setError(authGoogleErr, err);
+            }
+        });
+
+        // Check for Google OAuth redirect callback in URL hash or search params
+        async function checkGoogleOAuthCallback() {
+            try {
+                const hash = window.location.hash || '';
+                const search = window.location.search || '';
+                const isGoogleReturn = search.includes('auth_provider=google') || hash.includes('access_token=');
+
+                if (!isGoogleReturn) return;
+
+                const hashParams = new URLSearchParams(hash.replace(/^#/, ''));
+                const accessToken = hashParams.get('access_token');
+                const errorDesc = hashParams.get('error_description') || hashParams.get('error');
+
+                if (errorDesc) {
+                    showToast('Google Sign In', decodeURIComponent(errorDesc).replace(/\+/g, ' '), 'warning');
+                    const cleanUrl = window.location.origin + window.location.pathname;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                    return;
+                }
+
+                if (accessToken) {
+                    showToast('Authenticating', 'Verifying Google Patron access...', 'info');
+                    const res = await window.TeaFactoryAPI.verifyAuthToken(accessToken);
+                    if (res && res.success && res.user) {
+                        completeAuthentication({ ...res.user, token: accessToken }, 'Welcome');
+                        showToast('Signed In', `Welcome back to Rock One Wild Tea, ${res.user.full_name}.`, 'success');
+                    } else {
+                        showToast('Authentication Failed', (res && res.error) || 'Could not verify Google credentials.', 'warning');
+                    }
+                    const cleanUrl = window.location.origin + window.location.pathname;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                }
+            } catch (e) {
+                console.warn('Google OAuth verification check exception:', e);
+            }
+        }
+
+        checkGoogleOAuthCallback();
+
+        updateAuthUI();
+    }
+
     // 9. Initial Load Orchestration
     initCustomCursor();
     initLanguageSwitchers();
@@ -9344,6 +14282,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
     initCartSystem();
     initBulletinsNotificationSystem();
     initCookieConsent();
+    initPatronAuth();
     initAboutUsModal();
     initLookbookModal();
     initFaqChatbot();

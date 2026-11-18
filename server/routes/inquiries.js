@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../db/database');
 const { supabase, isSupabaseAvailable } = require('../db/supabase');
+const { isTursoAvailable, queryTurso, executeTurso } = require('../db/turso');
 const { sendInquiryEmails } = require('../services/email');
 
 /**
@@ -51,6 +52,13 @@ router.post('/', async (req, res) => {
                 INSERT OR REPLACE INTO inquiries (id, full_name, email, phone, service_interested, budget_range, message, status)
                 VALUES (?, ?, ?, ?, ?, ?, ?, 'new')
             `).run(id, full_name, email, phone, service_interested, budget_range, message);
+
+            if (isTursoAvailable()) {
+                await executeTurso(`
+                    INSERT OR REPLACE INTO inquiries (id, full_name, email, phone, service_interested, budget_range, message, status)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 'new')
+                `, [id, full_name, email, phone, service_interested, budget_range, message]);
+            }
         } catch (e) {}
 
         // Dispatch Resend email notification
@@ -81,6 +89,13 @@ router.get('/', async (req, res) => {
             const { data, error } = await supabase.from('inquiries').select('*').order('created_at', { ascending: false });
             if (!error && data) {
                 return res.json({ success: true, count: data.length, data });
+            }
+        }
+
+        if (isTursoAvailable()) {
+            const tursoRows = await queryTurso('SELECT * FROM inquiries ORDER BY created_at DESC');
+            if (tursoRows && tursoRows.length > 0) {
+                return res.json({ success: true, count: tursoRows.length, data: tursoRows });
             }
         }
 
@@ -116,6 +131,9 @@ router.patch('/:id', async (req, res) => {
         try {
             if (status) {
                 db.prepare('UPDATE inquiries SET status = ? WHERE id = ?').run(status, inqId);
+                if (isTursoAvailable()) {
+                    await executeTurso('UPDATE inquiries SET status = ? WHERE id = ?', [status, inqId]);
+                }
             }
         } catch (e) {}
 
@@ -140,6 +158,9 @@ router.put('/:id', async (req, res) => {
 
         try {
             db.prepare('UPDATE inquiries SET status = ? WHERE id = ?').run(status || 'new', inqId);
+            if (isTursoAvailable()) {
+                await executeTurso('UPDATE inquiries SET status = ? WHERE id = ?', [status || 'new', inqId]);
+            }
         } catch (e) {}
 
         res.json({ success: true, message: 'Inquiry updated successfully', id: inqId, status });
@@ -161,6 +182,9 @@ router.delete('/:id', async (req, res) => {
 
         try {
             db.prepare('DELETE FROM inquiries WHERE id = ?').run(inqId);
+            if (isTursoAvailable()) {
+                await executeTurso('DELETE FROM inquiries WHERE id = ?', [inqId]);
+            }
         } catch (e) {}
 
         res.json({ success: true, message: 'Inquiry deleted successfully', id: inqId });

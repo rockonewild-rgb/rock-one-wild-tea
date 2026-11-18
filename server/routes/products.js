@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../db/database');
 const { supabase, isSupabaseAvailable } = require('../db/supabase');
+const { isTursoAvailable, queryTurso, executeTurso } = require('../db/turso');
 
 function normalizeProductImage(img) {
     if (!img) return 'images/Product.jpeg';
@@ -46,6 +47,8 @@ router.get('/', async (req, res) => {
                         price: Number(r.price_usd || 0),
                         price_usd: Number(r.price_usd || 0),
                         leafGrade: r.grade || bg.leafGrade || 'Single-Estate Reserve',
+                subcategory: bg.subcategory || r.subcategory || 'Hot Tea (Gongfu style)',
+                        subcategory: bg.subcategory || r.subcategory || 'Hot Tea (Gongfu style)',
                         weight: bg.weight || '100g',
                         symbol: bg.symbol || '',
                         steepTemp: bg.temp || bg.steepTemp || '90°C',
@@ -87,7 +90,17 @@ router.get('/', async (req, res) => {
         }
 
         query += ' ORDER BY price_usd DESC';
-        const rows = db.prepare(query).all(...params);
+        let rows = [];
+        if (isTursoAvailable()) {
+            try {
+                rows = (await queryTurso(query, params)) || [];
+            } catch (e) {
+                console.warn('Turso products query notice:', e.message);
+            }
+        }
+        if (!rows || rows.length === 0) {
+            rows = db.prepare(query).all(...params);
+        }
 
         const products = rows.map(r => {
             const priceVal = Number(r.price_usd !== undefined ? r.price_usd : (r.price !== undefined ? r.price : 0)) || 0;
@@ -101,6 +114,7 @@ router.get('/', async (req, res) => {
                 price: priceVal,
                 price_usd: priceVal,
                 leafGrade: r.grade || bg.leafGrade || 'Single-Estate Reserve',
+                subcategory: bg.subcategory || r.subcategory || 'Hot Tea (Gongfu style)',
                 weight: bg.weight || '100g',
                 symbol: bg.symbol || '',
                 steepTemp: bg.temp || bg.steepTemp || '90°C',
@@ -175,6 +189,7 @@ router.get('/:id', async (req, res) => {
         const product = {
             ...row,
             leafGrade: row.grade || bg.leafGrade || 'Single-Estate Reserve',
+            subcategory: bg.subcategory || row.subcategory || 'Hot Tea (Gongfu style)',
             weight: bg.weight || '100g',
             symbol: bg.symbol || '',
             steepTemp: bg.temp || bg.steepTemp || '90°C',
@@ -207,10 +222,12 @@ router.post('/', async (req, res) => {
             price_usd, price, stock, image = 'images/Product.jpeg',
             description, desc, flavor_notes = [], brewing_guide = null,
             is_reserve = false, flavorProfile, tastingNotes, sensoryRadar, steepSeconds,
-            weight, symbol, steepTemp, steepTime
+            weight, symbol, steepTemp, steepTime,
+            shipping_fee_usd, shippingCharge, shippingFee
         } = req.body;
 
         const finalPrice = Number(price_usd || price || 0);
+        const finalShipping = Number(shipping_fee_usd !== undefined ? shipping_fee_usd : (shippingCharge !== undefined ? shippingCharge : (shippingFee || 0))) || 0;
         if (!name || !finalPrice) {
             return res.status(400).json({ success: false, error: 'Name and price are required.' });
         }
@@ -222,6 +239,7 @@ router.post('/', async (req, res) => {
         const finalFlavorProfile = flavorProfile || (finalTastingNotes.length > 0 ? finalTastingNotes.join(', ') : 'Single-Estate Reserve');
         const finalRadar = sensoryRadar || { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 };
         const finalSteepSeconds = parseInt(steepSeconds, 10) || 180;
+        const finalSubcategory = req.body.subcategory || req.body.sub_category || (brewing_guide && brewing_guide.subcategory) || 'Hot Tea (Gongfu style)';
         const stockStatusStr = typeof stock === 'string' ? stock : (Number(stock) <= 5 ? 'Low Stock' : 'In Stock');
         const stockInt = typeof stock === 'number' ? stock : (stock === 'Low Stock' ? 5 : (stock === 'Rare Reserve' ? 3 : 15));
 
@@ -235,7 +253,10 @@ router.post('/', async (req, res) => {
             sensoryRadar: finalRadar,
             flavorProfile: finalFlavorProfile,
             tastingNotes: finalTastingNotes,
-            steepSeconds: finalSteepSeconds
+            steepSeconds: finalSteepSeconds,
+            shippingCharge: finalShipping,
+            shipping_fee: finalShipping,
+            subcategory: finalSubcategory
         };
 
         const record = {
@@ -247,6 +268,7 @@ router.post('/', async (req, res) => {
             grade: finalGrade,
             elevation,
             price_usd: finalPrice,
+            shipping_fee_usd: finalShipping,
             stock: stockInt,
             image,
             description: finalDesc,
@@ -261,9 +283,9 @@ router.post('/', async (req, res) => {
                 // SQLite sync
                 try {
                     db.prepare(`
-                        INSERT OR REPLACE INTO products (id, name, category, type, season, grade, elevation, price_usd, stock, image, description, flavor_notes, brewing_guide, is_reserve)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    `).run(id, name, category, type, season, finalGrade, elevation, finalPrice, Number(stock) || 10, image, finalDesc, JSON.stringify(finalTastingNotes), JSON.stringify(bg), is_reserve ? 1 : 0);
+                        INSERT OR REPLACE INTO products (id, name, category, type, season, grade, elevation, price_usd, shipping_fee_usd, stock, image, description, flavor_notes, brewing_guide, is_reserve)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    `).run(id, name, category, type, season, finalGrade, elevation, finalPrice, finalShipping, Number(stock) || 10, image, finalDesc, JSON.stringify(finalTastingNotes), JSON.stringify(bg), is_reserve ? 1 : 0);
                 } catch (e) {}
 
                 return res.status(201).json({
@@ -280,7 +302,9 @@ router.post('/', async (req, res) => {
                         flavorProfile: finalFlavorProfile,
                         tastingNotes: finalTastingNotes,
                         sensoryRadar: finalRadar,
-                        steepSeconds: finalSteepSeconds
+                        steepSeconds: finalSteepSeconds,
+                        shippingCharge: finalShipping,
+                        shippingFee: finalShipping
                     }
                 });
             }
@@ -288,16 +312,32 @@ router.post('/', async (req, res) => {
 
         // SQLite fallback
         const insert = db.prepare(`
-            INSERT INTO products (id, name, category, type, season, grade, elevation, price_usd, stock, image, description, flavor_notes, brewing_guide, is_reserve)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO products (id, name, category, type, season, grade, elevation, price_usd, shipping_fee_usd, stock, image, description, flavor_notes, brewing_guide, is_reserve)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
 
         insert.run(
             id, name, category, type, season, finalGrade, elevation,
-            finalPrice, stockInt, image, finalDesc,
+            finalPrice, finalShipping, stockInt, image, finalDesc,
             JSON.stringify(finalTastingNotes), JSON.stringify(bg),
             is_reserve ? 1 : 0
         );
+
+        if (isTursoAvailable()) {
+            try {
+                await executeTurso(`
+                    INSERT OR REPLACE INTO products (id, name, category, type, season, grade, elevation, price_usd, shipping_fee_usd, stock, image, description, flavor_notes, brewing_guide, is_reserve)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `, [
+                    id, name, category, type, season, finalGrade, elevation,
+                    finalPrice, finalShipping, stockInt, image, finalDesc,
+                    JSON.stringify(finalTastingNotes), JSON.stringify(bg),
+                    is_reserve ? 1 : 0
+                ]);
+            } catch (te) {
+                console.warn('⚠️ Turso insert product error:', te.message);
+            }
+        }
 
         const created = db.prepare('SELECT * FROM products WHERE id = ?').get(id);
         res.status(201).json({
@@ -336,7 +376,8 @@ router.put('/:id', async (req, res) => {
             price_usd, price, stock, image, description, desc,
             flavor_notes, brewing_guide, is_reserve,
             flavorProfile, tastingNotes, sensoryRadar, steepSeconds,
-            weight, symbol, steepTemp, steepTime
+            weight, symbol, steepTemp, steepTime,
+            shipping_fee_usd, shippingCharge, shippingFee
         } = req.body;
 
         const updates = {};
@@ -347,6 +388,9 @@ router.put('/:id', async (req, res) => {
         if (grade !== undefined || leafGrade !== undefined) updates.grade = grade || leafGrade;
         if (elevation !== undefined) updates.elevation = elevation;
         if (price_usd !== undefined || price !== undefined) updates.price_usd = Number(price_usd || price);
+        if (shipping_fee_usd !== undefined || shippingCharge !== undefined || shippingFee !== undefined) {
+            updates.shipping_fee_usd = Number(shipping_fee_usd !== undefined ? shipping_fee_usd : (shippingCharge !== undefined ? shippingCharge : shippingFee)) || 0;
+        }
         if (stock !== undefined) {
             const stockInt = typeof stock === 'number' ? stock : (stock === 'Low Stock' ? 5 : (stock === 'Rare Reserve' ? 3 : 15));
             updates.stock = stockInt;
@@ -357,7 +401,9 @@ router.put('/:id', async (req, res) => {
         const finalTNotes = tastingNotes !== undefined ? (Array.isArray(tastingNotes) ? tastingNotes : [tastingNotes]) : (flavor_notes !== undefined ? (Array.isArray(flavor_notes) ? flavor_notes : [flavor_notes]) : undefined);
         if (finalTNotes !== undefined) updates.flavor_notes = finalTNotes;
 
-        if (brewing_guide !== undefined || sensoryRadar !== undefined || flavorProfile !== undefined || finalTNotes !== undefined || steepSeconds !== undefined || weight !== undefined || symbol !== undefined || steepTemp !== undefined || steepTime !== undefined || stock !== undefined) {
+        const subcategory = req.body.subcategory || req.body.sub_category;
+
+        if (brewing_guide !== undefined || sensoryRadar !== undefined || flavorProfile !== undefined || finalTNotes !== undefined || steepSeconds !== undefined || weight !== undefined || symbol !== undefined || steepTemp !== undefined || steepTime !== undefined || stock !== undefined || updates.shipping_fee_usd !== undefined || subcategory !== undefined) {
             const baseBg = typeof brewing_guide === 'object' && brewing_guide !== null ? brewing_guide : {};
             updates.brewing_guide = {
                 ...baseBg,
@@ -369,7 +415,9 @@ router.put('/:id', async (req, res) => {
                 ...(symbol !== undefined ? { symbol } : {}),
                 ...(steepTemp ? { temp: steepTemp } : {}),
                 ...(steepTime ? { time: steepTime } : {}),
-                ...(typeof stock === 'string' ? { stock_status: stock } : {})
+                ...(typeof stock === 'string' ? { stock_status: stock } : {}),
+                ...(subcategory ? { subcategory } : {}),
+                ...(updates.shipping_fee_usd !== undefined ? { shippingCharge: updates.shipping_fee_usd, shipping_fee: updates.shipping_fee_usd } : {})
             };
         }
         if (is_reserve !== undefined) updates.is_reserve = Boolean(is_reserve);
@@ -381,19 +429,33 @@ router.put('/:id', async (req, res) => {
             }
         }
 
-        // SQLite update
+        // SQLite & Turso update
         try {
             db.prepare(`
                 UPDATE products
-                SET name = COALESCE(?, name), price_usd = COALESCE(?, price_usd), stock = COALESCE(?, stock),
+                SET name = COALESCE(?, name), price_usd = COALESCE(?, price_usd), shipping_fee_usd = COALESCE(?, shipping_fee_usd), stock = COALESCE(?, stock),
                     flavor_notes = COALESCE(?, flavor_notes), brewing_guide = COALESCE(?, brewing_guide)
                 WHERE id = ?
             `).run(
-                name, Number(price_usd || price), Number(stock),
+                name, updates.price_usd || null, updates.shipping_fee_usd !== undefined ? updates.shipping_fee_usd : null, Number(stock) || null,
                 finalTNotes ? JSON.stringify(finalTNotes) : null,
                 updates.brewing_guide ? JSON.stringify(updates.brewing_guide) : null,
                 prodId
             );
+
+            if (isTursoAvailable()) {
+                await executeTurso(`
+                    UPDATE products
+                    SET name = COALESCE(?, name), price_usd = COALESCE(?, price_usd), shipping_fee_usd = COALESCE(?, shipping_fee_usd), stock = COALESCE(?, stock),
+                        flavor_notes = COALESCE(?, flavor_notes), brewing_guide = COALESCE(?, brewing_guide)
+                    WHERE id = ?
+                `, [
+                    name, updates.price_usd || null, updates.shipping_fee_usd !== undefined ? updates.shipping_fee_usd : null, Number(stock) || null,
+                    finalTNotes ? JSON.stringify(finalTNotes) : null,
+                    updates.brewing_guide ? JSON.stringify(updates.brewing_guide) : null,
+                    prodId
+                ]);
+            }
         } catch (e) {}
 
         res.json({ success: true, message: 'Product updated successfully' });
@@ -416,6 +478,9 @@ router.delete('/:id', async (req, res) => {
 
         try {
             db.prepare('DELETE FROM products WHERE id = ?').run(prodId);
+            if (isTursoAvailable()) {
+                await executeTurso('DELETE FROM products WHERE id = ?', [prodId]);
+            }
         } catch (e) {}
 
         res.json({ success: true, message: 'Product deleted successfully', id: prodId });
