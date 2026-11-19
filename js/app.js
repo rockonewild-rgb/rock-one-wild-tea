@@ -10806,11 +10806,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Live Search & Filter in User Table
         const userSearchInput = document.getElementById('users-search-input');
+        const userAuthFilter = document.getElementById('users-auth-filter');
         const userRoleFilter = document.getElementById('users-role-filter');
         const userStatusFilter = document.getElementById('users-status-filter');
 
         function applyUserFilters() {
             const query = (userSearchInput ? userSearchInput.value : '').toLowerCase().trim();
+            const auth = (userAuthFilter ? userAuthFilter.value : 'all').toLowerCase();
             const role = (userRoleFilter ? userRoleFilter.value : 'all').toLowerCase();
             const status = (userStatusFilter ? userStatusFilter.value : 'all').toLowerCase();
 
@@ -10821,12 +10823,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const rowSearch = row.getAttribute('data-search-text') || '';
                 const rowRole = row.getAttribute('data-role') || '';
                 const rowStatus = row.getAttribute('data-status') || '';
+                const rowAuth = row.getAttribute('data-auth-method') || '';
 
                 const matchesQuery = !query || rowSearch.includes(query);
+                const matchesAuth = (auth === 'all') || (rowAuth === auth);
                 const matchesRole = (role === 'all') || (rowRole === role);
                 const matchesStatus = (status === 'all') || (rowStatus === status);
 
-                if (matchesQuery && matchesRole && matchesStatus) {
+                if (matchesQuery && matchesAuth && matchesRole && matchesStatus) {
                     row.style.display = '';
                     visibleCount++;
                 } else {
@@ -10836,6 +10840,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (userSearchInput) userSearchInput.addEventListener('input', applyUserFilters);
+        if (userAuthFilter) userAuthFilter.addEventListener('change', applyUserFilters);
         if (userRoleFilter) userRoleFilter.addEventListener('change', applyUserFilters);
         if (userStatusFilter) userStatusFilter.addEventListener('change', applyUserFilters);
     }

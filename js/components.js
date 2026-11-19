@@ -45,12 +45,27 @@ window.getSeasonalThemeIconSvg = function(themeId, size = 18, extraClass = '') {
 window.renderUserTableRow = function(u) {
     if (!u) return '';
     const isOwner = (u.email || '').toLowerCase() === 'rockonewild@gmail.com';
-    const fullName = u.full_name || u.fullName || u.name || 'Staff Member';
-    const initials = fullName.split(' ').filter(Boolean).map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'ST';
+    const fullName = u.full_name || u.fullName || u.name || 'Web Patron';
+    const initials = fullName.split(' ').filter(Boolean).map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'WP';
     
+    // Auth / Login Method
+    const isGoogle = (u.auth_provider === 'google' || u.password_hash === 'OAUTH_GOOGLE' || (u.id && String(u.id).startsWith('G-')));
+    const authMethod = isGoogle ? 'google' : 'email';
+    const authBadge = isGoogle ? `
+        <span style="background: rgba(66,133,244,0.15); color: #93c5fd; border: 1px solid rgba(66,133,244,0.35); padding: 0.2rem 0.55rem; border-radius: 4px; font-size: 0.72rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <svg width="12" height="12" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+            Google Sign-In
+        </span>
+    ` : `
+        <span style="background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.35); padding: 0.2rem 0.55rem; border-radius: 4px; font-size: 0.72rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            Web Email ID
+        </span>
+    `;
+
     // Role styling & icons
     let roleBadge = '';
-    const role = (u.role || 'staff').toLowerCase();
+    const role = (u.role || 'patron').toLowerCase();
     switch (role) {
         case 'admin':
             roleBadge = `<span style="background: rgba(212,175,55,0.15); color: var(--color-gold); border: 1px solid rgba(212,175,55,0.4); padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
@@ -77,16 +92,10 @@ window.renderUserTableRow = function(u) {
             </span>`;
             break;
         case 'patron':
+        default:
             roleBadge = `<span style="background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.4); padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                 Connoisseur Patron
-            </span>`;
-            break;
-        case 'staff':
-        default:
-            roleBadge = `<span style="background: rgba(148,163,184,0.15); color: #cbd5e1; border: 1px solid rgba(148,163,184,0.4); padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                Staff Member
             </span>`;
             break;
     }
@@ -131,10 +140,10 @@ window.renderUserTableRow = function(u) {
         }
     }
 
-    const safeSearchText = `${fullName} ${u.email || ''} ${u.phone || ''} ${role} ${status} ${u.id || ''}`.toLowerCase();
+    const safeSearchText = `${fullName} ${u.email || ''} ${u.phone || ''} ${role} ${status} ${authMethod} ${u.id || ''}`.toLowerCase();
 
     return `
-        <tr class="user-table-row" data-user-id="${u.id}" data-role="${role}" data-status="${status}" data-search-text="${safeSearchText}" style="border-bottom: 1px solid rgba(255,255,255,0.06); transition: background 0.2s ease;">
+        <tr class="user-table-row" data-user-id="${u.id}" data-role="${role}" data-status="${status}" data-auth-method="${authMethod}" data-search-text="${safeSearchText}" style="border-bottom: 1px solid rgba(255,255,255,0.06); transition: background 0.2s ease;">
             <!-- User Identity -->
             <td style="padding: 0.95rem 1rem;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -159,6 +168,11 @@ window.renderUserTableRow = function(u) {
                     </button>
                     <span style="font-size: 0.65rem; background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.3); border-radius: 3px; padding: 1px 4px; font-weight: 600;">Verified ID</span>
                 </div>
+            </td>
+
+            <!-- Web Login Method -->
+            <td style="padding: 0.95rem 1rem;">
+                ${authBadge}
             </td>
 
             <!-- Role -->
@@ -192,12 +206,8 @@ window.renderUserTableRow = function(u) {
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                         <span>Key</span>
                     </button>
-                    ${isOwner ? `
-                        <button type="button" disabled title="Primary Estate Owner cannot be deleted" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); color: #52525b; border-radius: 5px; padding: 5px 9px; cursor: not-allowed; display: inline-flex; align-items: center; font-size: 0.75rem;">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>
-                    ` : `
-                        <button type="button" class="btn-delete-user" data-user-id="${u.id}" data-user-name="${fullName}" data-user-email="${u.email}" title="Delete User Account" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.35); color: #f87171; border-radius: 5px; padding: 5px 9px; cursor: pointer; display: inline-flex; align-items: center; font-size: 0.75rem;">
+                    ${isOwner ? '' : `
+                        <button type="button" class="btn-delete-user" data-user-id="${u.id}" data-email="${u.email}" title="Delete Account" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #f87171; border-radius: 5px; padding: 5px 8px; cursor: pointer; display: inline-flex; align-items: center;">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                         </button>
                     `}
@@ -206,7 +216,6 @@ window.renderUserTableRow = function(u) {
         </tr>
     `;
 };
-
 // Multi-Language dynamic translation helper
 const _t = (key, fallback) => (window.TeaFactoryI18n ? window.TeaFactoryI18n.t(key, fallback) : (fallback !== undefined ? fallback : key));
 
@@ -3395,9 +3404,10 @@ const UIComponents = {
                 : [];
             
             const totalUsers = users.length;
-            const adminCount = users.filter(u => (u.role || '').toLowerCase() === 'admin' || (u.role || '').toLowerCase() === 'manager').length;
-            const staffCount = users.filter(u => ['staff', 'sommelier', 'concierge'].includes((u.role || '').toLowerCase())).length;
-            const activeCount = users.filter(u => (u.status || 'active').toLowerCase() === 'active').length;
+            const emailUsersCount = users.filter(u => u.auth_provider === 'email' || (u.password_hash !== 'OAUTH_GOOGLE' && !(u.id && String(u.id).startsWith('G-')))).length;
+            const googleUsersCount = users.filter(u => u.auth_provider === 'google' || u.password_hash === 'OAUTH_GOOGLE' || (u.id && String(u.id).startsWith('G-'))).length;
+            const patronUsersCount = users.filter(u => (u.role || '').toLowerCase() === 'patron').length;
+            const adminStaffCount = users.filter(u => ['admin', 'manager', 'staff', 'sommelier', 'concierge'].includes((u.role || '').toLowerCase())).length;
 
             html += `
                 <div class="panel-card users-desk-wrapper" style="margin-bottom: 0; background: linear-gradient(145deg, rgba(8, 22, 14, 0.95), rgba(4, 12, 8, 0.98)); border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 16px 40px rgba(0,0,0,0.6); border-radius: 12px; padding: 1.75rem;">
@@ -3415,11 +3425,11 @@ const UIComponents = {
                                     </svg>
                                 </span>
                                 <h3 class="panel-title" style="margin-bottom: 0; font-family: var(--font-serif, 'Playfair Display', serif); font-size: 1.45rem; color: var(--color-gold); letter-spacing: 0.5px;">
-                                    User Accounts &amp; Staff Access Desk
+                                    Web Registered Patrons &amp; User Accounts Desk
                                 </h3>
                             </div>
                             <p class="panel-desc" style="margin-bottom: 0; color: #94a3b8; font-size: 0.88rem;">
-                                Create, provision, and administer authenticated accounts using their Email ID as the primary system identity with role-based access controls.
+                                Real-time registry of all patrons and users registered via Web Email ID &amp; Password or Google Sign-In with Turso Cloud database synchronization.
                             </p>
                         </div>
                         <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
@@ -3428,7 +3438,7 @@ const UIComponents = {
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                 </svg>
-                                <span>Create New User Account</span>
+                                <span>+ Add User Account</span>
                             </button>
                         </div>
                     </div>
@@ -3436,24 +3446,24 @@ const UIComponents = {
                     <!-- KPI Statistics Row -->
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; margin-bottom: 1.75rem;">
                         <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(212,175,55,0.22); border-radius: 8px; padding: 1rem 1.2rem;">
-                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--color-text-muted); display: block; margin-bottom: 0.35rem;">Total System Accounts</span>
+                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--color-text-muted); display: block; margin-bottom: 0.35rem;">Total Accounts</span>
                             <div style="font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; color: var(--color-gold); line-height: 1;">${totalUsers}</div>
-                            <span style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.35rem; display: block;">Registered Email identities</span>
+                            <span style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.35rem; display: block;">Active in Turso Cloud</span>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(34,197,94,0.3); border-radius: 8px; padding: 1rem 1.2rem;">
+                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: #86efac; display: block; margin-bottom: 0.35rem;">Web Email Registered</span>
+                            <div style="font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; color: #4ade80; line-height: 1;">${emailUsersCount}</div>
+                            <span style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.35rem; display: block;">Email &amp; Password signups</span>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(66,133,244,0.3); border-radius: 8px; padding: 1rem 1.2rem;">
+                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: #93c5fd; display: block; margin-bottom: 0.35rem;">Google Sign-In Patrons</span>
+                            <div style="font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; color: #60a5fa; line-height: 1;">${googleUsersCount}</div>
+                            <span style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.35rem; display: block;">One-Click Google OAuth</span>
                         </div>
                         <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(212,175,55,0.22); border-radius: 8px; padding: 1rem 1.2rem;">
-                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--color-text-muted); display: block; margin-bottom: 0.35rem;">Admins &amp; Managers</span>
-                            <div style="font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; color: #60a5fa; line-height: 1;">${adminCount}</div>
-                            <span style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.35rem; display: block;">Full console access</span>
-                        </div>
-                        <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(212,175,55,0.22); border-radius: 8px; padding: 1rem 1.2rem;">
-                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--color-text-muted); display: block; margin-bottom: 0.35rem;">Staff &amp; Sommeliers</span>
-                            <div style="font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; color: #facc15; line-height: 1;">${staffCount}</div>
-                            <span style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.35rem; display: block;">Floor &amp; cupping team</span>
-                        </div>
-                        <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(212,175,55,0.22); border-radius: 8px; padding: 1rem 1.2rem;">
-                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--color-text-muted); display: block; margin-bottom: 0.35rem;">Active Accounts</span>
-                            <div style="font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; color: #4ade80; line-height: 1;">${activeCount}</div>
-                            <span style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.35rem; display: block;">Authorized to login</span>
+                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--color-text-muted); display: block; margin-bottom: 0.35rem;">Admins &amp; Staff</span>
+                            <div style="font-family: var(--font-serif); font-size: 1.75rem; font-weight: 700; color: #ffd875; line-height: 1;">${adminStaffCount}</div>
+                            <span style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.35rem; display: block;">Console &amp; estate access</span>
                         </div>
                     </div>
 
@@ -3464,20 +3474,28 @@ const UIComponents = {
                                 <span style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--color-gold); display: flex; align-items: center; pointer-events: none;">
                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                                 </span>
-                                <input type="text" id="users-search-input" placeholder="Search by Email ID, Name, Phone, Role, or ID..." style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.55); border: 1px solid rgba(212,175,55,0.3); border-radius: 6px; padding: 0.55rem 0.85rem 0.55rem 2.3rem; color: #fff; font-size: 0.85rem; outline: none;">
+                                <input type="text" id="users-search-input" placeholder="Search by Email ID, Name, Phone, Login Method, or Role..." style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.55); border: 1px solid rgba(212,175,55,0.3); border-radius: 6px; padding: 0.55rem 0.85rem 0.55rem 2.3rem; color: #fff; font-size: 0.85rem; outline: none;">
                             </div>
                         </div>
                         <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
                             <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                <label style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.6px;">Login Method:</label>
+                                <select id="users-auth-filter" class="form-input" style="font-size: 0.8rem; padding: 0.45rem 0.75rem; border-radius: 6px; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(212,175,55,0.3); cursor: pointer;">
+                                    <option value="all">All Methods</option>
+                                    <option value="email">Web Email ID</option>
+                                    <option value="google">Google Sign-In</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.4rem;">
                                 <label style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.6px;">Role:</label>
                                 <select id="users-role-filter" class="form-input" style="font-size: 0.8rem; padding: 0.45rem 0.75rem; border-radius: 6px; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(212,175,55,0.3); cursor: pointer;">
                                     <option value="all">All Roles</option>
+                                    <option value="patron">Connoisseur Patron</option>
                                     <option value="admin">Administrator</option>
                                     <option value="manager">Estate Manager</option>
                                     <option value="sommelier">Tea Sommelier</option>
                                     <option value="concierge">Master Concierge</option>
                                     <option value="staff">Staff Member</option>
-                                    <option value="patron">Connoisseur Patron</option>
                                 </select>
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.4rem;">
@@ -3497,20 +3515,21 @@ const UIComponents = {
                         <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
                             <thead>
                                 <tr style="background: rgba(212,175,55,0.08); border-bottom: 1px solid rgba(212,175,55,0.25); color: var(--color-gold); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.8px;">
-                                    <th style="padding: 0.85rem 1rem;">User / Account</th>
+                                    <th style="padding: 0.85rem 1rem;">User / Patron</th>
                                     <th style="padding: 0.85rem 1rem;">Email ID (Identity)</th>
+                                    <th style="padding: 0.85rem 1rem;">Web Login Method</th>
                                     <th style="padding: 0.85rem 1rem;">Role</th>
                                     <th style="padding: 0.85rem 1rem;">Status</th>
                                     <th style="padding: 0.85rem 1rem;">Phone / WhatsApp</th>
-                                    <th style="padding: 0.85rem 1rem;">Created</th>
+                                    <th style="padding: 0.85rem 1rem;">Registered</th>
                                     <th style="padding: 0.85rem 1rem; text-align: right;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="users-table-tbody">
                                 ${users.length === 0 ? `
                                     <tr>
-                                        <td colspan="7" style="text-align: center; padding: 2.5rem 1rem; color: var(--color-text-muted);">
-                                            No user accounts registered yet. Click "+ Create New User Account" to add the first user.
+                                        <td colspan="8" style="text-align: center; padding: 2.5rem 1rem; color: var(--color-text-muted);">
+                                            No user accounts registered yet. Click "+ Add User Account" to add the first user.
                                         </td>
                                     </tr>
                                 ` : users.map(u => window.renderUserTableRow(u)).join('')}
