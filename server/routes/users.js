@@ -12,6 +12,7 @@ const { sendUserAccountWelcomeEmail } = require('../services/email');
 router.get('/', async (req, res) => {
     try {
         let users = [];
+        let fetchedFromTurso = false;
 
         // 1. Fetch from Turso Cloud (authoritative primary)
         if (isTursoAvailable()) {
@@ -23,14 +24,15 @@ router.get('/', async (req, res) => {
                 `);
                 if (tursoRows && Array.isArray(tursoRows)) {
                     users = tursoRows;
+                    fetchedFromTurso = true;
                 }
             } catch (te) {
                 console.warn('Turso fetch users warning:', te.message);
             }
         }
 
-        // 2. If Turso returned empty or offline, fallback to SQLite
-        if (users.length === 0) {
+        // 2. If Turso is offline/failed, fallback to SQLite
+        if (!fetchedFromTurso) {
             try {
                 users = db.prepare(`
                     SELECT id, full_name, email, phone, role, status, created_at, last_login, password_hash

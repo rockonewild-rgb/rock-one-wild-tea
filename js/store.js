@@ -630,36 +630,59 @@ class TeaFactoryStore {
     addReview(reviewData) {
         if (!this.state.reviews) this.state.reviews = [];
         const newReview = {
-            id: "rev_" + Date.now(),
-            name: reviewData.name || "Anonymous Connoisseur",
+            id: reviewData.id || ("REV-" + Date.now().toString(36).toUpperCase()),
+            name: reviewData.name || reviewData.author || "Anonymous Connoisseur",
+            author: reviewData.author || reviewData.name || "Anonymous Connoisseur",
             location: reviewData.location || "Verified Collector",
             title: reviewData.title || "Tea Enthusiast",
             rating: Math.min(5, Math.max(1, parseInt(reviewData.rating, 10) || 5)),
             experienceType: reviewData.experienceType || "Single-Estate Experience",
-            comment: reviewData.comment || "",
-            date: reviewData.date || new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+            role: reviewData.role || reviewData.experienceType || "Estate Visitor",
+            comment: reviewData.comment || reviewData.content || "",
+            content: reviewData.content || reviewData.comment || "",
+            date: reviewData.date || reviewData.date_str || new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
         };
         this.state.reviews.unshift(newReview);
         this.saveState();
+
+        if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.createReview === 'function') {
+            TeaFactoryAPI.createReview({
+                author: newReview.name,
+                role: newReview.experienceType,
+                location: newReview.location,
+                rating: newReview.rating,
+                title: newReview.title,
+                content: newReview.comment
+            }).catch(e => console.warn('Backend createReview error:', e));
+        }
+
         return newReview;
     }
 
-    deleteReview(reviewId) {
-        if (!this.state.reviews) return;
-        this.state.reviews = this.state.reviews.filter(r => r.id !== reviewId);
+    async deleteReview(reviewId) {
+        if (!this.state.reviews) this.state.reviews = [];
+        this.state.reviews = this.state.reviews.filter(r => String(r.id) !== String(reviewId));
         this.saveState();
+
+        try {
+            if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.deleteReview === 'function') {
+                await TeaFactoryAPI.deleteReview(reviewId);
+            }
+        } catch (e) {
+            console.warn('Backend delete review error:', e);
+        }
     }
 
     getReviewStats() {
         const reviews = this.getReviews();
-        if (reviews.length === 0) {
-            return { average: 5.0, count: 0, distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } };
+        if (!reviews || reviews.length === 0) {
+            return { average: "0.0", count: 0, distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } };
         }
-        const total = reviews.reduce((sum, r) => sum + (r.rating || 5), 0);
+        const total = reviews.reduce((sum, r) => sum + (Number(r.rating) || 5), 0);
         const avg = (total / reviews.length).toFixed(1);
         const dist = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
         reviews.forEach(r => {
-            const star = Math.min(5, Math.max(1, Math.round(r.rating || 5)));
+            const star = Math.min(5, Math.max(1, Math.round(Number(r.rating) || 5)));
             dist[star] = (dist[star] || 0) + 1;
         });
         return {
@@ -2851,15 +2874,18 @@ Rock One Wild Tea Sanctuary Concierge Team
             }
 
             // 4. Sync Reviews
-            if (revRes.status === 'fulfilled' && revRes.value?.data && Array.isArray(revRes.value.data)) {
+            if (revRes.status === 'fulfilled' && revRes.value && Array.isArray(revRes.value.data)) {
                 this.state.reviews = revRes.value.data.map(r => ({
                     id: r.id,
                     name: r.author,
+                    author: r.author,
                     role: r.role,
                     location: r.location,
-                    rating: r.rating,
+                    rating: Number(r.rating) || 5,
                     title: r.title,
                     comment: r.content,
+                    content: r.content,
+                    experienceType: r.role || 'Single-Estate Experience',
                     date: r.date_str
                 }));
             }
@@ -3080,6 +3106,30 @@ const TeaFactoryAPI = {
             return json.success ? json : null;
         } catch (e) {
             return null;
+        }
+    },
+
+    async createReview(payload) {
+        try {
+            const res = await fetch(`${this.baseUrl}/reviews`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async deleteReview(id) {
+        try {
+            const res = await fetch(`${this.baseUrl}/reviews/${encodeURIComponent(id)}`, {
+                method: 'DELETE'
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
         }
     },
 

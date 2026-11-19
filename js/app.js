@@ -10599,17 +10599,21 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', () => {
                 const revId = btn.getAttribute('data-id');
                 const rev = (window.TeaFactoryStore.getReviews() || []).find(r => String(r.id) === String(revId));
-                const revAuthor = rev ? `${rev.author} (${rev.rating}★)` : `Review #${revId}`;
+                const revAuthor = rev ? `${rev.name || rev.author || 'Review'} (${rev.rating}★)` : `Review #${revId}`;
                 showDeleteConfirmModal({
                     title: 'Delete Customer Review',
                     subtitle: 'Customer Experience Desk',
                     itemName: revAuthor,
-                    message: 'Are you sure you want to delete this customer review? It will be permanently removed from guest testimonials.',
+                    message: 'Are you sure you want to delete this customer review? It will be permanently removed from the database and guest testimonials.',
                     confirmText: 'Delete Review',
-                    onConfirm: () => {
-                        window.TeaFactoryStore.deleteReview(revId);
-                        showToast("Review Deleted", "Customer review has been removed.", "success");
+                    onConfirm: async () => {
+                        await window.TeaFactoryStore.deleteReview(revId);
+                        showToast("Review Deleted", "Customer review has been permanently removed.", "success");
                         renderTabContent('admin');
+                        if (window.UIComponents && typeof window.UIComponents.renderTestimonials === 'function') {
+                            window.UIComponents.renderTestimonials('home-testimonials-container');
+                            bindReviewEvents();
+                        }
                     }
                 });
             });

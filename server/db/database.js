@@ -360,9 +360,9 @@ function seedInitialData() {
         });
     }
 
-    // 4. Seed Reviews
+    // 4. Seed Reviews (Only on brand-new fresh database creation)
     const revCount = db.prepare('SELECT COUNT(*) as count FROM reviews').get().count;
-    if (revCount === 0) {
+    if (prodCount === 0 && revCount === 0) {
         const insertRev = db.prepare(`
             INSERT INTO reviews (id, author, role, location, rating, title, content, date_str, is_verified)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)

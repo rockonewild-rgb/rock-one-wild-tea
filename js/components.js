@@ -2922,27 +2922,27 @@ const UIComponents = {
                                 </tr>
                             </thead>
                             <tbody>
-                                ${allReviews.map(r => `
+                                ${allReviews && allReviews.length > 0 ? allReviews.map(r => `
                                     <tr>
                                         <td>
                                             <span style="color: var(--color-gold); font-size: 0.95rem; letter-spacing: 1px;">
-                                                ${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}
+                                                ${'★'.repeat(Number(r.rating) || 5)}${'☆'.repeat(5 - (Number(r.rating) || 5))}
                                             </span>
                                         </td>
                                         <td>
-                                            <strong>${r.name}</strong><br>
-                                            <small style="color: var(--color-text-muted);">${r.title ? r.title + ' • ' : ''}${r.location}</small>
+                                            <strong>${r.name || r.author || 'Guest'}</strong><br>
+                                            <small style="color: var(--color-text-muted);">${r.title ? r.title + ' • ' : ''}${r.location || ''}</small>
                                         </td>
                                         <td>
                                             <span class="box-badge status-available" style="font-size: 0.7rem;">
-                                                ${r.experienceType || 'Estate Experience'}
+                                                ${r.experienceType || r.role || 'Estate Experience'}
                                             </span>
                                         </td>
                                         <td style="max-width: 320px; font-size: 0.82rem; line-height: 1.5; color: #f1f5f9;">
-                                            "${r.comment}"
+                                            "${r.comment || r.content || ''}"
                                         </td>
                                         <td style="font-size: 0.75rem; color: var(--color-text-muted); white-space: nowrap;">
-                                            ${r.date}
+                                            ${r.date || r.date_str || ''}
                                         </td>
                                         <td>
                                             <button class="btn btn-outline btn-delete-review" data-id="${r.id}" style="padding: 0.3rem 0.65rem; font-size: 0.7rem; color: #ef4444; border-color: rgba(239,68,68,0.3);">
@@ -2950,7 +2950,13 @@ const UIComponents = {
                                             </button>
                                         </td>
                                     </tr>
-                                `).join('')}
+                                `).join('') : `
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; padding: 3rem 1.5rem; color: var(--color-text-muted);">
+                                            No customer reviews found. Verified reviews will appear here once submitted.
+                                        </td>
+                                    </tr>
+                                `}
                             </tbody>
                         </table>
                     </div>
@@ -4449,7 +4455,8 @@ const UIComponents = {
         if (!container) return;
 
         const reviews = window.TeaFactoryStore ? window.TeaFactoryStore.getReviews() : [];
-        const stats = window.TeaFactoryStore ? window.TeaFactoryStore.getReviewStats() : { average: 5.0, count: 5 };
+        const stats = window.TeaFactoryStore ? window.TeaFactoryStore.getReviewStats() : { average: "0.0", count: 0 };
+        const hasReviews = reviews && reviews.length > 0;
 
         container.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1.5rem;">
@@ -4462,9 +4469,9 @@ const UIComponents = {
                 <!-- Rating Stats & Action Pill -->
                 <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                     <div style="background: rgba(3, 14, 8, 0.7); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 12px; padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 0.85rem; box-shadow: 0 4px 15px rgba(0,0,0,0.35);">
-                        <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-serif); color: var(--color-gold); line-height: 1;">${stats.average}</div>
+                        <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-serif); color: var(--color-gold); line-height: 1;">${hasReviews ? stats.average : '—'}</div>
                         <div>
-                            <div style="color: var(--color-gold); font-size: 0.9rem; letter-spacing: 2px;">★★★★★</div>
+                            <div style="color: var(--color-gold); font-size: 0.9rem; letter-spacing: 2px;">${hasReviews ? '★★★★★' : '☆☆☆☆☆'}</div>
                             <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">${stats.count} Verified Reviews</span>
                         </div>
                     </div>
@@ -4476,28 +4483,33 @@ const UIComponents = {
             </div>
             
             <div class="testimonials-grid-layout">
-                ${reviews.map(rev => `
+                ${hasReviews ? reviews.map(rev => `
                     <div class="testimonial-card-item">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
                             <div class="stars-rating" style="color: var(--color-gold); letter-spacing: 3px; font-size: 1.1rem;">
-                                ${'★'.repeat(rev.rating)}${'☆'.repeat(5 - rev.rating)}
+                                ${'★'.repeat(Number(rev.rating) || 5)}${'☆'.repeat(5 - (Number(rev.rating) || 5))}
                             </div>
                             <span style="font-size: 0.7rem; color: var(--color-gold-light); background: rgba(212, 175, 55, 0.12); padding: 0.2rem 0.6rem; border-radius: 20px; border: 1px solid rgba(212, 175, 55, 0.25);">
-                                ${rev.experienceType || 'Estate Experience'}
+                                ${rev.experienceType || rev.role || 'Estate Experience'}
                             </span>
                         </div>
                         <p class="testimonial-quote-text" style="font-style: italic; color: #f1f5f9; line-height: 1.7; margin-bottom: 1.25rem;">
-                            "${rev.comment}"
+                            "${rev.comment || rev.content || ''}"
                         </p>
                         <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.85rem; display: flex; justify-content: space-between; align-items: flex-end;">
                             <div>
-                                <h4 class="testimonial-author-name" style="color: var(--color-white); font-size: 0.95rem; margin-bottom: 0.2rem;">${rev.name}</h4>
-                                <p class="testimonial-author-title" style="color: var(--color-gold); font-size: 0.78rem; margin: 0;">${rev.title ? rev.title + ' • ' : ''}${rev.location}</p>
+                                <h4 class="testimonial-author-name" style="color: var(--color-white); font-size: 0.95rem; margin-bottom: 0.2rem;">${rev.name || rev.author || 'Guest'}</h4>
+                                <p class="testimonial-author-title" style="color: var(--color-gold); font-size: 0.78rem; margin: 0;">${rev.title ? rev.title + ' • ' : ''}${rev.location || ''}</p>
                             </div>
-                            <span style="font-size: 0.7rem; color: var(--color-text-muted);">${rev.date}</span>
+                            <span style="font-size: 0.7rem; color: var(--color-text-muted);">${rev.date || rev.date_str || ''}</span>
                         </div>
                     </div>
-                `).join('')}
+                `).join('') : `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; background: rgba(3, 14, 8, 0.4); border: 1px dashed rgba(212, 175, 55, 0.25); border-radius: 12px;">
+                        <p style="color: var(--color-gold); font-size: 1.05rem; margin-bottom: 0.4rem; font-family: var(--font-serif);">No Guest Reviews Published Yet</p>
+                        <p style="color: var(--color-text-muted); font-size: 0.85rem; margin: 0;">Be the first connoisseur or estate visitor to submit your rating and tasting impressions.</p>
+                    </div>
+                `}
             </div>
         `;
     },
@@ -6916,3 +6928,4 @@ window.getSeasonalSkyRigHtml = function(themeId) {
     // All other themes use custom ambient full-screen canvas particle & atmosphere engines (no flying cartoon rigs)
     return '';
 };
+ 
