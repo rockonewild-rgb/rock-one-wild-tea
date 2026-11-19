@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const router = express.Router();
 const { db } = require('../db/database');
 const { rawSupabase, createAuthClient, isSupabaseAvailable, isConnectivityOrServiceError } = require('../db/supabase');
+const { isTursoAvailable, queryTurso, executeTurso } = require('../db/turso');
 
 const AUTH_TIMEOUT_MS = 4500;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -36,56 +37,113 @@ async function withTimeout(promise, ms = AUTH_TIMEOUT_MS) {
     }
 }
 
-function syncSqliteUser({ id, full_name, email, phone = '', password }) {
+async function syncUserToDatabase({ id, full_name, email, phone = '', password_hash = 'OAUTH_GOOGLE' }) {
+    // 1. SQLite Local
     try {
-        const hash = hashPassword(password);
         db.prepare(`
-            INSERT OR REPLACE INTO customer_users (id, full_name, email, phone, password_hash)
+            INSERT INTO customer_users (id, full_name, email, phone, password_hash)
             VALUES (?, ?, ?, ?, ?)
-        `).run(id, full_name, email, phone, hash);
+            ON CONFLICT(id) DO UPDATE SET
+                full_name = excluded.full_name,
+                email = excluded.email,
+                phone = excluded.phone,
+                password_hash = excluded.password_hash
+        `).run(id, full_name, email, phone, password_hash);
     } catch (e) {
         console.warn('⚠️ [Auth] SQLite user cache sync notice:', e.message);
     }
+
+    // 2. Turso Cloud
+    if (isTursoAvailable()) {
+        try {
+            await executeTurso(`
+                INSERT INTO customer_users (id, full_name, email, phone, password_hash)
+                VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    full_name = excluded.full_name,
+                    email = excluded.email,
+                    phone = excluded.phone,
+                    password_hash = excluded.password_hash
+            `, [id, full_name, email, phone, password_hash]);
+        } catch (te) {
+            console.warn('⚠️ [Auth] Turso user sync notice:', te.message);
+        }
+    }
+}
+
+function syncSqliteUser({ id, full_name, email, phone = '', password }) {
+    const hash = hashPassword(password);
+    syncUserToDatabase({ id, full_name, email, phone, password_hash: hash }).catch(() => {});
 }
 
 /**
+ * GET /api/auth/google/config
+ * Expose configured Google Client ID to frontend for Google Identity Services (GIS)
+ */
+router.get('/google/config', (req, res) => {
+    const clientId = (process.env.GOOGLE_CLIENT_ID || '25319114091-3dfpdlddbi971fmmcrlepjq2ppkaqqet.apps.googleusercontent.com').trim();
+    res.json({
+        success: true,
+        clientId
+    });
+});
+
+/**
  * GET /api/auth/google/url
- * Generate Supabase OAuth authorization URL for Google Sign-In
+ * Generate OAuth authorization URL for Google Sign-In
+ * Supports https://www.rockonewild.com and custom domain origins
  */
 router.get('/google/url', async (req, res) => {
     try {
-        const clientOrigin = req.query.origin || `${req.protocol}://${req.get('host')}`;
+        let clientOrigin = req.query.origin || req.headers.origin || `${req.protocol}://${req.get('host')}`;
+        clientOrigin = String(clientOrigin).replace(/\/+$/, '');
         const redirectTo = `${clientOrigin}/?auth_provider=google`;
 
-        if (!isSupabaseAvailable() || !rawSupabase) {
-            return res.status(503).json({
-                success: false,
-                error: 'Supabase authentication service is currently offline. Please sign in with Email ID.'
-            });
-        }
+        // 1. Primary: Supabase OAuth if available
+        if (isSupabaseAvailable() && rawSupabase) {
+            try {
+                const { data, error } = await withTimeout(
+                    rawSupabase.auth.signInWithOAuth({
+                        provider: 'google',
+                        options: {
+                            redirectTo,
+                            queryParams: {
+                                access_type: 'offline',
+                                prompt: 'consent'
+                            }
+                        }
+                    })
+                );
 
-        const { data, error } = await withTimeout(
-            rawSupabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo,
-                    queryParams: {
-                        access_type: 'offline',
-                        prompt: 'consent'
-                    }
+                if (!error && data && data.url) {
+                    return res.json({ success: true, url: data.url, mode: 'supabase', redirectTo });
                 }
-            })
-        );
-
-        if (error) {
-            return res.status(400).json({ success: false, error: error.message });
+                if (error) {
+                    console.warn('⚠️ [Auth] Supabase signInWithOAuth notice:', error.message);
+                }
+            } catch (sbErr) {
+                console.warn('⚠️ [Auth] Supabase signInWithOAuth exception:', sbErr.message);
+            }
         }
 
-        if (!data || !data.url) {
-            return res.status(500).json({ success: false, error: 'Could not generate Google authorization URL.' });
+        // 2. Direct Google OAuth fallback if Supabase is offline or not configured
+        const clientId = (process.env.GOOGLE_CLIENT_ID || '25319114091-3dfpdlddbi971fmmcrlepjq2ppkaqqet.apps.googleusercontent.com').trim();
+        if (clientId) {
+            const googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' + new URLSearchParams({
+                client_id: clientId,
+                redirect_uri: redirectTo,
+                response_type: 'token id_token',
+                scope: 'openid email profile',
+                prompt: 'select_account consent',
+                nonce: crypto.randomBytes(16).toString('hex')
+            }).toString();
+            return res.json({ success: true, url: googleAuthUrl, mode: 'google-direct', redirectTo });
         }
 
-        res.json({ success: true, url: data.url });
+        res.status(503).json({
+            success: false,
+            error: 'Google authentication service is currently not configured.'
+        });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message || 'Google OAuth initialization failed.' });
     }
@@ -93,58 +151,126 @@ router.get('/google/url', async (req, res) => {
 
 /**
  * POST /api/auth/verify-token
- * Verify a Supabase access token (e.g. from Google OAuth callback hash) and retrieve patron profile
+ * Verify access token (from Supabase OAuth or Google ID token) and retrieve/sync patron profile
  */
 router.post('/verify-token', async (req, res) => {
     try {
-        const token = (req.body.access_token || req.body.token || '').trim();
+        const token = (req.body.access_token || req.body.token || req.body.credential || '').trim();
         if (!token) {
-            return res.status(400).json({ success: false, error: 'Access token is required.' });
+            return res.status(400).json({ success: false, error: 'Access token or credential is required.' });
         }
 
-        if (!isSupabaseAvailable() || !rawSupabase) {
-            return res.status(503).json({ success: false, error: 'Supabase authentication service is currently offline.' });
+        let userObj = null;
+        let authSource = 'unknown';
+
+        // 1. Try Supabase Auth getUser if online
+        if (isSupabaseAvailable() && rawSupabase) {
+            try {
+                const { data, error } = await withTimeout(rawSupabase.auth.getUser(token));
+                if (!error && data && data.user) {
+                    const u = data.user;
+                    const meta = u.user_metadata || {};
+                    const fullName = meta.full_name || meta.name || meta.user_name || (u.email ? u.email.split('@')[0] : 'Patron');
+                    userObj = {
+                        id: u.id,
+                        email: u.email ? u.email.toLowerCase() : '',
+                        full_name: fullName,
+                        phone: meta.phone || ''
+                    };
+                    authSource = 'supabase-oauth';
+                }
+            } catch (sbErr) {}
         }
 
-        const { data, error } = await withTimeout(rawSupabase.auth.getUser(token));
-        if (error || !data || !data.user) {
+        // 2. Fallback: Verify directly with Google tokeninfo (for Google ID tokens or GIS credentials)
+        if (!userObj) {
+            try {
+                const gRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(token)}`);
+                const gData = await gRes.json();
+                if (gData && gData.email && !gData.error) {
+                    userObj = {
+                        id: 'G-' + (gData.sub || Date.now().toString(36)),
+                        email: gData.email.toLowerCase(),
+                        full_name: gData.name || gData.given_name || gData.email.split('@')[0],
+                        phone: ''
+                    };
+                    authSource = 'google-id-token';
+                }
+            } catch (gErr) {}
+        }
+
+        if (!userObj) {
             return res.status(401).json({
                 success: false,
-                error: error ? error.message : 'Invalid or expired session token.'
+                error: 'Invalid or expired session token.'
             });
         }
 
-        const u = data.user;
-        const meta = u.user_metadata || {};
-        const fullName = meta.full_name || meta.name || meta.user_name || (u.email ? u.email.split('@')[0] : 'Patron');
-        const phone = meta.phone || '';
-
-        const userObj = {
-            id: u.id,
-            email: u.email,
-            full_name: fullName,
-            phone
-        };
-
-        // Cache patron locally for offline compatibility
-        try {
-            db.prepare(`
-                INSERT OR REPLACE INTO customer_users (id, full_name, email, phone, password_hash)
-                VALUES (?, ?, ?, ?, ?)
-            `).run(userObj.id, userObj.full_name, userObj.email, userObj.phone, 'OAUTH_GOOGLE');
-        } catch (e) {
-            console.warn('⚠️ [Auth verify-token] SQLite sync notice:', e.message);
-        }
+        // Sync patron to SQLite and Turso Cloud
+        await syncUserToDatabase({
+            id: userObj.id,
+            full_name: userObj.full_name,
+            email: userObj.email,
+            phone: userObj.phone,
+            password_hash: 'OAUTH_GOOGLE'
+        });
 
         res.json({
             success: true,
-            source: 'supabase-oauth',
+            source: authSource,
             message: `Welcome to Rock One Wild Tea, ${userObj.full_name}.`,
             user: userObj,
             token
         });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message || 'Token verification failed.' });
+    }
+});
+
+/**
+ * POST /api/auth/google/verify-credential
+ * Direct verification endpoint for Google Identity Services (GIS) One-Tap / Popup
+ */
+router.post('/google/verify-credential', async (req, res) => {
+    try {
+        const credential = (req.body.credential || req.body.token || '').trim();
+        if (!credential) {
+            return res.status(400).json({ success: false, error: 'Google credential token is required.' });
+        }
+
+        const gRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+        const gData = await gRes.json();
+        if (gData.error || !gData.email) {
+            return res.status(401).json({
+                success: false,
+                error: gData.error_description || 'Invalid Google credential token.'
+            });
+        }
+
+        const userObj = {
+            id: 'G-' + (gData.sub || Date.now().toString(36)),
+            email: gData.email.toLowerCase(),
+            full_name: gData.name || gData.given_name || gData.email.split('@')[0],
+            phone: ''
+        };
+
+        await syncUserToDatabase({
+            id: userObj.id,
+            full_name: userObj.full_name,
+            email: userObj.email,
+            phone: '',
+            password_hash: 'OAUTH_GOOGLE'
+        });
+
+        res.json({
+            success: true,
+            source: 'google-identity-services',
+            message: `Welcome to Rock One Wild Tea, ${userObj.full_name}.`,
+            user: userObj,
+            token: credential
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message || 'Google token verification failed.' });
     }
 });
 

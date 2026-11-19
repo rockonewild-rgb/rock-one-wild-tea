@@ -3307,6 +3307,141 @@ const TeaFactoryAPI = {
         }
     },
 
+    async getGoogleConfig() {
+        try {
+            const res = await fetch(`${this.baseUrl}/auth/google/config`);
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async getGoogleAuthUrl(originOverride) {
+        try {
+            const origin = originOverride || (typeof window !== 'undefined' && window.location && window.location.origin 
+                ? window.location.origin 
+                : 'https://www.rockonewild.com');
+            const res = await fetch(`${this.baseUrl}/auth/google/url?origin=${encodeURIComponent(origin)}`);
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async verifyAuthToken(token) {
+        try {
+            const res = await fetch(`${this.baseUrl}/auth/verify-token`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token })
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async verifyGoogleCredential(credential) {
+        try {
+            const res = await fetch(`${this.baseUrl}/auth/google/verify-credential`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ credential })
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async loginCustomer(credentials) {
+        try {
+            const res = await fetch(`${this.baseUrl}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(credentials)
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async registerCustomer(userData) {
+        try {
+            const res = await fetch(`${this.baseUrl}/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async logoutCustomer() {
+        try {
+            const res = await fetch(`${this.baseUrl}/auth/logout`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async createUser(userData) {
+        try {
+            const res = await fetch(`${this.baseUrl}/users`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async updateUser(id, updates) {
+        try {
+            const res = await fetch(`${this.baseUrl}/users/${encodeURIComponent(id)}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates)
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async deleteUser(id) {
+        try {
+            const res = await fetch(`${this.baseUrl}/users/${encodeURIComponent(id)}`, {
+                method: 'DELETE'
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async resetUserPassword(id, newPassword, sendEmail = true) {
+        try {
+            const res = await fetch(`${this.baseUrl}/users/${encodeURIComponent(id)}/reset-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ newPassword, sendEmail })
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
     async subscribeNewsletter(email) {
         try {
             const res = await fetch(`${this.baseUrl}/newsletter/subscribe`, {

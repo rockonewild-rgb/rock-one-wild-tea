@@ -14219,6 +14219,46 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         window.requireCustomerAuth = requireCustomerAuth;
         window.logoutPatron = handleCustomerSignOut;
 
+        // Google Identity Services (GIS) One-Tap / Popup Setup
+        async function initGoogleIdentityServices() {
+            try {
+                if (!window.TeaFactoryAPI || typeof window.TeaFactoryAPI.getGoogleConfig !== 'function') return;
+                const cfg = await window.TeaFactoryAPI.getGoogleConfig();
+                if (!cfg || !cfg.success || !cfg.clientId) return;
+
+                const clientId = cfg.clientId;
+
+                const checkGIS = setInterval(() => {
+                    if (window.google && window.google.accounts && window.google.accounts.id) {
+                        clearInterval(checkGIS);
+                        window.google.accounts.id.initialize({
+                            client_id: clientId,
+                            callback: async (response) => {
+                                if (response && response.credential) {
+                                    showToast('Google Sign In', 'Authenticating Google Patron...', 'info');
+                                    const res = await window.TeaFactoryAPI.verifyGoogleCredential(response.credential);
+                                    if (res && res.success && res.user) {
+                                        completeAuthentication({ ...res.user, token: response.credential }, 'Welcome');
+                                        showToast('Signed In', `Welcome back to Rock One Wild Tea, ${res.user.full_name}.`, 'success');
+                                        closeModal();
+                                    } else {
+                                        showToast('Sign In Failed', (res && res.error) || 'Could not verify Google account.', 'warning');
+                                    }
+                                }
+                            },
+                            auto_select: false,
+                            cancel_on_tap_outside: true
+                        });
+                    }
+                }, 300);
+
+                setTimeout(() => clearInterval(checkGIS), 8000);
+            } catch (e) {
+                console.warn('GIS init exception:', e);
+            }
+        }
+        initGoogleIdentityServices();
+
         // Google Sign In Trigger
         authGoogleBtn?.addEventListener('click', async () => {
             setError(authGoogleErr, '');
@@ -14227,16 +14267,50 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 authGoogleBtn.style.opacity = '0.75';
             }
 
-            const res = await window.TeaFactoryAPI.getGoogleAuthUrl();
-            if (res && res.success && res.url) {
-                window.location.href = res.url;
-            } else {
-                if (authGoogleBtn) {
-                    authGoogleBtn.disabled = false;
-                    authGoogleBtn.style.opacity = '1';
+            // If GIS prompt is available, try prompt first
+            if (window.google && window.google.accounts && window.google.accounts.id) {
+                try {
+                    let prompted = false;
+                    window.google.accounts.id.prompt((notification) => {
+                        prompted = true;
+                        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                            fallbackToGoogleRedirect();
+                        }
+                    });
+                    setTimeout(() => {
+                        if (!prompted && authGoogleBtn && authGoogleBtn.disabled) {
+                            fallbackToGoogleRedirect();
+                        }
+                    }, 2500);
+                    return;
+                } catch (e) {
+                    // Fall through to redirect
                 }
-                const err = (res && res.error) ? res.error : 'Google Sign In is not yet enabled or configured in Supabase.';
-                setError(authGoogleErr, err);
+            }
+
+            fallbackToGoogleRedirect();
+
+            async function fallbackToGoogleRedirect() {
+                try {
+                    const currentOrigin = window.location.origin || 'https://www.rockonewild.com';
+                    const res = await window.TeaFactoryAPI.getGoogleAuthUrl(currentOrigin);
+                    if (res && res.success && res.url) {
+                        window.location.href = res.url;
+                    } else {
+                        if (authGoogleBtn) {
+                            authGoogleBtn.disabled = false;
+                            authGoogleBtn.style.opacity = '1';
+                        }
+                        const err = (res && res.error) ? res.error : 'Google Sign In is not yet enabled or configured in Supabase.';
+                        setError(authGoogleErr, err);
+                    }
+                } catch (err) {
+                    if (authGoogleBtn) {
+                        authGoogleBtn.disabled = false;
+                        authGoogleBtn.style.opacity = '1';
+                    }
+                    setError(authGoogleErr, err.message || 'Google Sign In error.');
+                }
             }
         });
 
@@ -14245,13 +14319,14 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             try {
                 const hash = window.location.hash || '';
                 const search = window.location.search || '';
-                const isGoogleReturn = search.includes('auth_provider=google') || hash.includes('access_token=');
+                const isGoogleReturn = search.includes('auth_provider=google') || hash.includes('access_token=') || hash.includes('id_token=');
 
                 if (!isGoogleReturn) return;
 
                 const hashParams = new URLSearchParams(hash.replace(/^#/, ''));
-                const accessToken = hashParams.get('access_token');
-                const errorDesc = hashParams.get('error_description') || hashParams.get('error');
+                const searchParams = new URLSearchParams(search.replace(/^\?/, ''));
+                const accessToken = hashParams.get('access_token') || hashParams.get('id_token') || searchParams.get('access_token');
+                const errorDesc = hashParams.get('error_description') || hashParams.get('error') || searchParams.get('error_description') || searchParams.get('error');
 
                 if (errorDesc) {
                     showToast('Google Sign In', decodeURIComponent(errorDesc).replace(/\+/g, ' '), 'warning');
