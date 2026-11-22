@@ -296,7 +296,7 @@ const UIComponents = {
                                     ${SVG_ICONS.calendar} ${ann.date}
                                 </span>
                             </div>
-                            <h4 class="box-title" style="font-size: 1.15rem; margin-top: 0.3rem; margin-bottom: 0.5rem; color: var(--color-white);">${ann.title}</h4>
+                            <h4 class="box-title" style="font-size: 1.15rem; margin-top: 0.3rem; margin-bottom: 0.5rem; color: var(--color-text-primary);">${ann.title}</h4>
                             <p class="box-details" style="line-height: 1.6; font-size: 0.8rem; height: 50px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 0;">${ann.content}</p>
                         </div>
                         <div class="box-footer" style="margin-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 0.75rem; text-align: right;">
@@ -706,7 +706,7 @@ const UIComponents = {
                 
                 <!-- Right Side: Number Selector Matrix -->
                 <div class="grid-card">
-                    <h4 class="grid-title" style="font-family: var(--font-serif); font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--color-white);">${_t('season_branding_badge', 'Select Box Number')}</h4>
+                    <h4 class="grid-title" style="font-family: var(--font-serif); font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--color-text-primary);">${_t('season_branding_badge', 'Select Box Number')}</h4>
                     <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 1.5rem;">${_t('season_branding_sub', 'Choose an available box slot below to submit an enquiry.')}</p>
                     
                     <div class="num-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem;">
@@ -818,27 +818,27 @@ const UIComponents = {
 
             <!-- Operating Guidelines 4-Card Summary Grid -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 3.5rem;">
-                <div style="background: rgba(6, 20, 12, 0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 12px; padding: 1.25rem; backdrop-filter: blur(8px);">
-                    <div style="color: var(--color-gold); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.4rem;">Operating Days</div>
-                    <div style="font-size: 1.05rem; font-weight: 600; color: #ffffff; margin-bottom: 0.25rem;">Monday – Saturday</div>
+                <div style="background: #ffffff; border: 1px solid #e8e4df; border-radius: 12px; padding: 1.25rem; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
+                    <div style="color: #7a5a06; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.4rem;">Operating Days</div>
+                    <div style="font-size: 1.05rem; font-weight: 600; color: var(--color-text-primary); margin-bottom: 0.25rem;">Monday – Saturday</div>
                     <div style="font-size: 0.8rem; color: var(--color-text-muted);">Available by advance booking. Sunday reserved for family &amp; processing.</div>
                 </div>
 
-                <div style="background: rgba(6, 20, 12, 0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 12px; padding: 1.25rem; backdrop-filter: blur(8px);">
-                    <div style="color: var(--color-gold); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.4rem;">Opening Hours</div>
-                    <div style="font-size: 1.05rem; font-weight: 600; color: #ffffff; margin-bottom: 0.25rem;">9:00 AM – 5:00 PM</div>
+                <div style="background: #ffffff; border: 1px solid #e8e4df; border-radius: 12px; padding: 1.25rem; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
+                    <div style="color: #7a5a06; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.4rem;">Opening Hours</div>
+                    <div style="font-size: 1.05rem; font-weight: 600; color: var(--color-text-primary); margin-bottom: 0.25rem;">9:00 AM – 5:00 PM</div>
                     <div style="font-size: 0.8rem; color: var(--color-text-muted);">4 designated daily slots: 9:30 AM, 11:00 AM, 1:30 PM &amp; 3:30 PM.</div>
                 </div>
 
-                <div style="background: rgba(6, 20, 12, 0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 12px; padding: 1.25rem; backdrop-filter: blur(8px);">
-                    <div style="color: var(--color-gold); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.4rem;">Visitor Capacity</div>
-                    <div style="font-size: 1.05rem; font-weight: 600; color: #ffffff; margin-bottom: 0.25rem;">Max 10 / No Minimum</div>
+                <div style="background: #ffffff; border: 1px solid #e8e4df; border-radius: 12px; padding: 1.25rem; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
+                    <div style="color: #7a5a06; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.4rem;">Visitor Capacity</div>
+                    <div style="font-size: 1.05rem; font-weight: 600; color: var(--color-text-primary); margin-bottom: 0.25rem;">Max 10 / No Minimum</div>
                     <div style="font-size: 0.8rem; color: var(--color-text-muted);">Private tours for individuals, couples and small groups are welcome.</div>
                 </div>
 
-                <div style="background: rgba(6, 20, 12, 0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 12px; padding: 1.25rem; backdrop-filter: blur(8px);">
-                    <div style="color: var(--color-gold); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.4rem;">Tour Duration</div>
-                    <div style="font-size: 1.05rem; font-weight: 600; color: #ffffff; margin-bottom: 0.25rem;">Approx. 1.5 – 2 Hours</div>
+                <div style="background: #ffffff; border: 1px solid #e8e4df; border-radius: 12px; padding: 1.25rem; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
+                    <div style="color: #7a5a06; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.4rem;">Tour Duration</div>
+                    <div style="font-size: 1.05rem; font-weight: 600; color: var(--color-text-primary); margin-bottom: 0.25rem;">Approx. 1.5 – 2 Hours</div>
                     <div style="font-size: 0.8rem; color: var(--color-text-muted);">Personalized, unhurried walk through our estate and handcrafted factory.</div>
                 </div>
             </div>
@@ -852,50 +852,50 @@ const UIComponents = {
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
-                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: rgba(255,255,255,0.03); padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
-                        <span style="color: var(--color-gold); font-size: 1.1rem; line-height: 1;">✦</span>
+                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: #fbf9f5; padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid #ebd9b8;">
+                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">✦</span>
                         <div>
-                            <strong style="color: #ffffff; font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">History of Our Tea Garden</strong>
+                            <strong style="color: var(--color-text-primary); font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">History of Our Tea Garden</strong>
                             <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Learn the origin of our Uva Medium estate, natural forest biome, and landmark rock formation.</span>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: rgba(255,255,255,0.03); padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
-                        <span style="color: var(--color-gold); font-size: 1.1rem; line-height: 1;">✦</span>
+                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: #fbf9f5; padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid #ebd9b8;">
+                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">✦</span>
                         <div>
-                            <strong style="color: #ffffff; font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Walk Through Our Family Tea Factory</strong>
+                            <strong style="color: var(--color-text-primary); font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Walk Through Our Family Tea Factory</strong>
                             <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Step inside our small-batch processing rooms where the human touch guides every batch.</span>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: rgba(255,255,255,0.03); padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
-                        <span style="color: var(--color-gold); font-size: 1.1rem; line-height: 1;">✦</span>
+                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: #fbf9f5; padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid #ebd9b8;">
+                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">✦</span>
                         <div>
-                            <strong style="color: #ffffff; font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Traditional Handcrafted Production</strong>
+                            <strong style="color: var(--color-text-primary); font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Traditional Handcrafted Production</strong>
                             <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Understand the delicate techniques of artisan withering, rolling, oxidation, and wood-fired drying.</span>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: rgba(255,255,255,0.03); padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
-                        <span style="color: var(--color-gold); font-size: 1.1rem; line-height: 1;">✦</span>
+                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: #fbf9f5; padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid #ebd9b8;">
+                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">✦</span>
                         <div>
-                            <strong style="color: #ffffff; font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Tea Leaf Selection &amp; Processing</strong>
+                            <strong style="color: var(--color-text-primary); font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Tea Leaf Selection &amp; Processing</strong>
                             <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Discover how carefully chosen leaf plucking produces distinctive aromas and tasting profiles.</span>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: rgba(255,255,255,0.03); padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
-                        <span style="color: var(--color-gold); font-size: 1.1rem; line-height: 1;">✦</span>
+                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: #fbf9f5; padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid #ebd9b8;">
+                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">✦</span>
                         <div>
-                            <strong style="color: #ffffff; font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Guided Tea Tasting Experience</strong>
+                            <strong style="color: var(--color-text-primary); font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Guided Tea Tasting Experience</strong>
                             <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Taste and compare our pure Ceylon varieties brewed to perfection.</span>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: rgba(255,255,255,0.03); padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
-                        <span style="color: var(--color-gold); font-size: 1.1rem; line-height: 1;">✦</span>
+                    <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: #fbf9f5; padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid #ebd9b8;">
+                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">✦</span>
                         <div>
-                            <strong style="color: #ffffff; font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Q&amp;A &amp; Natural Surroundings</strong>
+                            <strong style="color: var(--color-text-primary); font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Q&amp;A &amp; Natural Surroundings</strong>
                             <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Ample time to converse with our tea makers and enjoy the serene mountain sanctuary.</span>
                         </div>
                     </div>
@@ -6656,8 +6656,8 @@ const UIComponents = {
                                     <input type="radio" name="cart-shipping-method" id="cart-ship-ems" value="ems_express" checked style="margin-top: 0.25rem;">
                                     <div style="flex: 1;">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
-                                            <strong id="cart-shipping-ems-title" style="color: #ffffff; font-size: 0.88rem;">${isSriLanka ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air'}</strong>
-                                            <span id="cart-shipping-ems-price-pill" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-size: 0.8rem; font-weight: 700;">${formattedShipping}</span>
+                                            <strong id="cart-shipping-ems-title" style="color: var(--color-text-primary); font-size: 0.88rem;">${isSriLanka ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air'}</strong>
+                                            <span id="cart-shipping-ems-price-pill" style="color: ${shippingUSD > 0 ? '#15803d' : 'var(--color-gold)'}; font-size: 0.8rem; font-weight: 700;">${formattedShipping}</span>
                                         </div>
                                         <p id="cart-shipping-ems-desc" style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; margin: 0;">
                                             ${isSriLanka ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
@@ -6665,12 +6665,12 @@ const UIComponents = {
                                     </div>
                                 </label>
 
-                                <label class="radio-card" id="cart-shipping-card-cod" style="display: ${isSriLanka ? 'flex' : 'none'}; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 1rem; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 10px; background: rgba(0,0,0,0.3); cursor: pointer;">
+                                <label class="radio-card" id="cart-shipping-card-cod" style="display: ${isSriLanka ? 'flex' : 'none'}; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 1rem; border: 1.5px solid #d1d5db; border-radius: 10px; background: #ffffff; cursor: pointer;">
                                     <input type="radio" name="cart-shipping-method" id="cart-ship-cod" value="cod" style="margin-top: 0.25rem;">
                                     <div style="flex: 1;">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
-                                            <strong style="color: #ffffff; font-size: 0.88rem;">Cash on Delivery (COD &bull; Pay to Courier)</strong>
-                                            <span id="cart-shipping-cod-price-pill" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-size: 0.8rem; font-weight: 700;">${formattedShipping}</span>
+                                            <strong style="color: var(--color-text-primary); font-size: 0.88rem;">Cash on Delivery (COD &bull; Pay to Courier)</strong>
+                                            <span id="cart-shipping-cod-price-pill" style="color: ${shippingUSD > 0 ? '#15803d' : 'var(--color-gold)'}; font-size: 0.8rem; font-weight: 700;">${formattedShipping}</span>
                                         </div>
                                         <p style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; margin: 0;">
                                             Pay cash upon parcel delivery at your doorstep anywhere in Sri Lanka.
@@ -6765,16 +6765,16 @@ const UIComponents = {
 
                                 <!-- PayPal Panel -->
                                 <div id="cart-pay-panel-paypal" class="pay-panel pay-panel-paypal">
-                                    <div style="background: linear-gradient(135deg, rgba(0,121,193,0.12) 0%, rgba(4,14,8,0.92) 100%); border: 1.5px solid rgba(0,121,193,0.45); border-radius: 8px; padding: 1.15rem;">
+                                    <div style="background: #fbf9f5; border: 1.5px solid #0079C1; border-radius: 8px; padding: 1.15rem;">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.5rem;">
                                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
-                                                <strong style="color: #ffffff; font-size: 0.95rem;">PayPal &bull; Instant Online Settlement</strong>
+                                                <strong style="color: var(--color-text-primary); font-size: 0.95rem;">PayPal &bull; Instant Online Settlement</strong>
                                             </div>
                                         </div>
-                                        <div style="background: rgba(0,0,0,0.35); border-radius: 6px; padding: 0.55rem 0.85rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-size: 0.76rem; color: #9ca3af;">USD Settlement Amount:</span>
-                                            <strong id="cart-paypal-amount-display" style="font-size: 1.05rem; color: #38bdf8; font-family: monospace;">${currInfo.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`}</strong>
+                                        <div style="background: #ffffff; border: 1px solid #e8e4df; border-radius: 6px; padding: 0.55rem 0.85rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-size: 0.76rem; color: #4b5563;">USD Settlement Amount:</span>
+                                            <strong id="cart-paypal-amount-display" style="font-size: 1.05rem; color: #0284c7; font-family: monospace;">${currInfo.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`}</strong>
                                         </div>
                                         <div id="cart-paypal-button-container" class="paypal-smart-container" style="min-height: 44px;"></div>
                                     </div>
@@ -6829,20 +6829,20 @@ const UIComponents = {
                         <div style="display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.84rem; padding-top: 0.25rem;">
                             <div class="checkout-totals-row">
                                 <span>Subtotal</span>
-                                <strong id="cart-summary-subtotal" style="color: #ffffff;">${formattedSubtotal}</strong>
+                                <strong id="cart-summary-subtotal" style="color: var(--color-text-primary);">${formattedSubtotal}</strong>
                             </div>
-                            <div class="checkout-totals-row" id="cart-discount-row" style="display: ${promoDiscountUSD > 0 ? 'flex' : 'none'}; color: #4ade80;">
+                            <div class="checkout-totals-row" id="cart-discount-row" style="display: ${promoDiscountUSD > 0 ? 'flex' : 'none'}; color: #15803d;">
                                 <span>Promotional Savings</span>
                                 <strong id="cart-discount-amt">-${formattedDiscount}</strong>
                             </div>
                             <div class="checkout-totals-row">
                                 <span id="cart-summary-shipping-label">${isSriLanka ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS Priority Air'}</span>
-                                <span id="cart-summary-shipping" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-weight: 600;">${formattedShipping}</span>
+                                <span id="cart-summary-shipping" style="color: ${shippingUSD > 0 ? '#15803d' : 'var(--color-gold)'}; font-weight: 600;">${formattedShipping}</span>
                             </div>
                             <div class="checkout-grand-total-row">
                                 <div>
-                                    <strong id="cart-summary-total-title" style="font-size: 0.95rem; color: #ffffff;">Total Due (${currInfo.code})</strong>
-                                    <span id="cart-lkr-approx" style="display: block; font-size: 0.72rem; color: #94a3b8; font-weight: normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>
+                                    <strong id="cart-summary-total-title" style="font-size: 0.95rem; color: var(--color-text-primary);">Total Due (${currInfo.code})</strong>
+                                    <span id="cart-lkr-approx" style="display: block; font-size: 0.72rem; color: #4b5563; font-weight: normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>
                                 </div>
                                 <strong id="cart-summary-total" style="font-size: 1.45rem; color: var(--color-gold); font-family: var(--font-serif);">${formattedGrandTotal}</strong>
                             </div>

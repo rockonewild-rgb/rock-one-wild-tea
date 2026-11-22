@@ -519,14 +519,14 @@ a:hover {
 
 .brand-logo:hover {
     transform: scale(1.05);
-    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.6));
+    filter: drop-shadow(0 2px 8px rgba(184, 134, 11, 0.45));
 }
 
 .brand-logo img {
     height: clamp(34px, 4vw, 44px);
     width: auto;
     object-fit: contain;
-    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+    filter: drop-shadow(0 1px 2px rgba(184, 134, 11, 0.25)) drop-shadow(0 2px 5px rgba(0, 0, 0, 0.08));
 }
 
 .brand-title-lockup {
@@ -10310,15 +10310,17 @@ input, select, textarea, button {
         overflow-x: hidden !important;
     }
 
-    /* Header & Mobile Hamburger Menu Bar (Always Visible on Mobile) */
+    /* Header & Mobile Hamburger Menu Bar (Always Visible on Mobile - Luxury White Ribbon) */
     .app-header {
         position: sticky !important;
         top: 0 !important;
         z-index: 1000 !important;
         width: 100% !important;
-        background: rgba(3, 10, 6, 0.96) !important;
+        background: rgba(255, 255, 255, 0.96) !important;
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
+        border-bottom: 1px solid #e8e4df !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
     }
     .header-container {
         display: flex !important;
@@ -10381,23 +10383,23 @@ input, select, textarea, button {
         height: 42px !important;
         min-width: 42px !important;
         padding: 10px 8px !important;
-        background: rgba(10, 26, 16, 0.9) !important;
-        border: 1.5px solid rgba(212, 175, 55, 0.65) !important;
+        background: #ffffff !important;
+        border: 1.5px solid #d1d5db !important;
         border-radius: 8px !important;
         cursor: pointer !important;
         z-index: 100 !important;
         margin-left: auto !important;
-        box-shadow: 0 0 10px rgba(212, 175, 55, 0.25) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
     }
     .hamburger-bar {
         width: 100% !important;
         height: 2.5px !important;
-        background-color: var(--color-gold) !important;
+        background-color: #111827 !important;
         border-radius: 2px !important;
         display: block !important;
     }
 
-    /* Mobile Navigation Full Drawer Dropdown */
+    /* Mobile Navigation Full Drawer Dropdown - Clean Ivory Luxury */
     .mobile-nav-drawer {
         display: none;
         position: fixed !important;
@@ -10408,10 +10410,10 @@ input, select, textarea, button {
         width: 100vw !important;
         height: calc(100vh - 56px) !important;
         max-height: calc(100vh - 56px) !important;
-        background: #030c07 !important;
-        background-image: linear-gradient(180deg, #041009 0%, #020704 100%) !important;
-        border-top: 1px solid rgba(212, 175, 55, 0.4) !important;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.98) !important;
+        background: #ffffff !important;
+        background-image: none !important;
+        border-top: 1px solid #e8e4df !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08) !important;
         overflow-y: auto !important;
         -webkit-overflow-scrolling: touch !important;
         padding: 1rem 1rem 5rem 1rem !important;
@@ -10448,10 +10450,10 @@ input, select, textarea, button {
         width: 36px !important;
         height: 36px !important;
         border-radius: 0 18px 18px 0 !important;
-        background: rgba(4, 14, 8, 0.94) !important;
-        border: 1px solid rgba(212, 175, 55, 0.45) !important;
+        background: #ffffff !important;
+        border: 1px solid #e8e4df !important;
         border-left: none !important;
-        box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.6) !important;
+        box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.08) !important;
         display: flex !important;
         align-items: center !important;
         overflow: hidden !important;
@@ -10463,6 +10465,9 @@ input, select, textarea, button {
         min-width: 36px !important;
         display: flex !important;
         align-items: center !important;
+        justify-content: center !important;
+        color: #96700a !important;
+    }
         justify-content: center !important;
         color: var(--color-gold) !important;
     }
@@ -15202,4 +15207,454 @@ div[style*="rgba(32, 20, 4"] strong {
 .footer-links a {
     color: #d7dfda !important;
 }
+
+/* ==========================================================================
+   19. Master White Luxury Perfection: Modals, Cards, Buttons, and Responsive
+   ========================================================================== */
+
+/* Universal Scrollbars in Luxury Ivory/Gold */
+::-webkit-scrollbar-track {
+    background: #f7f5f0 !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cfc5b4 !important;
+    border-radius: 4px !important;
+    border: 1px solid #e5decb !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #96700a !important;
+}
+
+/* Modals & Dialogs -> Pristine Ivory/White Luxury Cards */
+.patron-auth-dialog,
+.cookie-modal-dialog,
+.about-modal-dialog,
+.lookbook-modal-container,
+.admin-login-card,
+.faq-chatbot-window,
+.global-prefs-popup {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.12), 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    color: #111827 !important;
+}
+
+.patron-auth-header,
+.cookie-modal-header,
+.about-modal-header,
+.lookbook-toolbar,
+.chatbot-header,
+.global-prefs-header {
+    background: #faf8f5 !important;
+    border-bottom: 1px solid #e8e4df !important;
+}
+
+.patron-auth-title,
+.cookie-modal-title,
+.about-modal-title,
+.lookbook-toolbar-title,
+.lookbook-main-title,
+.admin-login-title,
+.chatbot-title,
+.global-prefs-title {
+    color: #111827 !important;
+}
+
+.patron-auth-subtitle,
+.cookie-modal-subtitle,
+.about-modal-subtitle,
+.admin-login-subtitle,
+.chatbot-subtitle {
+    color: #4b5563 !important;
+}
+
+.patron-auth-close-btn,
+.cookie-modal-close-btn,
+.about-modal-close-btn,
+.lookbook-close-btn,
+.chatbot-close-btn,
+.global-prefs-close-btn {
+    background: #f3f0e8 !important;
+    color: #374151 !important;
+    border: 1px solid #e5e0d5 !important;
+}
+
+.patron-auth-close-btn:hover,
+.cookie-modal-close-btn:hover,
+.about-modal-close-btn:hover,
+.lookbook-close-btn:hover,
+.chatbot-close-btn:hover,
+.global-prefs-close-btn:hover {
+    background: #b8860b !important;
+    color: #ffffff !important;
+}
+
+/* Patron Auth Fields & Tabs */
+.patron-tab-btn {
+    color: #4b5563 !important;
+}
+
+.patron-tab-btn.active {
+    color: #96700a !important;
+    border-bottom: 2px solid #96700a !important;
+    font-weight: 700 !important;
+}
+
+.patron-field label,
+.admin-login-label {
+    color: #111827 !important;
+}
+
+.patron-field input,
+.admin-login-input {
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    color: #111827 !important;
+}
+
+.patron-field input:focus,
+.admin-login-input:focus {
+    border-color: #b8860b !important;
+    box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.15) !important;
+}
+
+/* Patron Dropdown Popover */
+.nav-patron-dropdown {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.1) !important;
+}
+
+.patron-drop-header strong {
+    color: #111827 !important;
+}
+
+.patron-drop-header span {
+    color: #4b5563 !important;
+}
+
+.patron-drop-item {
+    color: #374151 !important;
+}
+
+.patron-drop-item:hover {
+    background: #fdfbf7 !important;
+    color: #96700a !important;
+}
+
+/* Chatbot Bubbles & Input */
+.chat-bubble.bot {
+    background: #f3f0e8 !important;
+    color: #1f2937 !important;
+    border: 1px solid #e8e4df !important;
+}
+
+.chat-bubble.user {
+    background: #111827 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+.chatbot-input-field {
+    background: #fbf9f5 !important;
+    border: 1px solid #d1d5db !important;
+    color: #111827 !important;
+}
+
+.faq-directory-item {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    color: #111827 !important;
+}
+
+.faq-directory-item:hover {
+    background: #fdfbf7 !important;
+    border-color: #b8860b !important;
+    color: #96700a !important;
+}
+
+/* Global Prefs Popover Elements */
+.prefs-section-title {
+    color: #111827 !important;
+}
+
+.prefs-lang-btn,
+.prefs-curr-btn {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    color: #111827 !important;
+}
+
+.prefs-lang-btn.active,
+.prefs-curr-btn.active {
+    background: #fffdf7 !important;
+    border-color: #96700a !important;
+    color: #96700a !important;
+}
+
+.prefs-lang-names strong {
+    color: #111827 !important;
+}
+
+.prefs-curr-code {
+    color: #96700a !important;
+}
+
+/* Cookie Policy Categories */
+.cookie-category-card {
+    background: #fcfbf9 !important;
+    border: 1px solid #e8e4df !important;
+}
+
+.cookie-cat-name {
+    color: #111827 !important;
+}
+
+.cookie-cat-desc {
+    color: #4b5563 !important;
+}
+
+/* Lookbook Cards */
+.lookbook-card,
+.lookbook-image-card {
+    background: #fcfbf9 !important;
+    border: 1px solid #e8e4df !important;
+}
+
+.lookbook-card h4,
+.lookbook-card h3 {
+    color: #111827 !important;
+}
+
+.lookbook-card p {
+    color: #4b5563 !important;
+}
+
+/* Product Cards & Inner Specs */
+.product-luxury-card,
+.product-card {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+.product-card-visual-box {
+    background: #fbf9f5 !important;
+    border-bottom: 1px solid #f0ede8 !important;
+}
+
+.product-card-title,
+.product-luxury-title {
+    color: #111827 !important;
+}
+
+.product-card-description,
+.product-luxury-desc {
+    color: #4b5563 !important;
+}
+
+.product-price-val,
+.product-luxury-price {
+    color: #96700a !important;
+}
+
+.product-brewing-specs-row {
+    background: #fbf9f5 !important;
+    border: 1px solid #ebd9b8 !important;
+}
+
+.spec-cell,
+.brewing-spec-cell {
+    color: #111827 !important;
+}
+
+.brewing-spec-val {
+    color: #111827 !important;
+    font-weight: 700 !important;
+}
+
+.brewing-spec-label {
+    color: #6b7280 !important;
+}
+
+.tasting-chip {
+    background: #fdfbf7 !important;
+    border: 1px solid #e8e4df !important;
+    color: #7a5a06 !important;
+    font-weight: 600 !important;
+}
+
+.product-category-crumb {
+    background: #f3f0e8 !important;
+    border: 1px solid #e5e0d5 !important;
+    color: #4b5563 !important;
+}
+
+.product-card-actions-stack .btn-view-connoisseur {
+    background: #fffdf7 !important;
+    border: 1.5px solid #b8860b !important;
+    color: #7a5a06 !important;
+    box-shadow: 0 1px 3px rgba(184, 134, 11, 0.08) !important;
+}
+
+.product-card-actions-stack .btn-view-connoisseur:hover {
+    background: #b8860b !important;
+    color: #ffffff !important;
+    border-color: #b8860b !important;
+}
+
+.product-cta-button-group .btn-primary {
+    background: linear-gradient(135deg, #c59b27 0%, #dfb746 50%, #b8860b 100%) !important;
+    color: #111827 !important;
+    border: 1px solid #b8860b !important;
+    font-weight: 700 !important;
+}
+
+.product-cta-button-group .btn-outline {
+    background: #fffdf7 !important;
+    color: #7a5a06 !important;
+    border: 1.5px solid #b8860b !important;
+    font-weight: 600 !important;
+}
+
+.product-cta-button-group .btn-outline:hover {
+    background: #b8860b !important;
+    color: #ffffff !important;
+}
+
+/* Collector Gift Box Matrix & Number Grid */
+.minimal-box-selector-layout {
+    gap: 2rem !important;
+}
+
+.showcase-card,
+.grid-card {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+.grid-title {
+    color: #111827 !important;
+}
+
+#selected-box-name {
+    color: #855b05 !important;
+}
+
+#selected-box-desc {
+    color: #4b5563 !important;
+}
+
+.num-btn {
+    border: 1.5px solid #d1d5db !important;
+    background: #fdfbf7 !important;
+    color: #111827 !important;
+    font-weight: 700 !important;
+}
+
+.num-btn:hover {
+    border-color: #b8860b !important;
+    background: #fffdf7 !important;
+    color: #96700a !important;
+}
+
+.num-btn.active {
+    border-color: #96700a !important;
+    background: #96700a !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(150, 112, 10, 0.25) !important;
+}
+
+.num-btn.num-btn-booked {
+    background: #f3f4f6 !important;
+    border-color: #e5e7eb !important;
+    color: #9ca3af !important;
+}
+
+.num-btn.num-btn-pending {
+    background: #fefce8 !important;
+    border-color: #fde047 !important;
+    color: #854d0e !important;
+}
+
+/* Cart & Checkout Drawer Items */
+#cart-shipping-ems-title,
+#cart-summary-subtotal,
+#cart-summary-total-title,
+.cart-qty-val,
+.cart-item-title,
+.cart-item-price,
+.cart-item-name,
+.bank-detail-row strong,
+.bank-detail-row span {
+    color: #111827 !important;
+}
+
+.cart-item-meta,
+.cart-item-variant {
+    color: #4b5563 !important;
+}
+
+.cart-item-row {
+    border-bottom: 1px solid #f0ece5 !important;
+    background: #ffffff !important;
+}
+
+/* Admin Desks Tables, Customer & Box Text */
+.admin-table tbody tr td,
+.admin-table-container td,
+.admin-table-wrapper td {
+    color: #111827 !important;
+}
+
+.admin-table thead th {
+    background: #f8f6f0 !important;
+    color: #7a5a06 !important;
+}
+
+/* Tour Immersion Highlights */
+.tour-highlights-grid strong,
+.tour-highlights-box strong,
+div[style*="rgba(6, 24, 14"] strong {
+    color: #111827 !important;
+}
+
+div[style*="rgba(6, 24, 14"] span,
+div[style*="rgba(6, 24, 14"] p {
+    color: #4b5563 !important;
+}
+
+/* Responsive Button Layout on Mobile Devices */
+@media (max-width: 480px) {
+    .product-cta-button-group {
+        grid-template-columns: 1fr !important;
+        gap: 0.45rem !important;
+    }
+    
+    .product-cta-button-group .btn {
+        padding: 0.65rem 0.5rem !important;
+        font-size: 0.78rem !important;
+    }
+
+    .num-grid {
+        grid-template-columns: repeat(5, 1fr) !important;
+    }
+
+    .admin-stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.75rem !important;
+    }
+
+    .admin-stat-card {
+        padding: 1.15rem 1rem !important;
+    }
+
+    .admin-stat-card .stat-value {
+        font-size: 1.45rem !important;
+    }
+}
+
 
