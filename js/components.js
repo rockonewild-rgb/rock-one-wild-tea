@@ -267,12 +267,20 @@ const UIComponents = {
                 <p class="view-subtitle">Stay informed on our latest organic tea harvest notes, estate events, and exclusive sommelier updates.</p>
             </div>
 
-            <!-- Announcements Showcase Block -->
-            <div class="announcements-showcase-card" style="background-image: linear-gradient(rgba(255, 255, 255, 0.88), rgba(253, 251, 247, 0.97)), url('images/luxury_tea_announcement.jpg'); border: 1px solid #e8e4df; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);">
-                <div class="showcase-content">
-                    <span class="season-badge" style="background: #fdfbf7; border: 1px solid #ebd9b8; color: #7a5a06;">Master Sommelier Journal</span>
-                    <h3 class="showcase-title" style="color: #111827;">Artisanal Harvest Announcements</h3>
-                    <p class="showcase-desc" style="color: #4b5563;">Read our master tea maker's notes on weather conditions, seasonal plucking cycles, and flavor profile developments direct from the wild forest slopes.</p>
+            <!-- Announcements Showcase Block (Ultra-Luxury Ivory Card with Gold Accent) -->
+            <div class="announcements-showcase-card" style="background: #ffffff; border: 1.5px solid #ebd9b8; border-left: 6px solid #b8860b; border-radius: 18px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04); padding: 3rem 3rem; position: relative; overflow: hidden;">
+                <!-- Ambient Subtle Gold Glow Flare -->
+                <div style="position: absolute; top: -80px; right: -80px; width: 280px; height: 280px; background: radial-gradient(circle, rgba(184, 134, 11, 0.08) 0%, transparent 70%); pointer-events: none;"></div>
+                <!-- Subtle Watermark Seal -->
+                <img src="images/logo-gold.png" alt="Rock One Wild Tea Crest" style="position: absolute; right: 2.5rem; top: 50%; transform: translateY(-50%); width: 130px; height: auto; opacity: 0.12; pointer-events: none;" decoding="async">
+                
+                <div class="showcase-content" style="position: relative; z-index: 2; max-width: 760px;">
+                    <span class="season-badge" style="background: #fbf9f5; border: 1.5px solid #b8860b; color: #7a5a06; font-size: 0.76rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; padding: 0.35rem 0.95rem; border-radius: 30px; display: inline-flex; align-items: center; gap: 0.45rem; box-shadow: 0 2px 6px rgba(184, 134, 11, 0.08);">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        Master Sommelier Journal
+                    </span>
+                    <h3 class="showcase-title" style="font-family: var(--font-serif); font-size: 2.35rem; color: #111827 !important; font-weight: 800; margin: 0.75rem 0 0.85rem 0; line-height: 1.25; letter-spacing: -0.01em; text-shadow: none !important;">Artisanal Harvest Announcements</h3>
+                    <p class="showcase-desc" style="font-size: 1.02rem; color: #374151 !important; line-height: 1.8; max-width: 720px; margin: 0; text-shadow: none !important; font-weight: 450;">Read our master tea maker's notes on weather conditions, seasonal plucking cycles, and flavor profile developments direct from the wild forest slopes.</p>
                 </div>
             </div>
 

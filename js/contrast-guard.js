@@ -191,8 +191,6 @@
             reset();
             memo = new Map();
             var all = document.body.querySelectorAll('*');
-            solidifyPass(all);
-            memo = new Map();
             textPass(all);
         } catch (e) { /* never break the site */ }
         memo = new Map();
