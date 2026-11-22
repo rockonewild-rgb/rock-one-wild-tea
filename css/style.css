@@ -539,24 +539,24 @@ a:hover {
 .brand-name {
     font-family: var(--font-serif);
     font-size: clamp(0.92rem, 1.25vw, 1.18rem);
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: clamp(1.2px, 0.2vw, 1.8px);
-    color: #ffffff;
-    background: linear-gradient(to right, #ffffff 40%, var(--color-gold) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #111827 !important;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    -webkit-text-fill-color: #111827 !important;
     line-height: 1.15;
     white-space: nowrap;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    text-shadow: none !important;
 }
 
 .brand-tagline {
     font-size: clamp(0.48rem, 0.6vw, 0.58rem);
     letter-spacing: clamp(1.2px, 0.2vw, 2px);
-    color: var(--color-gold);
+    color: #7a5a06 !important;
     text-transform: uppercase;
-    font-weight: 600;
-    opacity: 0.9;
+    font-weight: 700;
+    opacity: 1 !important;
     margin-top: 2px;
     white-space: nowrap;
 }
@@ -2582,53 +2582,54 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
 }
 
 .admin-tab-btn {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #fdfbf7 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid #e8e4df !important;
     padding: 0.85rem 1.5rem;
     font-size: 0.8rem;
-    color: var(--color-text-muted);
+    color: #4b5563 !important;
     font-weight: 600;
     letter-spacing: 0.5px;
     border-radius: 8px;
     cursor: pointer;
     transition: var(--transition-smooth);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
 .admin-tab-btn:hover {
-    color: var(--color-white);
-    border-color: rgba(212, 175, 55, 0.4);
-    background: rgba(212, 175, 55, 0.08);
+    color: #111827 !important;
+    border-color: #d1d5db !important;
+    background: #f5f2eb !important;
     transform: translateY(-2px);
 }
 
 .admin-tab-btn.active {
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.08));
-    border-color: var(--color-gold);
-    color: var(--color-gold);
-    box-shadow: 0 4px 18px rgba(212, 175, 55, 0.25), var(--glass-specular);
+    background: #fffdf7 !important;
+    border-color: #96700a !important;
+    color: #96700a !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 10px rgba(184, 134, 11, 0.15) !important;
 }
 
 .admin-stat-card {
-    background: var(--color-bg-card);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: var(--glass-border);
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid #e8e4df !important;
     padding: 2rem;
     border-radius: 14px;
     position: relative;
-    box-shadow: var(--glass-shadow);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04) !important;
     transition: var(--transition-smooth);
     overflow: hidden;
 }
 
 .admin-stat-card:hover {
     transform: translateY(-4px);
-    border-color: var(--color-gold);
-    background: var(--color-bg-card-hover);
-    box-shadow: var(--glass-shadow-hover);
+    border-color: #b8860b !important;
+    background: #ffffff !important;
+    box-shadow: 0 8px 25px rgba(184, 134, 11, 0.1) !important;
 }
 
 .admin-stat-card::before {
@@ -2638,7 +2639,7 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     left: 0;
     width: 100%;
     height: 3px;
-    background: linear-gradient(to right, var(--color-gold), transparent);
+    background: linear-gradient(to right, #b8860b, transparent);
 }
 
 .stat-label {
@@ -2646,25 +2647,26 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     text-transform: uppercase;
     font-size: 0.65rem;
     letter-spacing: 2px;
-    color: var(--color-text-muted);
+    color: #6b7280 !important;
     margin-bottom: 0.75rem;
-    font-weight: 500;
+    font-weight: 600 !important;
 }
 
 .stat-value {
     display: block;
     font-family: var(--font-serif);
     font-size: 2.4rem;
-    color: var(--color-white);
+    color: #111827 !important;
     line-height: 1.1;
     margin-bottom: 0.5rem;
-    text-shadow: 0 2px 12px rgba(212, 175, 55, 0.25);
+    text-shadow: none !important;
+    font-weight: 700 !important;
 }
 
 .stat-desc {
     font-size: 0.75rem;
-    color: var(--color-text-muted);
-    font-weight: 300;
+    color: #6b7280 !important;
+    font-weight: 400;
 }
 
 .admin-columns {
@@ -3968,11 +3970,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     align-items: center;
     gap: 1.25rem;
     flex-wrap: wrap;
-    background: rgba(4, 14, 8, 0.65);
-    border: 1px solid rgba(212, 175, 55, 0.2);
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
     border-radius: 20px;
     padding: 1rem 1.25rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
 }
 
 .filter-tabs-group {
@@ -3990,27 +3992,41 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     padding: 0.65rem 1.15rem;
     letter-spacing: 0.5px;
     border-radius: 20px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--color-text-muted);
+    background: #fdfbf7 !important;
+    border: 1px solid #e8e4df !important;
+    color: #4b5563 !important;
     transition: var(--transition-smooth);
     cursor: pointer;
 }
 
+.filter-tab-btn:hover {
+    background: #f5f2eb !important;
+    color: #111827 !important;
+    border-color: #d1d5db !important;
+}
+
+.filter-tab-btn.active {
+    background: #fffdf7 !important;
+    border-color: #96700a !important;
+    color: #96700a !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 8px rgba(184, 134, 11, 0.15) !important;
+}
+
 .filter-tab-count {
-    background: rgba(0, 0, 0, 0.35);
-    color: var(--color-gold);
+    background: #f3f0e8 !important;
+    color: #7a5a06 !important;
     font-size: 0.68rem;
     font-weight: 700;
     padding: 0.1rem 0.45rem;
     border-radius: 12px;
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    border: 1px solid #e2dac9 !important;
 }
 
 .filter-tab-btn.active .filter-tab-count {
-    background: rgba(0, 0, 0, 0.6);
-    color: #ffd875;
-    border-color: rgba(0, 0, 0, 0.4);
+    background: #b8860b !important;
+    color: #ffffff !important;
+    border-color: #b8860b !important;
 }
 
 .catalog-actions-group {
@@ -4026,9 +4042,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .catalog-sort-select {
-    background: rgba(4, 10, 6, 0.85);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    color: #e2ede5;
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    color: #111827 !important;
     font-size: 0.78rem;
     padding: 0.6rem 1rem 0.6rem 0.85rem;
     border-radius: 18px;
@@ -4050,9 +4066,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .search-input-wrapper input {
     width: 100%;
     padding: 0.65rem 2.2rem 0.65rem 2.4rem;
-    background: rgba(4, 10, 6, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: var(--color-white);
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    color: #111827 !important;
     outline: none;
     border-radius: 20px;
     font-size: 0.82rem;
@@ -4124,8 +4140,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 /* Luxury Product Card Enhancement */
 .product-luxury-card {
-    background: linear-gradient(145deg, rgba(8, 22, 14, 0.95) 0%, rgba(4, 12, 8, 0.98) 100%) !important;
-    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
     border-radius: 18px !important;
     overflow: hidden;
     display: flex !important;
@@ -4133,15 +4149,15 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     justify-content: flex-start !important;
     height: 100%;
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
     position: relative;
     box-sizing: border-box;
 }
 
 .product-luxury-card:hover {
     transform: translateY(-6px);
-    border-color: var(--color-gold) !important;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.2) !important;
+    border-color: #b8860b !important;
+    box-shadow: 0 16px 36px rgba(184, 134, 11, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04) !important;
 }
 
 .product-card-visual-box {
@@ -4313,7 +4329,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     font-family: var(--font-serif);
     font-size: 1.22rem;
     line-height: 1.25;
-    color: #ffffff;
+    color: #111827 !important;
     margin: 0;
     flex: 1;
     display: -webkit-box;
@@ -4332,7 +4348,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .product-luxury-price {
     font-size: 1.22rem;
     font-weight: 700;
-    color: var(--color-gold);
+    color: #7a5a06 !important;
     display: block;
     line-height: 1.25;
     white-space: nowrap;
@@ -4340,14 +4356,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .product-luxury-unit {
     font-size: 0.65rem;
-    color: var(--color-text-muted);
+    color: #6b7280 !important;
 }
 
 .product-card-description,
 .product-luxury-desc {
     font-size: 0.82rem;
     line-height: 1.5;
-    color: #cbd5e1;
+    color: #4b5563 !important;
     margin-bottom: 0.85rem;
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -4370,9 +4386,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     font-size: 0.68rem;
     padding: 0.2rem 0.55rem;
     border-radius: 12px;
-    background: rgba(212, 175, 55, 0.08);
-    border: 1px solid rgba(212, 175, 55, 0.22);
-    color: #e2ede5;
+    background: #fdfbf7 !important;
+    border: 1px solid #e8e4df !important;
+    color: #4b5563 !important;
     white-space: nowrap;
 }
 
@@ -4380,8 +4396,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0.35rem;
-    background: rgba(0, 0, 0, 0.45);
-    border: 1px solid rgba(212, 175, 55, 0.18);
+    background: #fdfbf7 !important;
+    border: 1px solid #ebd9b8 !important;
     border-radius: 10px;
     padding: 0.5rem 0.6rem;
     margin-bottom: 1.1rem;
@@ -4396,20 +4412,20 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     gap: 0.3rem;
     font-size: 0.74rem;
     font-weight: 600;
-    color: #e2e8f0;
+    color: #1f2937 !important;
     text-align: center;
     white-space: nowrap;
 }
 
 .spec-cell svg {
-    color: var(--color-gold);
+    color: #96700a !important;
     flex-shrink: 0;
 }
 
 .brewing-spec-label {
     font-size: 0.62rem;
     text-transform: uppercase;
-    color: var(--color-text-muted);
+    color: #6b7280 !important;
     display: block;
     margin-bottom: 0.15rem;
 }
@@ -4417,7 +4433,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .brewing-spec-val {
     font-size: 0.78rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #111827 !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -4920,10 +4936,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     border-radius: 14px;
     background-size: cover;
     background-position: center;
-    border: var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     display: flex;
     align-items: flex-end;
     padding: 3rem 2.5rem;
@@ -4940,17 +4956,18 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .announcements-showcase-card .showcase-title {
     font-size: 2.2rem;
     font-family: var(--font-serif);
-    color: var(--color-white);
+    color: #111827 !important;
     margin: 0.5rem 0;
     line-height: 1.25;
+    font-weight: 700;
 }
 
 .announcements-showcase-card .showcase-desc {
     font-size: 0.9rem;
-    color: var(--color-text-primary);
+    color: #4b5563 !important;
     line-height: 1.7;
     margin: 0;
-    opacity: 0.9;
+    opacity: 1;
 }
 
 .announcements-grid {
@@ -9294,17 +9311,17 @@ mark.search-match-highlight {
     align-items: center;
     height: 44px;
     width: 44px;
-    background: rgba(6, 18, 11, 0.90);
+    background: #ffffff !important;
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(212, 175, 55, 0.35);
-    border-left: none;
+    border: 1px solid #e8e4df !important;
+    border-left: none !important;
     border-radius: 0 24px 24px 0;
     text-decoration: none;
     cursor: pointer;
     overflow: hidden;
     white-space: nowrap;
-    box-shadow: 4px 4px 18px rgba(0, 0, 0, 0.55), 0 0 10px rgba(212, 175, 55, 0.1);
+    box-shadow: 2px 4px 15px rgba(0, 0, 0, 0.08) !important;
     transition: width 0.38s cubic-bezier(0.25, 1, 0.5, 1),
                 background 0.3s ease,
                 border-color 0.3s ease,
@@ -9321,7 +9338,7 @@ mark.search-match-highlight {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-gold-light, #ffd875);
+    color: #7a5a06 !important;
     transition: transform 0.3s ease, color 0.3s ease;
     flex-shrink: 0;
 }
@@ -9341,15 +9358,15 @@ mark.search-match-highlight {
     font-family: var(--font-sans);
     font-size: 0.82rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #111827 !important;
     letter-spacing: 0.5px;
     line-height: 1.15;
 }
 
 .pill-sub {
     font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.75);
-    font-weight: 400;
+    color: #4b5563 !important;
+    font-weight: 500;
     margin-top: 2px;
     line-height: 1;
     letter-spacing: 0.3px;
@@ -12855,29 +12872,46 @@ input, select, textarea, button {
 }
 
 .admin-header-block {
-    background: linear-gradient(135deg, rgba(6, 22, 13, 0.78) 0%, rgba(3, 14, 8, 0.9) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(212, 175, 55, 0.28);
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid #e8e4df !important;
+    border-left: 5px solid #b8860b !important;
     border-radius: 14px;
     padding: 1.25rem 1.6rem;
     margin-bottom: 1.75rem;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
     box-sizing: border-box;
 }
 
 .admin-header-block .view-title {
     font-family: 'Cinzel', serif;
     font-size: clamp(1.35rem, 2vw, 1.85rem);
-    color: #ffffff;
+    color: #111827 !important;
     margin: 0 0 0.35rem;
     letter-spacing: 0.5px;
+    font-weight: 700 !important;
 }
 
 .admin-header-block .view-subtitle {
     font-size: 0.82rem;
-    color: #a3b8ad;
+    color: #4b5563 !important;
     margin: 0;
+}
+
+.admin-header-block .btn-outline {
+    background: #fdfbf7 !important;
+    border: 1px solid #d1d5db !important;
+    color: #1f2937 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.2s ease !important;
+}
+
+.admin-header-block .btn-outline:hover {
+    background: #fffdf7 !important;
+    border-color: #b8860b !important;
+    color: #7a5a06 !important;
+    box-shadow: 0 2px 8px rgba(184, 134, 11, 0.15) !important;
 }
 
 /* Header Alignment & Overflow Prevention on Medium Displays */
@@ -14646,10 +14680,19 @@ label {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
 }
 
-.package-card.selected {
-    background: #fffdf7 !important;
-    border-color: #b8860b !important;
-    box-shadow: 0 8px 25px rgba(184, 134, 11, 0.15) !important;
+.package-card.selected,
+#featured-gongfu-experience {
+    background: #ffffff !important;
+    border: 1.5px solid #b8860b !important;
+    box-shadow: 0 8px 30px rgba(184, 134, 11, 0.12) !important;
+}
+
+#featured-gongfu-experience h3 {
+    color: #111827 !important;
+}
+
+#featured-gongfu-experience p {
+    color: #374151 !important;
 }
 
 .package-name {
@@ -14666,16 +14709,24 @@ label {
 }
 
 .tour-slot-card,
-.tour-booking-card {
+.tour-booking-card,
+.timeline-card {
     background: #ffffff !important;
     border: 1px solid #e8e4df !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04) !important;
+}
+
+.slot-time {
+    color: #111827 !important;
+    font-weight: 700 !important;
 }
 
 /* 13. About Page System */
 .about-page-wrapper h1,
 .about-page-wrapper h2,
 .about-page-wrapper h3,
-.about-page-wrapper h4 {
+.about-page-wrapper h4,
+.about-page-wrapper h5 {
     color: #111827 !important;
 }
 
@@ -14685,20 +14736,61 @@ label {
 
 .editorial-story-card,
 .terroir-pillar-card,
-.family-craft-card {
+.family-craft-card,
+.about-page-wrapper .panel-card {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03) !important;
+}
+
+.about-page-wrapper .panel-card h3,
+.about-page-wrapper .panel-card h4,
+.about-page-wrapper .panel-card h5,
+.about-page-wrapper .panel-card strong {
+    color: #111827 !important;
+}
+
+.about-page-wrapper .panel-card p,
+.about-page-wrapper .panel-card span {
+    color: #4b5563 !important;
+}
+
+.about-page-wrapper .estate-cinema-card {
     background: #ffffff !important;
     border: 1px solid #e8e4df !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
 }
 
-/* 14. Luxury Grounding Footer (dark forest anchor with fully readable light text) */
+.about-page-wrapper .estate-cinema-card h3 {
+    color: #111827 !important;
+}
+
+.about-page-wrapper .estate-cinema-card p {
+    color: #374151 !important;
+}
+
+.why-different-card {
+    background: #ffffff !important;
+    border: 1.5px solid #ebd9b8 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+.why-different-card h2,
+.why-different-card h3,
+.why-different-card h4 {
+    color: #111827 !important;
+}
+
+.why-different-card p {
+    color: #374151 !important;
+}
+
+/* 14. Luxury White Heritage Footer */
 .app-footer {
-    --color-text-muted: #b4c2ba;
-    --color-text-primary: #f0f5f2;
-    --color-gold: #d4af37;
-    background: #111913 !important;
-    border-top: 1px solid rgba(212, 175, 55, 0.35) !important;
-    color: #cbd5d0 !important;
+    background: #faf8f5 !important;
+    border-top: 2px solid #b8860b !important;
+    color: #4b5563 !important;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.04) !important;
 }
 
 .app-footer p,
@@ -14709,7 +14801,8 @@ label {
 }
 
 .footer-brand-title {
-    color: #d4af37 !important;
+    color: #7a5a06 !important;
+    font-weight: 700 !important;
 }
 
 .footer-brand-tagline,
@@ -14717,38 +14810,64 @@ label {
 .footer-contact-item,
 .footer-bottom,
 .footer-bottom p {
-    color: #cbd5d0 !important;
+    color: #4b5563 !important;
 }
 
 .footer-col-title,
 .footer-contact-item strong {
-    color: #ffffff !important;
+    color: #111827 !important;
+    font-weight: 700 !important;
 }
 
 .footer-links-list span,
 .footer-contact-item a,
 .footer-links a,
 .footer-col a {
-    color: #d7dfda !important;
+    color: #4b5563 !important;
 }
 
 .footer-links-list span:hover,
 .footer-contact-item a:hover,
 .footer-links a:hover,
 .footer-col a:hover {
-    color: #f3cf65 !important;
+    color: #96700a !important;
 }
 
 .footer-social-link {
-    color: #cbd5d0 !important;
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    color: #374151 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    width: 36px !important;
+    height: 36px !important;
+    transition: all 0.2s ease !important;
 }
 
 .footer-social-link:hover {
-    color: #f3cf65 !important;
+    background: #fffdf7 !important;
+    border-color: #b8860b !important;
+    color: #7a5a06 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(184, 134, 11, 0.2) !important;
 }
 
 .footer-staff-portal-btn,
 .footer-cookie-btn {
+    color: #6b7280 !important;
+}
+
+.footer-staff-portal-btn:hover,
+.footer-cookie-btn:hover {
+    color: #7a5a06 !important;
+}
+
+.footer-bottom {
+    border-top: 1px solid #e8e4df !important;
+}
     color: #b4c2ba !important;
 }
 
@@ -15656,5 +15775,428 @@ div[style*="rgba(6, 24, 14"] p {
         font-size: 1.45rem !important;
     }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   SECTION 20: MASTER WHITE-THEME HIGH-CONTRAST VISIBILITY REINFORCEMENT
+   Guarantees 100% crisp readability, WCAG compliance & pristine luxury
+   ivory surfaces across Product Catalog, Factory Tours, Time Slots,
+   Announcements, About Us, Footer & Admin Panel.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* 20.1 Header Brand & Logo */
+.brand-name {
+    color: #111827 !important;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    -webkit-text-fill-color: #111827 !important;
+    text-shadow: none !important;
+    font-weight: 800 !important;
+}
+
+.brand-tagline {
+    color: #7a5a06 !important;
+    font-weight: 700 !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+}
+
+.brand-logo img {
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.06)) !important;
+}
+
+/* 20.2 Product Catalog Controls Toolbar & Products */
+.catalog-controls-bar {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+    border-radius: 20px !important;
+}
+
+.filter-tab-btn {
+    background: #fdfbf7 !important;
+    border: 1px solid #e8e4df !important;
+    color: #4b5563 !important;
+}
+
+.filter-tab-btn:hover {
+    background: #f5f2eb !important;
+    color: #111827 !important;
+    border-color: #d1d5db !important;
+}
+
+.filter-tab-btn.active {
+    background: #fffdf7 !important;
+    border-color: #96700a !important;
+    color: #96700a !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 8px rgba(184, 134, 11, 0.15) !important;
+}
+
+.filter-tab-count {
+    background: #f3f0e8 !important;
+    color: #7a5a06 !important;
+    border: 1px solid #e2dac9 !important;
+}
+
+.filter-tab-btn.active .filter-tab-count {
+    background: #b8860b !important;
+    color: #ffffff !important;
+    border-color: #b8860b !important;
+}
+
+.catalog-sort-select {
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    color: #111827 !important;
+}
+
+.search-input-wrapper input {
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    color: #111827 !important;
+}
+
+.search-input-wrapper input::placeholder {
+    color: #9ca3af !important;
+}
+
+.btn-lookbook-cta {
+    background: linear-gradient(135deg, #c59b27, #b8860b) !important;
+    color: #111827 !important;
+    font-weight: 700 !important;
+}
+
+.product-luxury-card {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+.product-luxury-card:hover {
+    border-color: #b8860b !important;
+    box-shadow: 0 16px 36px rgba(184, 134, 11, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+.product-card-title,
+.product-luxury-title {
+    color: #111827 !important;
+}
+
+.product-card-description,
+.product-luxury-desc {
+    color: #4b5563 !important;
+}
+
+.product-price-val,
+.product-luxury-price {
+    color: #7a5a06 !important;
+}
+
+.product-tasting-chips-row .tasting-chip {
+    background: #fdfbf7 !important;
+    border: 1px solid #e8e4df !important;
+    color: #4b5563 !important;
+}
+
+.product-brewing-specs-row {
+    background: #fdfbf7 !important;
+    border: 1px solid #ebd9b8 !important;
+}
+
+.spec-cell,
+.brewing-spec-cell {
+    color: #1f2937 !important;
+}
+
+.brewing-spec-label {
+    color: #6b7280 !important;
+}
+
+.brewing-spec-val {
+    color: #111827 !important;
+    font-weight: 700 !important;
+}
+
+/* 20.3 Factory Tour Featured Experience & Time Slots */
+#featured-gongfu-experience,
+.package-card.selected {
+    background: #ffffff !important;
+    border: 1.5px solid #b8860b !important;
+    box-shadow: 0 8px 30px rgba(184, 134, 11, 0.12) !important;
+}
+
+#featured-gongfu-experience h3,
+#featured-gongfu-experience h4 {
+    color: #111827 !important;
+}
+
+#featured-gongfu-experience p,
+#featured-gongfu-experience li,
+#featured-gongfu-experience span,
+#featured-gongfu-experience div {
+    color: inherit;
+}
+
+.timeline-card,
+.tour-slot-card,
+.slot-card {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04) !important;
+}
+
+.slot-time {
+    color: #111827 !important;
+    font-weight: 700 !important;
+}
+
+.timeline-card .slot-time {
+    color: #111827 !important;
+}
+
+.timeline-card p,
+.timeline-card span,
+.timeline-card div {
+    color: #4b5563 !important;
+}
+
+.timeline-card strong {
+    color: #111827 !important;
+}
+
+/* 20.4 Announcements Showcase Card & Feed */
+.announcements-showcase-card {
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+.announcements-showcase-card .showcase-title {
+    color: #111827 !important;
+    font-weight: 700 !important;
+}
+
+.announcements-showcase-card .showcase-desc {
+    color: #4b5563 !important;
+}
+
+.announcement-card,
+.box-card.announcement-card {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04) !important;
+}
+
+.ann-title,
+.box-title {
+    color: #111827 !important;
+}
+
+.ann-content,
+.box-details {
+    color: #4b5563 !important;
+}
+
+/* 20.5 About Us & Terroir Sanctuary */
+.about-page-wrapper,
+.about-hero-editorial {
+    color: #374151 !important;
+}
+
+.about-page-wrapper h1,
+.about-page-wrapper h2,
+.about-page-wrapper h3,
+.about-page-wrapper h4,
+.about-page-wrapper h5 {
+    color: #111827 !important;
+}
+
+.about-page-wrapper p {
+    color: #374151 !important;
+}
+
+.about-page-wrapper .panel-card,
+.why-different-card,
+.estate-cinema-card,
+.estate-location-card {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+.about-page-wrapper .panel-card h3,
+.about-page-wrapper .panel-card h4,
+.about-page-wrapper .panel-card h5 {
+    color: #111827 !important;
+}
+
+.about-page-wrapper .panel-card p,
+.about-page-wrapper .panel-card span {
+    color: #4b5563 !important;
+}
+
+/* 20.6 Estate Admin Panel & All Sub-Desks */
+.admin-header-block {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    border-left: 5px solid #b8860b !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+.admin-header-block .view-title {
+    color: #111827 !important;
+    font-weight: 700 !important;
+}
+
+.admin-header-block .view-subtitle {
+    color: #4b5563 !important;
+}
+
+.admin-header-block .btn-outline {
+    background: #fdfbf7 !important;
+    border: 1px solid #d1d5db !important;
+    color: #1f2937 !important;
+}
+
+.admin-header-block .btn-outline:hover {
+    background: #fffdf7 !important;
+    border-color: #b8860b !important;
+    color: #7a5a06 !important;
+}
+
+.admin-stat-card {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04) !important;
+}
+
+.admin-stat-card .stat-value {
+    color: #111827 !important;
+    text-shadow: none !important;
+    font-weight: 700 !important;
+}
+
+.admin-stat-card .stat-label {
+    color: #6b7280 !important;
+    font-weight: 600 !important;
+}
+
+.admin-stat-card .stat-desc {
+    color: #6b7280 !important;
+}
+
+.admin-tab-btn {
+    background: #fdfbf7 !important;
+    border: 1px solid #e8e4df !important;
+    color: #4b5563 !important;
+}
+
+.admin-tab-btn:hover {
+    color: #111827 !important;
+    border-color: #d1d5db !important;
+    background: #f5f2eb !important;
+}
+
+.admin-tab-btn.active {
+    background: #fffdf7 !important;
+    border-color: #96700a !important;
+    color: #96700a !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 10px rgba(184, 134, 11, 0.15) !important;
+}
+
+.inq-ledger-wrapper,
+.users-desk-wrapper,
+.theme-card,
+.admin-dashboard-wrapper .panel-card {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+.inq-ledger-wrapper h3,
+.users-desk-wrapper h3,
+.theme-card h4,
+.admin-dashboard-wrapper .panel-card h3,
+.admin-dashboard-wrapper .panel-card h4 {
+    color: #111827 !important;
+}
+
+/* 20.7 Footer & Floating Navigation Docks */
+.app-footer {
+    background: #faf8f5 !important;
+    border-top: 2px solid #b8860b !important;
+    color: #4b5563 !important;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.04) !important;
+}
+
+.footer-brand-title {
+    color: #7a5a06 !important;
+    font-weight: 700 !important;
+}
+
+.footer-brand-tagline,
+.footer-social-text,
+.footer-contact-item,
+.footer-bottom,
+.footer-bottom p {
+    color: #4b5563 !important;
+}
+
+.footer-col-title,
+.footer-contact-item strong {
+    color: #111827 !important;
+    font-weight: 700 !important;
+}
+
+.footer-links-list span,
+.footer-contact-item a,
+.footer-links a,
+.footer-col a {
+    color: #4b5563 !important;
+}
+
+.footer-links-list span:hover,
+.footer-contact-item a:hover,
+.footer-links a:hover,
+.footer-col a:hover {
+    color: #96700a !important;
+}
+
+.footer-social-link {
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    color: #374151 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+.footer-social-link:hover {
+    background: #fffdf7 !important;
+    border-color: #b8860b !important;
+    color: #7a5a06 !important;
+}
+
+.footer-bottom {
+    border-top: 1px solid #e8e4df !important;
+}
+
+.side-social-pill {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    border-left: none !important;
+    box-shadow: 2px 4px 15px rgba(0, 0, 0, 0.08) !important;
+}
+
+.side-social-pill .pill-icon {
+    color: #7a5a06 !important;
+}
+
+.side-social-pill .pill-name {
+    color: #111827 !important;
+}
+
+.side-social-pill .pill-sub {
+    color: #4b5563 !important;
+}
+
 
 

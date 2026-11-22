@@ -268,11 +268,11 @@ const UIComponents = {
             </div>
 
             <!-- Announcements Showcase Block -->
-            <div class="announcements-showcase-card" style="background-image: linear-gradient(rgba(4, 10, 6, 0.4), rgba(4, 10, 6, 0.9)), url('images/luxury_tea_announcement.jpg');">
+            <div class="announcements-showcase-card" style="background-image: linear-gradient(rgba(255, 255, 255, 0.88), rgba(253, 251, 247, 0.97)), url('images/luxury_tea_announcement.jpg'); border: 1px solid #e8e4df; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);">
                 <div class="showcase-content">
-                    <span class="season-badge">Master Sommelier Journal</span>
-                    <h3 class="showcase-title">Artisanal Harvest Announcements</h3>
-                    <p class="showcase-desc">Read our master tea maker's notes on weather conditions, seasonal plucking cycles, and flavor profile developments direct from the wild forest slopes.</p>
+                    <span class="season-badge" style="background: #fdfbf7; border: 1px solid #ebd9b8; color: #7a5a06;">Master Sommelier Journal</span>
+                    <h3 class="showcase-title" style="color: #111827;">Artisanal Harvest Announcements</h3>
+                    <p class="showcase-desc" style="color: #4b5563;">Read our master tea maker's notes on weather conditions, seasonal plucking cycles, and flavor profile developments direct from the wild forest slopes.</p>
                 </div>
             </div>
 
@@ -844,11 +844,11 @@ const UIComponents = {
             </div>
 
             <!-- What the Experience May Include (Walkthrough Highlights) -->
-            <div style="background: linear-gradient(135deg, rgba(6, 24, 14, 0.85) 0%, rgba(4, 14, 8, 0.95) 100%); border: 1px solid rgba(212,175,55,0.3); border-radius: 16px; padding: 2.25rem 2rem; margin-bottom: 3.5rem; box-shadow: 0 12px 40px rgba(0,0,0,0.5);">
+            <div style="background: #ffffff; border: 1px solid #e8e4df; border-radius: 16px; padding: 2.25rem 2rem; margin-bottom: 3.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
                 <div style="text-align: center; max-width: 680px; margin: 0 auto 1.75rem auto;">
-                    <span style="font-size: 0.75rem; color: var(--color-gold); text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">Estate Immersion</span>
-                    <h3 style="font-family: var(--font-serif); font-size: 1.8rem; color: var(--color-white); margin: 0.35rem 0 0.5rem 0;">What You Will Discover on Your Tour</h3>
-                    <p style="font-size: 0.88rem; color: var(--color-text-muted); line-height: 1.6;">Our guided experience opens the doors to our artisanal family craft and living highland ecosystem.</p>
+                    <span style="font-size: 0.75rem; color: #7a5a06; text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">Estate Immersion</span>
+                    <h3 style="font-family: var(--font-serif); font-size: 1.8rem; color: #111827; margin: 0.35rem 0 0.5rem 0;">What You Will Discover on Your Tour</h3>
+                    <p style="font-size: 0.88rem; color: #4b5563; line-height: 1.6;">Our guided experience opens the doors to our artisanal family craft and living highland ecosystem.</p>
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
@@ -903,112 +903,112 @@ const UIComponents = {
             </div>
 
             <!-- 01. Gongfu-Style Black Tea Brewing Experience Feature Block -->
-            <div id="featured-gongfu-experience" class="package-card selected" data-package="01. Gongfu-Style Black Tea Brewing Experience" data-deposit="2.00" data-price="4.754" style="background: linear-gradient(135deg, rgba(8, 32, 18, 0.92) 0%, rgba(4, 16, 10, 0.96) 100%); border: 1.5px solid var(--color-gold); border-radius: 18px; padding: 2.5rem 2.25rem; margin-bottom: 3.5rem; position: relative; overflow: hidden; box-shadow: 0 15px 50px rgba(0,0,0,0.6);">
-                <div style="position: absolute; top: 0; right: 0; background: linear-gradient(135deg, var(--color-gold), #b89127); color: #040e08; font-weight: 800; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; padding: 0.45rem 1.25rem; border-bottom-left-radius: 14px;">
+            <div id="featured-gongfu-experience" class="package-card selected" data-package="01. Gongfu-Style Black Tea Brewing Experience" data-deposit="2.00" data-price="4.754" style="background: #ffffff; border: 1.5px solid #b8860b; border-radius: 18px; padding: 2.5rem 2.25rem; margin-bottom: 3.5rem; position: relative; overflow: hidden; box-shadow: 0 8px 30px rgba(184,134,11,0.12);">
+                <div style="position: absolute; top: 0; right: 0; background: linear-gradient(135deg, #c59b27, #b8860b); color: #111827; font-weight: 800; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; padding: 0.45rem 1.25rem; border-bottom-left-radius: 14px;">
                     Signature Visitor Experience &bull; 01
                 </div>
 
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
                     <div>
-                        <span style="color: var(--color-gold); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">Experience 01</span>
-                        <h3 style="font-family: var(--font-serif); font-size: 2.1rem; color: var(--color-white); margin: 0.25rem 0 0.4rem 0;">
+                        <span style="color: #7a5a06; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">Experience 01</span>
+                        <h3 style="font-family: var(--font-serif); font-size: 2.1rem; color: #111827; margin: 0.25rem 0 0.4rem 0;">
                             Gongfu-Style Black Tea Brewing Experience
                         </h3>
-                        <div style="color: #cbd5e1; font-size: 0.95rem; font-style: italic;">
+                        <div style="color: #4b5563; font-size: 0.95rem; font-style: italic;">
                             Handcrafted Ceylon Black Tea from the Uva Medium region
                         </div>
                     </div>
-                    <div style="background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.35); border-radius: 12px; padding: 0.85rem 1.4rem; text-align: right;">
-                        <span style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; display: block;">Per Person Fee</span>
-                        <div style="font-size: 1.8rem; font-family: var(--font-serif); font-weight: 700; color: var(--color-gold);">
+                    <div style="background: #fdfbf7; border: 1px solid #ebd9b8; border-radius: 12px; padding: 0.85rem 1.4rem; text-align: right;">
+                        <span style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; display: block;">Per Person Fee</span>
+                        <div style="font-size: 1.8rem; font-family: var(--font-serif); font-weight: 700; color: #7a5a06;">
                             ${window.TeaFactoryStore && window.TeaFactoryStore.getActiveCurrency() === 'USD' ? '$4.75' : 'LKR 1,450'}
                         </div>
-                        <span style="font-size: 0.75rem; color: #94a3b8;">(${window.TeaFactoryStore && window.TeaFactoryStore.getActiveCurrency() === 'USD' ? 'approx. LKR 1,450 / €4.40 EUR' : 'approx. $4.75 USD / €4.40 EUR'})</span>
+                        <span style="font-size: 0.75rem; color: #6b7280;">(${window.TeaFactoryStore && window.TeaFactoryStore.getActiveCurrency() === 'USD' ? 'approx. LKR 1,450 / €4.40 EUR' : 'approx. $4.75 USD / €4.40 EUR'})</span>
                     </div>
                 </div>
 
                 <!-- Story & Narrative Introduction -->
-                <div style="color: #e2e8f0; font-size: 0.95rem; line-height: 1.8; margin-bottom: 1.75rem; border-left: 3px solid var(--color-gold); padding-left: 1.25rem;">
+                <div style="color: #374151; font-size: 0.95rem; line-height: 1.8; margin-bottom: 1.75rem; border-left: 3px solid #b8860b; padding-left: 1.25rem;">
                     <p style="margin: 0 0 0.85rem 0;">
                         Begin your Rock One Wild Tea experience with a traditional <strong>Gongfu-style brewing session</strong> using our handcrafted Ceylon Black Tea from the Uva Medium region.
                     </p>
                     <p style="margin: 0 0 0.85rem 0;">
                         Before brewing, our tea host will introduce you to the story of our tea — where it comes from, how the leaves are selected, and how we carefully transform fresh tea leaves into our handcrafted black tea.
                     </p>
-                    <p style="margin: 0; color: #fde047; font-weight: 500;">
+                    <p style="margin: 0; color: #7a5a06; font-weight: 600;">
                         You will then prepare the tea yourself, following the Gongfu-style brewing method.
                     </p>
                 </div>
 
                 <!-- What You Will Experience Checklist -->
                 <div style="margin-bottom: 2rem;">
-                    <h4 style="color: var(--color-gold); font-size: 1.05rem; font-family: var(--font-serif); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <h4 style="color: #7a5a06; font-size: 1.05rem; font-family: var(--font-serif); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
                         <span>✦</span> What You Will Experience
                     </h4>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.75rem;">
-                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
-                            <span style="color: var(--color-gold); font-weight: bold;">•</span> A brief introduction to our Uva Medium tea garden
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
+                            <span style="color: #b8860b; font-weight: bold;">•</span> A brief introduction to our Uva Medium tea garden
                         </div>
-                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
-                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Learn about the tea leaves used to make our black tea
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
+                            <span style="color: #b8860b; font-weight: bold;">•</span> Learn about the tea leaves used to make our black tea
                         </div>
-                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
-                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Introduction to our handcrafted black tea production process
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
+                            <span style="color: #b8860b; font-weight: bold;">•</span> Introduction to our handcrafted black tea production process
                         </div>
-                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
-                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Learn how Gongfu-style brewing works
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
+                            <span style="color: #b8860b; font-weight: bold;">•</span> Learn how Gongfu-style brewing works
                         </div>
-                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
-                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Measure the tea leaves and prepare your own brew
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
+                            <span style="color: #b8860b; font-weight: bold;">•</span> Measure the tea leaves and prepare your own brew
                         </div>
-                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
-                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Observe how the whole tea leaves gradually open during brewing
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
+                            <span style="color: #b8860b; font-weight: bold;">•</span> Observe how the whole tea leaves gradually open during brewing
                         </div>
-                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
-                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Smell the tea before and after brewing
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
+                            <span style="color: #b8860b; font-weight: bold;">•</span> Smell the tea before and after brewing
                         </div>
-                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
-                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Taste the tea through several short infusions
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
+                            <span style="color: #b8860b; font-weight: bold;">•</span> Taste the tea through several short infusions
                         </div>
-                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #cbd5e1;">
-                            <span style="color: var(--color-gold); font-weight: bold;">•</span> Notice how the aroma, flavour and aftertaste develop with each infusion
+                        <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
+                            <span style="color: #b8860b; font-weight: bold;">•</span> Notice how the aroma, flavour and aftertaste develop with each infusion
                         </div>
                     </div>
                 </div>
 
                 <!-- Philosophy Box: A Tea Experience, Not Just a Cup of Tea -->
-                <div style="background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.35); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
-                    <h5 style="color: var(--color-gold); font-size: 0.98rem; font-family: var(--font-serif); margin: 0 0 0.6rem 0;">
+                <div style="background: #fcfaf5; border: 1px dashed #d4af37; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <h5 style="color: #7a5a06; font-size: 0.98rem; font-family: var(--font-serif); margin: 0 0 0.6rem 0;">
                         A Tea Experience, Not Just a Cup of Tea
                     </h5>
-                    <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.7; margin: 0 0 0.75rem 0;">
+                    <p style="color: #4b5563; font-size: 0.88rem; line-height: 1.7; margin: 0 0 0.75rem 0;">
                         Gongfu-style brewing allows you to slow down and pay attention to the tea. Rather than simply drinking one cup, you will experience how the same tea can reveal different aromas, flavours and sensations through multiple infusions.
                     </p>
-                    <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.7; margin: 0 0 0.85rem 0;">
+                    <p style="color: #4b5563; font-size: 0.88rem; line-height: 1.7; margin: 0 0 0.85rem 0;">
                         Our tea host will guide you throughout the session and explain what you are experiencing, while giving you the freedom to discover the character of the tea for yourself.
                     </p>
-                    <div style="font-family: var(--font-serif); font-size: 1.05rem; color: #ffd875; letter-spacing: 1px; text-transform: uppercase;">
+                    <div style="font-family: var(--font-serif); font-size: 1.05rem; color: #7a5a06; letter-spacing: 1px; text-transform: uppercase; font-weight: 700;">
                         Take your time. Observe. Smell. Taste. Discover.
                     </div>
                 </div>
 
                 <!-- Included in Experience & Action Row -->
-                <div style="display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap; border-top: 1px solid rgba(212,175,55,0.25); padding-top: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap; border-top: 1px solid #e8e4df; padding-top: 1.5rem;">
                     <div>
-                        <span style="font-size: 0.78rem; text-transform: uppercase; color: var(--color-gold); letter-spacing: 1.5px; font-weight: 700; display: block; margin-bottom: 0.5rem;">
+                        <span style="font-size: 0.78rem; text-transform: uppercase; color: #7a5a06; letter-spacing: 1.5px; font-weight: 700; display: block; margin-bottom: 0.5rem;">
                             Included in the Experience
                         </span>
-                        <div style="display: flex; flex-wrap: wrap; gap: 0.6rem 1.25rem; font-size: 0.82rem; color: #e2e8f0;">
-                            <span><strong style="color:#86efac;">✓</strong> Handcrafted Rock One Wild Tea Black Tea</span>
-                            <span><strong style="color:#86efac;">✓</strong> Gongfu-style brewing session</span>
-                            <span><strong style="color:#86efac;">✓</strong> Tea host guidance</span>
-                            <span><strong style="color:#86efac;">✓</strong> Multiple tea infusions</span>
-                            <span><strong style="color:#86efac;">✓</strong> Tea tasting experience</span>
-                            <span><strong style="color:#86efac;">✓</strong> Introduction to tea garden &amp; production</span>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.6rem 1.25rem; font-size: 0.82rem; color: #374151;">
+                            <span><strong style="color:#15803d;">✓</strong> Handcrafted Rock One Wild Tea Black Tea</span>
+                            <span><strong style="color:#15803d;">✓</strong> Gongfu-style brewing session</span>
+                            <span><strong style="color:#15803d;">✓</strong> Tea host guidance</span>
+                            <span><strong style="color:#15803d;">✓</strong> Multiple tea infusions</span>
+                            <span><strong style="color:#15803d;">✓</strong> Tea tasting experience</span>
+                            <span><strong style="color:#15803d;">✓</strong> Introduction to tea garden &amp; production</span>
                         </div>
                     </div>
                     <div>
-                        <button type="button" class="btn btn-primary btn-book-slot" data-id="1" data-timeslot="09:30 AM" style="padding: 0.95rem 2rem; font-size: 0.95rem; white-space: nowrap; box-shadow: 0 4px 20px rgba(212,175,55,0.3);">
+                        <button type="button" class="btn btn-primary btn-book-slot" data-id="1" data-timeslot="09:30 AM" style="padding: 0.95rem 2rem; font-size: 0.95rem; white-space: nowrap; box-shadow: 0 4px 20px rgba(184,134,11,0.25);">
                             Reserve Gongfu Experience (LKR 1,450)
                         </button>
                     </div>
@@ -1061,28 +1061,28 @@ const UIComponents = {
             return `
                 <div class="timeline-item ${alignClass}">
                     <div class="timeline-dot"></div>
-                    <div class="timeline-card" style="background: rgba(6, 22, 13, 0.9); border: 1px solid rgba(212,175,55,0.3); border-radius: 14px; padding: 1.5rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.75rem;">
+                    <div class="timeline-card" style="background: #ffffff; border: 1px solid #e8e4df; border-radius: 14px; padding: 1.5rem; box-shadow: 0 4px 18px rgba(0,0,0,0.04);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e8e4df; padding-bottom: 0.75rem;">
                             <div>
-                                <span class="slot-time" style="font-family: var(--font-serif); font-size: 1.3rem; font-weight: 700; color: var(--color-white);">${timeStr}</span>
-                                <span style="display: block; font-size: 0.72rem; color: var(--color-gold); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.15rem;">Duration: ~1.5 - 2.0 Hours</span>
+                                <span class="slot-time" style="font-family: var(--font-serif); font-size: 1.3rem; font-weight: 700; color: #111827;">${timeStr}</span>
+                                <span style="display: block; font-size: 0.72rem; color: #7a5a06; text-transform: uppercase; letter-spacing: 1px; margin-top: 0.15rem; font-weight: 600;">Duration: ~1.5 - 2.0 Hours</span>
                             </div>
                             ${statusBadge}
                         </div>
-                        <div style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.6; margin-top: 0.85rem;">
+                        <div style="font-size: 0.85rem; color: #4b5563; line-height: 1.6; margin-top: 0.85rem;">
                             ${isBooked ? `
-                                <div style="color: var(--color-text-muted); font-size: 0.85rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
-                                    <span style="color: var(--color-gold); display: inline-flex; align-items: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span> Fully Booked &bull; Private Session
+                                <div style="color: #6b7280; font-size: 0.85rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+                                    <span style="color: #b8860b; display: inline-flex; align-items: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span> Fully Booked &bull; Private Session
                                 </div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 0.6rem;">
-                                    <span style="font-size: 0.75rem; color: var(--color-text-muted);">Estate Experience</span>
-                                    <span class="slot-pkg-badge" style="color: var(--color-gold); font-size: 0.7rem; text-transform: uppercase; font-weight: 600;">${pkgName}</span>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; border-top: 1px dashed #e8e4df; padding-top: 0.6rem;">
+                                    <span style="font-size: 0.75rem; color: #6b7280;">Estate Experience</span>
+                                    <span class="slot-pkg-badge" style="color: #7a5a06; font-size: 0.7rem; text-transform: uppercase; font-weight: 600;">${pkgName}</span>
                                 </div>
                             ` : `
-                                <div style="margin-bottom: 1rem; color: #cbd5e1;">${slotSubtitle}</div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; background: rgba(0,0,0,0.3); padding: 0.5rem 0.75rem; border-radius: 8px;">
-                                    <span style="font-size: 0.78rem; color: #94a3b8;">Rate / Guest:</span>
-                                    <strong style="color: var(--color-gold); font-size: 0.95rem;">LKR 1,450 <span style="font-size:0.75rem; color:#9ca3af; font-weight:normal;">($4.75)</span></strong>
+                                <div style="margin-bottom: 1rem; color: #374151;">${slotSubtitle}</div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; background: #fdfbf7; border: 1px solid #ebd9b8; padding: 0.5rem 0.75rem; border-radius: 8px;">
+                                    <span style="font-size: 0.78rem; color: #6b7280;">Rate / Guest:</span>
+                                    <strong style="color: #7a5a06; font-size: 0.95rem;">LKR 1,450 <span style="font-size:0.75rem; color:#6b7280; font-weight:normal;">($4.75)</span></strong>
                                 </div>
                                 <button class="btn btn-primary btn-book-slot" data-id="${slot.id}" data-timeslot="${timeStr}" style="width: 100%; text-align: center; font-size: 0.88rem; padding: 0.75rem 1rem;">
                                     Book ${timeStr} Slot
@@ -1099,27 +1099,27 @@ const UIComponents = {
             </div>
 
             <!-- Holidays, Closures & Advance Booking Requirements Notice -->
-            <div style="background: linear-gradient(135deg, rgba(32, 20, 4, 0.75) 0%, rgba(14, 10, 4, 0.85) 100%); border: 1.5px solid rgba(212,175,55,0.45); border-radius: 14px; padding: 1.75rem 2rem; margin-top: 3.5rem;">
+            <div style="background: #ffffff; border: 1.5px solid #ebd9b8; border-radius: 14px; padding: 1.75rem 2rem; margin-top: 3.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
                 <div style="display: flex; gap: 1rem; align-items: flex-start; flex-wrap: wrap;">
-                    <div style="background: rgba(212,175,55,0.15); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-gold);">
+                    <div style="background: rgba(184,134,11,0.12); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #7a5a06;">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                     </div>
                     <div style="flex: 1; min-width: 260px;">
-                        <h4 style="color: #ffd875; font-family: var(--font-serif); font-size: 1.15rem; margin: 0 0 0.5rem 0;">
+                        <h4 style="color: #111827; font-family: var(--font-serif); font-size: 1.15rem; margin: 0 0 0.5rem 0; font-weight: 700;">
                             Booking Requirements, Holidays &amp; Closures
                         </h4>
-                        <p style="color: #e2e8f0; font-size: 0.88rem; line-height: 1.7; margin: 0 0 0.6rem 0;">
+                        <p style="color: #374151; font-size: 0.88rem; line-height: 1.7; margin: 0 0 0.6rem 0;">
                             <strong>Advance booking is required.</strong> Please contact us before your visit to confirm your date, preferred time slot, and number of visitors. For larger groups or customized tea experiences, kindly reach out in advance.
                         </p>
-                        <p style="color: #cbd5e1; font-size: 0.84rem; line-height: 1.6; margin: 0 0 1rem 0;">
+                        <p style="color: #4b5563; font-size: 0.84rem; line-height: 1.6; margin: 0 0 1rem 0;">
                             <em>Notice:</em> The factory may be closed on Sundays, public holidays, and selected days for family or tea-production activities. Please contact us before travelling to confirm availability.
                         </p>
                         <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-                            <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20Factory%20Tour%20and%20Gongfu%20Brewing%20Experience." target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="border-color: #25D366; color: #25D366; font-size: 0.82rem; padding: 0.55rem 1.15rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                            <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20Factory%20Tour%20and%20Gongfu%20Brewing%20Experience." target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="border-color: #16a34a; color: #16a34a; font-size: 0.82rem; padding: 0.55rem 1.15rem; display: inline-flex; align-items: center; gap: 0.4rem; background: #f0fdf4;">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
                                 WhatsApp Concierge (+94 77 320 9950)
                             </a>
-                            <span style="font-size: 0.8rem; color: var(--color-text-muted);">
+                            <span style="font-size: 0.8rem; color: #6b7280;">
                                 We look forward to welcoming you to Rock One Wild Tea and sharing our tea, our story and our way of life with you.
                             </span>
                         </div>
@@ -1164,17 +1164,17 @@ const UIComponents = {
                         <p class="view-subtitle">Manage collector box reserves, order records, factory tours, seasonal resets, and bulletins.</p>
                     </div>
                     <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
-                        <button id="admin-change-passcode-btn" class="btn btn-outline" style="border-color: rgba(212,175,55,0.4); color: var(--color-gold); font-size: 0.75rem; padding: 0.5rem 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;" title="Change Admin Panel Passcode">
+                        <button id="admin-change-passcode-btn" class="btn btn-outline" style="border-color: #d1d5db; color: #1f2937; background: #fdfbf7; font-size: 0.75rem; padding: 0.5rem 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;" title="Change Admin Panel Passcode">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Change Passcode
                         </button>
-                        <button id="admin-backup-db-btn" class="btn btn-outline" style="border-color: rgba(212,175,55,0.4); color: var(--color-gold); font-size: 0.75rem; padding: 0.5rem 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;" title="Download full JSON database snapshot">
+                        <button id="admin-backup-db-btn" class="btn btn-outline" style="border-color: #d1d5db; color: #1f2937; background: #fdfbf7; font-size: 0.75rem; padding: 0.5rem 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;" title="Download full JSON database snapshot">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Backup Database (JSON)
                         </button>
-                        <button id="admin-restore-db-trigger-btn" class="btn btn-outline" style="border-color: rgba(255,255,255,0.2); color: var(--color-text-primary); font-size: 0.75rem; padding: 0.5rem 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;" title="Restore state from JSON backup file">
+                        <button id="admin-restore-db-trigger-btn" class="btn btn-outline" style="border-color: #d1d5db; color: #1f2937; background: #fdfbf7; font-size: 0.75rem; padding: 0.5rem 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;" title="Restore state from JSON backup file">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> Restore Backup
                         </button>
                         <input type="file" id="admin-restore-db-file-input" accept=".json,application/json" style="display: none;">
-                        <button id="admin-logout-btn" class="btn btn-outline" style="border-color: rgba(255, 255, 255, 0.15); color: var(--color-text-muted); font-size: 0.75rem; padding: 0.5rem 0.85rem;">
+                        <button id="admin-logout-btn" class="btn btn-outline" style="border-color: #d1d5db; color: #4b5563; background: #fdfbf7; font-size: 0.75rem; padding: 0.5rem 0.85rem;">
                             <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Lock Admin Panel
                         </button>
                     </div>
@@ -1658,7 +1658,7 @@ const UIComponents = {
                                 const qrUrl = b.qrCodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=240x240&color=d4af37&bgcolor=040e08&data=${encodeURIComponent(payLink)}`;
 
                                 return `
-                                    <div class="panel-card" style="margin-bottom: 0; background: rgba(0,0,0,0.55); border: 1px solid rgba(212,175,55,${isAwaiting ? '0.45' : '0.2'}); border-radius: 10px; padding: 1.25rem; transition: var(--transition-smooth);">
+                                    <div class="panel-card" style="margin-bottom: 0; background: #ffffff; border: 1px solid ${isAwaiting ? '#b8860b' : '#e8e4df'}; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border-radius: 10px; padding: 1.25rem; transition: var(--transition-smooth);">
                                         <!-- Top Row: Ref ID, Date, Season, Status Badge -->
                                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; padding-bottom: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 1rem;">
                                             <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
@@ -3026,7 +3026,7 @@ const UIComponents = {
             const archivedCount = inquiries.filter(i => i.status === 'Archived').length;
 
             html += `
-                <div class="panel-card inq-ledger-wrapper" style="margin-bottom: 0; background: linear-gradient(145deg, rgba(8, 22, 14, 0.95), rgba(4, 12, 8, 0.98)); border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 16px 40px rgba(0,0,0,0.6); border-radius: 12px; padding: 1.75rem;">
+                <div class="panel-card inq-ledger-wrapper" style="margin-bottom: 0; background: #ffffff; border: 1px solid #e8e4df; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border-radius: 12px; padding: 1.75rem;">
                     
                     <!-- Header Section -->
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1.25rem; border-bottom: 1px solid rgba(212,175,55,0.18); padding-bottom: 1.25rem;">
@@ -3346,15 +3346,15 @@ const UIComponents = {
                         ${seasonalThemes.map(t => {
                             const isCurrent = t.id === activeTheme.id;
                             return `
-                                <div class="theme-card ${isCurrent ? 'active-theme' : ''}" style="background: linear-gradient(145deg, rgba(8, 22, 14, 0.95) 0%, rgba(4, 12, 8, 0.98) 100%); border: ${isCurrent ? '2px solid var(--color-gold)' : '1px solid rgba(212,175,55,0.2)'}; border-radius: 14px; padding: 1.35rem; display: flex; flex-direction: column; justify-content: space-between; position: relative; transition: all 0.3s ease; box-shadow: ${isCurrent ? '0 0 25px rgba(212,175,55,0.25)' : 'none'};">
+                                <div class="theme-card ${isCurrent ? 'active-theme' : ''}" style="background: #ffffff; border: ${isCurrent ? '2px solid #b8860b' : '1px solid #e8e4df'}; border-radius: 14px; padding: 1.35rem; display: flex; flex-direction: column; justify-content: space-between; position: relative; transition: all 0.3s ease; box-shadow: ${isCurrent ? '0 4px 20px rgba(184,134,11,0.15)' : '0 2px 8px rgba(0,0,0,0.03)'};">
                                     <div>
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
                                             <div style="display: flex; align-items: center; gap: 0.65rem;">
-                                                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.3); display: flex; align-items: center; justify-content: center; color: var(--color-gold); flex-shrink: 0;">
+                                                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(184,134,11,0.1); border: 1px solid rgba(184,134,11,0.3); display: flex; align-items: center; justify-content: center; color: #7a5a06; flex-shrink: 0;">
                                                     ${window.getSeasonalThemeIconSvg(t.id, 20)}
                                                 </div>
                                                 <div>
-                                                    <h4 style="font-size: 1.05rem; font-weight: 700; color: #ffffff; margin: 0;">${t.name}</h4>
+                                                    <h4 style="font-size: 1.05rem; font-weight: 700; color: #111827; margin: 0;">${t.name}</h4>
                                                     <span style="font-size: 0.7rem; color: var(--color-gold); font-weight: 600;">${t.occasion}</span>
                                                 </div>
                                             </div>
@@ -3416,7 +3416,7 @@ const UIComponents = {
             const adminStaffCount = users.filter(u => ['admin', 'manager', 'staff', 'sommelier', 'concierge'].includes((u.role || '').toLowerCase())).length;
 
             html += `
-                <div class="panel-card users-desk-wrapper" style="margin-bottom: 0; background: linear-gradient(145deg, rgba(8, 22, 14, 0.95), rgba(4, 12, 8, 0.98)); border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 16px 40px rgba(0,0,0,0.6); border-radius: 12px; padding: 1.75rem;">
+                <div class="panel-card users-desk-wrapper" style="margin-bottom: 0; background: #ffffff; border: 1px solid #e8e4df; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border-radius: 12px; padding: 1.75rem;">
                     
                     <!-- Header Section -->
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1.25rem; border-bottom: 1px solid rgba(212,175,55,0.18); padding-bottom: 1.25rem;">
@@ -3728,13 +3728,13 @@ const UIComponents = {
             </div>
 
             <!-- Why Rock One Wild Tea Is Different Section -->
-            <div class="why-different-card" style="margin-bottom: 4.5rem; background: linear-gradient(135deg, rgba(20, 16, 6, 0.75) 0%, rgba(4, 16, 8, 0.92) 100%); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 20px; padding: 3rem 2.25rem; box-shadow: 0 16px 45px rgba(0, 0, 0, 0.75);">
+            <div class="why-different-card" style="margin-bottom: 4.5rem; background: #ffffff; border: 1.5px solid #ebd9b8; border-radius: 20px; padding: 3rem 2.25rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);">
                 <div style="text-align: center; max-width: 860px; margin: 0 auto 3rem auto;">
                     <span class="section-tag" style="font-size: 0.82rem; letter-spacing: 2px;">WHY ROCK ONE WILD TEA IS DIFFERENT</span>
-                    <h3 style="font-family: var(--font-serif); font-size: 2.3rem; color: var(--color-white); margin-bottom: 1rem; line-height: 1.25;">
+                    <h3 style="font-family: var(--font-serif); font-size: 2.3rem; color: #111827; margin-bottom: 1rem; line-height: 1.25;">
                         Why Rock One Wild Tea Is Different
                     </h3>
-                    <p style="color: var(--color-text-primary); font-size: 1.05rem; line-height: 1.85; margin-bottom: 0;">
+                    <p style="color: #374151; font-size: 1.05rem; line-height: 1.85; margin-bottom: 0;">
                         At <strong>Rock One Wild Tea</strong>, our difference is not simply in the tea. It is in the place where it grows, the way we care for our garden, the way we make our tea, and the personal attention we give to every small batch.
                     </p>
                 </div>
@@ -4006,13 +4006,13 @@ const UIComponents = {
                 </div>
 
                 <!-- 3. Why Rock One Wild Tea Is Different (13 Core Distinction Pillars) -->
-                <div style="margin-bottom: 4.5rem; background: linear-gradient(135deg, rgba(20, 16, 6, 0.75) 0%, rgba(4, 16, 8, 0.92) 100%); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 20px; padding: 3rem 2.25rem; box-shadow: 0 16px 45px rgba(0, 0, 0, 0.75);">
+                <div style="margin-bottom: 4.5rem; background: #ffffff; border: 1.5px solid #ebd9b8; border-radius: 20px; padding: 3rem 2.25rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);">
                     <div style="text-align: center; max-width: 860px; margin: 0 auto 3rem auto;">
                         <span class="section-tag" style="font-size: 0.82rem; letter-spacing: 2px;">OUR PHILOSOPHY</span>
-                        <h2 style="font-family: var(--font-serif); font-size: 2.3rem; color: var(--color-white); margin-bottom: 0.75rem; line-height: 1.25;">
+                        <h2 style="font-family: var(--font-serif); font-size: 2.3rem; color: #111827; margin-bottom: 0.75rem; line-height: 1.25;">
                             Why Rock One Wild Tea Is Different
                         </h2>
-                        <p style="color: var(--color-text-primary); font-size: 1.05rem; line-height: 1.85; margin: 0;">
+                        <p style="color: #374151; font-size: 1.05rem; line-height: 1.85; margin: 0;">
                             At <strong>Rock One Wild Tea</strong>, our difference is not simply in the tea. It is in the place where it grows, the way we care for our garden, the way we make our tea, and the personal attention we give to every small batch.
                         </p>
                     </div>
@@ -4779,17 +4779,17 @@ const UIComponents = {
         ];
 
         container.innerHTML = `
-            <div class="estate-cinema-card" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(4, 18, 10, 0.9) 100%); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 20px; padding: 3rem 2.5rem; box-shadow: 0 18px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(212, 175, 55, 0.1); position: relative; overflow: hidden;">
+            <div class="estate-cinema-card" style="background: #ffffff; border: 1px solid #e8e4df; border-radius: 20px; padding: 3rem 2.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden;">
                 <!-- Header Lockup -->
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                     <div>
-                        <span class="section-tag" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--color-gold); font-weight: 700; display: block; margin-bottom: 0.5rem;">
+                        <span class="section-tag" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #7a5a06; font-weight: 700; display: block; margin-bottom: 0.5rem;">
                             ESTATE CINEMATOGRAPHY • 4K ULTRA HD
                         </span>
-                        <h3 class="home-section-title" style="font-size: 2.2rem; line-height: 1.2; margin: 0; color: var(--color-white);">
+                        <h3 class="home-section-title" style="font-size: 2.2rem; line-height: 1.2; margin: 0; color: #111827;">
                             Cinema of the Estate • The Living Terroir
                         </h3>
-                        <p style="color: var(--color-text-muted); font-size: 0.92rem; margin-top: 0.5rem; max-width: 680px; line-height: 1.6;">
+                        <p style="color: #4b5563; font-size: 0.92rem; margin-top: 0.5rem; max-width: 680px; line-height: 1.6;">
                             Immerse in the mist-veiled mountain amphitheaters of Ettampitiya (1,200m+), witness the sacred orthodox hand-rolling rituals, and explore the uncultivated wild tea sanctuary.
                         </p>
                     </div>
@@ -5012,7 +5012,7 @@ const UIComponents = {
         ];
 
         container.innerHTML = `
-            <div class="estate-location-card" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(8, 22, 14, 0.85) 100%); backdrop-filter: blur(24px) saturate(190%); -webkit-backdrop-filter: blur(24px) saturate(190%); border: 1px solid rgba(212, 175, 55, 0.28); border-radius: 20px; padding: 3rem 2.5rem; box-shadow: 0 16px 45px rgba(0, 0, 0, 0.65), 0 0 25px rgba(212, 175, 55, 0.1); position: relative; overflow: hidden;">
+            <div class="estate-location-card" style="background: #ffffff; border: 1px solid #e8e4df; border-radius: 20px; padding: 3rem 2.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden;">
                 <!-- Ambient Gold Light Flare -->
                 <div style="position: absolute; top: -100px; right: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 70%); pointer-events: none;"></div>
 
@@ -5296,18 +5296,18 @@ const UIComponents = {
         ).join('');
 
         modal.innerHTML = `
-            <div class="modal-card connoisseur-dossier-card" style="background:linear-gradient(145deg, rgba(6,18,12,0.98) 0%, rgba(12,32,22,0.98) 100%); border:1px solid rgba(212,175,55,0.4); border-radius:20px; max-width:880px; width:100%; padding:2.5rem 2.25rem; box-shadow:0 24px 60px rgba(0,0,0,0.85), 0 0 35px rgba(212,175,55,0.1); position:relative; max-height:90vh; overflow-y:auto;">
-                <button type="button" id="close-connoisseur-modal-btn" style="position:absolute; top:1.25rem; right:1.25rem; background:transparent; border:none; color:var(--color-gold); font-size:1.5rem; cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:all 0.2s;" title="${_t('common_close', 'Close')}">&times;</button>
+            <div class="modal-card connoisseur-dossier-card" style="background:#ffffff; border:1.5px solid #ebd9b8; border-radius:20px; max-width:880px; width:100%; padding:2.5rem 2.25rem; box-shadow:0 24px 60px rgba(0,0,0,0.15); position:relative; max-height:90vh; overflow-y:auto;">
+                <button type="button" id="close-connoisseur-modal-btn" style="position:absolute; top:1.25rem; right:1.25rem; background:transparent; border:none; color:#7a5a06; font-size:1.5rem; cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:all 0.2s;" title="${_t('common_close', 'Close')}">&times;</button>
                 
                 <!-- Dossier Header -->
-                <div style="text-align:center; margin-bottom:2rem; border-bottom:1px solid rgba(212,175,55,0.2); padding-bottom:1.5rem;">
-                    <div style="display:inline-flex; align-items:center; gap:0.5rem; background:rgba(212,175,55,0.12); border:1px solid var(--color-gold); border-radius:20px; padding:0.35rem 1.2rem; font-size:0.72rem; text-transform:uppercase; letter-spacing:2px; color:var(--color-gold); font-weight:700; margin-bottom:0.75rem;">
+                <div style="text-align:center; margin-bottom:2rem; border-bottom:1px solid #e8e4df; padding-bottom:1.5rem;">
+                    <div style="display:inline-flex; align-items:center; gap:0.5rem; background:#fdfbf7; border:1px solid #ebd9b8; border-radius:20px; padding:0.35rem 1.2rem; font-size:0.72rem; text-transform:uppercase; letter-spacing:2px; color:#7a5a06; font-weight:700; margin-bottom:0.75rem;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="12 6 12 12 16 14"></polygon></svg>
                         <span>${_t('dossier_modal_badge', 'CONNOISSEUR SENSORY DOSSIER')}</span>
                     </div>
-                    <h2 style="font-family:var(--font-serif); font-size:2rem; color:#ffffff; margin-bottom:0.4rem;">${product.name}</h2>
-                    <p style="color:var(--color-text-muted); font-size:0.88rem; max-width:620px; margin:0 auto;">
-                        ${product.leafGrade || _t('leaf_grade_default', 'Single-Estate Reserve')} &bull; <strong style="color:var(--color-gold);">${product.elevation || '1,240m Highlands'}</strong> &bull; ${product.harvestSeason || 'Equinox First Flush'}
+                    <h2 style="font-family:var(--font-serif); font-size:2rem; color:#111827; margin-bottom:0.4rem;">${product.name}</h2>
+                    <p style="color:#6b7280; font-size:0.88rem; max-width:620px; margin:0 auto;">
+                        ${product.leafGrade || _t('leaf_grade_default', 'Single-Estate Reserve')} &bull; <strong style="color:#7a5a06;">${product.elevation || '1,240m Highlands'}</strong> &bull; ${product.harvestSeason || 'Equinox First Flush'}
                     </p>
                 </div>
 
@@ -5315,16 +5315,16 @@ const UIComponents = {
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:2.25rem; margin-bottom:2.25rem; align-items:center;" class="connoisseur-grid-layout">
                     <!-- Left: Terroir & Sensory Spectrum Bars -->
                     <div>
-                        <div style="position:relative; border-radius:12px; overflow:hidden; border:1px solid rgba(212,175,55,0.3); margin-bottom:1.25rem; aspect-ratio:16/9; background:#000;">
+                        <div style="position:relative; border-radius:12px; overflow:hidden; border:1px solid #ebd9b8; margin-bottom:1.25rem; aspect-ratio:16/9; background:#fdfbf7;">
                             <img src="${product.image || 'images/Product.jpeg'}" alt="${product.name}" style="width:100%; height:100%; object-fit:contain;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
-                            <span style="position:absolute; bottom:0.6rem; left:0.6rem; background:rgba(4,14,8,0.85); border:1px solid var(--color-gold); color:var(--color-gold); font-size:0.7rem; padding:0.25rem 0.65rem; border-radius:12px; font-weight:600;">
+                            <span style="position:absolute; bottom:0.6rem; left:0.6rem; background:rgba(255,255,255,0.92); border:1px solid #ebd9b8; color:#7a5a06; font-size:0.7rem; padding:0.25rem 0.65rem; border-radius:12px; font-weight:600;">
                                 Batch Ref: ROW-${(product.id || 'P1').toUpperCase()}
                             </span>
                         </div>
 
-                        <h4 style="font-family:var(--font-serif); color:var(--color-gold); font-size:1.1rem; margin-bottom:0.6rem;">${_t('dossier_sensory_title', 'Sommelier Tasting Chords')}</h4>
+                        <h4 style="font-family:var(--font-serif); color:#7a5a06; font-size:1.1rem; margin-bottom:0.6rem;">${_t('dossier_sensory_title', 'Sommelier Tasting Chords')}</h4>
                         ${product.flavorProfile ? `
-                        <div style="font-size:0.84rem; color:#f1f5f9; font-style:italic; margin-bottom:0.85rem; border-left:2.5px solid var(--color-gold); padding-left:0.75rem; line-height:1.45; background:rgba(212,175,55,0.06); padding-top:0.4rem; padding-bottom:0.4rem; border-radius:0 8px 8px 0;">
+                        <div style="font-size:0.84rem; color:#374151; font-style:italic; margin-bottom:0.85rem; border-left:2.5px solid #b8860b; padding-left:0.75rem; line-height:1.45; background:#fdfbf7; padding-top:0.4rem; padding-bottom:0.4rem; border-radius:0 8px 8px 0;">
                             "${product.flavorProfile}"
                         </div>` : ''}
                         <div style="display:flex; flex-wrap:wrap; gap:0.45rem; margin-bottom:1.25rem;">
@@ -5332,74 +5332,74 @@ const UIComponents = {
                         </div>
 
                         <!-- Sensory Spectrum Horizontal Bars (All 6 Calibrated Sommelier Dimensions) -->
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.65rem 0.95rem; background:rgba(4,14,8,0.65); border:1px solid rgba(212,175,55,0.2); border-radius:12px; padding:0.95rem 1.15rem;">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.65rem 0.95rem; background:#fdfbf7; border:1px solid #ebd9b8; border-radius:12px; padding:0.95rem 1.15rem;">
                             <!-- Floral -->
                             <div class="spectrum-bar-item">
-                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#dcece1; margin-bottom:0.25rem;">
+                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
                                     <span>🌸 ${_t('radar_floral', 'Floral Intensity')}</span>
-                                    <strong style="color:var(--color-gold);">${radar.floral ?? 80}%</strong>
+                                    <strong style="color:#7a5a06;">${radar.floral ?? 80}%</strong>
                                 </div>
-                                <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
-                                    <div style="width:${radar.floral ?? 80}%; height:100%; background:linear-gradient(90deg, #aa820a, #d4af37); border-radius:3px;"></div>
+                                <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
+                                    <div style="width:${radar.floral ?? 80}%; height:100%; background:linear-gradient(90deg, #c59b27, #b8860b); border-radius:3px;"></div>
                                 </div>
                             </div>
                             <!-- Malty -->
                             <div class="spectrum-bar-item">
-                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#dcece1; margin-bottom:0.25rem;">
+                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
                                     <span>🌾 ${_t('radar_malty', 'Malty / Roast')}</span>
-                                    <strong style="color:var(--color-gold);">${radar.malty ?? 75}%</strong>
+                                    <strong style="color:#7a5a06;">${radar.malty ?? 75}%</strong>
                                 </div>
-                                <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
-                                    <div style="width:${radar.malty ?? 75}%; height:100%; background:linear-gradient(90deg, #aa820a, #d4af37); border-radius:3px;"></div>
+                                <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
+                                    <div style="width:${radar.malty ?? 75}%; height:100%; background:linear-gradient(90deg, #c59b27, #b8860b); border-radius:3px;"></div>
                                 </div>
                             </div>
                             <!-- Sweetness -->
                             <div class="spectrum-bar-item">
-                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#dcece1; margin-bottom:0.25rem;">
+                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
                                     <span>🍯 ${_t('radar_sweetness', 'Natural Sweetness')}</span>
-                                    <strong style="color:var(--color-gold);">${radar.sweetness ?? 80}%</strong>
+                                    <strong style="color:#7a5a06;">${radar.sweetness ?? 80}%</strong>
                                 </div>
-                                <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
-                                    <div style="width:${radar.sweetness ?? 80}%; height:100%; background:linear-gradient(90deg, #aa820a, #d4af37); border-radius:3px;"></div>
+                                <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
+                                    <div style="width:${radar.sweetness ?? 80}%; height:100%; background:linear-gradient(90deg, #c59b27, #b8860b); border-radius:3px;"></div>
                                 </div>
                             </div>
                             <!-- Astringency -->
                             <div class="spectrum-bar-item">
-                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#dcece1; margin-bottom:0.25rem;">
+                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
                                     <span>🍃 ${_t('radar_astringency', 'Astringency')}</span>
-                                    <strong style="color:var(--color-gold);">${radar.astringency ?? 40}%</strong>
+                                    <strong style="color:#7a5a06;">${radar.astringency ?? 40}%</strong>
                                 </div>
-                                <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
-                                    <div style="width:${radar.astringency ?? 40}%; height:100%; background:linear-gradient(90deg, #aa820a, #d4af37); border-radius:3px;"></div>
+                                <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
+                                    <div style="width:${radar.astringency ?? 40}%; height:100%; background:linear-gradient(90deg, #c59b27, #b8860b); border-radius:3px;"></div>
                                 </div>
                             </div>
                             <!-- Body -->
                             <div class="spectrum-bar-item">
-                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#dcece1; margin-bottom:0.25rem;">
+                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
                                     <span>⚖️ ${_t('radar_body', 'Body & Structure')}</span>
-                                    <strong style="color:var(--color-gold);">${radar.body ?? 80}%</strong>
+                                    <strong style="color:#7a5a06;">${radar.body ?? 80}%</strong>
                                 </div>
-                                <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
-                                    <div style="width:${radar.body ?? 80}%; height:100%; background:linear-gradient(90deg, #aa820a, #d4af37); border-radius:3px;"></div>
+                                <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
+                                    <div style="width:${radar.body ?? 80}%; height:100%; background:linear-gradient(90deg, #c59b27, #b8860b); border-radius:3px;"></div>
                                 </div>
                             </div>
                             <!-- Aroma -->
                             <div class="spectrum-bar-item">
-                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#dcece1; margin-bottom:0.25rem;">
+                                <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
                                     <span>✨ ${_t('radar_aroma', 'Aroma Intensity')}</span>
-                                    <strong style="color:var(--color-gold);">${radar.aroma ?? 90}%</strong>
+                                    <strong style="color:#7a5a06;">${radar.aroma ?? 90}%</strong>
                                 </div>
-                                <div style="height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
-                                    <div style="width:${radar.aroma ?? 90}%; height:100%; background:linear-gradient(90deg, #aa820a, #d4af37); border-radius:3px;"></div>
+                                <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
+                                    <div style="width:${radar.aroma ?? 90}%; height:100%; background:linear-gradient(90deg, #c59b27, #b8860b); border-radius:3px;"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Right: Flavor Profile Radar Chart -->
-                    <div style="background:rgba(4,14,8,0.7); border:1px solid rgba(212,175,55,0.3); border-radius:16px; padding:1.75rem 1.5rem; text-align:center;">
-                        <h4 style="font-family:var(--font-serif); color:#ffffff; font-size:1.15rem; margin-bottom:0.25rem;">${_t('dossier_sensory_title', '6-Point Sensory Radar')}</h4>
-                        <p style="color:var(--color-text-muted); font-size:0.78rem; margin-bottom:1.25rem;">${_t('dossier_terroir_title', 'Harmonic balance calibrated by Estate Sommelier')}</p>
+                    <div style="background:#fdfbf7; border:1px solid #ebd9b8; border-radius:16px; padding:1.75rem 1.5rem; text-align:center;">
+                        <h4 style="font-family:var(--font-serif); color:#111827; font-size:1.15rem; margin-bottom:0.25rem;">${_t('dossier_sensory_title', '6-Point Sensory Radar')}</h4>
+                        <p style="color:#6b7280; font-size:0.78rem; margin-bottom:1.25rem;">${_t('dossier_terroir_title', 'Harmonic balance calibrated by Estate Sommelier')}</p>
                         
                         <div style="max-width:270px; margin:0 auto;">
                             ${radarSvg}
@@ -5408,15 +5408,15 @@ const UIComponents = {
                 </div>
 
                 <!-- Bottom: Interactive Live Digital Steep Timer Section -->
-                <div class="digital-steep-timer-block" style="background:linear-gradient(135deg, rgba(4,14,8,0.92) 0%, rgba(8,24,14,0.95) 100%); border:1px solid var(--color-gold); border-radius:18px; padding:2rem; box-shadow:0 12px 35px rgba(0,0,0,0.6);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem; border-bottom:1px solid rgba(212,175,55,0.2); padding-bottom:1rem;">
+                <div class="digital-steep-timer-block" style="background:#ffffff; border:1.5px solid #ebd9b8; border-radius:18px; padding:2rem; box-shadow:0 4px 20px rgba(0,0,0,0.04);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem; border-bottom:1px solid #e8e4df; padding-bottom:1rem;">
                         <div>
-                            <span style="font-size:0.72rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--color-gold); font-weight:700; display:block; margin-bottom:0.2rem;">${_t('brew_section_tag', 'PRECISION BREWING RITUAL')}</span>
-                            <h3 style="font-family:var(--font-serif); color:#ffffff; font-size:1.4rem; margin:0;">${_t('dossier_steep_title', 'Live Sommelier Steep Timer')}</h3>
+                            <span style="font-size:0.72rem; text-transform:uppercase; letter-spacing:1.5px; color:#7a5a06; font-weight:700; display:block; margin-bottom:0.2rem;">${_t('brew_section_tag', 'PRECISION BREWING RITUAL')}</span>
+                            <h3 style="font-family:var(--font-serif); color:#111827; font-size:1.4rem; margin:0;">${_t('dossier_steep_title', 'Live Sommelier Steep Timer')}</h3>
                         </div>
                         
                         <!-- Infusion Selector Tabs -->
-                        <div class="infusion-selector-tabs" style="display:flex; gap:0.4rem; background:rgba(255,255,255,0.04); border:1px solid rgba(212,175,55,0.25); border-radius:30px; padding:0.25rem;">
+                        <div class="infusion-selector-tabs" style="display:flex; gap:0.4rem; background:#fdfbf7; border:1px solid #e8e4df; border-radius:30px; padding:0.25rem;">
                             ${infusions.map((inf, idx) => `
                                 <button type="button" class="infusion-tab-btn ${idx === 0 ? 'active' : ''}" data-seconds="${inf.seconds}" data-label="${inf.label}" style="padding:0.4rem 0.9rem; font-size:0.75rem; border-radius:20px; border:none; cursor:pointer; transition:all 0.2s;">
                                     ${idx + 1} (${Math.floor(inf.seconds/60)}m)
@@ -5429,21 +5429,21 @@ const UIComponents = {
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:center;" class="steep-timer-inner-grid">
                         <!-- Brewing Parameters -->
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-                            <div style="background:rgba(212,175,55,0.06); border:1px solid rgba(212,175,55,0.2); border-radius:10px; padding:0.9rem; text-align:center;">
-                                <span style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:var(--color-text-muted); display:block; margin-bottom:0.25rem;">${_t('stat_water_temp', 'Water Temp')}</span>
-                                <strong style="font-size:1.15rem; color:var(--color-gold);">${product.steepTemp || '95°C'}</strong>
+                            <div style="background:#fdfbf7; border:1px solid #ebd9b8; border-radius:10px; padding:0.9rem; text-align:center;">
+                                <span style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:#6b7280; display:block; margin-bottom:0.25rem;">${_t('stat_water_temp', 'Water Temp')}</span>
+                                <strong style="font-size:1.15rem; color:#7a5a06;">${product.steepTemp || '95°C'}</strong>
                             </div>
-                            <div style="background:rgba(212,175,55,0.06); border:1px solid rgba(212,175,55,0.2); border-radius:10px; padding:0.9rem; text-align:center;">
-                                <span style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:var(--color-text-muted); display:block; margin-bottom:0.25rem;">${_t('stat_leaf_ratio', 'Leaf Ratio')}</span>
-                                <strong style="font-size:1.15rem; color:#ffffff;">${product.leafRatio || '2.5g / 180ml'}</strong>
+                            <div style="background:#fdfbf7; border:1px solid #ebd9b8; border-radius:10px; padding:0.9rem; text-align:center;">
+                                <span style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:#6b7280; display:block; margin-bottom:0.25rem;">${_t('stat_leaf_ratio', 'Leaf Ratio')}</span>
+                                <strong style="font-size:1.15rem; color:#111827;">${product.leafRatio || '2.5g / 180ml'}</strong>
                             </div>
-                            <div style="background:rgba(212,175,55,0.06); border:1px solid rgba(212,175,55,0.2); border-radius:10px; padding:0.9rem; text-align:center;">
-                                <span style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:var(--color-text-muted); display:block; margin-bottom:0.25rem;">${_t('stat_steep_duration', 'Steep Duration')}</span>
-                                <strong id="modal-infusion-target-label" style="font-size:0.85rem; color:#dcece1; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">1st (Aroma)</strong>
+                            <div style="background:#fdfbf7; border:1px solid #ebd9b8; border-radius:10px; padding:0.9rem; text-align:center;">
+                                <span style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:#6b7280; display:block; margin-bottom:0.25rem;">${_t('stat_steep_duration', 'Steep Duration')}</span>
+                                <strong id="modal-infusion-target-label" style="font-size:0.85rem; color:#111827; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">1st (Aroma)</strong>
                             </div>
-                            <div style="background:rgba(212,175,55,0.06); border:1px solid rgba(212,175,55,0.2); border-radius:10px; padding:0.9rem; text-align:center;">
-                                <span style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:var(--color-text-muted); display:block; margin-bottom:0.25rem;">${_t('stat_serving_vessel', 'Serving Vessel')}</span>
-                                <strong style="font-size:0.95rem; color:#ffffff;">${_t('brew_vessel_porcelain', 'Porcelain / Glass')}</strong>
+                            <div style="background:#fdfbf7; border:1px solid #ebd9b8; border-radius:10px; padding:0.9rem; text-align:center;">
+                                <span style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:#6b7280; display:block; margin-bottom:0.25rem;">${_t('stat_serving_vessel', 'Serving Vessel')}</span>
+                                <strong style="font-size:0.95rem; color:#111827;">${_t('brew_vessel_porcelain', 'Porcelain / Glass')}</strong>
                             </div>
                         </div>
 
@@ -5451,14 +5451,14 @@ const UIComponents = {
                         <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
                             <div style="position:relative; width:160px; height:160px; display:flex; align-items:center; justify-content:center; margin-bottom:1.25rem;">
                                 <svg width="160" height="160" viewBox="0 0 160 160" style="transform:rotate(-90deg);">
-                                    <circle cx="80" cy="80" r="70" stroke="rgba(212,175,55,0.18)" stroke-width="8" fill="none" />
-                                    <circle id="modal-timer-progress-ring" cx="80" cy="80" r="70" stroke="#d4af37" stroke-width="8" stroke-dasharray="440" stroke-dashoffset="0" stroke-linecap="round" fill="none" style="transition:stroke-dashoffset 0.8s linear;" />
+                                    <circle cx="80" cy="80" r="70" stroke="#f0ece1" stroke-width="8" fill="none" />
+                                    <circle id="modal-timer-progress-ring" cx="80" cy="80" r="70" stroke="#b8860b" stroke-width="8" stroke-dasharray="440" stroke-dashoffset="0" stroke-linecap="round" fill="none" style="transition:stroke-dashoffset 0.8s linear;" />
                                 </svg>
                                 <div style="position:absolute; text-align:center;">
-                                    <span id="modal-timer-digits" style="font-family:monospace; font-size:2.1rem; font-weight:700; color:#ffffff; letter-spacing:1px; display:block; line-height:1;">
+                                    <span id="modal-timer-digits" style="font-family:monospace; font-size:2.1rem; font-weight:700; color:#111827; letter-spacing:1px; display:block; line-height:1;">
                                         ${initialMin}:${initialSec}
                                     </span>
-                                    <span id="modal-timer-status-text" style="font-size:0.68rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--color-gold); font-weight:700; margin-top:0.35rem; display:block;">
+                                    <span id="modal-timer-status-text" style="font-size:0.68rem; text-transform:uppercase; letter-spacing:1.5px; color:#7a5a06; font-weight:700; margin-top:0.35rem; display:block;">
                                         ${_t('timer_standby', 'READY TO STEEP')}
                                     </span>
                                 </div>
@@ -5469,10 +5469,10 @@ const UIComponents = {
                                 <button type="button" id="btn-timer-start-pause" class="btn btn-primary" style="padding:0.65rem 1.4rem; font-size:0.82rem; font-weight:700;">
                                     <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5,3 19,12 5,21"/></svg> ${_t('btn_start_steep', 'Start Steep')}
                                 </button>
-                                <button type="button" id="btn-timer-plus-30" class="btn btn-outline" style="padding:0.65rem 0.9rem; font-size:0.8rem; border-color:rgba(212,175,55,0.3); color:var(--color-gold);" title="Add 30 Seconds">
+                                <button type="button" id="btn-timer-plus-30" class="btn btn-outline" style="padding:0.65rem 0.9rem; font-size:0.8rem; border-color:#d1d5db; color:#1f2937; background:#fdfbf7;" title="Add 30 Seconds">
                                     +30s
                                 </button>
-                                <button type="button" id="btn-timer-reset" class="btn btn-outline" style="padding:0.65rem 0.9rem; font-size:0.8rem; border-color:rgba(255,255,255,0.15); color:var(--color-text-muted);" title="${_t('btn_reset_steep', 'Reset Timer')}">
+                                <button type="button" id="btn-timer-reset" class="btn btn-outline" style="padding:0.65rem 0.9rem; font-size:0.8rem; border-color:#d1d5db; color:#4b5563; background:#fdfbf7;" title="${_t('btn_reset_steep', 'Reset Timer')}">
                                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3"/></svg> ${_t('btn_reset_steep', 'Reset')}
                                 </button>
                             </div>
@@ -5487,11 +5487,11 @@ const UIComponents = {
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
                             ${_t('btn_add_to_bag', 'Add to Bag')} — ${window.TeaFactoryStore.formatCurrency(product.price)}
                         </button>
-                        <button type="button" class="btn btn-outline btn-book-prod" data-id="${product.id}" style="padding:0.85rem 1.4rem; font-size:0.9rem; border-color:rgba(255,255,255,0.25); color:#ffffff;">
+                        <button type="button" class="btn btn-outline btn-book-prod" data-id="${product.id}" style="padding:0.85rem 1.4rem; font-size:0.9rem; border-color:#d1d5db; color:#1f2937; background:#fdfbf7;">
                             ${_t('btn_quick_order', 'Quick Order')}
                         </button>
                     </div>
-                    <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20am%20interested%20in%20learning%20more%20about%20${encodeURIComponent(product.name)}." target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="color:#25d366; border-color:rgba(37,211,102,0.4); text-decoration:none; display:flex; align-items:center; gap:0.4rem; font-size:0.88rem; padding:0.85rem 1.35rem;">
+                    <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20am%20interested%20in%20learning%20more%20about%20${encodeURIComponent(product.name)}." target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="color:#16a34a; border-color:#86efac; background:#f0fdf4; text-decoration:none; display:flex; align-items:center; gap:0.4rem; font-size:0.88rem; padding:0.85rem 1.35rem;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.247 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.992-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.443-4.436-9.884-9.888-9.884-5.447 0-9.885 4.437-9.889 9.885-.001 2.016.52 3.49 1.37 4.975l-.997 3.641 3.731-.978z"/></svg>
                         Ask Sommelier on WhatsApp
                     </a>
