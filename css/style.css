@@ -7,13 +7,13 @@
     --color-bg-card-hover: #ffffff;
     --color-bg-input: #ffffff;
     --color-bg-modal: #ffffff;
-    --color-gold: #b8860b;
-    --color-gold-hover: #996e00;
+    --color-gold: #96700a;
+    --color-gold-hover: #7a5a05;
     --color-gold-light: #fef3c7;
-    --color-gold-dark: #805b00;
+    --color-gold-dark: #6b4f04;
     --color-white: #ffffff;
     --color-text-primary: #18201b;
-    --color-text-muted: #576560;
+    --color-text-muted: #4b5563;
     --color-black: #000000;
     --color-emerald-glow: rgba(30, 120, 60, 0.15);
     
@@ -14125,24 +14125,36 @@ html, body {
 }
 
 /* 2. Global Headings & Typography */
-h1, h2, h3, h4, h5, h6,
-.home-section-title,
-.view-title,
-.subsection-title,
-.brand-title,
-.brand-name {
-    color: #111827 !important;
-    font-family: var(--font-serif) !important;
+/* Base heading/paragraph colors (non-forced so dark panels can set their own light text) */
+h1, h2, h3, h4, h5, h6 {
+    color: #111827;
+    font-family: var(--font-serif);
 }
 
-p,
 .story-text,
 .view-subtitle,
 .package-desc,
-.newsletter-box-desc,
-.announcement-card p,
-.testimonial-card-item p {
-    color: #4b5563 !important;
+.newsletter-box-desc {
+    color: #4b5563;
+}
+
+/* Header brand lockup: dark-to-gold gradient text on the white ribbon */
+.brand-name {
+    background: linear-gradient(to right, #111827 35%, #8a6508 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: none !important;
+}
+
+.brand-tagline {
+    color: #7a5a06 !important;
+    opacity: 1 !important;
+}
+
+#nav-order .nav-text,
+#nav-order {
+    color: #7a5a06 !important;
 }
 
 /* Hero slide text stays crisp white with shadow over photography */
@@ -14674,36 +14686,520 @@ label {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
 }
 
-/* 14. Luxury Grounding Footer */
+/* 14. Luxury Grounding Footer (dark forest anchor with fully readable light text) */
 .app-footer {
+    --color-text-muted: #b4c2ba;
+    --color-text-primary: #f0f5f2;
+    --color-gold: #d4af37;
     background: #111913 !important;
-    border-top: 1px solid rgba(184, 134, 11, 0.3) !important;
-    color: #9ca3af !important;
+    border-top: 1px solid rgba(212, 175, 55, 0.35) !important;
+    color: #cbd5d0 !important;
+}
+
+.app-footer p,
+.app-footer span,
+.app-footer li,
+.app-footer div {
+    color: inherit;
 }
 
 .footer-brand-title {
     color: #d4af37 !important;
 }
 
-.footer-brand-tagline {
-    color: #9ca3af !important;
+.footer-brand-tagline,
+.footer-social-text,
+.footer-contact-item,
+.footer-bottom,
+.footer-bottom p {
+    color: #cbd5d0 !important;
 }
 
-.footer-col-title {
+.footer-col-title,
+.footer-contact-item strong {
     color: #ffffff !important;
 }
 
+.footer-links-list span,
+.footer-contact-item a,
 .footer-links a,
 .footer-col a {
-    color: #d1d5db !important;
+    color: #d7dfda !important;
 }
 
+.footer-links-list span:hover,
+.footer-contact-item a:hover,
 .footer-links a:hover,
 .footer-col a:hover {
     color: #f3cf65 !important;
 }
 
-.footer-bottom {
-    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-    color: #6b7280 !important;
+.footer-social-link {
+    color: #cbd5d0 !important;
 }
+
+.footer-social-link:hover {
+    color: #f3cf65 !important;
+}
+
+.footer-staff-portal-btn,
+.footer-cookie-btn {
+    color: #b4c2ba !important;
+}
+
+.footer-staff-portal-btn:hover,
+.footer-cookie-btn:hover {
+    color: #f3cf65 !important;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+/* 15. Admin panel header card: light luxury card */
+.admin-header-block {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    border-left: 4px solid #b8860b !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+.admin-header-block .view-title {
+    color: #111827 !important;
+}
+
+.admin-header-block .view-subtitle {
+    color: #4b5563 !important;
+}
+
+.admin-header-block .btn-outline,
+.admin-header-block .btn {
+    color: #7a5a06 !important;
+    border-color: #b8860b !important;
+    background: #fffdf7 !important;
+}
+
+.admin-header-block .btn:hover {
+    background: #b8860b !important;
+    color: #ffffff !important;
+}
+
+/* 16. Cookie consent banner (dark glass): explicit light text */
+.estate-cookie-banner .cookie-banner-title {
+    color: #ffffff !important;
+}
+
+/* 17. Text sitting on photography / video posters must stay light */
+.hero-slide .btn-outline {
+    background: rgba(4, 14, 8, 0.55) !important;
+    color: #ffffff !important;
+    border: 1.5px solid #f3cf65 !important;
+}
+
+.hero-slide .btn-outline:hover {
+    background: #f3cf65 !important;
+    color: #111827 !important;
+}
+
+.hero-slide .btn-primary {
+    color: #111827 !important;
+}
+
+#cinema-poster-facade h4,
+#cinema-poster-facade span {
+    color: #ffffff !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+}
+
+#cinema-poster-facade span[style*="letter-spacing"] {
+    color: #f3cf65 !important;
+}
+
+.showcase-content .showcase-title,
+.showcase-content h3 {
+    color: #ffffff !important;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+}
+
+.showcase-content .showcase-desc,
+.showcase-content p {
+    color: #e5e7eb !important;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
+}
+
+.hero-side-nav {
+    color: #f3cf65 !important;
+}
+
+.estate-cookie-banner .cookie-banner-desc {
+    color: #cbd5e1 !important;
+}
+
+.estate-cookie-banner .cookie-banner-badge {
+    color: #f3cf65 !important;
+}
+
+/* 18. Comprehensive White Theme Legibility & High Contrast Master Overrides */
+
+/* Header Brand Lockup */
+.brand-name {
+    background: linear-gradient(to right, #111827 35%, #8a6508 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: #111827 !important;
+    text-shadow: none !important;
+}
+
+.brand-tagline {
+    color: #7a5a06 !important;
+    opacity: 1 !important;
+}
+
+/* Estate Admin Panel: Stats, Tabs, Desks & Actions */
+.admin-stat-card {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    border-top: 3px solid #b8860b !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+}
+
+.admin-stat-card:hover {
+    background: #ffffff !important;
+    border-color: #b8860b !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+}
+
+.admin-stat-card .stat-value {
+    color: #111827 !important;
+    text-shadow: none !important;
+    font-weight: 700 !important;
+}
+
+.admin-stat-card .stat-label {
+    color: #4b5563 !important;
+    font-weight: 600 !important;
+}
+
+.admin-tab-btn {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    color: #4b5563 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+}
+
+.admin-tab-btn:hover {
+    background: #fdfbf7 !important;
+    border-color: #b8860b !important;
+    color: #96700a !important;
+    transform: translateY(-2px) !important;
+}
+
+.admin-tab-btn.active {
+    background: #fffdf7 !important;
+    border-color: #96700a !important;
+    color: #96700a !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 8px rgba(150, 112, 10, 0.15) !important;
+}
+
+.admin-form-card,
+.inq-ledger-wrapper,
+.users-desk-wrapper {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+    color: #1f2937 !important;
+}
+
+.panel-title,
+.admin-card-header {
+    color: #111827 !important;
+}
+
+.panel-desc {
+    color: #4b5563 !important;
+}
+
+.recent-order-customer,
+.client-name,
+.log-subject {
+    color: #111827 !important;
+}
+
+.admin-action-btn {
+    color: #374151 !important;
+    border: 1px solid #d1d5db !important;
+    background: #ffffff !important;
+}
+
+.admin-action-btn:hover {
+    color: #111827 !important;
+    background: #f3f4f6 !important;
+    border-color: #9ca3af !important;
+}
+
+.admin-action-btn.btn-act-convert {
+    color: #96700a !important;
+    border-color: #b8860b !important;
+    background: #fffdf7 !important;
+}
+
+.admin-action-btn.btn-act-convert:hover {
+    color: #ffffff !important;
+    background: #b8860b !important;
+}
+
+/* Collector Gift Boxes */
+.box-title-row .box-title,
+.box-title {
+    color: #111827 !important;
+}
+
+.box-title-row .box-price,
+.box-price {
+    color: #96700a !important;
+}
+
+.filter-tab-btn:hover,
+.brewing-tab-btn:hover,
+.filter-chip:hover {
+    color: #96700a !important;
+    border-color: #b8860b !important;
+    background: #fffdf7 !important;
+}
+
+/* Announcements */
+.ann-title {
+    color: #111827 !important;
+}
+
+.ann-content {
+    color: #4b5563 !important;
+}
+
+/* Location & Terroir Card */
+.estate-location-card {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+.estate-location-card .home-section-title {
+    color: #111827 !important;
+}
+
+.estate-location-card p {
+    color: #4b5563 !important;
+}
+
+.estate-location-card .section-tag {
+    color: #96700a !important;
+}
+
+.estate-location-card div[style*="rgba(4, 14, 8"] {
+    background: #fbf9f5 !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: none !important;
+}
+
+.estate-location-card div[style*="rgba(4, 14, 8"] strong {
+    color: #111827 !important;
+}
+
+.estate-location-card div[style*="rgba(4, 14, 8"] span {
+    color: #4b5563 !important;
+}
+
+.estate-location-card div[style*="rgba(4, 14, 8"] span[style*="letter-spacing"] {
+    color: #96700a !important;
+    font-weight: 700 !important;
+}
+
+.estate-location-card .btn-outline {
+    color: #7a5a06 !important;
+    border-color: #b8860b !important;
+    background: #fffdf7 !important;
+}
+
+.estate-location-card .btn-outline:hover {
+    color: #ffffff !important;
+    background: #b8860b !important;
+}
+
+/* Tours Immersion & Notice Blocks */
+div[style*="rgba(6, 24, 14"] {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+div[style*="rgba(6, 24, 14"] h3 {
+    color: #111827 !important;
+}
+
+div[style*="rgba(6, 24, 14"] p {
+    color: #4b5563 !important;
+}
+
+div[style*="rgba(6, 24, 14"] strong {
+    color: #111827 !important;
+}
+
+div[style*="rgba(6, 24, 14"] span {
+    color: #4b5563 !important;
+}
+
+div[style*="rgba(6, 24, 14"] span[style*="letter-spacing"] {
+    color: #96700a !important;
+    font-weight: 700 !important;
+}
+
+div[style*="rgba(6, 24, 14"] div[style*="rgba(255,255,255,0.03)"] {
+    background: #fbf9f5 !important;
+    border: 1px solid #f0ece5 !important;
+}
+
+div[style*="rgba(32, 20, 4"] {
+    background: #fffdfa !important;
+    border: 1px solid #ebd9b8 !important;
+    border-left: 4px solid #b8860b !important;
+}
+
+div[style*="rgba(32, 20, 4"] h4 {
+    color: #855b05 !important;
+}
+
+div[style*="rgba(32, 20, 4"] p {
+    color: #4b5563 !important;
+}
+
+div[style*="rgba(32, 20, 4"] strong {
+    color: #111827 !important;
+}
+
+/* About Page Why Different & CTA Blocks */
+.why-different-card {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.04) !important;
+}
+
+.why-different-card h2,
+.why-different-card h3,
+.why-different-card h4 {
+    color: #111827 !important;
+}
+
+.why-different-card p {
+    color: #4b5563 !important;
+}
+
+.why-different-card .section-tag {
+    color: #96700a !important;
+}
+
+.about-page-wrapper div[style*="radial-gradient"] {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+.about-page-wrapper div[style*="radial-gradient"] h3 {
+    color: #111827 !important;
+}
+
+.about-page-wrapper div[style*="radial-gradient"] p {
+    color: #4b5563 !important;
+}
+
+.about-page-wrapper div[style*="radial-gradient"] p[style*="italic"] {
+    color: #855b05 !important;
+    font-weight: 600 !important;
+}
+
+.about-page-wrapper div[style*="radial-gradient"] .section-tag {
+    color: #96700a !important;
+}
+
+.about-page-wrapper div[style*="radial-gradient"] .btn-outline {
+    color: #7a5a06 !important;
+    border-color: #b8860b !important;
+    background: #fffdf7 !important;
+}
+
+.about-page-wrapper div[style*="radial-gradient"] .btn-outline:hover {
+    color: #ffffff !important;
+    background: #b8860b !important;
+}
+
+/* Connoisseur Dossier Modal */
+.connoisseur-dossier-card {
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15) !important;
+    color: #1f2937 !important;
+}
+
+.connoisseur-dossier-card h2 {
+    color: #111827 !important;
+}
+
+.connoisseur-dossier-card h4 {
+    color: #855b05 !important;
+}
+
+.connoisseur-dossier-card p,
+.connoisseur-dossier-card span {
+    color: #4b5563 !important;
+}
+
+.dossier-tasting-tag {
+    background: #fdfbf7 !important;
+    border: 1px solid #ebd9b8 !important;
+    color: #855b05 !important;
+}
+
+.digital-steep-timer-block {
+    background: #f8f6f0 !important;
+    border: 1px solid #e8e4df !important;
+}
+
+.digital-steep-timer-block span,
+.digital-steep-timer-block div {
+    color: #111827 !important;
+}
+
+/* App Footer Clean Forest Grounding */
+.app-footer h1,
+.app-footer h2,
+.app-footer h3,
+.app-footer h4,
+.app-footer h5,
+.app-footer h6 {
+    color: #ffffff !important;
+}
+
+.app-footer p,
+.app-footer span,
+.app-footer a,
+.app-footer li,
+.app-footer div {
+    color: #cbd5d0 !important;
+}
+
+.footer-brand-title {
+    color: #d4af37 !important;
+}
+
+.footer-col-title,
+.footer-contact-item strong {
+    color: #ffffff !important;
+}
+
+.footer-links-list span,
+.footer-contact-item a,
+.footer-links a {
+    color: #d7dfda !important;
+}
+
