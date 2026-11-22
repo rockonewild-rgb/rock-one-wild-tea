@@ -2015,7 +2015,7 @@ document.addEventListener('DOMContentLoaded', () => {
         drawerOverlay.classList.add('active');
         const drawerContainer = drawerOverlay.querySelector('.drawer-container');
         if (drawerContainer) {
-            if (type === 'product' || type === 'box' || type === 'box_quoted_pay') {
+            if (type === 'product' || type === 'box' || type === 'box_quoted_pay' || type === 'tour') {
                 drawerOverlay.classList.add('checkout-fullscreen');
                 drawerContainer.classList.add('checkout-mode');
                 document.body.style.overflow = 'hidden';
@@ -4925,6 +4925,70 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ─── Seven Teahouse Luxury Detail & Purchasing View API ─────────────────
+    window.closeProductDetail = function() {
+        const modal = document.getElementById('product-detail-modal');
+        if (modal) {
+            modal.classList.remove('active', 'open');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+        document.body.style.overflow = '';
+    };
+
+    window.openProductDetail = function(id, type = 'product', options = {}) {
+        let item = null;
+        if (type === 'product') {
+            const products = window.TeaFactoryStore ? window.TeaFactoryStore.getProducts() : [];
+            item = products.find(p => p && (p.id == id || String(p.id) === String(id)));
+            if (!item && window.TeaFactoryStore && window.TeaFactoryStore.getProductById) {
+                item = window.TeaFactoryStore.getProductById(id);
+            }
+        } else if (type === 'box') {
+            const boxes = window.TeaFactoryStore ? window.TeaFactoryStore.getBoxes() : [];
+            item = boxes.find(b => b && (b.id == id || String(b.id) === String(id)));
+            if (!item) {
+                item = { id, name: `Collector Chest #${String(id).padStart(2, '0')}`, price: 150.00, image: 'images/Gift Box.jpeg' };
+            }
+        } else if (type === 'tour') {
+            const selectedPkgCard = document.querySelector('.package-card.selected');
+            const pkgName = (options && options.package) || (selectedPkgCard ? selectedPkgCard.getAttribute('data-package') : '01. Gongfu-Style Black Tea Brewing Experience');
+            const lkrPerGuest = (options && options.price_lkr) || (selectedPkgCard ? (parseFloat(selectedPkgCard.getAttribute('data-price-lkr')) || 1450) : 1450);
+            const baseUsdPerGuest = (options && options.price) || (selectedPkgCard ? parseFloat(selectedPkgCard.getAttribute('data-price')) : (lkrPerGuest / 305)) || (lkrPerGuest / 305);
+            const timeSlot = (options && options.timeSlot) || '09:30 AM';
+            item = {
+                id: id || 1,
+                name: pkgName,
+                timeSlot: timeSlot,
+                price: baseUsdPerGuest,
+                price_lkr: lkrPerGuest,
+                image: 'images/Factory inside.jpeg',
+                type: 'tour'
+            };
+        }
+
+        if (!item) return;
+
+        if (window.UIComponents && window.UIComponents.renderSevenTeahouseDetailModal) {
+            window.UIComponents.renderSevenTeahouseDetailModal(item, type, options);
+        }
+    };
+
+    // Close button & backdrop events for product detail modal
+    const prodDetailModal = document.getElementById('product-detail-modal');
+    const prodDetailCloseBtn = document.getElementById('product-detail-close-btn');
+    const prodDetailBackdrop = document.getElementById('product-detail-backdrop');
+    if (prodDetailCloseBtn) {
+        prodDetailCloseBtn.addEventListener('click', window.closeProductDetail);
+    }
+    if (prodDetailBackdrop) {
+        prodDetailBackdrop.addEventListener('click', window.closeProductDetail);
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && prodDetailModal && prodDetailModal.classList.contains('active')) {
+            window.closeProductDetail();
+        }
+    });
+
     // 5a. Quoted Collector Gift Box Checkout Drawer & Handlers
     function openQuotedBoxCheckoutDrawer(bookingId) {
         if (!bookingId) return;
@@ -6227,12 +6291,27 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Standard product reserve buttons
+        // Seven Teahouse Style Purchasing View for Products
         document.querySelectorAll('.btn-book-prod').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const productId = btn.getAttribute('data-id');
-                openDrawer('product', productId);
+                window.openProductDetail(productId, 'product');
+            });
+        });
+
+        // Clicking entire product card opens Seven Teahouse purchasing view
+        document.querySelectorAll('.product-luxury-card').forEach(card => {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('.btn-add-to-cart') || e.target.closest('.btn-view-connoisseur') || e.target.closest('.btn-book-prod')) {
+                    return;
+                }
+                const btn = card.querySelector('.btn-book-prod') || card.querySelector('.btn-add-to-cart');
+                const productId = btn ? btn.getAttribute('data-id') : null;
+                if (productId) {
+                    window.openProductDetail(productId, 'product');
+                }
             });
         });
 
@@ -6241,20 +6320,32 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const boxId = parseInt(btn.getAttribute('data-id'));
-                openDrawer('box', boxId);
+                window.openProductDetail(boxId, 'box');
             });
         });
     }
 
     function bindTourEvents() {
         const container = document.getElementById('tours-timeline-container');
-        if (!container) return;
+        if (container) {
+            container.querySelectorAll('.btn-book-slot').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const slotId = parseInt(btn.getAttribute('data-id'));
+                    const timeSlot = btn.getAttribute('data-timeslot');
+                    window.openProductDetail(slotId, 'tour', { timeSlot });
+                });
+            });
+        }
 
-        container.querySelectorAll('.btn-book-slot').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const slotId = parseInt(btn.getAttribute('data-id'));
-                const timeSlot = btn.getAttribute('data-timeslot');
-                openDrawer('tour', slotId, { timeSlot });
+        // Clicking on tour package cards opens Seven Teahouse tour booking
+        document.querySelectorAll('.package-card').forEach(card => {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', (e) => {
+                const pkgName = card.getAttribute('data-package') || '01. Gongfu-Style Black Tea Brewing Experience';
+                const price = parseFloat(card.getAttribute('data-price')) || 4.75;
+                const priceLkr = parseFloat(card.getAttribute('data-price-lkr')) || 1450;
+                window.openProductDetail(1, 'tour', { package: pkgName, price, price_lkr: priceLkr });
             });
         });
     }

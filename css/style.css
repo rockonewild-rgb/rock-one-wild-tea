@@ -16256,3 +16256,979 @@ div[style*="rgba(6, 24, 14"] p {
 
 
 
+
+
+/* ==========================================================================
+   SEVEN TEAHOUSE LUXURY PURCHASING & DETAIL MODAL (SEVENTEAHOUSE.COM PARITY)
+   ========================================================================== */
+.product-detail-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2150;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 2.5rem 1rem;
+    box-sizing: border-box;
+}
+
+.product-detail-modal.active,
+.product-detail-modal.open {
+    display: flex !important;
+}
+
+.product-detail-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1;
+}
+
+.product-detail-dialog {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1180px;
+    margin: auto;
+    background: #ffffff;
+    border: 1px solid #e5e0d8;
+    border-radius: 18px;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: modalPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.product-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.75rem;
+    background: #ffffff;
+    border-bottom: 1px solid #f0ede6;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.product-detail-brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.product-detail-crest {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.product-detail-brand-name {
+    font-family: var(--font-serif);
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #111827;
+    display: block;
+}
+
+.product-detail-breadcrumb {
+    font-size: 0.72rem;
+    color: #855b05;
+    letter-spacing: 0.5px;
+    display: block;
+}
+
+.product-detail-close-btn {
+    background: #f4efe6;
+    border: 1px solid #e2dacd;
+    color: #1f2937;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+.product-detail-close-btn:hover {
+    background: #b8860b;
+    color: #ffffff;
+    transform: rotate(90deg);
+}
+
+.product-detail-body {
+    padding: 2.25rem 2.75rem 3.5rem 2.75rem;
+    background: #ffffff;
+    overflow-y: visible;
+}
+
+/* Seven Teahouse Main Split Layout */
+.seventea-container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    color: #1f2937;
+}
+
+.seventea-brand-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+}
+
+.seventea-main-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 3.5rem;
+    align-items: start;
+}
+
+/* Left Column: Hero & Gallery */
+.seventea-left-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.seventea-hero-box {
+    position: relative;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fbf9f5;
+    border: 1px solid #eee9e0;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.seventea-hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease, opacity 0.2s ease;
+}
+
+.seventea-hero-img.zoomed {
+    transform: scale(1.45);
+    cursor: zoom-out;
+}
+
+.seventea-zoom-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    color: #111827;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.seventea-zoom-badge:hover {
+    transform: translate(-50%, -50%) scale(1.12);
+    background: #ffffff;
+}
+
+/* Thumbnail Strip */
+.seventea-thumb-strip {
+    display: flex;
+    gap: 0.65rem;
+    overflow-x: auto;
+    padding-bottom: 0.4rem;
+    scrollbar-width: thin;
+}
+
+.seventea-thumb-item {
+    flex: 0 0 58px;
+    height: 58px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    padding: 0;
+    background: #fbf9f5;
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.seventea-thumb-item:hover {
+    transform: translateY(-2px);
+}
+
+.seventea-thumb-item.active {
+    border-color: #b8860b !important;
+    box-shadow: 0 2px 8px rgba(184, 134, 11, 0.25);
+}
+
+.seventea-thumb-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Poetic Banner Quote */
+.seventea-poetic-banner {
+    padding: 1.5rem 0.5rem;
+    text-align: center;
+    border-top: 1px solid #f0ede6;
+    border-bottom: 1px solid #f0ede6;
+    margin-top: 0.5rem;
+}
+
+.seventea-poetic-banner h3 {
+    font-family: var(--font-serif);
+    font-size: 1.45rem;
+    font-weight: 500;
+    color: #111827;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Collapsible Accordions (Seven Teahouse Style) */
+.seventea-accordions {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #e5e0d8;
+}
+
+.seventea-accordion-item {
+    border-top: 1px solid #e5e0d8;
+}
+
+.seventea-accordion-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.15rem 0.25rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: color 0.2s ease;
+}
+
+.seventea-accordion-header:hover .seventea-accordion-title {
+    color: #b8860b;
+}
+
+.seventea-accordion-title {
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.seventea-accordion-icon {
+    font-size: 1.3rem;
+    color: #4b5563;
+    line-height: 1;
+    font-weight: 300;
+}
+
+.seventea-accordion-body {
+    padding: 0 0.25rem 1.25rem 0.25rem;
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: #4b5563;
+}
+
+.seventea-accordion-body p {
+    margin: 0 0 0.75rem 0;
+}
+
+/* Right Column Details */
+.seventea-right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+}
+
+.seventea-title {
+    font-family: var(--font-serif);
+    font-size: 2.15rem;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.2;
+    margin: 0;
+}
+
+.seventea-rating-row {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.88rem;
+}
+
+.seventea-stars {
+    color: #eab308;
+    letter-spacing: 2px;
+    font-size: 1rem;
+}
+
+.seventea-rating-val {
+    font-weight: 700;
+    color: #111827;
+}
+
+.seventea-rating-count {
+    color: #6b7280;
+}
+
+.seventea-pricing-row {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.seventea-strikethrough-price {
+    font-size: 1.25rem;
+    color: #9ca3af;
+    text-decoration: line-through;
+    font-family: var(--font-serif);
+}
+
+.seventea-current-price {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #111827;
+    font-family: var(--font-serif);
+}
+
+.seventea-discount-badge {
+    background: #f4dfc8;
+    color: #855b05;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    letter-spacing: 0.5px;
+}
+
+.seventea-financing-note {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    color: #4b5563;
+    padding: 0.5rem 0;
+}
+
+.seventea-fin-icon {
+    color: #5a31f4;
+    font-size: 0.95rem;
+}
+
+.seventea-info-circle {
+    color: #9ca3af;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.seventea-sensory-desc {
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: #4b5563;
+    margin: 0;
+}
+
+.seventea-award-badge {
+    font-size: 0.85rem;
+    color: #855b05;
+    background: #fef9ee;
+    border-left: 3px solid #b8860b;
+    padding: 0.65rem 0.85rem;
+    border-radius: 0 8px 8px 0;
+}
+
+/* Variant Selector */
+.seventea-variant-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.seventea-section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #374151;
+}
+
+.seventea-variant-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+}
+
+.seventea-variant-btn {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #1f2937;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.seventea-variant-btn:hover {
+    border-color: #111827;
+}
+
+.seventea-variant-btn.active {
+    background: #111827 !important;
+    color: #ffffff !important;
+    border-color: #111827 !important;
+}
+
+/* Stock Urgency Indicator */
+.seventea-stock-urgency {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-top: 0.25rem;
+}
+
+.seventea-stock-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+
+.seventea-stock-bar-track {
+    width: 100%;
+    height: 4px;
+    background: #f3f4f6;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.seventea-stock-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f59e0b 0%, #ef4444 100%);
+    border-radius: 9999px;
+    transition: width 0.4s ease;
+}
+
+/* Quantity & Buttons Stack */
+.seventea-actions-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.seventea-cta-row {
+    display: flex;
+    gap: 0.85rem;
+    align-items: center;
+}
+
+.seventea-stepper {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #ffffff;
+    overflow: hidden;
+    height: 48px;
+}
+
+.seventea-step-btn {
+    background: none;
+    border: none;
+    width: 36px;
+    height: 100%;
+    font-size: 1.1rem;
+    color: #4b5563;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+}
+
+.seventea-step-btn:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.seventea-step-val {
+    width: 38px;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.seventea-btn-add {
+    flex: 1;
+    height: 48px;
+    background: #ffffff;
+    border: 1.5px solid #c59b27;
+    color: #855b05;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.seventea-btn-add:hover {
+    background: #c59b27;
+    color: #ffffff;
+}
+
+.seventea-btn-express {
+    width: 100%;
+    height: 48px;
+    background: #5a31f4;
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.seventea-btn-express:hover {
+    background: #4922dc;
+    transform: translateY(-1px);
+}
+
+.seventea-more-opts-wrap {
+    text-align: center;
+}
+
+.seventea-more-opts-btn {
+    background: none;
+    border: none;
+    color: #4b5563;
+    font-size: 0.8rem;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.seventea-more-opts-btn:hover {
+    color: #111827;
+}
+
+/* Perks List */
+.seventea-perks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem 0;
+    border-top: 1px solid #f0ede6;
+    border-bottom: 1px solid #f0ede6;
+}
+
+.seventea-perk-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+}
+
+.seventea-perk-check {
+    color: #15803d;
+    font-weight: bold;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.seventea-perk-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.seventea-perk-sub {
+    font-size: 0.78rem;
+    color: #6b7280;
+}
+
+.seventea-share-row {
+    padding-top: 0.25rem;
+}
+
+.seventea-share-btn {
+    background: none;
+    border: none;
+    color: #6b7280;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.seventea-share-btn:hover {
+    color: #111827;
+}
+
+/* Customer Reviews Block (Parity with Screenshot 4) */
+.seventea-reviews-block {
+    margin-top: 4.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid #e5e0d8;
+}
+
+.seventea-reviews-header {
+    font-family: var(--font-serif);
+    font-size: 1.85rem;
+    color: #111827;
+    margin: 0 0 2rem 0;
+}
+
+.seventea-reviews-summary-grid {
+    display: grid;
+    grid-template-columns: 200px 1fr auto;
+    gap: 2.5rem;
+    align-items: center;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #f0ede6;
+}
+
+.seventea-big-score {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+}
+
+.seventea-score-num {
+    font-family: var(--font-serif);
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1;
+}
+
+.seventea-score-denom {
+    font-size: 1.5rem;
+    color: #6b7280;
+}
+
+.seventea-score-stars {
+    color: #eab308;
+    font-size: 1.25rem;
+    letter-spacing: 2px;
+    margin: 0.4rem 0 0.2rem 0;
+}
+
+.seventea-score-sub {
+    font-size: 0.82rem;
+    color: #6b7280;
+}
+
+.seventea-rating-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    max-width: 360px;
+}
+
+.seventea-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.78rem;
+    color: #4b5563;
+}
+
+.seventea-bar-label {
+    width: 25px;
+}
+
+.seventea-bar-track {
+    flex: 1;
+    height: 6px;
+    background: #f3f4f6;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.seventea-bar-fill {
+    height: 100%;
+    background: #d4a373;
+    border-radius: 9999px;
+}
+
+.seventea-bar-pct {
+    width: 35px;
+    text-align: right;
+    color: #6b7280;
+}
+
+.seventea-btn-write-review {
+    padding: 0.75rem 1.5rem;
+    background: #c59b27;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.seventea-btn-write-review:hover {
+    background: #b8860b;
+}
+
+.seventea-filter-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #f0ede6;
+    flex-wrap: wrap;
+}
+
+.seventea-filter-tab {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #111827;
+    border-bottom: 2px solid #b8860b;
+    padding-bottom: 0.35rem;
+}
+
+.seventea-filter-tools {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.seventea-search-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.82rem;
+}
+
+.seventea-search-reviews-input {
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 0.82rem;
+    color: #1f2937;
+    width: 120px;
+}
+
+.seventea-filter-select,
+.seventea-media-filter-btn {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.82rem;
+    color: #374151;
+    cursor: pointer;
+}
+
+.seventea-review-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    padding-top: 1.75rem;
+}
+
+.seventea-review-card {
+    padding-bottom: 1.75rem;
+    border-bottom: 1px solid #f0ede6;
+}
+
+.seventea-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.45rem;
+}
+
+.seventea-card-stars {
+    color: #eab308;
+    letter-spacing: 2px;
+    font-size: 0.95rem;
+}
+
+.seventea-card-date {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.seventea-card-author {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.65rem;
+}
+
+.seventea-author-name {
+    font-size: 0.88rem;
+    color: #111827;
+}
+
+.seventea-verified-badge {
+    font-size: 0.72rem;
+    color: #15803d;
+    font-weight: 600;
+}
+
+.seventea-card-text {
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: #4b5563;
+    margin: 0;
+}
+
+/* ==========================================================================
+   UNBREAKABLE CHECKOUT SCROLLING ENGINE (GUARANTEED NO-CUTOFF)
+   ========================================================================== */
+.drawer-overlay.checkout-fullscreen,
+#cart-drawer-overlay.checkout-fullscreen {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100% !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    z-index: 2200 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #f8f6f2 !important;
+    display: block !important;
+}
+
+.drawer-container.checkout-mode,
+.cart-drawer-container.checkout-mode {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: visible !important;
+}
+
+.drawer-container.checkout-mode .drawer-header,
+.cart-drawer-container.checkout-mode .drawer-header {
+    flex-shrink: 0 !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    width: 100% !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid #e5e0d8 !important;
+    padding: 1.15rem 3rem !important;
+    box-sizing: border-box !important;
+}
+
+.drawer-container.checkout-mode .drawer-body,
+.cart-drawer-container.checkout-mode .drawer-body {
+    flex: 1 0 auto !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 0 7rem 0 !important;
+    background: #fcfbf9 !important;
+    box-sizing: border-box !important;
+}
+
+.checkout-split-layout {
+    max-width: 1260px !important;
+    margin: 0 auto !important;
+    padding: 2.25rem 2rem 7rem 2rem !important;
+    display: grid !important;
+    grid-template-columns: 1.25fr 0.85fr !important;
+    gap: 2.75rem !important;
+    align-items: start !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+@media (max-width: 900px) {
+    .seventea-main-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    .product-detail-body {
+        padding: 1.5rem 1.25rem 2.5rem 1.25rem;
+    }
+    .seventea-reviews-summary-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    .drawer-container.checkout-mode .drawer-header,
+    .cart-drawer-container.checkout-mode .drawer-header {
+        padding: 0.85rem 1rem !important;
+    }
+    .checkout-split-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1.5rem !important;
+        padding: 1rem 0.85rem 7rem 0.85rem !important;
+    }
+    .checkout-summary-sidebar {
+        position: static !important;
+        top: 0 !important;
+    }
+}

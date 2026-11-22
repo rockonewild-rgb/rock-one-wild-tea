@@ -228,7 +228,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png?v=1.26.0">
 
     <!-- Main Style Sheet -->
-    <link rel="stylesheet" href="css/style.css?v=3.40.0">
+    <link rel="stylesheet" href="css/style.css?v=3.41.0">
     
     <!-- Instant Scroll Position Reset (Ensures refresh & load always start at Top Hero Slideshow) -->
     <script>
@@ -1842,6 +1842,26 @@
         </div>
     </aside>
 
+    <!-- Seven Teahouse Style Luxury Product, Tour & Gift Box Purchasing Experience Modal -->
+    <div id="product-detail-modal" class="product-detail-modal" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="product-detail-backdrop" id="product-detail-backdrop"></div>
+        <div class="product-detail-dialog" id="product-detail-dialog">
+            <div class="product-detail-header">
+                <div class="product-detail-brand-lockup">
+                    <img src="images/logo-gold.png" alt="Rock One Wild Tea Crest" class="product-detail-crest" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
+                    <div>
+                        <span class="product-detail-brand-name">ROCK ONE WILD TEA</span>
+                        <span class="product-detail-breadcrumb" id="product-detail-breadcrumb">Shop &bull; Single-Estate Artisanal Harvest</span>
+                    </div>
+                </div>
+                <button type="button" id="product-detail-close-btn" class="product-detail-close-btn" aria-label="Close Product Detail">&times;</button>
+            </div>
+            <div class="product-detail-body" id="product-detail-body-container">
+                <!-- Populated dynamically by UIComponents.renderSevenTeahouseDetail -->
+            </div>
+        </div>
+    </div>
+
     <!-- Luxury About Us & Estate Terroir Interactive Modal Popup -->
     <div id="about-us-modal" class="about-us-modal" aria-hidden="true" role="dialog" aria-modal="true">
         <div class="about-modal-backdrop" id="about-modal-backdrop"></div>
@@ -2124,11 +2144,11 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <!-- Script Loads (Execution dependency order: i18n -> store -> components -> paypal -> app) -->
-    <script defer src="js/i18n.js?v=3.40.0"></script>
-    <script defer src="js/store.js?v=3.40.0"></script>
-    <script defer src="js/components.js?v=3.40.0"></script>
-    <script defer src="js/paypal.js?v=3.40.0"></script>
-    <script defer src="js/app.js?v=3.40.0"></script>
-    <script defer src="js/contrast-guard.js?v=3.40.0"></script>
+    <script defer src="js/i18n.js?v=3.41.0"></script>
+    <script defer src="js/store.js?v=3.41.0"></script>
+    <script defer src="js/components.js?v=3.41.0"></script>
+    <script defer src="js/paypal.js?v=3.41.0"></script>
+    <script defer src="js/app.js?v=3.41.0"></script>
+    <script defer src="js/contrast-guard.js?v=3.41.0"></script>
 </body>
 </html>

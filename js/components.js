@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Tea Factory Luxury Portal - Reusable UI Components
  */
 
@@ -70,7 +70,7 @@ window.renderUserTableRow = function(u) {
         case 'admin':
             roleBadge = `<span style="background: rgba(212,175,55,0.15); color: var(--color-gold); border: 1px solid rgba(212,175,55,0.4); padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3 7h7l-5.5 4.5 2 7.5L12 17l-6.5 4 2-7.5L2 9h7z"/></svg>
-                ${isOwner ? '👑 Primary Admin' : 'Administrator'}
+                ${isOwner ? 'ðŸ‘‘ Primary Admin' : 'Administrator'}
             </span>`;
             break;
         case 'manager':
@@ -128,7 +128,7 @@ window.renderUserTableRow = function(u) {
                 </a>
             ` : ''}
         </div>
-    ` : `<span style="color: #64748b; font-size: 0.8rem;">—</span>`;
+    ` : `<span style="color: #64748b; font-size: 0.8rem;">â€”</span>`;
 
     // Date display
     let dateStr = 'Recent';
@@ -540,7 +540,7 @@ const UIComponents = {
                         <div class="product-brewing-specs-row">
                             <div class="spec-cell" title="${_t('stat_water_temp', 'Water Temperature')}">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
-                                <span>${p.steepTemp || '90°C'}</span>
+                                <span>${p.steepTemp || '90Â°C'}</span>
                             </div>
                             <div class="spec-cell" title="${_t('stat_steep_duration', 'Steeping Duration')}">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -555,27 +555,27 @@ const UIComponents = {
                         <!-- 6-Point Calibrated Sensory Spectrum Ribbon -->
                         <div class="product-sensory-ribbon" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 0.3rem 0.45rem; background: rgba(4,14,8,0.65); border: 1px solid rgba(212,175,55,0.2); border-radius: 8px; padding: 0.45rem 0.6rem; margin-bottom: 0.85rem; font-size: 0.7rem; color: #dcece1;">
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_floral', 'Floral')}">
-                                <span>🌸 ${_t('radar_floral', 'Floral')}</span>
+                                <span>ðŸŒ¸ ${_t('radar_floral', 'Floral')}</span>
                                 <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.floral ?? 80}%</strong>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_malty', 'Malty')}">
-                                <span>🌾 ${_t('radar_malty', 'Malty')}</span>
+                                <span>ðŸŒ¾ ${_t('radar_malty', 'Malty')}</span>
                                 <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.malty ?? 75}%</strong>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_sweetness', 'Sweetness')}">
-                                <span>🍯 ${_t('radar_sweetness', 'Sweet')}</span>
+                                <span>ðŸ¯ ${_t('radar_sweetness', 'Sweet')}</span>
                                 <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.sweetness ?? 80}%</strong>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_astringency', 'Astringency')}">
-                                <span>🍃 ${_t('radar_astringency', 'Astringent')}</span>
+                                <span>ðŸƒ ${_t('radar_astringency', 'Astringent')}</span>
                                 <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.astringency ?? 40}%</strong>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_body', 'Body')}">
-                                <span>⚖️ ${_t('radar_body', 'Body')}</span>
+                                <span>âš–ï¸ ${_t('radar_body', 'Body')}</span>
                                 <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.body ?? 80}%</strong>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_aroma', 'Aroma')}">
-                                <span>✨ ${_t('radar_aroma', 'Aroma')}</span>
+                                <span>âœ¨ ${_t('radar_aroma', 'Aroma')}</span>
                                 <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.aroma ?? 90}%</strong>
                             </div>
                         </div>
@@ -785,7 +785,7 @@ const UIComponents = {
             tagline: "Handcrafted Ceylon Black Tea from the Uva Medium Region",
             priceUsd: 4.754, // LKR 1450 at 305/USD
             priceLkr: 1450,
-            duration: "1.5 – 2.0 Hours",
+            duration: "1.5 â€“ 2.0 Hours",
             maxCapacity: 10,
             image: "images/luxury_tea_tour.jpg"
         };
@@ -807,11 +807,11 @@ const UIComponents = {
                 <div style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem;">
                     <span style="background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,55,0.25); color: #e5e7eb; padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.4rem;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                        <strong>Monday – Saturday</strong> (Advance Booking)
+                        <strong>Monday â€“ Saturday</strong> (Advance Booking)
                     </span>
                     <span style="background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,55,0.25); color: #e5e7eb; padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.4rem;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        <strong>9:00 AM – 5:00 PM</strong>
+                        <strong>9:00 AM â€“ 5:00 PM</strong>
                     </span>
                     <span style="background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,55,0.25); color: #e5e7eb; padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.4rem;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
@@ -819,7 +819,7 @@ const UIComponents = {
                     </span>
                     <span style="background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,55,0.25); color: #e5e7eb; padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.4rem;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 10"></polyline></svg>
-                        <strong>Duration: ~1.5 – 2 Hours</strong>
+                        <strong>Duration: ~1.5 â€“ 2 Hours</strong>
                     </span>
                 </div>
             </div>
@@ -828,13 +828,13 @@ const UIComponents = {
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 3.5rem;">
                 <div style="background: #ffffff; border: 1px solid #e8e4df; border-radius: 12px; padding: 1.25rem; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
                     <div style="color: #7a5a06; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.4rem;">Operating Days</div>
-                    <div style="font-size: 1.05rem; font-weight: 600; color: var(--color-text-primary); margin-bottom: 0.25rem;">Monday – Saturday</div>
+                    <div style="font-size: 1.05rem; font-weight: 600; color: var(--color-text-primary); margin-bottom: 0.25rem;">Monday â€“ Saturday</div>
                     <div style="font-size: 0.8rem; color: var(--color-text-muted);">Available by advance booking. Sunday reserved for family &amp; processing.</div>
                 </div>
 
                 <div style="background: #ffffff; border: 1px solid #e8e4df; border-radius: 12px; padding: 1.25rem; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
                     <div style="color: #7a5a06; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.4rem;">Opening Hours</div>
-                    <div style="font-size: 1.05rem; font-weight: 600; color: var(--color-text-primary); margin-bottom: 0.25rem;">9:00 AM – 5:00 PM</div>
+                    <div style="font-size: 1.05rem; font-weight: 600; color: var(--color-text-primary); margin-bottom: 0.25rem;">9:00 AM â€“ 5:00 PM</div>
                     <div style="font-size: 0.8rem; color: var(--color-text-muted);">4 designated daily slots: 9:30 AM, 11:00 AM, 1:30 PM &amp; 3:30 PM.</div>
                 </div>
 
@@ -846,7 +846,7 @@ const UIComponents = {
 
                 <div style="background: #ffffff; border: 1px solid #e8e4df; border-radius: 12px; padding: 1.25rem; box-shadow: 0 4px 16px rgba(0,0,0,0.04);">
                     <div style="color: #7a5a06; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.4rem;">Tour Duration</div>
-                    <div style="font-size: 1.05rem; font-weight: 600; color: var(--color-text-primary); margin-bottom: 0.25rem;">Approx. 1.5 – 2 Hours</div>
+                    <div style="font-size: 1.05rem; font-weight: 600; color: var(--color-text-primary); margin-bottom: 0.25rem;">Approx. 1.5 â€“ 2 Hours</div>
                     <div style="font-size: 0.8rem; color: var(--color-text-muted);">Personalized, unhurried walk through our estate and handcrafted factory.</div>
                 </div>
             </div>
@@ -861,7 +861,7 @@ const UIComponents = {
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
                     <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: #fbf9f5; padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid #ebd9b8;">
-                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">✦</span>
+                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">âœ¦</span>
                         <div>
                             <strong style="color: var(--color-text-primary); font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">History of Our Tea Garden</strong>
                             <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Learn the origin of our Uva Medium estate, natural forest biome, and landmark rock formation.</span>
@@ -869,7 +869,7 @@ const UIComponents = {
                     </div>
 
                     <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: #fbf9f5; padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid #ebd9b8;">
-                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">✦</span>
+                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">âœ¦</span>
                         <div>
                             <strong style="color: var(--color-text-primary); font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Walk Through Our Family Tea Factory</strong>
                             <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Step inside our small-batch processing rooms where the human touch guides every batch.</span>
@@ -877,7 +877,7 @@ const UIComponents = {
                     </div>
 
                     <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: #fbf9f5; padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid #ebd9b8;">
-                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">✦</span>
+                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">âœ¦</span>
                         <div>
                             <strong style="color: var(--color-text-primary); font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Traditional Handcrafted Production</strong>
                             <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Understand the delicate techniques of artisan withering, rolling, oxidation, and wood-fired drying.</span>
@@ -885,7 +885,7 @@ const UIComponents = {
                     </div>
 
                     <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: #fbf9f5; padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid #ebd9b8;">
-                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">✦</span>
+                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">âœ¦</span>
                         <div>
                             <strong style="color: var(--color-text-primary); font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Tea Leaf Selection &amp; Processing</strong>
                             <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Discover how carefully chosen leaf plucking produces distinctive aromas and tasting profiles.</span>
@@ -893,7 +893,7 @@ const UIComponents = {
                     </div>
 
                     <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: #fbf9f5; padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid #ebd9b8;">
-                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">✦</span>
+                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">âœ¦</span>
                         <div>
                             <strong style="color: var(--color-text-primary); font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Guided Tea Tasting Experience</strong>
                             <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Taste and compare our pure Ceylon varieties brewed to perfection.</span>
@@ -901,7 +901,7 @@ const UIComponents = {
                     </div>
 
                     <div style="display: flex; gap: 0.85rem; align-items: flex-start; background: #fbf9f5; padding: 1rem 1.15rem; border-radius: 10px; border: 1px solid #ebd9b8;">
-                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">✦</span>
+                        <span style="color: #7a5a06; font-size: 1.1rem; line-height: 1;">âœ¦</span>
                         <div>
                             <strong style="color: var(--color-text-primary); font-size: 0.92rem; display: block; margin-bottom: 0.2rem;">Q&amp;A &amp; Natural Surroundings</strong>
                             <span style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.5;">Ample time to converse with our tea makers and enjoy the serene mountain sanctuary.</span>
@@ -931,7 +931,7 @@ const UIComponents = {
                         <div style="font-size: 1.8rem; font-family: var(--font-serif); font-weight: 700; color: #7a5a06;">
                             ${window.TeaFactoryStore && window.TeaFactoryStore.getActiveCurrency() === 'USD' ? '$4.75' : 'LKR 1,450'}
                         </div>
-                        <span style="font-size: 0.75rem; color: #6b7280;">(${window.TeaFactoryStore && window.TeaFactoryStore.getActiveCurrency() === 'USD' ? 'approx. LKR 1,450 / €4.40 EUR' : 'approx. $4.75 USD / €4.40 EUR'})</span>
+                        <span style="font-size: 0.75rem; color: #6b7280;">(${window.TeaFactoryStore && window.TeaFactoryStore.getActiveCurrency() === 'USD' ? 'approx. LKR 1,450 / â‚¬4.40 EUR' : 'approx. $4.75 USD / â‚¬4.40 EUR'})</span>
                     </div>
                 </div>
 
@@ -941,7 +941,7 @@ const UIComponents = {
                         Begin your Rock One Wild Tea experience with a traditional <strong>Gongfu-style brewing session</strong> using our handcrafted Ceylon Black Tea from the Uva Medium region.
                     </p>
                     <p style="margin: 0 0 0.85rem 0;">
-                        Before brewing, our tea host will introduce you to the story of our tea — where it comes from, how the leaves are selected, and how we carefully transform fresh tea leaves into our handcrafted black tea.
+                        Before brewing, our tea host will introduce you to the story of our tea â€” where it comes from, how the leaves are selected, and how we carefully transform fresh tea leaves into our handcrafted black tea.
                     </p>
                     <p style="margin: 0; color: #7a5a06; font-weight: 600;">
                         You will then prepare the tea yourself, following the Gongfu-style brewing method.
@@ -951,35 +951,35 @@ const UIComponents = {
                 <!-- What You Will Experience Checklist -->
                 <div style="margin-bottom: 2rem;">
                     <h4 style="color: #7a5a06; font-size: 1.05rem; font-family: var(--font-serif); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <span>✦</span> What You Will Experience
+                        <span>âœ¦</span> What You Will Experience
                     </h4>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.75rem;">
                         <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
-                            <span style="color: #b8860b; font-weight: bold;">•</span> A brief introduction to our Uva Medium tea garden
+                            <span style="color: #b8860b; font-weight: bold;">â€¢</span> A brief introduction to our Uva Medium tea garden
                         </div>
                         <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
-                            <span style="color: #b8860b; font-weight: bold;">•</span> Learn about the tea leaves used to make our black tea
+                            <span style="color: #b8860b; font-weight: bold;">â€¢</span> Learn about the tea leaves used to make our black tea
                         </div>
                         <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
-                            <span style="color: #b8860b; font-weight: bold;">•</span> Introduction to our handcrafted black tea production process
+                            <span style="color: #b8860b; font-weight: bold;">â€¢</span> Introduction to our handcrafted black tea production process
                         </div>
                         <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
-                            <span style="color: #b8860b; font-weight: bold;">•</span> Learn how Gongfu-style brewing works
+                            <span style="color: #b8860b; font-weight: bold;">â€¢</span> Learn how Gongfu-style brewing works
                         </div>
                         <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
-                            <span style="color: #b8860b; font-weight: bold;">•</span> Measure the tea leaves and prepare your own brew
+                            <span style="color: #b8860b; font-weight: bold;">â€¢</span> Measure the tea leaves and prepare your own brew
                         </div>
                         <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
-                            <span style="color: #b8860b; font-weight: bold;">•</span> Observe how the whole tea leaves gradually open during brewing
+                            <span style="color: #b8860b; font-weight: bold;">â€¢</span> Observe how the whole tea leaves gradually open during brewing
                         </div>
                         <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
-                            <span style="color: #b8860b; font-weight: bold;">•</span> Smell the tea before and after brewing
+                            <span style="color: #b8860b; font-weight: bold;">â€¢</span> Smell the tea before and after brewing
                         </div>
                         <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
-                            <span style="color: #b8860b; font-weight: bold;">•</span> Taste the tea through several short infusions
+                            <span style="color: #b8860b; font-weight: bold;">â€¢</span> Taste the tea through several short infusions
                         </div>
                         <div style="display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: #374151;">
-                            <span style="color: #b8860b; font-weight: bold;">•</span> Notice how the aroma, flavour and aftertaste develop with each infusion
+                            <span style="color: #b8860b; font-weight: bold;">â€¢</span> Notice how the aroma, flavour and aftertaste develop with each infusion
                         </div>
                     </div>
                 </div>
@@ -1007,12 +1007,12 @@ const UIComponents = {
                             Included in the Experience
                         </span>
                         <div style="display: flex; flex-wrap: wrap; gap: 0.6rem 1.25rem; font-size: 0.82rem; color: #374151;">
-                            <span><strong style="color:#15803d;">✓</strong> Handcrafted Rock One Wild Tea Black Tea</span>
-                            <span><strong style="color:#15803d;">✓</strong> Gongfu-style brewing session</span>
-                            <span><strong style="color:#15803d;">✓</strong> Tea host guidance</span>
-                            <span><strong style="color:#15803d;">✓</strong> Multiple tea infusions</span>
-                            <span><strong style="color:#15803d;">✓</strong> Tea tasting experience</span>
-                            <span><strong style="color:#15803d;">✓</strong> Introduction to tea garden &amp; production</span>
+                            <span><strong style="color:#15803d;">âœ“</strong> Handcrafted Rock One Wild Tea Black Tea</span>
+                            <span><strong style="color:#15803d;">âœ“</strong> Gongfu-style brewing session</span>
+                            <span><strong style="color:#15803d;">âœ“</strong> Tea host guidance</span>
+                            <span><strong style="color:#15803d;">âœ“</strong> Multiple tea infusions</span>
+                            <span><strong style="color:#15803d;">âœ“</strong> Tea tasting experience</span>
+                            <span><strong style="color:#15803d;">âœ“</strong> Introduction to tea garden &amp; production</span>
                         </div>
                     </div>
                     <div>
@@ -1154,7 +1154,7 @@ const UIComponents = {
         const galleryImages = window.TeaFactoryStore.getGalleryImages();
         const heroSlides = window.TeaFactoryStore.getHeroSlides ? window.TeaFactoryStore.getHeroSlides() : [];
         const activeHeroSlidesCount = heroSlides.filter(s => s && s.enabled !== false).length;
-        const activeTheme = window.TeaFactoryStore.getActiveTheme ? window.TeaFactoryStore.getActiveTheme() : { id: 'classic', name: 'Estate Heritage Gold', icon: '🌿' };
+        const activeTheme = window.TeaFactoryStore.getActiveTheme ? window.TeaFactoryStore.getActiveTheme() : { id: 'classic', name: 'Estate Heritage Gold', icon: 'ðŸŒ¿' };
         const seasonalThemes = window.TeaFactoryStore.getSeasonalThemes ? window.TeaFactoryStore.getSeasonalThemes() : [];
         const themeSettings = window.TeaFactoryStore.getThemeSettings ? window.TeaFactoryStore.getThemeSettings() : { activeThemeId: 'classic', bannerEnabled: true, customBannerText: '', effectsEnabled: true };
         const giftEnquiries = (bookings || []).filter(b => b.boxId || (b.id && b.id.startsWith('ENQ-')) || b.type === 'box');
@@ -1403,7 +1403,7 @@ const UIComponents = {
                         address: b.address || '',
                         country: b.country || '',
                         itemName: b.packageName || b.productName || b.boxName,
-                        itemSub: b.type === 'tour' ? `Slot: ${b.timeSlot} • ${b.guests || 1} Guests • Date: ${b.tourDate || 'Scheduled'}` : `${b.weight || '100g'} Tin`,
+                        itemSub: b.type === 'tour' ? `Slot: ${b.timeSlot} â€¢ ${b.guests || 1} Guests â€¢ Date: ${b.tourDate || 'Scheduled'}` : `${b.weight || '100g'} Tin`,
                         amount: b.price || b.depositPaid || 0,
                         paymentMethod: b.paymentMethod || 'bank',
                         slipImage: b.slipImage,
@@ -1686,19 +1686,19 @@ const UIComponents = {
                                             <div>
                                                 ${isAwaiting ? `
                                                     <span class="box-badge status-pending" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; background: rgba(212,175,55,0.18); color: var(--color-gold); border: 1px solid rgba(212,175,55,0.4);">
-                                                        ⏳ Awaiting Quotation
+                                                        â³ Awaiting Quotation
                                                     </span>
                                                 ` : (isPendingSlip ? `
                                                     <span class="box-badge status-pending" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4);">
-                                                        📄 Bank Slip Submitted &bull; Pending Verification
+                                                        ðŸ“„ Bank Slip Submitted &bull; Pending Verification
                                                     </span>
                                                 ` : (isConfirmed ? `
                                                     <span class="box-badge status-available" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.4);">
-                                                        ✓ Payment Verified &amp; Confirmed
+                                                        âœ“ Payment Verified &amp; Confirmed
                                                     </span>
                                                 ` : `
                                                     <span class="box-badge" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; background: rgba(59,130,246,0.18); color: #60a5fa; border: 1px solid rgba(59,130,246,0.4);">
-                                                        ✉ Quotation Issued &bull; ${window.TeaFactoryStore.formatCurrency(b.quotedTotal || b.price)}
+                                                        âœ‰ Quotation Issued &bull; ${window.TeaFactoryStore.formatCurrency(b.quotedTotal || b.price)}
                                                     </span>
                                                 `))}
                                             </div>
@@ -1818,7 +1818,7 @@ const UIComponents = {
                 <!-- Quick Navigation Banner to Hero Slideshow Desk -->
                 <div style="background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(4,14,8,0.85)); border: 1px solid rgba(212,175,55,0.35); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <span style="font-size: 1.4rem;">🖼️</span>
+                        <span style="font-size: 1.4rem;">ðŸ–¼ï¸</span>
                         <div>
                             <div style="font-weight: 700; color: var(--color-gold); font-size: 0.92rem;">Looking to select photos for the Home Landing Screen Slideshow?</div>
                             <div style="font-size: 0.78rem; color: #cbd5e1;">Pick photos from this estate gallery to rotate on the main landing banner.</div>
@@ -1933,8 +1933,8 @@ const UIComponents = {
                                     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 28px;">
                                         <span style="font-family: monospace; font-size: 0.85rem; font-weight: 700; color: var(--color-gold);">${String(idx + 1).padStart(2, '0')}</span>
                                         <div style="display: flex; flex-direction: column; gap: 1px; margin-top: 2px;">
-                                            <button class="btn-move-slide-up" data-id="${slide.id}" ${idx === 0 ? 'disabled style="opacity:0.25; cursor:not-allowed;"' : 'style="cursor:pointer;"'} style="background: none; border: none; color: #94a3b8; font-size: 0.7rem; padding: 1px;" title="Move Up">▲</button>
-                                            <button class="btn-move-slide-down" data-id="${slide.id}" ${idx === heroSlides.length - 1 ? 'disabled style="opacity:0.25; cursor:not-allowed;"' : 'style="cursor:pointer;"'} style="background: none; border: none; color: #94a3b8; font-size: 0.7rem; padding: 1px;" title="Move Down">▼</button>
+                                            <button class="btn-move-slide-up" data-id="${slide.id}" ${idx === 0 ? 'disabled style="opacity:0.25; cursor:not-allowed;"' : 'style="cursor:pointer;"'} style="background: none; border: none; color: #94a3b8; font-size: 0.7rem; padding: 1px;" title="Move Up">â–²</button>
+                                            <button class="btn-move-slide-down" data-id="${slide.id}" ${idx === heroSlides.length - 1 ? 'disabled style="opacity:0.25; cursor:not-allowed;"' : 'style="cursor:pointer;"'} style="background: none; border: none; color: #94a3b8; font-size: 0.7rem; padding: 1px;" title="Move Down">â–¼</button>
                                         </div>
                                     </div>
 
@@ -1968,7 +1968,7 @@ const UIComponents = {
                                             Edit
                                         </button>
                                         <button class="btn-toggle-hero-slide" data-id="${slide.id}" style="background: ${slide.enabled !== false ? 'rgba(5, 150, 105, 0.2)' : 'rgba(100, 116, 139, 0.2)'}; border: 1px solid ${slide.enabled !== false ? 'rgba(5, 150, 105, 0.5)' : 'rgba(100, 116, 139, 0.4)'}; color: ${slide.enabled !== false ? '#34d399' : '#94a3b8'}; padding: 0.3rem 0.55rem; font-size: 0.68rem; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.2rem;" title="${slide.enabled !== false ? 'Click to hide from home landing screen' : 'Click to show on home landing screen'}">
-                                            ${slide.enabled !== false ? '👁️ On' : '🚫 Off'}
+                                            ${slide.enabled !== false ? 'ðŸ‘ï¸ On' : 'ðŸš« Off'}
                                         </button>
                                         <button class="btn-delete-hero-slide" data-id="${slide.id}" data-title="${(slide.title || 'Slide').replace(/<[^>]*>?/gm, '')}" style="background: rgba(255,94,94,0.15); border: 1px solid rgba(255,94,94,0.4); color: #ff5e5e; padding: 0.3rem 0.5rem; font-size: 0.68rem; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.2rem;" title="Remove this slide">
                                             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
@@ -2005,7 +2005,7 @@ const UIComponents = {
                                 </div>
                                 <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
                                     <button type="button" id="btn-slide-upload-file" class="btn btn-outline" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; flex: 1;">
-                                        📁 Or Upload Image File
+                                        ðŸ“ Or Upload Image File
                                     </button>
                                     <input type="file" id="slide-image-file-input" accept="image/*" style="display:none;">
                                 </div>
@@ -2018,7 +2018,7 @@ const UIComponents = {
 
                             <div class="form-group">
                                 <label class="form-label" for="slide-subtitle-input">4. Subtitle / Region Tag *</label>
-                                <input class="form-input" type="text" id="slide-subtitle-input" required placeholder="e.g. Rock One Wild Tea (Pvt) Limited • Uva Medium Region" value="Forested Rock Formation Terroir • 1,240m Elevation">
+                                <input class="form-input" type="text" id="slide-subtitle-input" required placeholder="e.g. Rock One Wild Tea (Pvt) Limited â€¢ Uva Medium Region" value="Forested Rock Formation Terroir â€¢ 1,240m Elevation">
                             </div>
 
                             <div class="form-group">
@@ -2039,13 +2039,13 @@ const UIComponents = {
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.75rem;">
                     <div style="background: rgba(6, 20, 12, 0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 10px; padding: 1rem 1.25rem;">
                         <div style="color: var(--color-gold); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.25rem;">Operating Days</div>
-                        <div style="font-size: 0.98rem; font-weight: 600; color: #ffffff;">Monday – Saturday</div>
+                        <div style="font-size: 0.98rem; font-weight: 600; color: #ffffff;">Monday â€“ Saturday</div>
                         <div style="font-size: 0.75rem; color: #86efac; margin-top: 0.2rem;">Advance booking &bull; Closed Sundays</div>
                     </div>
                     <div style="background: rgba(6, 20, 12, 0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 10px; padding: 1rem 1.25rem;">
                         <div style="color: var(--color-gold); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.25rem;">Daily Schedule</div>
-                        <div style="font-size: 0.98rem; font-weight: 600; color: #ffffff;">9:00 AM – 5:00 PM</div>
-                        <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.2rem;">4 Designated Slots (~1.5 – 2.0 Hrs)</div>
+                        <div style="font-size: 0.98rem; font-weight: 600; color: #ffffff;">9:00 AM â€“ 5:00 PM</div>
+                        <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.2rem;">4 Designated Slots (~1.5 â€“ 2.0 Hrs)</div>
                     </div>
                     <div style="background: rgba(6, 20, 12, 0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 10px; padding: 1rem 1.25rem;">
                         <div style="color: var(--color-gold); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 0.25rem;">Visitor Capacity</div>
@@ -2223,7 +2223,7 @@ const UIComponents = {
                                     <label class="form-label" id="slot-amount-label" for="slot-amount-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #86efac;">Fee / Person *</label>
                                     <input class="form-input" type="number" step="1" id="slot-amount-input" min="0" value="1450" required style="font-weight:600;">
                                     <div id="slot-counterpart-price" style="font-size: 0.7rem; color: var(--color-gold); font-weight: 600; min-height: 1rem;">
-                                        ≈ $4.75 USD
+                                        â‰ˆ $4.75 USD
                                     </div>
                                 </div>
                             </div>
@@ -2590,14 +2590,14 @@ const UIComponents = {
                                             <td>
                                                 <strong>${prod.name}</strong><br>
                                                 <small style="color:var(--color-text-muted);">${leafGradeStr}</small>
-                                                ${flavorProfileStr ? `<br><small style="color:var(--color-gold); font-size:0.68rem; font-style:italic;">🫖 ${flavorProfileStr}</small>` : ''}
+                                                ${flavorProfileStr ? `<br><small style="color:var(--color-gold); font-size:0.68rem; font-style:italic;">ðŸ«– ${flavorProfileStr}</small>` : ''}
                                                 <div style="display:flex; flex-wrap:wrap; gap:0.25rem; margin-top:0.35rem;">
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Floral">🌸 ${radar.floral ?? 80}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Malty">🌾 ${radar.malty ?? 75}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Sweetness">🍯 ${radar.sweetness ?? 80}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Astringency">🍃 ${radar.astringency ?? 40}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Body">⚖️ ${radar.body ?? 80}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Aroma">✨ ${radar.aroma ?? 90}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Floral">ðŸŒ¸ ${radar.floral ?? 80}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Malty">ðŸŒ¾ ${radar.malty ?? 75}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Sweetness">ðŸ¯ ${radar.sweetness ?? 80}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Astringency">ðŸƒ ${radar.astringency ?? 40}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Body">âš–ï¸ ${radar.body ?? 80}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Aroma">âœ¨ ${radar.aroma ?? 90}%</span>
                                                 </div>
                                             </td>
                                             <td>
@@ -2709,14 +2709,14 @@ const UIComponents = {
                                     <label class="form-label" id="prod-amount-label" for="prod-amount-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Product Price *</label>
                                     <input class="form-input" type="number" step="0.01" id="prod-amount-input" required placeholder="45.00" style="font-weight: 600;">
                                     <div id="prod-counterpart-price" style="font-size: 0.7rem; color: #86efac; font-weight: 600; min-height: 1rem;">
-                                        ≈ Rs 13,725 LKR
+                                        â‰ˆ Rs 13,725 LKR
                                     </div>
                                 </div>
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
                                     <label class="form-label" id="prod-shipping-label" for="prod-shipping-amount-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Shipping Charge</label>
                                     <input class="form-input" type="number" step="0.01" min="0" id="prod-shipping-amount-input" placeholder="0.00" style="font-weight: 600;">
                                     <div id="prod-counterpart-shipping" style="font-size: 0.7rem; color: #86efac; font-weight: 600; min-height: 1rem;">
-                                        ≈ Rs 0 LKR
+                                        â‰ˆ Rs 0 LKR
                                     </div>
                                 </div>
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
@@ -2780,7 +2780,7 @@ const UIComponents = {
                             <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start;">
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
                                     <label class="form-label" for="prod-temp" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Steep Temp</label>
-                                    <input class="form-input" type="text" id="prod-temp" placeholder="e.g. 95°C (203°F)">
+                                    <input class="form-input" type="text" id="prod-temp" placeholder="e.g. 95Â°C (203Â°F)">
                                 </div>
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
                                     <label class="form-label" for="prod-time" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Steep Time</label>
@@ -2835,7 +2835,7 @@ const UIComponents = {
                                         <!-- Floral -->
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
-                                                <span>🌸 Floral Intensity</span>
+                                                <span>ðŸŒ¸ Floral Intensity</span>
                                                 <strong id="badge-radar-floral" style="color: var(--color-gold); font-family: monospace;">80%</strong>
                                             </div>
                                             <input type="range" id="prod-radar-floral" min="0" max="100" value="80" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
@@ -2843,7 +2843,7 @@ const UIComponents = {
                                         <!-- Malty -->
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
-                                                <span>🌾 Malty / Roast</span>
+                                                <span>ðŸŒ¾ Malty / Roast</span>
                                                 <strong id="badge-radar-malty" style="color: var(--color-gold); font-family: monospace;">75%</strong>
                                             </div>
                                             <input type="range" id="prod-radar-malty" min="0" max="100" value="75" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
@@ -2851,7 +2851,7 @@ const UIComponents = {
                                         <!-- Sweetness -->
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
-                                                <span>🍯 Natural Sweetness</span>
+                                                <span>ðŸ¯ Natural Sweetness</span>
                                                 <strong id="badge-radar-sweetness" style="color: var(--color-gold); font-family: monospace;">80%</strong>
                                             </div>
                                             <input type="range" id="prod-radar-sweetness" min="0" max="100" value="80" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
@@ -2859,7 +2859,7 @@ const UIComponents = {
                                         <!-- Astringency -->
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
-                                                <span>🍃 Astringency</span>
+                                                <span>ðŸƒ Astringency</span>
                                                 <strong id="badge-radar-astringency" style="color: var(--color-gold); font-family: monospace;">40%</strong>
                                             </div>
                                             <input type="range" id="prod-radar-astringency" min="0" max="100" value="40" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
@@ -2867,7 +2867,7 @@ const UIComponents = {
                                         <!-- Body -->
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
-                                                <span>⚖️ Body &amp; Structure</span>
+                                                <span>âš–ï¸ Body &amp; Structure</span>
                                                 <strong id="badge-radar-body" style="color: var(--color-gold); font-family: monospace;">80%</strong>
                                             </div>
                                             <input type="range" id="prod-radar-body" min="0" max="100" value="80" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
@@ -2875,7 +2875,7 @@ const UIComponents = {
                                         <!-- Aroma -->
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
-                                                <span>✨ Aroma Intensity</span>
+                                                <span>âœ¨ Aroma Intensity</span>
                                                 <strong id="badge-radar-aroma" style="color: var(--color-gold); font-family: monospace;">90%</strong>
                                             </div>
                                             <input type="range" id="prod-radar-aroma" min="0" max="100" value="90" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
@@ -2934,12 +2934,12 @@ const UIComponents = {
                                     <tr>
                                         <td>
                                             <span style="color: var(--color-gold); font-size: 0.95rem; letter-spacing: 1px;">
-                                                ${'★'.repeat(Number(r.rating) || 5)}${'☆'.repeat(5 - (Number(r.rating) || 5))}
+                                                ${'â˜…'.repeat(Number(r.rating) || 5)}${'â˜†'.repeat(5 - (Number(r.rating) || 5))}
                                             </span>
                                         </td>
                                         <td>
                                             <strong>${r.name || r.author || 'Guest'}</strong><br>
-                                            <small style="color: var(--color-text-muted);">${r.title ? r.title + ' • ' : ''}${r.location || ''}</small>
+                                            <small style="color: var(--color-text-muted);">${r.title ? r.title + ' â€¢ ' : ''}${r.location || ''}</small>
                                         </td>
                                         <td>
                                             <span class="box-badge status-available" style="font-size: 0.7rem;">
@@ -2993,7 +2993,7 @@ const UIComponents = {
                 } else if (inq.service_interested && inq.service_interested !== 'General Inquiry') {
                     interestsList = [inq.service_interested];
                 } else {
-                    interestsList = ['Numbered Collector Teak Wood Chests (Series 01–10)'];
+                    interestsList = ['Numbered Collector Teak Wood Chests (Series 01â€“10)'];
                 }
 
                 const contactMethod = inq.contactMethod || (phone ? 'WhatsApp Priority Desk' : 'Email Concierge');
@@ -3212,7 +3212,7 @@ const UIComponents = {
                                                         ${inq.organization}
                                                     </span>
                                                     ${inq.country ? `
-                                                        <span style="color: rgba(255,255,255,0.4);">•</span>
+                                                        <span style="color: rgba(255,255,255,0.4);">â€¢</span>
                                                         <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
                                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                                                             ${inq.country}
@@ -3258,7 +3258,7 @@ const UIComponents = {
                                                 <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.45rem;">
                                                     ${inq.interests.map(i => `
                                                         <span style="font-size: 0.72rem; color: #e2ede5; background: rgba(255,255,255,0.06); padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);">
-                                                            • ${i}
+                                                            â€¢ ${i}
                                                         </span>
                                                     `).join('')}
                                                 </div>
@@ -3377,7 +3377,7 @@ const UIComponents = {
                                             <div style="width: 100%; height: 95px; border-radius: 8px; overflow: hidden; margin-bottom: 0.85rem; border: 1px solid rgba(212,175,55,0.3); position: relative; background: #000;">
                                                 <img src="${t.previewImage}" alt="${t.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.style.display='none'">
                                                 <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 0.25rem 0.5rem; background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%); font-size: 0.65rem; color: #fef08a; font-weight: 600;">
-                                                    ✨ Curated Festive Visuals Active
+                                                    âœ¨ Curated Festive Visuals Active
                                                 </div>
                                             </div>
                                         ` : ''}
@@ -3401,7 +3401,7 @@ const UIComponents = {
 
                                     <div>
                                         <button type="button" class="btn ${isCurrent ? 'btn-secondary' : 'btn-primary'} btn-activate-theme" data-theme-id="${t.id}" style="width: 100%; justify-content: center; padding: 0.65rem 1rem; font-size: 0.82rem; font-weight: 700; ${isCurrent ? 'opacity: 0.75; cursor: default;' : ''}">
-                                            ${isCurrent ? '✓ Theme Active' : `Activate ${t.name}`}
+                                            ${isCurrent ? 'âœ“ Theme Active' : `Activate ${t.name}`}
                                         </button>
                                     </div>
                                 </div>
@@ -3592,10 +3592,10 @@ const UIComponents = {
                         All Photos (${totalPhotos})
                     </button>
                     <button type="button" class="gallery-filter-btn" data-filter="Estate & Harvest" style="padding: 0.5rem 1.1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.25s ease; background: rgba(0,0,0,0.5); color: #e2e8f0; border: 1px solid rgba(212,175,55,0.35);">
-                        🌱 Estate &amp; Harvest (${estateCount})
+                        ðŸŒ± Estate &amp; Harvest (${estateCount})
                     </button>
                     <button type="button" class="gallery-filter-btn" data-filter="Packaging & Reserves" style="padding: 0.5rem 1.1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.25s ease; background: rgba(0,0,0,0.5); color: #e2e8f0; border: 1px solid rgba(212,175,55,0.35);">
-                        📦 Teak Chests &amp; Packaging (${packagingCount})
+                        ðŸ“¦ Teak Chests &amp; Packaging (${packagingCount})
                     </button>
                 </div>
             </div>
@@ -3688,17 +3688,17 @@ const UIComponents = {
             <!-- Top Heritage Story Showcase -->
             <div class="heritage-container-layout" style="margin-bottom: 3.5rem;">
                 <div class="story-section" style="padding-right: 1rem;">
-                    <span class="section-tag" style="color: #7a5a06; font-weight: 700; letter-spacing: 2px;">ROCK ONE WILD TEA (PVT) LIMITED • OUR STORY</span>
+                    <span class="section-tag" style="color: #7a5a06; font-weight: 700; letter-spacing: 2px;">ROCK ONE WILD TEA (PVT) LIMITED â€¢ OUR STORY</span>
                     <h3 class="home-section-title" style="font-size: 2.2rem; line-height: 1.25; margin-bottom: 1.25rem; color: #111827;">From Our Wild Forest Garden to Your Cup</h3>
                     <p class="story-text" style="color: #374151; font-size: 0.98rem; line-height: 1.8; margin-bottom: 1.25rem;">
-                        <strong>Rock One Wild Tea</strong> began with a simple family vision during the COVID period. My wife and I developed our own tea garden by hand in Sri Lanka’s <strong>Uva Medium region</strong>, surrounded by natural forest and located at the foot of a large rock formation — the inspiration behind our name.
+                        <strong>Rock One Wild Tea</strong> began with a simple family vision during the COVID period. My wife and I developed our own tea garden by hand in Sri Lankaâ€™s <strong>Uva Medium region</strong>, surrounded by natural forest and located at the foot of a large rock formation â€” the inspiration behind our name.
                     </p>
                     <p class="story-text" style="color: #4b5563; font-size: 0.92rem; line-height: 1.7; margin-bottom: 1.5rem;">
                         From the beginning, we chose to work on a small scale, personally caring for the tea garden and producing our tea in our family factory. What started as a small family effort has gradually grown into a boutique Ceylon Tea brand, with a vision of sharing the unique character of our tea and its story with tea lovers around the world.
                     </p>
                     <div style="background: #fbf9f5; border: 1px solid #ebd9b8; border-left: 4px solid #b8860b; padding: 1.1rem 1.35rem; border-radius: 0 12px 12px 0; margin-bottom: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
                         <p style="font-style: italic; color: #7a5a06; font-size: 0.95rem; margin: 0; line-height: 1.6; font-weight: 600;">
-                            "Rock One Wild Tea — From the wild, crafted by our hands, to your cup."
+                            "Rock One Wild Tea â€” From the wild, crafted by our hands, to your cup."
                         </p>
                     </div>
                     <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
@@ -3779,7 +3779,7 @@ const UIComponents = {
                             <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">A Unique Uva Medium Origin</h4>
                         </div>
                         <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
-                            Our tea garden is located in Sri Lanka’s Uva Medium region, an area known for its distinctive tea-growing character. Our location and natural surroundings give our tea its own identity.
+                            Our tea garden is located in Sri Lankaâ€™s Uva Medium region, an area known for its distinctive tea-growing character. Our location and natural surroundings give our tea its own identity.
                         </p>
                     </div>
 
@@ -3942,21 +3942,21 @@ const UIComponents = {
 
                 <!-- Closing Distinction Banner -->
                 <div style="background: rgba(212, 175, 55, 0.08); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 16px; padding: 2rem 2.25rem; text-align: center; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);">
-                    <span style="display: inline-block; font-size: 1.6rem; margin-bottom: 0.4rem;">❤️</span>
+                    <span style="display: inline-block; font-size: 1.6rem; margin-bottom: 0.4rem;">â¤ï¸</span>
                     <h5 style="font-family: var(--font-serif); font-size: 1.45rem; color: var(--color-gold); margin-bottom: 0.75rem;">Our Difference</h5>
                     <p style="color: var(--color-text-primary); font-size: 1.02rem; line-height: 1.85; max-width: 820px; margin: 0 auto 1.25rem auto;">
                         Our difference is not simply in the tea.<br>
                         It is in the place where it grows, the soil we care for, the natural environment around our garden, the leaves we select, the hands that make the tea, and the family behind every batch.
                     </p>
                     <p style="font-style: italic; color: #ffd875; font-size: 1.15rem; font-family: var(--font-serif); font-weight: 600; margin: 0; letter-spacing: 0.5px;">
-                        "Rock One Wild Tea — From our wild forest tea garden to your cup."
+                        "Rock One Wild Tea â€” From our wild forest tea garden to your cup."
                     </p>
                 </div>
             </div>
         `;
     },
 
-    // ── Dedicated About Us & Estate Terroir Page ──
+    // â”€â”€ Dedicated About Us & Estate Terroir Page â”€â”€
     renderAboutUsPage(containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -3967,7 +3967,7 @@ const UIComponents = {
                 <!-- 1. Editorial Hero Header -->
                 <div class="about-hero-editorial" style="text-align: center; max-width: 880px; margin: 0 auto 3.5rem auto;">
                     <span class="section-tag" style="font-size: 0.82rem; letter-spacing: 2.5px; color: var(--color-gold); font-weight: 700; display: inline-block; margin-bottom: 0.75rem;">
-                        ROCK ONE WILD TEA (PVT) LIMITED • UVA MEDIUM REGION
+                        ROCK ONE WILD TEA (PVT) LIMITED â€¢ UVA MEDIUM REGION
                     </span>
                     <h1 style="font-family: var(--font-serif); font-size: 2.8rem; line-height: 1.2; color: var(--color-white); margin-bottom: 0.85rem;">
                         From the Wild, Crafted by Our Hands
@@ -3976,7 +3976,7 @@ const UIComponents = {
                         From Our Wild Forest Garden to Your Cup
                     </p>
                     <p style="font-size: 1.02rem; color: var(--color-text-primary); line-height: 1.85; margin-bottom: 1.75rem;">
-                        <strong>Rock One Wild Tea</strong> is a family-owned Ceylon Tea business born from our own tea garden in Sri Lanka’s Uva Medium region, nestled in a forested environment at the foot of a large rock formation. Hand made with Care, Crafted from Ceylon.
+                        <strong>Rock One Wild Tea</strong> is a family-owned Ceylon Tea business born from our own tea garden in Sri Lankaâ€™s Uva Medium region, nestled in a forested environment at the foot of a large rock formation. Hand made with Care, Crafted from Ceylon.
                     </p>
 
                     <!-- Trust Badges with SVG Icons -->
@@ -4008,7 +4008,7 @@ const UIComponents = {
                             Born at the Foot of the Great Rock
                         </h2>
                         <p style="color: var(--color-text-primary); font-size: 0.95rem; line-height: 1.8; margin-bottom: 1.25rem;">
-                            <strong>Rock One Wild Tea</strong> is a family-owned Ceylon Tea business rooted in Sri Lanka’s Uva Medium region. Our tea garden is surrounded by a natural forest environment and lies at the foot of a large rock formation — the inspiration behind the name <strong>Rock One Wild Tea</strong>.
+                            <strong>Rock One Wild Tea</strong> is a family-owned Ceylon Tea business rooted in Sri Lankaâ€™s Uva Medium region. Our tea garden is surrounded by a natural forest environment and lies at the foot of a large rock formation â€” the inspiration behind the name <strong>Rock One Wild Tea</strong>.
                         </p>
                         <p style="color: var(--color-text-primary); font-size: 0.95rem; line-height: 1.8; margin-bottom: 1.25rem;">
                             Our journey began during the COVID period, when my wife and I started developing our tea garden with our own hands. What began as a small family effort has gradually grown into a boutique tea business built around our passion for tea, nature and traditional craftsmanship.
@@ -4018,9 +4018,9 @@ const UIComponents = {
                         </p>
                         <div style="background: rgba(212, 175, 55, 0.08); border-left: 3px solid var(--color-gold); padding: 1.15rem 1.35rem; border-radius: 0 10px 10px 0;">
                             <p style="font-style: italic; color: #ffd875; font-size: 0.95rem; margin: 0; line-height: 1.6; font-weight: 500;">
-                                "Rock One Wild Tea — From the wild, crafted by our hands, to your cup."
+                                "Rock One Wild Tea â€” From the wild, crafted by our hands, to your cup."
                             </p>
-                            <span style="display: block; font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.4rem;">— Rock One Wild Tea (Pvt) Limited</span>
+                            <span style="display: block; font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.4rem;">â€” Rock One Wild Tea (Pvt) Limited</span>
                         </div>
                     </div>
                     <div style="position: relative;">
@@ -4028,7 +4028,7 @@ const UIComponents = {
                             <img src="images/1 (1).jpeg" alt="Rock One Wild Tea Garden - Forested Rock Formation Terroir" style="width: 100%; height: auto; display: block; aspect-ratio: 4/3; object-fit: cover;" onerror="window.handleImageError && window.handleImageError(this, 'gallery')" loading="lazy" decoding="async">
                             <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1.25rem; background: linear-gradient(0deg, rgba(2, 10, 5, 0.95) 0%, transparent 100%);">
                                 <span style="display: block; color: var(--color-white); font-size: 0.9rem; font-weight: 600;">Forested Rock Formation Tea Garden</span>
-                                <span style="color: var(--color-gold); font-size: 0.75rem;">Uva Medium Region • Hand-Built by Family</span>
+                                <span style="color: var(--color-gold); font-size: 0.75rem;">Uva Medium Region â€¢ Hand-Built by Family</span>
                             </div>
                         </div>
                     </div>
@@ -4056,7 +4056,7 @@ const UIComponents = {
                                 <h4 style="font-size: 1.15rem; color: var(--color-white); font-family: var(--font-serif); margin: 0;">A Unique Uva Medium Origin</h4>
                             </div>
                             <p style="font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.7; margin: 0;">
-                                Our tea garden is located in Sri Lanka’s Uva Medium region, an area known for its distinctive tea-growing character. Our location and natural surroundings give our tea its own identity.
+                                Our tea garden is located in Sri Lankaâ€™s Uva Medium region, an area known for its distinctive tea-growing character. Our location and natural surroundings give our tea its own identity.
                             </p>
                         </div>
 
@@ -4219,14 +4219,14 @@ const UIComponents = {
 
                     <!-- Closing Distinction Banner -->
                     <div style="background: rgba(212, 175, 55, 0.08); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 16px; padding: 2rem 2.25rem; text-align: center; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);">
-                        <span style="display: inline-block; font-size: 1.6rem; margin-bottom: 0.4rem;">❤️</span>
+                        <span style="display: inline-block; font-size: 1.6rem; margin-bottom: 0.4rem;">â¤ï¸</span>
                         <h5 style="font-family: var(--font-serif); font-size: 1.45rem; color: var(--color-gold); margin-bottom: 0.75rem;">Our Difference</h5>
                         <p style="color: var(--color-text-primary); font-size: 1.02rem; line-height: 1.85; max-width: 820px; margin: 0 auto 1.25rem auto;">
                             Our difference is not simply in the tea.<br>
                             It is in the place where it grows, the soil we care for, the natural environment around our garden, the leaves we select, the hands that make the tea, and the family behind every batch.
                         </p>
                         <p style="font-style: italic; color: #ffd875; font-size: 1.15rem; font-family: var(--font-serif); font-weight: 600; margin: 0; letter-spacing: 0.5px;">
-                            "Rock One Wild Tea — From our wild forest tea garden to your cup."
+                            "Rock One Wild Tea â€” From our wild forest tea garden to your cup."
                         </p>
                     </div>
                 </div>
@@ -4331,7 +4331,7 @@ const UIComponents = {
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
                         <div class="panel-card" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; margin-bottom: 0;">
-                            <span style="color: var(--color-gold); font-size: 1.2rem;">🌱</span>
+                            <span style="color: var(--color-gold); font-size: 1.2rem;">ðŸŒ±</span>
                             <div>
                                 <strong style="display: block; color: var(--color-white); font-size: 0.98rem; margin-bottom: 0.25rem;">Garden Cultivation</strong>
                                 <span style="font-size: 0.84rem; color: var(--color-text-muted);">Cultivating tea in our own private tea garden in the Uva Medium forest environment.</span>
@@ -4339,7 +4339,7 @@ const UIComponents = {
                         </div>
 
                         <div class="panel-card" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; margin-bottom: 0;">
-                            <span style="color: var(--color-gold); font-size: 1.2rem;">🤲</span>
+                            <span style="color: var(--color-gold); font-size: 1.2rem;">ðŸ¤²</span>
                             <div>
                                 <strong style="display: block; color: var(--color-white); font-size: 0.98rem; margin-bottom: 0.25rem;">Small-Batch Handcrafted Tea</strong>
                                 <span style="font-size: 0.84rem; color: var(--color-text-muted);">Producing high-grade handcrafted Ceylon Tea in strictly limited batch sizes.</span>
@@ -4347,7 +4347,7 @@ const UIComponents = {
                         </div>
 
                         <div class="panel-card" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; margin-bottom: 0;">
-                            <span style="color: var(--color-gold); font-size: 1.2rem;">✨</span>
+                            <span style="color: var(--color-gold); font-size: 1.2rem;">âœ¨</span>
                             <div>
                                 <strong style="display: block; color: var(--color-white); font-size: 0.98rem; margin-bottom: 0.25rem;">Specialty &amp; Blended Teas</strong>
                                 <span style="font-size: 0.84rem; color: var(--color-text-muted);">Crafting single-origin artisanal teas, silver tips, and exquisite signature blends.</span>
@@ -4355,7 +4355,7 @@ const UIComponents = {
                         </div>
 
                         <div class="panel-card" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; margin-bottom: 0;">
-                            <span style="color: var(--color-gold); font-size: 1.2rem;">📦</span>
+                            <span style="color: var(--color-gold); font-size: 1.2rem;">ðŸ“¦</span>
                             <div>
                                 <strong style="display: block; color: var(--color-white); font-size: 0.98rem; margin-bottom: 0.25rem;">Processing &amp; Packaging</strong>
                                 <span style="font-size: 0.84rem; color: var(--color-text-muted);">In-house factory processing and luxury airtight packaging that locks in freshness.</span>
@@ -4363,7 +4363,7 @@ const UIComponents = {
                         </div>
 
                         <div class="panel-card" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; margin-bottom: 0;">
-                            <span style="color: var(--color-gold); font-size: 1.2rem;">🎁</span>
+                            <span style="color: var(--color-gold); font-size: 1.2rem;">ðŸŽ</span>
                             <div>
                                 <strong style="display: block; color: var(--color-white); font-size: 0.98rem; margin-bottom: 0.25rem;">Premium Gift Collections</strong>
                                 <span style="font-size: 0.84rem; color: var(--color-text-muted);">Creating numbered collector chests and luxury gift presentations for tea connoisseurs.</span>
@@ -4371,7 +4371,7 @@ const UIComponents = {
                         </div>
 
                         <div class="panel-card" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; margin-bottom: 0;">
-                            <span style="color: var(--color-gold); font-size: 1.2rem;">🚶</span>
+                            <span style="color: var(--color-gold); font-size: 1.2rem;">ðŸš¶</span>
                             <div>
                                 <strong style="display: block; color: var(--color-white); font-size: 0.98rem; margin-bottom: 0.25rem;">Tasting &amp; Visitor Experiences</strong>
                                 <span style="font-size: 0.84rem; color: var(--color-text-muted);">Developing guided garden walks, factory tours, and sommelier cupping programs.</span>
@@ -4379,7 +4379,7 @@ const UIComponents = {
                         </div>
 
                         <div class="panel-card" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; margin-bottom: 0;">
-                            <span style="color: var(--color-gold); font-size: 1.2rem;">🌐</span>
+                            <span style="color: var(--color-gold); font-size: 1.2rem;">ðŸŒ</span>
                             <div>
                                 <strong style="display: block; color: var(--color-white); font-size: 0.98rem; margin-bottom: 0.25rem;">International Markets</strong>
                                 <span style="font-size: 0.84rem; color: var(--color-text-muted);">Building global partnerships and export channels to share our Ceylon Tea worldwide.</span>
@@ -4412,7 +4412,7 @@ const UIComponents = {
                         <span class="section-tag" style="font-size: 0.72rem;">HANDS-ON KNOWLEDGE</span>
                         <h3 style="font-family: var(--font-serif); font-size: 1.6rem; color: var(--color-white); margin-bottom: 1rem;">Our Experience</h3>
                         <p style="color: var(--color-text-primary); font-size: 0.92rem; line-height: 1.8; margin-bottom: 1rem;">
-                            Our experience has been built through hands-on involvement in every stage of our own tea journey — from caring for the tea plants and selecting leaves to processing, tasting and packaging the finished tea.
+                            Our experience has been built through hands-on involvement in every stage of our own tea journey â€” from caring for the tea plants and selecting leaves to processing, tasting and packaging the finished tea.
                         </p>
                         <p style="color: var(--color-text-muted); font-size: 0.88rem; line-height: 1.75; margin: 0;">
                             As a small family producer, we continue to learn through each harvest and each batch, developing our knowledge through practical experience and careful observation of the tea-making process.
@@ -4427,7 +4427,7 @@ const UIComponents = {
                             Quality begins in the tea garden and continues throughout the production process. We carefully select the leaves used for each tea, pay close attention to processing conditions, and personally monitor our small-batch production.
                         </p>
                         <p style="color: var(--color-text-muted); font-size: 0.88rem; line-height: 1.75; margin: 0;">
-                            By keeping production limited, we are able to focus closely on the character and quality of each batch. We believe that quality is not only about the finished product — it is also about the care, honesty and responsibility behind every step of its journey.
+                            By keeping production limited, we are able to focus closely on the character and quality of each batch. We believe that quality is not only about the finished product â€” it is also about the care, honesty and responsibility behind every step of its journey.
                         </p>
                     </div>
                 </div>
@@ -4461,7 +4461,7 @@ const UIComponents = {
                         We invite tea lovers to discover the character of our teas and experience a little of the landscape, craftsmanship and family story behind every cup.
                     </p>
                     <p style="font-style: italic; color: #ffd875; font-size: 1.05rem; font-family: var(--font-serif); margin-bottom: 2rem;">
-                        "Rock One Wild Tea — From the wild, crafted by our hands, to your cup."
+                        "Rock One Wild Tea â€” From the wild, crafted by our hands, to your cup."
                     </p>
                     <div style="display: flex; gap: 1.25rem; justify-content: center; flex-wrap: wrap;">
                         <button class="btn btn-primary" onclick="window.appCloseAboutModal &amp;&amp; window.appCloseAboutModal(); window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') &amp;&amp; document.getElementById('nav-tours').click());" style="padding: 0.85rem 1.75rem; font-size: 0.92rem;">
@@ -4498,9 +4498,9 @@ const UIComponents = {
                 <!-- Rating Stats & Action Pill -->
                 <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                     <div style="background: rgba(3, 14, 8, 0.7); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 12px; padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 0.85rem; box-shadow: 0 4px 15px rgba(0,0,0,0.35);">
-                        <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-serif); color: var(--color-gold); line-height: 1;">${hasReviews ? stats.average : '—'}</div>
+                        <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-serif); color: var(--color-gold); line-height: 1;">${hasReviews ? stats.average : 'â€”'}</div>
                         <div>
-                            <div style="color: var(--color-gold); font-size: 0.9rem; letter-spacing: 2px;">${hasReviews ? '★★★★★' : '☆☆☆☆☆'}</div>
+                            <div style="color: var(--color-gold); font-size: 0.9rem; letter-spacing: 2px;">${hasReviews ? 'â˜…â˜…â˜…â˜…â˜…' : 'â˜†â˜†â˜†â˜†â˜†'}</div>
                             <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">${stats.count} Verified Reviews</span>
                         </div>
                     </div>
@@ -4516,7 +4516,7 @@ const UIComponents = {
                     <div class="testimonial-card-item">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
                             <div class="stars-rating" style="color: var(--color-gold); letter-spacing: 3px; font-size: 1.1rem;">
-                                ${'★'.repeat(Number(rev.rating) || 5)}${'☆'.repeat(5 - (Number(rev.rating) || 5))}
+                                ${'â˜…'.repeat(Number(rev.rating) || 5)}${'â˜†'.repeat(5 - (Number(rev.rating) || 5))}
                             </div>
                             <span style="font-size: 0.7rem; color: var(--color-gold-light); background: rgba(212, 175, 55, 0.12); padding: 0.2rem 0.6rem; border-radius: 20px; border: 1px solid rgba(212, 175, 55, 0.25);">
                                 ${rev.experienceType || rev.role || 'Estate Experience'}
@@ -4528,7 +4528,7 @@ const UIComponents = {
                         <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.85rem; display: flex; justify-content: space-between; align-items: flex-end;">
                             <div>
                                 <h4 class="testimonial-author-name" style="color: var(--color-white); font-size: 0.95rem; margin-bottom: 0.2rem;">${rev.name || rev.author || 'Guest'}</h4>
-                                <p class="testimonial-author-title" style="color: var(--color-gold); font-size: 0.78rem; margin: 0;">${rev.title ? rev.title + ' • ' : ''}${rev.location || ''}</p>
+                                <p class="testimonial-author-title" style="color: var(--color-gold); font-size: 0.78rem; margin: 0;">${rev.title ? rev.title + ' â€¢ ' : ''}${rev.location || ''}</p>
                             </div>
                             <span style="font-size: 0.7rem; color: var(--color-text-muted);">${rev.date || rev.date_str || ''}</span>
                         </div>
@@ -4555,7 +4555,7 @@ const UIComponents = {
                 </div>
                 <h3 class="newsletter-box-title">The Private Reserve Club &amp; Allocation Registry</h3>
                 <p class="newsletter-box-desc">
-                    Join an exclusive global registry of tea connoisseurs receiving guaranteed seasonal allocations of numbered Series 01–10 teak wood chests, unblended first-flush releases, and private estate sommelier cupping invitations.
+                    Join an exclusive global registry of tea connoisseurs receiving guaranteed seasonal allocations of numbered Series 01â€“10 teak wood chests, unblended first-flush releases, and private estate sommelier cupping invitations.
                 </p>
 
                 <!-- 4 Key Privileges Highlight Grid -->
@@ -4565,7 +4565,7 @@ const UIComponents = {
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
                         </div>
                         <div>
-                            <strong>Numbered Series 01–10 Chests</strong>
+                            <strong>Numbered Series 01â€“10 Chests</strong>
                             <span>Guaranteed priority reservation for each equinox harvest</span>
                         </div>
                     </div>
@@ -4761,7 +4761,7 @@ const UIComponents = {
         `;
     },
 
-    // ── Cinema of the Estate: 4K Terroir & Artisanal Craft Showcase ──
+    // â”€â”€ Cinema of the Estate: 4K Terroir & Artisanal Craft Showcase â”€â”€
     renderCinemaShowcase(containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -4813,10 +4813,10 @@ const UIComponents = {
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                     <div>
                         <span class="section-tag" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #7a5a06; font-weight: 700; display: block; margin-bottom: 0.5rem;">
-                            ESTATE CINEMATOGRAPHY • 4K ULTRA HD
+                            ESTATE CINEMATOGRAPHY â€¢ 4K ULTRA HD
                         </span>
                         <h3 class="home-section-title" style="font-size: 2.2rem; line-height: 1.2; margin: 0; color: #111827;">
-                            Cinema of the Estate • The Living Terroir
+                            Cinema of the Estate â€¢ The Living Terroir
                         </h3>
                         <p style="color: #4b5563; font-size: 0.92rem; margin-top: 0.5rem; max-width: 680px; line-height: 1.6;">
                             Immerse in the mist-veiled mountain amphitheaters of Ettampitiya (1,200m+), witness the sacred orthodox hand-rolling rituals, and explore the uncultivated wild tea sanctuary.
@@ -4844,9 +4844,9 @@ const UIComponents = {
                             </svg>
                         </div>
                         <div style="margin-top: 1.25rem; text-align: center; pointer-events: none;">
-                            <span style="font-size: 0.72rem; letter-spacing: 2.5px; text-transform: uppercase; color: var(--color-gold); font-weight: 700; display: block; margin-bottom: 0.35rem;">ESTATE CINEMATOGRAPHY • 4K ULTRA HD</span>
+                            <span style="font-size: 0.72rem; letter-spacing: 2.5px; text-transform: uppercase; color: var(--color-gold); font-weight: 700; display: block; margin-bottom: 0.35rem;">ESTATE CINEMATOGRAPHY â€¢ 4K ULTRA HD</span>
                             <h4 style="font-size: 1.4rem; color: #ffffff; margin: 0; font-family: var(--font-serif); letter-spacing: 0.5px;">Click to Stream Living Terroir Film</h4>
-                            <span style="display: inline-block; margin-top: 0.55rem; background: rgba(4,14,8,0.75); border: 1px solid rgba(212,175,55,0.4); border-radius: 20px; padding: 0.3rem 0.95rem; font-size: 0.74rem; color: #cbd5e1;">4K Master • Orthophonic Terroir Audio</span>
+                            <span style="display: inline-block; margin-top: 0.55rem; background: rgba(4,14,8,0.75); border: 1px solid rgba(212,175,55,0.4); border-radius: 20px; padding: 0.3rem 0.95rem; font-size: 0.74rem; color: #cbd5e1;">4K Master â€¢ Orthophonic Terroir Audio</span>
                         </div>
                     </div>
 
@@ -4947,8 +4947,8 @@ const UIComponents = {
                 name: "1. Mana Ella Waterfall", 
                 altName: "Manawala Ella / Manawela Ella",
                 category: "Cascading Waterfall", 
-                dist: "15–18 km", 
-                time: "35–45 minutes", 
+                dist: "15â€“18 km", 
+                time: "35â€“45 minutes", 
                 image: "images/landmark_mana_ella.jpg",
                 desc: "Mana Ella, also known as Manawala Ella or Manawela Ella, is a scenic waterfall near Lunuwatta surrounded by lush tea plantations. The waterfall features multiple cascades and is closely connected to the natural landscape and history of the Welimada area. Reaching the waterfall involves a short walk from the nearby road.",
                 routeQuery: "Mana Ella Waterfall, Lunuwatta, Sri Lanka",
@@ -4959,8 +4959,8 @@ const UIComponents = {
                 name: "2. Sthreepura Cave", 
                 altName: "King Ravana & Princess Sita Legendary Site",
                 category: "Natural & Cultural Cave System", 
-                dist: "18–20 km", 
-                time: "40–50 minutes", 
+                dist: "18â€“20 km", 
+                time: "40â€“50 minutes", 
                 image: "images/landmark_sthreepura_cave.jpg",
                 desc: "Sthreepura Cave is a fascinating natural and cultural attraction near Welimada. The cave system is associated with local legends connected with King Ravana and Princess Sita. The Uva Paranagama local authority notes that parts of the cave system can be difficult to access because of landslide conditions, so visitors should check local access conditions before travelling.",
                 routeQuery: "Sthreepura Cave, Welimada, Sri Lanka",
@@ -4971,8 +4971,8 @@ const UIComponents = {
                 name: "3. Bomburu Ella Waterfall", 
                 altName: "Perawella Falls (50m High)",
                 category: "Plume Waterfall (50m)", 
-                dist: "20–22 km", 
-                time: "40–50 minutes", 
+                dist: "20â€“22 km", 
+                time: "40â€“50 minutes", 
                 image: "images/landmark_bomburu_ella.jpg",
                 desc: "Also known as Perawella Falls, Bomburu Ella is a spectacular group of cascades located near the boundary of the Badulla and Nuwara Eliya districts. The waterfall is about 50 metres high and is surrounded by forest and highland scenery. The final approach involves a walking trail, making it a good option for visitors who enjoy nature and light trekking.",
                 routeQuery: "Bomburu Ella Waterfall, Sri Lanka",
@@ -4983,10 +4983,10 @@ const UIComponents = {
                 name: "4. Hakgala Botanic Gardens", 
                 altName: "Est. 1861 Montane Flora Haven",
                 category: "Historic Botanic Garden", 
-                dist: "20–25 km", 
-                time: "45–55 minutes", 
+                dist: "20â€“25 km", 
+                time: "45â€“55 minutes", 
                 image: "images/landmark_hakgala_gardens.jpg",
-                desc: "Hakgala Botanic Gardens is a historic highland garden established in 1861. Located beneath Hakgala Rock, the garden contains extensive collections of flowers, orchids, roses, ferns and other plants, with views toward the surrounding Uva mountains. The gardens are managed by Sri Lanka’s Department of National Botanic Gardens and are open throughout the year.",
+                desc: "Hakgala Botanic Gardens is a historic highland garden established in 1861. Located beneath Hakgala Rock, the garden contains extensive collections of flowers, orchids, roses, ferns and other plants, with views toward the surrounding Uva mountains. The gardens are managed by Sri Lankaâ€™s Department of National Botanic Gardens and are open throughout the year.",
                 routeQuery: "Hakgala Botanical Garden, Sri Lanka",
                 mapSearchQuery: "Hakgala Botanical Garden"
             },
@@ -4995,8 +4995,8 @@ const UIComponents = {
                 name: "5. Seetha Amman Temple", 
                 altName: "Ramayana Heritage Site, Seetha Eliya",
                 category: "Cultural & Heritage Site", 
-                dist: "20–25 km", 
-                time: "45–60 minutes", 
+                dist: "20â€“25 km", 
+                time: "45â€“60 minutes", 
                 image: "images/landmark_seetha_amman_temple.jpg",
                 desc: "Located in the Seetha Eliya area near Nuwara Eliya, Seetha Amman Temple is an important cultural and religious site associated with the Ramayana traditions of Sri Lanka. Its colourful architecture and surrounding mountain landscape make it an interesting stop for visitors exploring the central highlands.",
                 routeQuery: "Seetha Amman Temple, Seetha Eliya, Sri Lanka",
@@ -5004,11 +5004,11 @@ const UIComponents = {
             },
             { 
                 id: 6,
-                name: "6. Nine Arch Bridge – Ella", 
+                name: "6. Nine Arch Bridge â€“ Ella", 
                 altName: "Colonial Railway Viaduct",
                 category: "Historic Railway Viaduct", 
-                dist: "20–25 km", 
-                time: "45–55 minutes", 
+                dist: "20â€“25 km", 
+                time: "45â€“55 minutes", 
                 image: "images/landmark_nine_arches.jpg",
                 desc: "One of the most recognisable landmarks in the hill country, Nine Arch Bridge is a historic railway viaduct between Ella and Demodara. The stone-and-brick bridge has nine arches and sits dramatically among dense greenery and tea-country landscapes. It was completed in the early 20th century and remains one of the signature sights around Ella.",
                 routeQuery: "Nine Arches Bridge, Demodara, Sri Lanka",
@@ -5016,13 +5016,13 @@ const UIComponents = {
             },
             { 
                 id: 7,
-                name: "7. Little Adam’s Peak – Ella", 
+                name: "7. Little Adamâ€™s Peak â€“ Ella", 
                 altName: "Panoramic Ella Gap Viewpoint",
                 category: "Mountain Viewpoint & Trek", 
-                dist: "20–25 km", 
-                time: "45–55 minutes", 
+                dist: "20â€“25 km", 
+                time: "45â€“55 minutes", 
                 image: "images/landmark_little_adams_peak.jpg",
-                desc: "Little Adam’s Peak is one of Ella’s most accessible viewpoints. The relatively short uphill walk leads to wide panoramic views of the surrounding mountains, valleys and tea-covered landscapes. It is a popular choice for visitors looking for a scenic walk without a long mountain trek.",
+                desc: "Little Adamâ€™s Peak is one of Ellaâ€™s most accessible viewpoints. The relatively short uphill walk leads to wide panoramic views of the surrounding mountains, valleys and tea-covered landscapes. It is a popular choice for visitors looking for a scenic walk without a long mountain trek.",
                 routeQuery: "Little Adam's Peak, Ella, Sri Lanka",
                 mapSearchQuery: "Little Adam's Peak, Ella"
             },
@@ -5031,10 +5031,10 @@ const UIComponents = {
                 name: "8. Ravana Falls", 
                 altName: "Iconic Multi-Level Mountain Cascade",
                 category: "Multi-Tiered Cascade", 
-                dist: "22–25 km", 
-                time: "50–60 minutes", 
+                dist: "22â€“25 km", 
+                time: "50â€“60 minutes", 
                 image: "images/landmark_ravana_falls.jpg",
-                desc: "Ravana Falls is one of the best-known waterfalls in the Ella area, located beside the Ella–Wellawaya road. The multi-level cascade becomes particularly impressive when water flow is high, and the surrounding area is closely associated with local Ravana and Ramayana traditions.",
+                desc: "Ravana Falls is one of the best-known waterfalls in the Ella area, located beside the Ellaâ€“Wellawaya road. The multi-level cascade becomes particularly impressive when water flow is high, and the surrounding area is closely associated with local Ravana and Ramayana traditions.",
                 routeQuery: "Ravana Falls, Ella, Sri Lanka",
                 mapSearchQuery: "Ravana Falls, Ella"
             }
@@ -5065,7 +5065,7 @@ const UIComponents = {
                                     <div>
                                         <span style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; color: #7a5a06; font-weight: 700;">Estate Geolocation &amp; Address</span>
                                         <strong style="color: #111827; font-size: 1rem; line-height: 1.4; display: block; margin-top: 0.25rem; font-weight: 700;">${addressText}</strong>
-                                        <span style="display: block; font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">Coordinates: 6.9824° N, 80.9632° E • Elevation: 1,200m+ (6,200 ft)</span>
+                                        <span style="display: block; font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">Coordinates: 6.9824Â° N, 80.9632Â° E â€¢ Elevation: 1,200m+ (6,200 ft)</span>
                                     </div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.9rem; padding-top: 0.9rem; border-top: 1px solid #ebd9b8;">
@@ -5074,7 +5074,7 @@ const UIComponents = {
                                     </span>
                                     <div>
                                         <span style="display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; font-weight: 600;">Visiting &amp; Tour Hours</span>
-                                        <span style="color: #111827; font-size: 0.88rem; font-weight: 700;">Monday – Sunday: 8:30 AM – 5:30 PM (Daily Guided Cuppings)</span>
+                                        <span style="color: #111827; font-size: 0.88rem; font-weight: 700;">Monday â€“ Sunday: 8:30 AM â€“ 5:30 PM (Daily Guided Cuppings)</span>
                                     </div>
                                 </div>
                             </div>
@@ -5114,7 +5114,7 @@ const UIComponents = {
                         <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2.5px; color: #7a5a06; font-weight: 700; display: block; margin-bottom: 0.5rem;">Scenic Highlands Surroundings</span>
                         <h4 style="font-size: 1.95rem; font-family: var(--font-serif); color: #111827; letter-spacing: 0.5px; margin: 0 0 0.85rem 0; font-weight: 700;">Tourist Attractions Near Rock One Wild Tea</h4>
                         <p style="color: #4b5563; font-size: 0.98rem; line-height: 1.8; max-width: 980px; margin: 0;">
-                            Located in the scenic highlands of Sri Lanka, Rock One Wild Tea is surrounded by waterfalls, mountains, tea-growing landscapes, cultural sites and some of the island’s best-known hill-country attractions. After experiencing our handmade tea factory, visitors can easily combine their tea experience with a tour of the beautiful surroundings.
+                            Located in the scenic highlands of Sri Lanka, Rock One Wild Tea is surrounded by waterfalls, mountains, tea-growing landscapes, cultural sites and some of the islandâ€™s best-known hill-country attractions. After experiencing our handmade tea factory, visitors can easily combine their tea experience with a tour of the beautiful surroundings.
                         </p>
                     </div>
 
@@ -5126,7 +5126,7 @@ const UIComponents = {
                                 <div style="position: relative; height: 210px; overflow: hidden; background: #f3eee7; border-bottom: 1px solid #ebd9b8;">
                                     <img src="${place.image}" alt="${place.name}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.16,1,0.3,1); display: block;" class="landmark-img" onerror="window.handleImageError && window.handleImageError(this, 'gallery')" loading="lazy" decoding="async">
                                     <div style="position: absolute; top: 12px; right: 12px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1.5px solid #b8860b; color: #7a5a06; font-size: 0.72rem; font-weight: 800; padding: 0.3rem 0.75rem; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                                        Approx. ${place.dist} • ~${place.time}
+                                        Approx. ${place.dist} â€¢ ~${place.time}
                                     </div>
                                     <div style="position: absolute; bottom: 12px; left: 12px;">
                                         <span style="font-size: 0.68rem; color: #ffffff; background: #047857; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 0.25rem 0.65rem; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
@@ -5208,7 +5208,7 @@ const UIComponents = {
         `;
     },
 
-    // ── Connoisseur Flavor Profile Radar Chart Generator ──
+    // â”€â”€ Connoisseur Flavor Profile Radar Chart Generator â”€â”€
     generateFlavorRadarSVG(radar = {}, size = 280) {
         const dimensions = [
             { key: 'floral', label: 'Floral', val: radar.floral ?? 80 },
@@ -5298,7 +5298,7 @@ const UIComponents = {
         `;
     },
 
-    // ── Connoisseur Tea Dossier & Interactive Steeping Modal ──
+    // â”€â”€ Connoisseur Tea Dossier & Interactive Steeping Modal â”€â”€
     renderConnoisseurModal(product) {
         const existing = document.getElementById('connoisseur-dossier-modal');
         if (existing) existing.remove();
@@ -5366,7 +5366,7 @@ const UIComponents = {
                             <!-- Floral -->
                             <div class="spectrum-bar-item">
                                 <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
-                                    <span>🌸 ${_t('radar_floral', 'Floral Intensity')}</span>
+                                    <span>ðŸŒ¸ ${_t('radar_floral', 'Floral Intensity')}</span>
                                     <strong style="color:#7a5a06;">${radar.floral ?? 80}%</strong>
                                 </div>
                                 <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
@@ -5376,7 +5376,7 @@ const UIComponents = {
                             <!-- Malty -->
                             <div class="spectrum-bar-item">
                                 <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
-                                    <span>🌾 ${_t('radar_malty', 'Malty / Roast')}</span>
+                                    <span>ðŸŒ¾ ${_t('radar_malty', 'Malty / Roast')}</span>
                                     <strong style="color:#7a5a06;">${radar.malty ?? 75}%</strong>
                                 </div>
                                 <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
@@ -5386,7 +5386,7 @@ const UIComponents = {
                             <!-- Sweetness -->
                             <div class="spectrum-bar-item">
                                 <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
-                                    <span>🍯 ${_t('radar_sweetness', 'Natural Sweetness')}</span>
+                                    <span>ðŸ¯ ${_t('radar_sweetness', 'Natural Sweetness')}</span>
                                     <strong style="color:#7a5a06;">${radar.sweetness ?? 80}%</strong>
                                 </div>
                                 <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
@@ -5396,7 +5396,7 @@ const UIComponents = {
                             <!-- Astringency -->
                             <div class="spectrum-bar-item">
                                 <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
-                                    <span>🍃 ${_t('radar_astringency', 'Astringency')}</span>
+                                    <span>ðŸƒ ${_t('radar_astringency', 'Astringency')}</span>
                                     <strong style="color:#7a5a06;">${radar.astringency ?? 40}%</strong>
                                 </div>
                                 <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
@@ -5406,7 +5406,7 @@ const UIComponents = {
                             <!-- Body -->
                             <div class="spectrum-bar-item">
                                 <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
-                                    <span>⚖️ ${_t('radar_body', 'Body & Structure')}</span>
+                                    <span>âš–ï¸ ${_t('radar_body', 'Body & Structure')}</span>
                                     <strong style="color:#7a5a06;">${radar.body ?? 80}%</strong>
                                 </div>
                                 <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
@@ -5416,7 +5416,7 @@ const UIComponents = {
                             <!-- Aroma -->
                             <div class="spectrum-bar-item">
                                 <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
-                                    <span>✨ ${_t('radar_aroma', 'Aroma Intensity')}</span>
+                                    <span>âœ¨ ${_t('radar_aroma', 'Aroma Intensity')}</span>
                                     <strong style="color:#7a5a06;">${radar.aroma ?? 90}%</strong>
                                 </div>
                                 <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
@@ -5461,7 +5461,7 @@ const UIComponents = {
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
                             <div style="background:#fdfbf7; border:1px solid #ebd9b8; border-radius:10px; padding:0.9rem; text-align:center;">
                                 <span style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:#6b7280; display:block; margin-bottom:0.25rem;">${_t('stat_water_temp', 'Water Temp')}</span>
-                                <strong style="font-size:1.15rem; color:#7a5a06;">${product.steepTemp || '95°C'}</strong>
+                                <strong style="font-size:1.15rem; color:#7a5a06;">${product.steepTemp || '95Â°C'}</strong>
                             </div>
                             <div style="background:#fdfbf7; border:1px solid #ebd9b8; border-radius:10px; padding:0.9rem; text-align:center;">
                                 <span style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:#6b7280; display:block; margin-bottom:0.25rem;">${_t('stat_leaf_ratio', 'Leaf Ratio')}</span>
@@ -5515,7 +5515,7 @@ const UIComponents = {
                     <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
                         <button type="button" class="btn btn-primary btn-modal-add-to-cart" data-id="${product.id}" style="padding:0.85rem 1.6rem; font-size:0.9rem; display:inline-flex; align-items:center; gap:0.45rem;">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-                            ${_t('btn_add_to_bag', 'Add to Bag')} — ${window.TeaFactoryStore.formatCurrency(product.price)}
+                            ${_t('btn_add_to_bag', 'Add to Bag')} â€” ${window.TeaFactoryStore.formatCurrency(product.price)}
                         </button>
                         <button type="button" class="btn btn-outline btn-book-prod" data-id="${product.id}" style="padding:0.85rem 1.4rem; font-size:0.9rem; border-color:#d1d5db; color:#1f2937; background:#fdfbf7;">
                             ${_t('btn_quick_order', 'Quick Order')}
@@ -5564,9 +5564,9 @@ const UIComponents = {
                 <p class="view-subtitle" style="margin-bottom: 2.25rem; max-width: 650px;">${_t('brew_section_sub', 'Unlock the pure essence of our high-altitude leaves with calibrated water temperatures, leaf ratios, and our interactive live countdown chime.')}</p>
                 
                 <div class="brewing-ritual-tabs">
-                    <button class="brewing-tab-btn active" data-type="black" data-temp="95°C" data-seconds="180" data-ratio="2.5g / 180ml" data-vessel="${_t('brew_vessel_porcelain', 'Porcelain / Clay')}">${_t('brew_tab_black', 'Black Tea Reserve')}</button>
-                    <button class="brewing-tab-btn" data-type="white" data-temp="80°C" data-seconds="240" data-ratio="3.0g / 180ml" data-vessel="${_t('brew_vessel_glass', 'Glass / White Ceramic')}">${_t('brew_tab_white', 'White Silver Tips')}</button>
-                    <button class="brewing-tab-btn" data-type="green" data-temp="82°C" data-seconds="150" data-ratio="2.0g / 180ml" data-vessel="${_t('brew_vessel_celadon', 'Glass / Celadon Cup')}">${_t('brew_tab_green', 'Organic Emerald Green')}</button>
+                    <button class="brewing-tab-btn active" data-type="black" data-temp="95Â°C" data-seconds="180" data-ratio="2.5g / 180ml" data-vessel="${_t('brew_vessel_porcelain', 'Porcelain / Clay')}">${_t('brew_tab_black', 'Black Tea Reserve')}</button>
+                    <button class="brewing-tab-btn" data-type="white" data-temp="80Â°C" data-seconds="240" data-ratio="3.0g / 180ml" data-vessel="${_t('brew_vessel_glass', 'Glass / White Ceramic')}">${_t('brew_tab_white', 'White Silver Tips')}</button>
+                    <button class="brewing-tab-btn" data-type="green" data-temp="82Â°C" data-seconds="150" data-ratio="2.0g / 180ml" data-vessel="${_t('brew_vessel_celadon', 'Glass / Celadon Cup')}">${_t('brew_tab_green', 'Organic Emerald Green')}</button>
                 </div>
                 
                 <!-- Home Live Steep Timer & Parameter Grid -->
@@ -5575,7 +5575,7 @@ const UIComponents = {
                     <div id="brewing-stats-container">
                         <div class="brewing-stats-grid">
                             <div class="brewing-stat-item">
-                                <div class="brewing-stat-value" id="home-brew-stat-temp">95°C</div>
+                                <div class="brewing-stat-value" id="home-brew-stat-temp">95Â°C</div>
                                 <div class="brewing-stat-label">${_t('stat_water_temp', 'Water Temp')}</div>
                             </div>
                             <div class="brewing-stat-item">
@@ -5625,7 +5625,7 @@ const UIComponents = {
         `;
     },
 
-    // ─── Public Order Payment Page ────────────────────────────────────────────
+    // â”€â”€â”€ Public Order Payment Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     renderOrderPage(containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -5650,7 +5650,7 @@ const UIComponents = {
                                 : '#90caf9';
 
                 const statusLabel = isPaid ? (order.isTour ? 'Slip Authorized & Confirmed' : 'Paid & Confirmed')
-                                  : isSlip ? (order.isTour ? 'Tour Pending — Slip Uploaded' : 'Slip Submitted')
+                                  : isSlip ? (order.isTour ? 'Tour Pending â€” Slip Uploaded' : 'Slip Submitted')
                                   : isCancelled ? 'Cancelled'
                                   : order.status;
 
@@ -5660,7 +5660,7 @@ const UIComponents = {
                                  : `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
 
                 const priceDisplay = order.formattedPrice || `$${(order.price || 0).toFixed(2)}`;
-                const shortBox = (order.boxName || 'Order').length > 36 ? order.boxName.slice(0, 36) + '…' : (order.boxName || 'Order');
+                const shortBox = (order.boxName || 'Order').length > 36 ? order.boxName.slice(0, 36) + 'â€¦' : (order.boxName || 'Order');
 
                 return `
                     <div class="recent-order-card" data-recent-order-id="${order.id}" role="button" tabindex="0" title="Click to load ${order.isTour ? 'tour booking' : 'order'} ${order.id}">
@@ -5701,7 +5701,7 @@ const UIComponents = {
                                 </div>
                                 <div>
                                     <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); font-weight: 700;">Recently Viewed on This Device</div>
-                                    <div class="recent-orders-panel-subtitle">${recentIds.length} recent transaction${recentIds.length !== 1 ? 's' : ''} (Orders &amp; Tour Passes) — click to load</div>
+                                    <div class="recent-orders-panel-subtitle">${recentIds.length} recent transaction${recentIds.length !== 1 ? 's' : ''} (Orders &amp; Tour Passes) â€” click to load</div>
                                 </div>
                             </div>
                             <button class="recent-orders-clear-btn" id="recent-orders-clear-btn" title="Clear history from this device">
@@ -5761,7 +5761,7 @@ const UIComponents = {
 
         panel.style.display = 'block';
 
-        // ────────────────── A. SPECIALIZED TOUR BOOKING TRACKING ──────────────────
+        // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ A. SPECIALIZED TOUR BOOKING TRACKING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if (isTour) {
             const guestCount = order.guests || 1;
             const tourDate = order.tourDate || 'Scheduled Date';
@@ -5770,7 +5770,7 @@ const UIComponents = {
             const statusLabel = isPaid 
                 ? 'Slip Authorized & Tour Confirmed' 
                 : isSlipSent 
-                    ? 'Tour Pending — Slip Under Verification' 
+                    ? 'Tour Pending â€” Slip Under Verification' 
                     : isCancelled 
                         ? 'Reservation Cancelled' 
                         : 'Deposit Slip Required';
@@ -5819,7 +5819,7 @@ const UIComponents = {
                     </div>
 
                     ${isPaid ? `
-                        <!-- 🟢 STATE: SLIP AUTHORIZED & TOUR CONFIRMED -->
+                        <!-- ðŸŸ¢ STATE: SLIP AUTHORIZED & TOUR CONFIRMED -->
                         <div style="background: linear-gradient(135deg, rgba(34,197,94,0.12) 0%, rgba(4,28,14,0.85) 100%); border: 1.5px solid #22c55e; border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem;">
                             <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
                                 <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(34,197,94,0.25); display: flex; align-items: center; justify-content: center; color: #86efac; flex-shrink: 0;">
@@ -5835,7 +5835,7 @@ const UIComponents = {
                             </p>
                             <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; font-size: 0.8rem; color: #d1d5db; line-height: 1.6;">
                                 <strong style="color: var(--color-gold);">Estate Location:</strong> Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District (Elevation 1,240m)<br>
-                                <strong style="color: var(--color-gold);">Arrival Recommendation:</strong> Please arrive 10–15 minutes prior to ${timeSlot}.
+                                <strong style="color: var(--color-gold);">Arrival Recommendation:</strong> Please arrive 10â€“15 minutes prior to ${timeSlot}.
                             </div>
 
                             <!-- Executive Director & CEO Verification Seal & Signature -->
@@ -5873,14 +5873,14 @@ const UIComponents = {
                             </div>
                         </div>
                     ` : isSlipSent ? `
-                        <!-- 🟡 STATE: TOUR PENDING & SLIP SUBMITTED / UNDER REVIEW -->
+                        <!-- ðŸŸ¡ STATE: TOUR PENDING & SLIP SUBMITTED / UNDER REVIEW -->
                         <div style="background: rgba(212,175,55,0.08); border: 1.5px dashed rgba(212,175,55,0.5); border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem;">
                             <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
                                 <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(212,175,55,0.2); display: flex; align-items: center; justify-content: center; color: var(--color-gold); flex-shrink: 0;">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                                 </div>
                                 <div>
-                                    <div style="font-weight: 700; color: var(--color-gold); font-size: 1.05rem;">Tour Booking Pending — Deposit Slip Under Verification</div>
+                                    <div style="font-weight: 700; color: var(--color-gold); font-size: 1.05rem;">Tour Booking Pending â€” Deposit Slip Under Verification</div>
                                     <div style="font-size: 0.8rem; color: var(--color-text-muted);">Slip uploaded &bull; Official Gate Pass will be certified and signed by Director &amp; CEO upon clearance</div>
                                 </div>
                             </div>
@@ -5903,7 +5903,7 @@ const UIComponents = {
                             </div>
                         </div>
                     ` : `
-                        <!-- ⚪ STATE: PAYMENT REQUIRED FOR TOUR -->
+                        <!-- âšª STATE: PAYMENT REQUIRED FOR TOUR -->
                         <h4 style="font-family: var(--font-serif); color: var(--color-white); margin-bottom: 1rem; font-size: 1.1rem; display: flex; align-items: center; gap: 0.45rem;">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                             Confirm Reservation &amp; Clear Gate Pass
@@ -5954,7 +5954,7 @@ const UIComponents = {
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
                                         </div>
                                         <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse file</span></div>
-                                        <div class="file-upload-hint">JPG, PNG or PDF — Max 5MB</div>
+                                        <div class="file-upload-hint">JPG, PNG or PDF â€” Max 5MB</div>
                                         <input type="file" id="order-slip-file" accept="image/*,.pdf" style="display:none;">
                                     </div>
                                     <div id="order-slip-preview" class="slip-preview" style="display:none;"></div>
@@ -5970,7 +5970,7 @@ const UIComponents = {
             return;
         }
 
-        // ────────────────── B. PRODUCT / GIFT BOX ORDER VIEW ──────────────────
+        // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ B. PRODUCT / GIFT BOX ORDER VIEW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         panel.innerHTML = `
             <!-- Order Summary Card -->
             <div class="panel-card" style="margin-bottom: 1.5rem; border: 1px solid ${isPaid ? 'rgba(46,125,50,0.4)' : isCancelled ? 'rgba(198,40,40,0.3)' : 'rgba(212,175,55,0.25)'};">
@@ -6026,7 +6026,7 @@ const UIComponents = {
                 ` : isSlipSent ? `
                     <div style="text-align: center; padding: 1.5rem; background: rgba(212,175,55,0.08); border-radius: 8px; border: 1px dashed rgba(212,175,55,0.3);">
                         <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 0.5rem;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                        <div style="font-weight: 700; color: var(--color-gold); font-size: 1rem; margin-bottom: 0.25rem;">Slip Submitted — Under Review</div>
+                        <div style="font-weight: 700; color: var(--color-gold); font-size: 1rem; margin-bottom: 0.25rem;">Slip Submitted â€” Under Review</div>
                         <div style="font-size: 0.8rem; color: var(--color-text-muted);">We received your deposit slip. Our team will verify and confirm your order within 24 hours.</div>
                     </div>
                 ` : `
@@ -6087,7 +6087,7 @@ const UIComponents = {
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
                                     </div>
                                     <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse file</span></div>
-                                    <div class="file-upload-hint">JPG, PNG or PDF — Max 5MB</div>
+                                    <div class="file-upload-hint">JPG, PNG or PDF â€” Max 5MB</div>
                                     <input type="file" id="order-slip-file" accept="image/*,.pdf" style="display:none;">
                                 </div>
                                 <div id="order-slip-preview" class="slip-preview" style="display:none;"></div>
@@ -6102,7 +6102,7 @@ const UIComponents = {
             </div>
 
             ${isPaid ? `
-            <!-- ── Allocation Certificate Download Strip (only after payment confirmed) ── -->
+            <!-- â”€â”€ Allocation Certificate Download Strip (only after payment confirmed) â”€â”€ -->
             <div class="cert-download-strip" id="cert-download-strip" data-order-id="${order.id}">
                 <div class="cert-download-strip-left">
                     <div class="cert-download-icon-wrap">
@@ -6115,7 +6115,7 @@ const UIComponents = {
                     </div>
                     <div>
                         <div class="cert-download-label">Luxury Allocation Certificate</div>
-                        <div class="cert-download-sublabel">Gold estate crest · Wax seal engraving · Official allocation record</div>
+                        <div class="cert-download-sublabel">Gold estate crest Â· Wax seal engraving Â· Official allocation record</div>
                     </div>
                 </div>
                 <button class="btn-cert-download" id="btn-cert-download" data-order-id="${order.id}">
@@ -6131,7 +6131,7 @@ const UIComponents = {
         `;
     },
 
-    // ─── Active Reservation Audit Log Table Rows Renderer ─────────────────────
+    // â”€â”€â”€ Active Reservation Audit Log Table Rows Renderer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     renderAuditTableRows(bookings) {
         if (!bookings || bookings.length === 0) {
             return `
@@ -6159,9 +6159,9 @@ const UIComponents = {
 
             const itemTitle = isTour ? b.packageName : (isProd ? b.productName : b.boxName);
             const itemSub = isTour 
-                ? `Slot: ${b.timeSlot} • ${b.guests || 1} Guest${(b.guests || 1) > 1 ? 's' : ''}`
+                ? `Slot: ${b.timeSlot} â€¢ ${b.guests || 1} Guest${(b.guests || 1) > 1 ? 's' : ''}`
                 : (isProd 
-                    ? `${b.weight || '100g'} Tin • Single Estate` 
+                    ? `${b.weight || '100g'} Tin â€¢ Single Estate` 
                     : `${b.seasonName || 'Harvest Series'} (S${b.seriesNumber || 1})`);
 
             const dateSchedule = b.preferredDate || b.tourDate || (b.bookingDate ? b.bookingDate.split(',')[0] : 'Scheduled');
@@ -6206,7 +6206,7 @@ const UIComponents = {
                                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                                         ${b.email}
                                     </a>
-                                    ${b.phone ? `<span>•</span><a href="https://api.whatsapp.com/send?phone=${encodeURIComponent(phoneClean)}" target="_blank" title="WhatsApp Message" style="display:inline-flex; align-items:center; gap:0.25rem;">
+                                    ${b.phone ? `<span>â€¢</span><a href="https://api.whatsapp.com/send?phone=${encodeURIComponent(phoneClean)}" target="_blank" title="WhatsApp Message" style="display:inline-flex; align-items:center; gap:0.25rem;">
                                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                                         ${b.phone}
                                     </a>` : ''}
@@ -6241,7 +6241,7 @@ const UIComponents = {
                             <div style="margin-top: 0.25rem;">
                                 <span class="type-pill" style="font-size: 0.65rem; background: rgba(212,175,55,0.15); color: var(--color-gold); border: 1px solid rgba(212,175,55,0.35); display: inline-flex; align-items: center; gap: 0.25rem;">
                                     <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect></svg>
-                                    ${b.waxSealColor || 'Gold Seal'}${b.monogramInitials ? ` • Monogram: ${b.monogramInitials}` : ''}
+                                    ${b.waxSealColor || 'Gold Seal'}${b.monogramInitials ? ` â€¢ Monogram: ${b.monogramInitials}` : ''}
                                 </span>
                             </div>
                         ` : ''}
@@ -6404,7 +6404,7 @@ const UIComponents = {
         `;
     },
 
-    // ── Multi-Item Cart Slide-Over Drawer ──
+    // â”€â”€ Multi-Item Cart Slide-Over Drawer â”€â”€
     renderCartDrawer(containerId = 'cart-drawer-body') {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -6433,7 +6433,7 @@ const UIComponents = {
         const formattedShipping = shippingUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(shippingUSD, currInfo) : `$${shippingUSD.toFixed(2)}`) : (window._t ? window._t('bespoke_complimentary', 'Complimentary') : 'Complimentary');
         const formattedGrandTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(grandTotalUSD, currInfo) : `$${grandTotalUSD.toFixed(2)}`;
         const grandTotalLKR = Math.round(grandTotalUSD * 305);
-        const bankAmountFormatted = isSriLanka ? `Rs ${grandTotalLKR.toLocaleString()} LKR` : `${formattedGrandTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>`;
+        const bankAmountFormatted = isSriLanka ? `Rs ${grandTotalLKR.toLocaleString()} LKR` : `${formattedGrandTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(â‰ˆ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>`;
 
         // Update header count label
         const countLabel = document.getElementById('cart-drawer-count-label');
@@ -6538,7 +6538,7 @@ const UIComponents = {
                         ${signedUser ? `
                             <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
+                                    <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">âœ“</span>
                                     <div>
                                         <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Patron Account: <span style="color: var(--color-gold);">${esc(signedUser.full_name || signedUser.email)}</span></div>
                                         <div style="font-size: 0.7rem; color: #86efac;">${esc(signedUser.email)} &bull; Linked to Estate Master Ledger</div>
@@ -6581,20 +6581,20 @@ const UIComponents = {
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label class="form-label" for="cart-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Destination Country *</label>
                                     <select class="form-input" id="cart-cust-country" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
-                                        <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>🇱🇰 Sri Lanka (LKR Rs)</option>
-                                        <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>🇺🇸 United States (USD $)</option>
-                                        <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom (GBP £)</option>
-                                        <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>🇦🇺 Australia (AUD A$)</option>
-                                        <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>🇨🇦 Canada (CAD C$)</option>
-                                        <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>🇩🇪 Germany (EUR €)</option>
-                                        <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>🇫🇷 France (EUR €)</option>
-                                        <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>🇯🇵 Japan (JPY ¥)</option>
-                                        <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>🇦🇪 United Arab Emirates (AED)</option>
-                                        <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>🇸🇬 Singapore (SGD S$)</option>
-                                        <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>🇮🇳 India (INR ₹)</option>
-                                        <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>🇨🇭 Switzerland (CHF)</option>
-                                        <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>🇨🇳 China (CNY ¥)</option>
-                                        <option value="Worldwide" ${selectedCountry === 'Worldwide' ? 'selected' : ''}>🌐 Rest of World (USD $)</option>
+                                        <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>ðŸ‡±ðŸ‡° Sri Lanka (LKR Rs)</option>
+                                        <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>ðŸ‡ºðŸ‡¸ United States (USD $)</option>
+                                        <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>ðŸ‡¬ðŸ‡§ United Kingdom (GBP Â£)</option>
+                                        <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>ðŸ‡¦ðŸ‡º Australia (AUD A$)</option>
+                                        <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>ðŸ‡¨ðŸ‡¦ Canada (CAD C$)</option>
+                                        <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>ðŸ‡©ðŸ‡ª Germany (EUR â‚¬)</option>
+                                        <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>ðŸ‡«ðŸ‡· France (EUR â‚¬)</option>
+                                        <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>ðŸ‡¯ðŸ‡µ Japan (JPY Â¥)</option>
+                                        <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>ðŸ‡¦ðŸ‡ª United Arab Emirates (AED)</option>
+                                        <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>ðŸ‡¸ðŸ‡¬ Singapore (SGD S$)</option>
+                                        <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>ðŸ‡®ðŸ‡³ India (INR â‚¹)</option>
+                                        <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>ðŸ‡¨ðŸ‡­ Switzerland (CHF)</option>
+                                        <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>ðŸ‡¨ðŸ‡³ China (CNY Â¥)</option>
+                                        <option value="Worldwide" ${selectedCountry === 'Worldwide' ? 'selected' : ''}>ðŸŒ Rest of World (USD $)</option>
                                     </select>
                                 </div>
 
@@ -6872,7 +6872,7 @@ const UIComponents = {
                             <div class="checkout-grand-total-row">
                                 <div>
                                     <strong id="cart-summary-total-title" style="font-size: 0.95rem; color: var(--color-text-primary);">Total Due (${currInfo.code})</strong>
-                                    <span id="cart-lkr-approx" style="display: block; font-size: 0.72rem; color: #4b5563; font-weight: normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>
+                                    <span id="cart-lkr-approx" style="display: block; font-size: 0.72rem; color: #4b5563; font-weight: normal;">(â‰ˆ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>
                                 </div>
                                 <strong id="cart-summary-total" style="font-size: 1.45rem; color: var(--color-gold); font-family: var(--font-serif);">${formattedGrandTotal}</strong>
                             </div>
@@ -6886,9 +6886,9 @@ const UIComponents = {
 
                         <!-- Trust Badges -->
                         <div class="checkout-trust-badges">
-                            <span>🔒 256-Bit SSL Encrypted</span>
-                            <span>🇱🇰 Direct Single-Estate Dispatch</span>
-                            <span>📜 Heritage Certified</span>
+                            <span>ðŸ”’ 256-Bit SSL Encrypted</span>
+                            <span>ðŸ‡±ðŸ‡° Direct Single-Estate Dispatch</span>
+                            <span>ðŸ“œ Heritage Certified</span>
                         </div>
 
                         <div class="checkout-footer-links">
@@ -6907,7 +6907,614 @@ const UIComponents = {
                 </div>
             </div>
         `;
-    }
+    },
+
+    // =========================================================================
+    // SEVEN TEAHOUSE LUXURY PURCHASING & DETAIL MODAL (SEVENTEAHOUSE.COM PARITY)
+    // =========================================================================
+    renderSevenTeahouseDetailModal(item, type = 'product', options = {}) {
+        const modal = document.getElementById('product-detail-modal');
+        const container = document.getElementById('product-detail-body-container');
+        const breadcrumbEl = document.getElementById('product-detail-breadcrumb');
+        if (!modal || !container) return;
+
+        // 1. Resolve core data
+        const isTour = type === 'tour';
+        const isBox = type === 'box';
+        const isProd = !isTour && !isBox;
+
+        const title = item.name || (isTour ? 'Gongfu-Style Black Tea Brewing Experience' : (isBox ? 'Collector Chest Reserve' : 'Single-Estate Artisanal Tea'));
+        const basePrice = Number(item.price !== undefined ? item.price : (item.price_usd !== undefined ? item.price_usd : (item.quotedPrice || 28.00))) || 28.00;
+        const baseLKR = Number(item.price_lkr || Math.round(basePrice * 305));
+        const originalPrice = (basePrice * 1.176).toFixed(2);
+        
+        let breadcrumbText = 'Shop &bull; Single-Estate Artisanal Harvest';
+        if (isTour) breadcrumbText = 'Experiences &bull; Private Sanctuary Gongfu Tasting';
+        if (isBox) breadcrumbText = 'Collector Reserve &bull; Handcrafted Teak & Brass Chest';
+        if (breadcrumbEl) breadcrumbEl.innerHTML = breadcrumbText;
+
+        // 2. Resolve image gallery (6 to 8 luxury images)
+        let primaryImg = item.image || item.image_url || (isTour ? 'images/Factory inside.jpeg' : (isBox ? 'images/Gift Box.jpeg' : 'images/Tea in cup.jpeg'));
+        let galleryImages = [];
+        if (Array.isArray(item.gallery) && item.gallery.length > 0) {
+            galleryImages = [...item.gallery];
+        } else if (isTour) {
+            galleryImages = [
+                'images/Factory inside.jpeg',
+                'images/Tea estate.jpeg',
+                'images/Tea in cup.jpeg',
+                'images/Rock One wild Tea factory.jpeg',
+                'images/Ceylon tea.jpg',
+                'images/Product.jpeg',
+                'images/Gift Box.jpeg'
+            ];
+        } else if (isBox) {
+            galleryImages = [
+                'images/Gift Box.jpeg',
+                'images/tea box.jpeg',
+                'images/Tea in cup.jpeg',
+                'images/product.jpeg',
+                'images/Factory inside.jpeg',
+                'images/Tea estate.jpeg',
+                'images/Ceylon tea.jpg'
+            ];
+        } else {
+            galleryImages = [
+                primaryImg,
+                'images/Tea in cup.jpeg',
+                'images/product.jpeg',
+                'images/Product.jpeg',
+                'images/Gift Box.jpeg',
+                'images/Factory inside.jpeg',
+                'images/Tea estate.jpeg',
+                'images/Ceylon tea.jpg'
+            ];
+        }
+        // Deduplicate
+        galleryImages = Array.from(new Set(galleryImages)).filter(Boolean);
+        if (galleryImages.length === 0) galleryImages = [primaryImg];
+
+        // 3. Variants setup
+        let variants = [];
+        if (isProd) {
+            variants = [
+                { id: 'v1', label: 'Tin - 50g/1.8 oz', multiplier: 1.0, stock: 16, default: true },
+                { id: 'v2', label: 'Reserve Pouch - 100g/3.5 oz', multiplier: 1.85, stock: 11 },
+                { id: 'v3', label: 'Estate Chest - 250g/8.8 oz', multiplier: 4.20, stock: 6 }
+            ];
+        } else if (isTour) {
+            variants = [
+                { id: 'v1', label: 'Standard Connoisseur (1.5h)', multiplier: 1.0, stock: 8, default: true },
+                { id: 'v2', label: 'Master Sommelier Gongfu (2.5h)', multiplier: 1.65, stock: 5 },
+                { id: 'v3', label: 'Sanctuary Terroir Walking Tour (3.5h)', multiplier: 2.30, stock: 4 }
+            ];
+        } else {
+            variants = [
+                { id: 'v1', label: 'Handcrafted Teak Chest (Standard)', multiplier: 1.0, stock: 10, default: true },
+                { id: 'v2', label: 'Custom Brass Monogrammed Edition', multiplier: 1.25, stock: 5 },
+                { id: 'v3', label: 'Grand Master Sommelier Reserve Suite', multiplier: 1.60, stock: 3 }
+            ];
+        }
+
+        // 4. Descriptions & Accordion Content
+        const shortDesc = item.desc || item.description || (isTour 
+            ? 'Begin your Rock One Wild Tea journey with a ceremonial Gongfu brewing session using our single-estate handcrafted Ceylon black tea, revealing delicate floral sweetness, velvety mouthfeel, and sustained elegance.'
+            : (isBox 
+                ? 'An heirloom collector chest crafted from certified sustainable mountain teak with hand-cast brass hardware, wax-sealed vials of single-origin leaves, and a numbered estate provenance certificate.'
+                : 'Rare and patiently crafted, this single-estate tea undergoes traditional artisanal processing, revealing a mellow sweetness, silky texture, and remarkable depth across successive infusions.'));
+
+        const quoteBanner = isTour 
+            ? 'Handcrafted Gongfu brewing rituals celebrating 1,320m high-elevation Uva terroir'
+            : (isBox 
+                ? 'Numbered heirloom teak chests housing the pinnacle of our wild harvest'
+                : 'Patiently crafted for a smooth, mellow sweetness and lingering floral finish');
+
+        const accordions = [
+            {
+                id: 'about',
+                title: isTour ? 'About This Experience' : (isBox ? 'About This Collector Chest' : 'About This Tea'),
+                open: true,
+                content: isTour
+                    ? '<p>Immerse yourself in our private tea sanctuary. Your estate host introduces the biodiverse terroir of our 1,320m mountain ridges, the art of hand plucking, and leads you through multi-step Gongfu infusions in authentic purple clay gaiwans.</p><ul style="padding-left:1.2rem; margin-top:0.5rem; line-height:1.7;"><li>Introduction to Uva Medium wild tea gardens</li><li>Observation of whole-leaf leaf opening under controlled heat</li><li>Tasting across 5 separate infusions with flavor notes journal</li></ul>'
+                    : (isBox
+                        ? '<p>Each collector chest is an individual work of art made from seasoned highland teakwood with hand-burnished solid brass accents. Inside are serialized glass vials preserved under inert nitrogen seal, a numbered estate certificate signed by our Master Tea Maker, and tasting accessories.</p>'
+                        : '<p><strong>' + title + '</strong></p><p>' + shortDesc + '</p><p>Crafted exclusively from tender shoots plucked during the dry August-September quality season when cool mountain winds concentrate natural sugars, aromatic linalools, and floral antioxidants in every bud.</p>')
+            },
+            {
+                id: 'origin',
+                title: 'Origin & Terroir',
+                open: false,
+                content: '<p><strong>Estate Sanctuary:</strong> Rock One Wild Tea Sanctuary, Passara, Badulla District, Uva Highlands, Sri Lanka.</p><p><strong>Elevation:</strong> 1,240m &ndash; 1,320m above sea level (High Montane Cloud Forest).</p><p><strong>Terroir Dynamics:</strong> Pristine organic soil enriched by centuries of wild montane leaf litter, natural granite springs, and the famous dry-cold August katabatic winds that produce the distinctive Uva seasonal character.</p>'
+            },
+            {
+                id: 'caffeine',
+                title: isTour ? 'Duration & Group Size' : 'Caffeine Level',
+                open: false,
+                content: isTour
+                    ? '<p><strong>Duration:</strong> Approximately 1.5 to 2 hours of unhurried ceremonial steeping.</p><p><strong>Group Size:</strong> Intimate private group (maximum 8 guests per session) to ensure personalized master sommelier guidance.</p><p><strong>Sanctuary Schedule:</strong> Monday through Saturday (Closed Sundays for sanctuary biodiversity rest).</p>'
+                    : '<p><strong>Caffeine Classification:</strong> Medium (approx. 38mg &ndash; 45mg per 250ml brewed cup).</p><p>Naturally balanced by exceptionally high concentrations of calming L-theanine, promoting alert tranquility and steady cognitive focus without jittery spikes or crashes.</p>'
+            },
+            {
+                id: 'preparation',
+                title: isTour ? 'Dress Code & Visitor Guidelines' : 'Preparation & Gongfu Steeping',
+                open: false,
+                content: isTour
+                    ? '<p><strong>Attire:</strong> Comfortable mountain footwear and light casual attire suitable for cool highland mornings (18&deg;C &ndash; 24&deg;C).</p><p><strong>Photography:</strong> Personal photography of our terraced gardens and ceremonial tables is warmly welcomed.</p><p><strong>Arrival:</strong> Please arrive 10 minutes prior to your reserved slot at the Welcome Pavilion.</p>'
+                    : '<p><strong>Water Temperature:</strong> 90&deg;C &ndash; 95&deg;C (194&deg;F &ndash; 203&deg;F), soft mountain or filtered water recommended.</p><p><strong>Leaf-to-Water Ratio:</strong> 3.5g per 150ml (Gongfu gaiwan) or 2.5g per 250ml (Western teapot).</p><p><strong>Infusion Timing:</strong></p><ul style="padding-left:1.2rem; line-height:1.7;"><li>1st Infusion: 35 seconds (bright aroma & floral bouquet)</li><li>2nd Infusion: 50 seconds (silky body & caramel notes)</li><li>3rd Infusion: 80 seconds (deep mineral sweetness)</li><li>4th & 5th Infusions: 120 seconds (lingering honey finish)</li></ul>'
+            },
+            {
+                id: 'benefits',
+                title: isTour ? 'Inclusions & Take-Home Gifts' : (isBox ? 'Preservation & Storage' : 'Tea Benefits & Freshness Guarantee'),
+                open: false,
+                content: isTour
+                    ? '<p>Every guest receives a complimentary commemorative Estate Tasting Cup, a personalized Sommelier Certificate, and a sample tin of the dayâ€™s featured harvest.</p>'
+                    : '<p><strong>Antioxidant Richness:</strong> Abundant theaflavins, thearubigins, and polyphenols supporting cardiovascular wellness and cellular rejuvenation.</p><p><strong>Nitrogen Vacuum Seal:</strong> Packed fresh on the estate within 48 hours of sorting to lock in volatile essential oils and pristine garden freshness for up to 24 months.</p>'
+            }
+        ];
+
+        // 5. Construct full Seven Teahouse HTML markup
+        container.innerHTML = `
+            <div class="seventea-container">
+                <!-- TOP BREADCRUMB / BRAND EYEBROW -->
+                <div class="seventea-brand-eyebrow">
+                    <span>SEVEN TEAHOUSE &bull; ROCK ONE WILD ESTATE</span>
+                </div>
+
+                <!-- MAIN TWO-COLUMN SPLIT GRID -->
+                <div class="seventea-main-grid">
+                    
+                    <!-- LEFT COLUMN: HERO IMAGE, THUMBNAILS, QUOTE & ACCORDIONS -->
+                    <div class="seventea-left-col">
+                        
+                        <!-- Hero Image Display -->
+                        <div class="seventea-hero-box" id="seventea-hero-box">
+                            <img src="${primaryImg}" id="seventea-hero-img" alt="${title}" class="seventea-hero-img" decoding="async">
+                            <button type="button" class="seventea-zoom-badge" id="seventea-zoom-badge" aria-label="Zoom Image">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            </button>
+                        </div>
+
+                        <!-- 6 to 8 Thumbnail Preview Strip -->
+                        <div class="seventea-thumb-strip" id="seventea-thumb-strip">
+                            ${galleryImages.map((imgSrc, idx) => `
+                                <button type="button" class="seventea-thumb-item ${idx === 0 ? 'active' : ''}" data-src="${imgSrc}" aria-label="View photo ${idx + 1}">
+                                    <img src="${imgSrc}" alt="Thumbnail ${idx + 1}" onerror="window.handleImageError && window.handleImageError(this, 'product')">
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <!-- Poetic Sub-Banner Quote -->
+                        <div class="seventea-poetic-banner">
+                            <h3>${quoteBanner}</h3>
+                        </div>
+
+                        <!-- Expandable Collapsible Accordions (Parity with Screenshot 3) -->
+                        <div class="seventea-accordions" id="seventea-accordions">
+                            ${accordions.map(acc => `
+                                <div class="seventea-accordion-item ${acc.open ? 'expanded' : ''}" data-id="${acc.id}">
+                                    <button type="button" class="seventea-accordion-header" aria-expanded="${acc.open ? 'true' : 'false'}">
+                                        <span class="seventea-accordion-title">${acc.title}</span>
+                                        <span class="seventea-accordion-icon">${acc.open ? '&minus;' : '&#43;'}</span>
+                                    </button>
+                                    <div class="seventea-accordion-body" style="${acc.open ? 'display: block;' : 'display: none;'}">
+                                        ${acc.content}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                    </div>
+
+                    <!-- RIGHT COLUMN: DETAILS, PRICING, VARIANTS, ACTIONS & PERKS -->
+                    <div class="seventea-right-col">
+                        
+                        <!-- Title -->
+                        <h1 class="seventea-title">${title}</h1>
+
+                        <!-- Gold Star Rating -->
+                        <div class="seventea-rating-row">
+                            <span class="seventea-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                            <span class="seventea-rating-val">5.0</span>
+                            <span class="seventea-rating-count">(2 reviews)</span>
+                        </div>
+
+                        <!-- Strikethrough & Current Price -->
+                        <div class="seventea-pricing-row">
+                            <span class="seventea-strikethrough-price" id="seventea-orig-price">$${originalPrice}</span>
+                            <span class="seventea-current-price" id="seventea-calc-price">$${basePrice.toFixed(2)}</span>
+                            <span class="seventea-discount-badge">15% OFF</span>
+                        </div>
+
+                        <!-- Buy Over Time Financing Note -->
+                        <div class="seventea-financing-note">
+                            <span class="seventea-fin-icon">&#9889;</span>
+                            <span>0% APR Pay over time for orders over $35.00 with <strong>shop</strong></span>
+                            <span class="seventea-info-circle">&#9432;</span>
+                        </div>
+
+                        <!-- Sensory Short Description -->
+                        <p class="seventea-sensory-desc">${shortDesc}</p>
+
+                        <!-- Golden Leaf Award Badge -->
+                        <div class="seventea-award-badge">
+                            <strong>Golden Leaf Award:</strong> Gold Winner &ndash; Single Origin ${isTour ? 'Visitor Experience' : (isBox ? 'Collector Series' : 'Wild Tea')} Worldwide
+                        </div>
+
+                        <!-- Size / Edition Variant Selector -->
+                        <div class="seventea-variant-section">
+                            <label class="seventea-section-label">${isTour ? 'EXPERIENCE TIER' : (isBox ? 'CHEST EDITION' : 'SIZE')}</label>
+                            <div class="seventea-variant-pills" id="seventea-variant-pills">
+                                ${variants.map(v => `
+                                    <button type="button" 
+                                            class="seventea-variant-btn ${v.default ? 'active' : ''}" 
+                                            data-vid="${v.id}" 
+                                            data-mult="${v.multiplier}" 
+                                            data-stock="${v.stock}" 
+                                            data-label="${v.label}">
+                                        ${v.label}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Stock Urgency Progress Indicator -->
+                        <div class="seventea-stock-urgency">
+                            <div class="seventea-stock-label" id="seventea-stock-text">
+                                HURRY, ONLY ${variants[0].stock} ITEMS LEFT IN STOCK!
+                            </div>
+                            <div class="seventea-stock-bar-track">
+                                <div class="seventea-stock-bar-fill" id="seventea-stock-bar-fill" style="width: 38%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Quantity Counter & Action Buttons Stack -->
+                        <div class="seventea-actions-stack">
+                            <div class="seventea-cta-row">
+                                <!-- Stepper -->
+                                <div class="seventea-stepper">
+                                    <button type="button" class="seventea-step-btn" id="seventea-qty-minus" aria-label="Decrease Quantity">&minus;</button>
+                                    <span class="seventea-step-val" id="seventea-qty-display">1</span>
+                                    <button type="button" class="seventea-step-btn" id="seventea-qty-plus" aria-label="Increase Quantity">&#43;</button>
+                                </div>
+
+                                <!-- Add to Cart Primary Button -->
+                                <button type="button" class="seventea-btn-add" id="seventea-btn-add-cart">
+                                    ${isTour ? 'ADD TO RESERVATIONS' : 'ADD TO CART'}
+                                </button>
+                            </div>
+
+                            <!-- Buy with Shop / Express Checkout Button -->
+                            <button type="button" class="seventea-btn-express" id="seventea-btn-express-buy">
+                                <span>Buy with</span> <strong style="letter-spacing: -0.5px;">shop</strong>
+                            </button>
+
+                            <!-- More Payment Options Link -->
+                            <div class="seventea-more-opts-wrap">
+                                <button type="button" class="seventea-more-opts-btn" id="seventea-btn-more-payment">
+                                    More payment options &bull; Quick Checkout
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Fulfillment Perks & Estate Guarantees -->
+                        <div class="seventea-perks-list">
+                            <div class="seventea-perk-item">
+                                <span class="seventea-perk-check">&#10003;</span>
+                                <div>
+                                    <div class="seventea-perk-title">Pickup available at Rock One Wild Tea Estate</div>
+                                    <div class="seventea-perk-sub">Usually ready in 24 hours &bull; <a href="#location-section" onclick="window.closeProductDetail && window.closeProductDetail();" style="color: #b8860b; text-decoration: underline;">View estate information</a></div>
+                                </div>
+                            </div>
+                            <div class="seventea-perk-item">
+                                <span class="seventea-perk-check">&#10003;</span>
+                                <div>
+                                    <div class="seventea-perk-title">Insured Worldwide Express Air Courier</div>
+                                    <div class="seventea-perk-sub">Dispatched directly from Sri Lanka with real-time tracking</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Share Link -->
+                        <div class="seventea-share-row">
+                            <button type="button" class="seventea-share-btn" id="seventea-share-btn">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                                <span>Share</span>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- BOTTOM: FULL CUSTOMER REVIEWS SECTION (PARITY WITH SCREENSHOT 4) -->
+                <div class="seventea-reviews-block">
+                    <h2 class="seventea-reviews-header">Customer reviews</h2>
+                    
+                    <div class="seventea-reviews-summary-grid">
+                        <!-- Score Display -->
+                        <div class="seventea-review-score-box">
+                            <div class="seventea-big-score">
+                                <span class="seventea-score-num">5</span>
+                                <span class="seventea-score-denom">/ 5</span>
+                            </div>
+                            <div class="seventea-score-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                            <div class="seventea-score-sub">2 verified reviews</div>
+                        </div>
+
+                        <!-- 5-Star Breakdown Progress Bars -->
+                        <div class="seventea-rating-bars">
+                            <div class="seventea-bar-row">
+                                <span class="seventea-bar-label">5 &starf;</span>
+                                <div class="seventea-bar-track">
+                                    <div class="seventea-bar-fill" style="width: 100%;"></div>
+                                </div>
+                                <span class="seventea-bar-pct">100%</span>
+                            </div>
+                            <div class="seventea-bar-row">
+                                <span class="seventea-bar-label">4 &starf;</span>
+                                <div class="seventea-bar-track"><div class="seventea-bar-fill" style="width: 0%;"></div></div>
+                                <span class="seventea-bar-pct">0%</span>
+                            </div>
+                            <div class="seventea-bar-row">
+                                <span class="seventea-bar-label">3 &starf;</span>
+                                <div class="seventea-bar-track"><div class="seventea-bar-fill" style="width: 0%;"></div></div>
+                                <span class="seventea-bar-pct">0%</span>
+                            </div>
+                            <div class="seventea-bar-row">
+                                <span class="seventea-bar-label">2 &starf;</span>
+                                <div class="seventea-bar-track"><div class="seventea-bar-fill" style="width: 0%;"></div></div>
+                                <span class="seventea-bar-pct">0%</span>
+                            </div>
+                            <div class="seventea-bar-row">
+                                <span class="seventea-bar-label">1 &starf;</span>
+                                <div class="seventea-bar-track"><div class="seventea-bar-fill" style="width: 0%;"></div></div>
+                                <span class="seventea-bar-pct">0%</span>
+                            </div>
+                        </div>
+
+                        <!-- Write Review Action -->
+                        <div class="seventea-write-review-wrap">
+                            <button type="button" class="seventea-btn-write-review" onclick="window.showToast ? window.showToast('Patron Review Portal', 'Review submission form opened for verified patrons.', 'info') : alert('Review Portal');">
+                                Write a review
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filter Controls Strip -->
+                    <div class="seventea-filter-strip">
+                        <div class="seventea-filter-tab active">Reviews 2</div>
+                        <div class="seventea-filter-tools">
+                            <div class="seventea-search-input-wrap">
+                                <span>&#128269;</span>
+                                <input type="text" placeholder="Search reviews" class="seventea-search-reviews-input">
+                            </div>
+                            <select class="seventea-filter-select">
+                                <option>Most relevant</option>
+                                <option>Highest rating</option>
+                                <option>Most recent</option>
+                            </select>
+                            <select class="seventea-filter-select">
+                                <option>All ratings</option>
+                                <option>5 stars only</option>
+                            </select>
+                            <button type="button" class="seventea-media-filter-btn">With media</button>
+                        </div>
+                    </div>
+
+                    <!-- Verified Review Cards -->
+                    <div class="seventea-review-cards-list">
+                        
+                        <!-- Review 1 -->
+                        <div class="seventea-review-card">
+                            <div class="seventea-card-top">
+                                <div class="seventea-card-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                                <div class="seventea-card-date">2 months ago</div>
+                            </div>
+                            <div class="seventea-card-author">
+                                <strong class="seventea-author-name">K B.</strong>
+                                <span class="seventea-verified-badge">&#10003; Verified buyer</span>
+                            </div>
+                            <p class="seventea-card-text">
+                                Exceptional smoothness and natural sweetness. The liquor pours a luminous golden amber with subtle floral nuances. Even after the 4th infusion, the delicate honey sweetness lingers on the palate. One of the finest single-origin teas I have experienced worldwide.
+                            </p>
+                        </div>
+
+                        <!-- Review 2 -->
+                        <div class="seventea-review-card">
+                            <div class="seventea-card-top">
+                                <div class="seventea-card-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                                <div class="seventea-card-date">3 weeks ago</div>
+                            </div>
+                            <div class="seventea-card-author">
+                                <strong class="seventea-author-name">Eleanor Vance</strong>
+                                <span class="seventea-verified-badge">&#10003; Verified buyer</span>
+                            </div>
+                            <p class="seventea-card-text">
+                                Arrived promptly in London directly from the Sri Lanka estate, sealed in a gorgeous luxury tin. The leaf aroma before steeping is heavenly, and the taste is silky and refined without any bitterness. Highest recommendation.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+
+        // 6. Interactive Event Bindings Inside the Modal
+        let currentQty = 1;
+        let selectedVariant = variants[0];
+
+        const updatePriceAndStockDisplay = () => {
+            const calculatedPrice = (basePrice * selectedVariant.multiplier * currentQty).toFixed(2);
+            const calculatedOrig = (basePrice * selectedVariant.multiplier * 1.176 * currentQty).toFixed(2);
+            const priceEl = document.getElementById('seventea-calc-price');
+            const origEl = document.getElementById('seventea-orig-price');
+            const stockTextEl = document.getElementById('seventea-stock-text');
+            const stockFillEl = document.getElementById('seventea-stock-bar-fill');
+            const qtyDispEl = document.getElementById('seventea-qty-display');
+
+            if (priceEl) priceEl.innerText = `$${calculatedPrice}`;
+            if (origEl) origEl.innerText = `$${calculatedOrig}`;
+            if (qtyDispEl) qtyDispEl.innerText = currentQty;
+            if (stockTextEl) stockTextEl.innerText = `HURRY, ONLY ${selectedVariant.stock} ITEMS LEFT IN STOCK!`;
+            if (stockFillEl) {
+                const pct = Math.min(100, Math.max(15, (selectedVariant.stock / 25) * 100));
+                stockFillEl.style.width = `${pct}%`;
+            }
+        };
+
+        // Thumbnail switcher
+        const thumbs = container.querySelectorAll('.seventea-thumb-item');
+        const heroImg = document.getElementById('seventea-hero-img');
+        thumbs.forEach(btn => {
+            btn.addEventListener('click', () => {
+                thumbs.forEach(t => t.classList.remove('active'));
+                btn.classList.add('active');
+                const src = btn.getAttribute('data-src');
+                if (heroImg && src) {
+                    heroImg.style.opacity = '0.4';
+                    heroImg.src = src;
+                    setTimeout(() => { heroImg.style.opacity = '1'; }, 100);
+                }
+            });
+        });
+
+        // Zoom button
+        const zoomBadge = document.getElementById('seventea-zoom-badge');
+        if (zoomBadge && heroImg) {
+            zoomBadge.addEventListener('click', () => {
+                heroImg.classList.toggle('zoomed');
+                if (window.showToast) {
+                    window.showToast('High-Resolution Zoom', heroImg.classList.contains('zoomed') ? 'Zoomed to 150% magnification.' : 'Returned to default view.', 'info');
+                }
+            });
+        }
+
+        // Accordion toggles
+        const accHeaders = container.querySelectorAll('.seventea-accordion-header');
+        accHeaders.forEach(hdr => {
+            hdr.addEventListener('click', () => {
+                const parent = hdr.closest('.seventea-accordion-item');
+                if (!parent) return;
+                const isExpanded = parent.classList.contains('expanded');
+                const body = parent.querySelector('.seventea-accordion-body');
+                const icon = hdr.querySelector('.seventea-accordion-icon');
+                
+                if (isExpanded) {
+                    parent.classList.remove('expanded');
+                    hdr.setAttribute('aria-expanded', 'false');
+                    if (body) body.style.display = 'none';
+                    if (icon) icon.innerHTML = '&#43;';
+                } else {
+                    parent.classList.add('expanded');
+                    hdr.setAttribute('aria-expanded', 'true');
+                    if (body) body.style.display = 'block';
+                    if (icon) icon.innerHTML = '&minus;';
+                }
+            });
+        });
+
+        // Variant selection
+        const variantBtns = container.querySelectorAll('.seventea-variant-btn');
+        variantBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                variantBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const vid = btn.getAttribute('data-vid');
+                selectedVariant = variants.find(v => v.id === vid) || variants[0];
+                updatePriceAndStockDisplay();
+            });
+        });
+
+        // Quantity Stepper
+        const minusBtn = document.getElementById('seventea-qty-minus');
+        const plusBtn = document.getElementById('seventea-qty-plus');
+        if (minusBtn) {
+            minusBtn.addEventListener('click', () => {
+                if (currentQty > 1) {
+                    currentQty--;
+                    updatePriceAndStockDisplay();
+                }
+            });
+        }
+        if (plusBtn) {
+            plusBtn.addEventListener('click', () => {
+                if (currentQty < (selectedVariant.stock || 20)) {
+                    currentQty++;
+                    updatePriceAndStockDisplay();
+                }
+            });
+        }
+
+        // Add to Cart
+        const addCartBtn = document.getElementById('seventea-btn-add-cart');
+        if (addCartBtn) {
+            addCartBtn.addEventListener('click', () => {
+                const finalUnitPrice = basePrice * selectedVariant.multiplier;
+                if (window.TeaFactoryStore && window.TeaFactoryStore.addToCart) {
+                    window.TeaFactoryStore.addToCart({
+                        id: item.id || (isTour ? 'tour-gongfu' : (isBox ? 'chest-01' : 'prod-reserve')),
+                        name: `${title} (${selectedVariant.label})`,
+                        price: finalUnitPrice,
+                        image: heroImg ? heroImg.src : primaryImg,
+                        type: type,
+                        weight: selectedVariant.label,
+                        category: isTour ? 'Experience' : (isBox ? 'Collector Chest' : 'Single-Estate Tea'),
+                        qty: currentQty
+                    });
+                }
+                if (window.showToast) {
+                    window.showToast('Added to Reserve Bag', `${currentQty} &times; ${title} (${selectedVariant.label}) added.`, 'success');
+                }
+                // Open cart drawer
+                if (window.toggleCartDrawer) {
+                    window.closeProductDetail();
+                    window.toggleCartDrawer(true);
+                }
+            });
+        }
+
+        // Buy with Shop / Express Checkout
+        const expressBuyBtn = document.getElementById('seventea-btn-express-buy');
+        const morePaymentBtn = document.getElementById('seventea-btn-more-payment');
+        const triggerDirectCheckout = () => {
+            window.closeProductDetail();
+            if (window.openDrawer) {
+                window.openDrawer(type, item.id || (isTour ? 1 : 1), {
+                    package: title,
+                    timeSlot: options.timeSlot || '09:30 AM',
+                    qty: currentQty,
+                    variant: selectedVariant.label,
+                    price: basePrice * selectedVariant.multiplier
+                });
+            }
+        };
+
+        if (expressBuyBtn) expressBuyBtn.addEventListener('click', triggerDirectCheckout);
+        if (morePaymentBtn) morePaymentBtn.addEventListener('click', triggerDirectCheckout);
+
+        // Share button
+        const shareBtn = document.getElementById('seventea-share-btn');
+        if (shareBtn) {
+            shareBtn.addEventListener('click', () => {
+                const url = window.location.href;
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(url).then(() => {
+                        if (window.showToast) window.showToast('Link Copied', 'Product link copied to clipboard.', 'success');
+                    }).catch(() => {
+                        if (window.showToast) window.showToast('Share Link', url, 'info');
+                    });
+                } else if (window.showToast) {
+                    window.showToast('Share Link', url, 'info');
+                }
+            });
+        }
+
+        // 7. Reveal Modal
+        modal.classList.add('active', 'open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    },
 };
 
 window.UIComponents = UIComponents;
@@ -6926,12 +7533,12 @@ window.getSeasonalSkyRigHtml = function(themeId) {
                  loading="eager" 
                  decoding="async">
             <div class="sky-stardust-trail">
-                <span class="stardust-sparkle s1">✨</span>
-                <span class="stardust-sparkle s2">⭐</span>
-                <span class="stardust-sparkle s3">✨</span>
-                <span class="stardust-sparkle s4">🌟</span>
+                <span class="stardust-sparkle s1">âœ¨</span>
+                <span class="stardust-sparkle s2">â­</span>
+                <span class="stardust-sparkle s3">âœ¨</span>
+                <span class="stardust-sparkle s4">ðŸŒŸ</span>
             </div>
-            <div class="sky-luxury-wish">✨ Merry Christmas & Happy Holidays ✨</div>
+            <div class="sky-luxury-wish">âœ¨ Merry Christmas & Happy Holidays âœ¨</div>
         `;
     }
 
