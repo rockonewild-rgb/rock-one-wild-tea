@@ -9601,22 +9601,42 @@ mark.search-match-highlight {
     box-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
 }
 
+.landmark-photo-card {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease !important;
+}
+
 .landmark-photo-card:hover {
-    transform: translateY(-6px);
-    border-color: rgba(212, 175, 55, 0.6) !important;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 20px rgba(212, 175, 55, 0.2) !important;
+    transform: translateY(-6px) !important;
+    border-color: #b8860b !important;
+    box-shadow: 0 16px 36px rgba(184, 134, 11, 0.15), 0 4px 12px rgba(0, 0, 0, 0.06) !important;
 }
 
 .landmark-photo-card:hover .landmark-img {
-    transform: scale(1.08);
+    transform: scale(1.06) !important;
 }
 
 .landmark-directions-btn:hover {
-    background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%) !important;
-    color: #040a06 !important;
-    border-color: #ffd875 !important;
+    background: #b8860b !important;
+    color: #ffffff !important;
+    border-color: #b8860b !important;
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+    box-shadow: 0 6px 18px rgba(184, 134, 11, 0.3) !important;
+}
+
+.proximity-item-card {
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+.proximity-item-card:hover {
+    border-color: #b8860b !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 20px rgba(184, 134, 11, 0.12) !important;
+}
+
+.proximity-route-btn:hover {
+    background: #b8860b !important;
+    color: #ffffff !important;
+    border-color: #b8860b !important;
 }
 
 @media (max-width: 900px) {

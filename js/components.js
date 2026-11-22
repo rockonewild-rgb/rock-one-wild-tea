@@ -5033,40 +5033,40 @@ const UIComponents = {
         ];
 
         container.innerHTML = `
-            <div class="estate-location-card" style="background: #ffffff; border: 1px solid #e8e4df; border-radius: 20px; padding: 3rem 2.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden;">
-                <!-- Ambient Gold Light Flare -->
-                <div style="position: absolute; top: -100px; right: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 70%); pointer-events: none;"></div>
+            <div class="estate-location-card" style="background: #ffffff; border: 1.5px solid #ebd9b8; border-radius: 20px; padding: 3rem 2.5rem; box-shadow: 0 6px 25px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden;">
+                <!-- Ambient Warm Glow Flare -->
+                <div style="position: absolute; top: -100px; right: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(184, 134, 11, 0.08) 0%, transparent 70%); pointer-events: none;"></div>
 
                 <!-- Top Grid: Estate Description & Map Embed -->
-                <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; align-items: stretch; margin-bottom: 3rem;" class="location-grid-layout">
+                <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; align-items: stretch; margin-bottom: 3.5rem;" class="location-grid-layout">
                     <!-- Left: Estate Info Column -->
                     <div style="display: flex; flex-direction: column; justify-content: space-between;">
                         <div>
-                            <span class="section-tag" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--color-gold); font-weight: 600; margin-bottom: 0.75rem; display: block;">Estate Sanctuary & Terroir</span>
-                            <h3 class="home-section-title" style="font-size: 2rem; margin-bottom: 1.25rem; line-height: 1.2;">Visit Our Highlands Sanctuary</h3>
-                            <p style="color: var(--color-text-muted); font-size: 0.92rem; line-height: 1.7; margin-bottom: 1.75rem;">
+                            <span class="section-tag" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #7a5a06; font-weight: 700; margin-bottom: 0.75rem; display: block;">Estate Sanctuary &amp; Terroir</span>
+                            <h3 class="home-section-title" style="font-size: 2.1rem; margin-bottom: 1.25rem; line-height: 1.25; color: #111827;">Visit Our Highlands Sanctuary</h3>
+                            <p style="color: #4b5563; font-size: 0.96rem; line-height: 1.8; margin-bottom: 1.75rem;">
                                 Perched at over 1,200 meters amidst misty mountain amphitheaters in Wellawela, Ettampitiya, our single-estate sanctuary invites connoisseurs and world travelers for private tea cuppings, orthodox factory tours, and alpine terroir walks.
                             </p>
 
-                            <!-- Address & Hours Detail Box -->
-                            <div style="background: rgba(4, 14, 8, 0.75); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 14px; padding: 1.35rem 1.5rem; margin-bottom: 1.75rem; backdrop-filter: blur(12px); box-shadow: inset 0 1px 1px rgba(255,255,255,0.1);">
-                                <div style="display: flex; align-items: flex-start; gap: 0.9rem; margin-bottom: 0.9rem;">
-                                    <span style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: rgba(212, 175, 55, 0.15); color: var(--color-gold); flex-shrink: 0;">
+                            <!-- Address & Hours Detail Box (White Theme Luxury Card) -->
+                            <div style="background: #fbf9f5; border: 1.5px solid #ebd9b8; border-radius: 14px; padding: 1.4rem 1.6rem; margin-bottom: 1.75rem; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+                                <div style="display: flex; align-items: flex-start; gap: 0.9rem; margin-bottom: 1rem;">
+                                    <span style="display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: rgba(184, 134, 11, 0.12); color: #7a5a06; flex-shrink: 0;">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                                     </span>
                                     <div>
-                                        <span style="display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold); font-weight: 700;">Estate Geolocation & Address</span>
-                                        <strong style="color: var(--color-white); font-size: 0.96rem; line-height: 1.4; display: block; margin-top: 0.25rem;">${addressText}</strong>
-                                        <span style="display: block; font-size: 0.72rem; color: var(--color-text-muted); margin-top: 0.2rem;">Coordinates: 6.9824° N, 80.9632° E • Elevation: 1,200m+ (6,200 ft)</span>
+                                        <span style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; color: #7a5a06; font-weight: 700;">Estate Geolocation &amp; Address</span>
+                                        <strong style="color: #111827; font-size: 1rem; line-height: 1.4; display: block; margin-top: 0.25rem; font-weight: 700;">${addressText}</strong>
+                                        <span style="display: block; font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">Coordinates: 6.9824° N, 80.9632° E • Elevation: 1,200m+ (6,200 ft)</span>
                                     </div>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 0.9rem; padding-top: 0.85rem; border-top: 1px dashed rgba(255, 255, 255, 0.1);">
-                                    <span style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: rgba(37, 211, 102, 0.12); color: #4ade80; flex-shrink: 0;">
+                                <div style="display: flex; align-items: center; gap: 0.9rem; padding-top: 0.9rem; border-top: 1px solid #ebd9b8;">
+                                    <span style="display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: rgba(4, 120, 87, 0.1); color: #047857; flex-shrink: 0;">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                                     </span>
                                     <div>
-                                        <span style="display: block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-muted);">Visiting & Tour Hours</span>
-                                        <span style="color: var(--color-white); font-size: 0.86rem; font-weight: 600;">Monday – Sunday: 8:30 AM – 5:30 PM (Daily Guided Cuppings)</span>
+                                        <span style="display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; font-weight: 600;">Visiting &amp; Tour Hours</span>
+                                        <span style="color: #111827; font-size: 0.88rem; font-weight: 700;">Monday – Sunday: 8:30 AM – 5:30 PM (Daily Guided Cuppings)</span>
                                     </div>
                                 </div>
                             </div>
@@ -5074,11 +5074,11 @@ const UIComponents = {
 
                         <!-- Direct Navigation Buttons -->
                         <div style="display: flex; gap: 0.85rem; flex-wrap: wrap;">
-                            <a href="${googleMapsDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="flex: 1; min-width: 175px; text-decoration: none; font-size: 0.82rem; padding: 0.85rem 1.25rem; display: flex; align-items: center; justify-content: center; gap: 0.45rem;">
+                            <a href="${googleMapsDirectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="flex: 1; min-width: 175px; text-decoration: none; font-size: 0.85rem; padding: 0.85rem 1.25rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 700;">
                                 <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                                 Open in Google Maps
                             </a>
-                            <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="flex: 1; min-width: 175px; text-decoration: none; font-size: 0.82rem; padding: 0.85rem 1.25rem; color: var(--color-gold); border-color: rgba(212, 175, 55, 0.45); display: flex; align-items: center; justify-content: center; gap: 0.45rem;">
+                            <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="flex: 1; min-width: 175px; text-decoration: none; font-size: 0.85rem; padding: 0.85rem 1.25rem; color: #7a5a06; border-color: #b8860b; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 700;">
                                 <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
                                 Instant GPS Directions
                             </a>
@@ -5086,12 +5086,12 @@ const UIComponents = {
                     </div>
 
                     <!-- Right: Embedded Interactive Map Frame -->
-                    <div style="position: relative; border-radius: 14px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.35); box-shadow: 0 14px 35px rgba(0,0,0,0.7), 0 0 20px rgba(212, 175, 55, 0.15); min-height: 360px; display: flex;">
+                    <div style="position: relative; border-radius: 16px; overflow: hidden; border: 1.5px solid #ebd9b8; box-shadow: 0 6px 20px rgba(0,0,0,0.06); min-height: 380px; display: flex;">
                         <iframe 
                             src="${mapEmbedUrl}" 
                             width="100%" 
                             height="100%" 
-                            style="border:0; min-height: 360px; width: 100%; border-radius: 14px; filter: contrast(1.05) saturate(1.15);" 
+                            style="border:0; min-height: 380px; width: 100%; border-radius: 16px; filter: contrast(1.02) saturate(1.1);" 
                             allowfullscreen="" 
                             loading="lazy" 
                             referrerpolicy="no-referrer-when-downgrade"
@@ -5101,46 +5101,45 @@ const UIComponents = {
                 </div>
 
                 <!-- Middle Section: Tourist Attractions Near Rock One Wild Tea -->
-                <div style="border-top: 1px solid rgba(212, 175, 55, 0.2); padding-top: 2.75rem; margin-bottom: 2.75rem;">
-                    <div style="margin-bottom: 2rem;">
-                        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2.5px; color: var(--color-gold); font-weight: 700; display: block; margin-bottom: 0.45rem;">Scenic Highlands Surroundings</span>
-                        <h4 style="font-size: 1.65rem; font-family: var(--font-serif); color: var(--color-white); letter-spacing: 0.5px; margin: 0 0 0.85rem 0;">Tourist Attractions Near Rock One Wild Tea</h4>
-                        <p style="color: var(--color-text-muted); font-size: 0.94rem; line-height: 1.75; max-width: 960px; margin: 0;">
+                <div style="border-top: 1px solid #e8e4df; padding-top: 3rem; margin-bottom: 3.5rem;">
+                    <div style="margin-bottom: 2.25rem;">
+                        <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2.5px; color: #7a5a06; font-weight: 700; display: block; margin-bottom: 0.5rem;">Scenic Highlands Surroundings</span>
+                        <h4 style="font-size: 1.95rem; font-family: var(--font-serif); color: #111827; letter-spacing: 0.5px; margin: 0 0 0.85rem 0; font-weight: 700;">Tourist Attractions Near Rock One Wild Tea</h4>
+                        <p style="color: #4b5563; font-size: 0.98rem; line-height: 1.8; max-width: 980px; margin: 0;">
                             Located in the scenic highlands of Sri Lanka, Rock One Wild Tea is surrounded by waterfalls, mountains, tea-growing landscapes, cultural sites and some of the island’s best-known hill-country attractions. After experiencing our handmade tea factory, visitors can easily combine their tea experience with a tour of the beautiful surroundings.
                         </p>
                     </div>
 
                     <!-- 3/4-Column Photographic Grid -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.4rem;" class="landmark-photo-grid">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.6rem;" class="landmark-photo-grid">
                         ${nearbyLandmarks.map(place => `
-                            <div class="landmark-photo-card" style="background: rgba(4, 14, 8, 0.85); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                            <div class="landmark-photo-card" style="background: #ffffff; border: 1.5px solid #e8e4df; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.3s ease; box-shadow: 0 4px 18px rgba(0,0,0,0.04);">
                                 <!-- Photo Container -->
-                                <div style="position: relative; height: 195px; overflow: hidden; background: #030805;">
-                                    <img src="${place.image}" alt="${place.name}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;" class="landmark-img" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
-                                    <div style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(4, 14, 8, 0.95) 100%);"></div>
-                                    <div style="position: absolute; top: 10px; right: 10px; background: rgba(4, 14, 8, 0.88); backdrop-filter: blur(8px); border: 1px solid rgba(212, 175, 55, 0.45); color: #ffd875; font-size: 0.72rem; font-weight: 700; padding: 0.28rem 0.65rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.6);">
+                                <div style="position: relative; height: 210px; overflow: hidden; background: #f3eee7; border-bottom: 1px solid #ebd9b8;">
+                                    <img src="${place.image}" alt="${place.name}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.16,1,0.3,1); display: block;" class="landmark-img" onerror="window.handleImageError && window.handleImageError(this, 'gallery')" loading="lazy" decoding="async">
+                                    <div style="position: absolute; top: 12px; right: 12px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1.5px solid #b8860b; color: #7a5a06; font-size: 0.72rem; font-weight: 800; padding: 0.3rem 0.75rem; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                                         Approx. ${place.dist} • ~${place.time}
                                     </div>
-                                    <div style="position: absolute; bottom: 10px; left: 12px;">
-                                        <span style="font-size: 0.68rem; color: #86efac; background: rgba(74, 222, 128, 0.18); border: 1px solid rgba(74, 222, 128, 0.35); padding: 0.18rem 0.55rem; border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                    <div style="position: absolute; bottom: 12px; left: 12px;">
+                                        <span style="font-size: 0.68rem; color: #ffffff; background: #047857; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 0.25rem 0.65rem; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
                                             ${place.category}
                                         </span>
                                     </div>
                                 </div>
 
                                 <!-- Card Content -->
-                                <div style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1;">
+                                <div style="padding: 1.4rem; display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1; background: #ffffff;">
                                     <div>
-                                        <h5 style="color: var(--color-white); font-size: 1.08rem; font-family: var(--font-serif); margin: 0 0 0.45rem 0; letter-spacing: 0.5px; line-height: 1.3;">${place.name}</h5>
-                                        <p style="color: var(--color-text-muted); font-size: 0.82rem; line-height: 1.6; margin: 0 0 1.2rem 0;">${place.desc}</p>
+                                        <h5 style="color: #111827; font-size: 1.15rem; font-family: var(--font-serif); margin: 0 0 0.5rem 0; letter-spacing: 0.3px; line-height: 1.35; font-weight: 700;">${place.name}</h5>
+                                        <p style="color: #4b5563; font-size: 0.88rem; line-height: 1.65; margin: 0 0 1.35rem 0;">${place.desc}</p>
                                     </div>
                                     <div style="display: flex; gap: 0.6rem; align-items: center;">
-                                        <a href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent("Rock One Wild Tea, Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka")}&destination=${encodeURIComponent(place.routeQuery)}&destination_place_id=0x3ae4630013bcccbb:0x453d082c477ea3bf" target="_blank" rel="noopener noreferrer" class="landmark-directions-btn" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.45rem; background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); color: var(--color-gold); text-decoration: none; padding: 0.65rem 0.9rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600; transition: all 0.25s ease;">
-                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                                        <a href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent("Rock One Wild Tea, Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka")}&destination=${encodeURIComponent(place.routeQuery)}&destination_place_id=0x3ae4630013bcccbb:0x453d082c477ea3bf" target="_blank" rel="noopener noreferrer" class="landmark-directions-btn" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #fbf9f5; border: 1.5px solid #b8860b; color: #7a5a06; text-decoration: none; padding: 0.7rem 0.95rem; border-radius: 10px; font-size: 0.82rem; font-weight: 700; transition: all 0.25s ease;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
                                             View Route in Google Maps
                                         </a>
-                                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.mapSearchQuery)}" target="_blank" rel="noopener noreferrer" title="View ${place.name} on Google Maps" style="display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: var(--color-gold); text-decoration: none; transition: all 0.2s ease; flex-shrink: 0;">
-                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.mapSearchQuery)}" target="_blank" rel="noopener noreferrer" title="View ${place.name} on Google Maps" style="display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 10px; background: #fbf9f5; border: 1.5px solid #ebd9b8; color: #7a5a06; text-decoration: none; transition: all 0.2s ease; flex-shrink: 0;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                                         </a>
                                     </div>
                                 </div>
@@ -5149,13 +5148,13 @@ const UIComponents = {
                     </div>
 
                     <!-- Outro Exploration Banner -->
-                    <div style="margin-top: 2rem; background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 14px; padding: 1.5rem 1.75rem; display: flex; align-items: center; gap: 1.25rem;">
-                        <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(212, 175, 55, 0.2); display: flex; align-items: center; justify-content: center; color: var(--color-gold); flex-shrink: 0;">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                    <div style="margin-top: 2.25rem; background: #fbf9f5; border: 1.5px solid #ebd9b8; border-radius: 16px; padding: 1.6rem 2rem; display: flex; align-items: center; gap: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+                        <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(184, 134, 11, 0.12); display: flex; align-items: center; justify-content: center; color: #7a5a06; flex-shrink: 0;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
                         </div>
                         <div>
-                            <h5 style="color: var(--color-gold); font-family: var(--font-serif); font-size: 1.08rem; margin: 0 0 0.35rem 0; letter-spacing: 0.5px;">Explore the Highlands After Your Tea Experience</h5>
-                            <p style="color: #d1d5db; font-size: 0.86rem; line-height: 1.6; margin: 0;">
+                            <h5 style="color: #111827; font-family: var(--font-serif); font-size: 1.15rem; margin: 0 0 0.35rem 0; letter-spacing: 0.3px; font-weight: 700;">Explore the Highlands After Your Tea Experience</h5>
+                            <p style="color: #4b5563; font-size: 0.92rem; line-height: 1.7; margin: 0;">
                                 A visit to Rock One Wild Tea can easily be combined with a day of exploring the surrounding highlands. Visitors can experience our handmade tea production, enjoy the scenery of the Uva tea country, and continue on to waterfalls, mountain viewpoints, botanical gardens and cultural landmarks.
                             </p>
                         </div>
@@ -5163,32 +5162,34 @@ const UIComponents = {
                 </div>
 
                 <!-- Bottom Section: Nearest Main Cities & Hubs Strip -->
-                <div style="border-top: 1px solid rgba(212, 175, 55, 0.2); padding-top: 2rem;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
-                        <div style="display: flex; align-items: center; gap: 0.6rem;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                            <h4 style="font-size: 1.05rem; font-family: var(--font-serif); color: var(--color-white); letter-spacing: 1px; margin: 0;">Nearest Main Cities & Transit Hubs</h4>
+                <div style="border-top: 1px solid #e8e4df; padding-top: 2.75rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <span style="display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: rgba(184, 134, 11, 0.12); color: #7a5a06;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                            </span>
+                            <h4 style="font-size: 1.35rem; font-family: var(--font-serif); color: #111827; letter-spacing: 0.5px; margin: 0; font-weight: 700;">Nearest Main Cities &amp; Transit Hubs</h4>
                         </div>
-                        <span style="font-size: 0.65rem; color: var(--color-gold); text-transform: uppercase; letter-spacing: 1px;">Direct Access Routes</span>
+                        <span style="font-size: 0.72rem; color: #7a5a06; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; background: #fbf9f5; border: 1px solid #ebd9b8; padding: 0.35rem 0.85rem; border-radius: 20px;">Direct Access Routes</span>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.85rem;" class="cities-proximity-grid">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem;" class="cities-proximity-grid">
                         ${nearbyCities.map(city => `
-                            <div class="proximity-item-card" style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); padding: 0.75rem 1rem; border-radius: 10px; transition: all 0.25s ease;">
+                            <div class="proximity-item-card" style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; border: 1.5px solid #e8e4df; padding: 0.9rem 1.15rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.25s ease;">
                                 <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--color-gold); box-shadow: 0 0 8px var(--color-gold); flex-shrink: 0;"></div>
+                                    <div style="width: 10px; height: 10px; border-radius: 50%; background: #b8860b; box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.18); flex-shrink: 0;"></div>
                                     <div>
-                                        <strong style="color: var(--color-white); font-size: 0.88rem; display: block;">${city.name}</strong>
-                                        <span style="color: var(--color-text-muted); font-size: 0.7rem;">${city.type}</span>
+                                        <strong style="color: #111827; font-size: 0.96rem; font-weight: 700; display: block; margin-bottom: 2px;">${city.name}</strong>
+                                        <span style="color: #6b7280; font-size: 0.74rem; font-weight: 500;">${city.type}</span>
                                     </div>
                                 </div>
                                 <div style="text-align: right; display: flex; align-items: center; gap: 0.75rem;">
                                     <div>
-                                        <span class="proximity-badge-dist" style="display: inline-block; background: rgba(212, 175, 55, 0.15); color: #ffd875; border: 1px solid rgba(212, 175, 55, 0.35); font-size: 0.72rem; font-weight: 700; padding: 0.18rem 0.5rem; border-radius: 6px;">${city.dist}</span>
-                                        <span style="display: block; font-size: 0.62rem; color: var(--color-text-muted); margin-top: 2px;">~${city.time}</span>
+                                        <span class="proximity-badge-dist" style="display: inline-block; background: #fbf9f5; color: #7a5a06; border: 1.5px solid #ebd9b8; font-size: 0.78rem; font-weight: 800; padding: 0.25rem 0.6rem; border-radius: 8px;">${city.dist}</span>
+                                        <span style="display: block; font-size: 0.7rem; color: #4b5563; font-weight: 600; margin-top: 3px; text-align: right;">~${city.time}</span>
                                     </div>
-                                    <a href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(city.routeQuery)}&destination=Rock+One+Wild+Tea+(Pvt)+Limited&destination_place_id=0x3ae4630013bcccbb:0x453d082c477ea3bf" target="_blank" rel="noopener noreferrer" title="Get Driving Route from ${city.name}" class="proximity-route-btn" style="color: var(--color-gold); display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(212, 175, 55, 0.2); text-decoration: none; transition: all 0.2s ease; flex-shrink: 0;">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    <a href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(city.routeQuery)}&destination=Rock+One+Wild+Tea+(Pvt)+Limited&destination_place_id=0x3ae4630013bcccbb:0x453d082c477ea3bf" target="_blank" rel="noopener noreferrer" title="Get Driving Route from ${city.name}" class="proximity-route-btn" style="color: #7a5a06; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: #fbf9f5; border: 1.5px solid #ebd9b8; text-decoration: none; transition: all 0.2s ease; flex-shrink: 0;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                     </a>
                                 </div>
                             </div>
