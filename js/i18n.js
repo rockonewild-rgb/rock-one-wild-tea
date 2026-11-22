@@ -23,7 +23,7 @@
             nav_bulletins: "Announcements",
             nav_announcements: "Announcements",
             nav_gifts: "Gifts",
-            nav_products: "Products",
+            nav_products: "Shop",
             nav_tours: "Tours",
             nav_gallery: "Gallery",
             nav_order: "My Order",
