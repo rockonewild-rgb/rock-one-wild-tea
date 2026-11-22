@@ -6382,15 +6382,25 @@ const UIComponents = {
         const cart = window.TeaFactoryStore.getCart();
         const totalCount = window.TeaFactoryStore.getCartTotalCount();
         const subtotalUSD = window.TeaFactoryStore.getCartSubtotal();
-        const shippingUSD = window.TeaFactoryStore.getCartShippingTotal ? window.TeaFactoryStore.getCartShippingTotal() : 0;
-        const grandTotalUSD = window.TeaFactoryStore.getCartGrandTotal ? window.TeaFactoryStore.getCartGrandTotal() : (subtotalUSD + shippingUSD);
         
         const selectedCountry = window.lastSelectedCheckoutCountry || 'Sri Lanka';
         const isSriLanka = selectedCountry === 'Sri Lanka';
         const currInfo = window.getCountryCurrency ? window.getCountryCurrency(selectedCountry) : (isSriLanka ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
         
+        // Calculate promo discount if active
+        let promoDiscountUSD = 0;
+        let activePromo = window.activeCartPromo || null;
+        if (activePromo && activePromo.percent) {
+            promoDiscountUSD = Number((subtotalUSD * (activePromo.percent / 100)).toFixed(2));
+        }
+        const discountedSubtotalUSD = Math.max(0, subtotalUSD - promoDiscountUSD);
+
+        const shippingUSD = window.TeaFactoryStore.getCartShippingTotal ? window.TeaFactoryStore.getCartShippingTotal(selectedCountry) : (window.calculateShippingFee ? window.calculateShippingFee(discountedSubtotalUSD, selectedCountry) : (isSriLanka ? 2.13 : 15.0));
+        const grandTotalUSD = discountedSubtotalUSD + shippingUSD;
+
         const formattedSubtotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(subtotalUSD, currInfo) : `$${subtotalUSD.toFixed(2)}`;
-        const formattedShipping = shippingUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(shippingUSD, currInfo) : `$${shippingUSD.toFixed(2)}`) : _t('bespoke_complimentary', 'Complimentary Estate Courier');
+        const formattedDiscount = promoDiscountUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(promoDiscountUSD, currInfo) : `$${promoDiscountUSD.toFixed(2)}`) : '';
+        const formattedShipping = shippingUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(shippingUSD, currInfo) : `$${shippingUSD.toFixed(2)}`) : (window._t ? window._t('bespoke_complimentary', 'Complimentary') : 'Complimentary');
         const formattedGrandTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(grandTotalUSD, currInfo) : `$${grandTotalUSD.toFixed(2)}`;
         const grandTotalLKR = Math.round(grandTotalUSD * 305);
         const bankAmountFormatted = isSriLanka ? `Rs ${grandTotalLKR.toLocaleString()} LKR` : `${formattedGrandTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>`;
@@ -6398,7 +6408,7 @@ const UIComponents = {
         // Update header count label
         const countLabel = document.getElementById('cart-drawer-count-label');
         if (countLabel) {
-            countLabel.textContent = `${totalCount} ${_t('cart_qty', 'item')}${totalCount === 1 ? '' : 's'} ${_t('cart_drawer_title', 'in reserve bag')}`;
+            countLabel.textContent = `${totalCount} ${window._t ? window._t('cart_qty', 'item') : 'item'}${totalCount === 1 ? '' : 's'} ${window._t ? window._t('cart_drawer_title', 'in reserve bag') : 'in reserve bag'}`;
         }
 
         // 1. Empty State
@@ -6412,12 +6422,12 @@ const UIComponents = {
                             <path d="M16 10a4 4 0 0 1-8 0"></path>
                         </svg>
                     </div>
-                    <h4 style="font-family: var(--font-serif); color: #ffffff; font-size: 1.35rem; margin-bottom: 0.5rem; letter-spacing: 0.5px;">${_t('cart_empty_title', 'Your Reserve Bag is Empty')}</h4>
+                    <h4 style="font-family: var(--font-serif); color: #ffffff; font-size: 1.35rem; margin-bottom: 0.5rem; letter-spacing: 0.5px;">${window._t ? window._t('cart_empty_title', 'Your Reserve Bag is Empty') : 'Your Reserve Bag is Empty'}</h4>
                     <p style="color: var(--color-text-muted); font-size: 0.85rem; max-width: 320px; margin: 0 auto 2rem auto; line-height: 1.55;">
-                        ${_t('cart_empty_sub', 'Explore our single-estate montane harvests and collector series chests to assemble your multi-item allocation.')}
+                        ${window._t ? window._t('cart_empty_sub', 'Explore our single-estate montane harvests and collector series chests to assemble your multi-item allocation.') : 'Explore our single-estate montane harvests and collector series chests to assemble your multi-item allocation.'}
                     </p>
                     <button type="button" class="btn btn-primary" onclick="if(window.appCloseCart){window.appCloseCart()} window.appSwitchTab ? window.appSwitchTab('catalog') : (document.getElementById('nav-catalog') &amp;&amp; document.getElementById('nav-catalog').click());" style="padding: 0.75rem 2rem; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 0.45rem;">
-                        <span>${_t('btn_browse_catalog', 'Explore Storefront Catalog')}</span>
+                        <span>${window._t ? window._t('btn_browse_catalog', 'Explore Storefront Catalog') : 'Explore Storefront Catalog'}</span>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
                     </button>
                 </div>
@@ -6425,169 +6435,119 @@ const UIComponents = {
             return;
         }
 
-        // 2. Items List & In-Drawer Checkout
+        // 2. Build Cart Items HTML for Right Column
         const itemsHtml = cart.map(item => {
             const itemPriceUSD = Number(item.price) || 0;
-            const itemLineUSD = itemPriceUSD * (item.quantity || 1);
+            const itemQty = Number(item.quantity) || 1;
+            const itemLineUSD = itemPriceUSD * itemQty;
             const unitPrice = window.formatAmountInCurrency ? window.formatAmountInCurrency(itemPriceUSD, currInfo) : `$${itemPriceUSD.toFixed(2)}`;
             const lineTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(itemLineUSD, currInfo) : `$${itemLineUSD.toFixed(2)}`;
             const hasGifting = item.giftOptions && item.giftOptions.giftPackaging;
 
             return `
-                <div class="cart-item-row" data-cart-key="${item.cartKey}" data-unit-usd="${itemPriceUSD}" data-line-usd="${itemLineUSD}" style="display: flex; gap: 1rem; align-items: flex-start; padding: 1.15rem 0; border-bottom: 1px solid rgba(212,175,55,0.12);">
-                    <div class="cart-item-img-box" style="width: 68px; height: 68px; border-radius: 10px; overflow: hidden; background: rgba(0,0,0,0.4); border: 1px solid rgba(212,175,55,0.25); flex-shrink: 0; position: relative;">
-                        <img src="${item.image || 'images/Product.jpeg'}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: contain;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
+                <div class="checkout-item-row" data-cart-key="${item.cartKey}" data-unit-usd="${itemPriceUSD}" data-line-usd="${itemLineUSD}">
+                    <!-- Thumbnail with Count Badge -->
+                    <div class="checkout-thumb-wrap">
+                        <img src="${item.image || 'images/Product.jpeg'}" alt="${item.name}" onerror="window.handleImageError &amp;&amp; window.handleImageError(this, 'product')" loading="lazy" decoding="async">
+                        <span class="checkout-count-badge">${itemQty}</span>
                     </div>
-                    
-                    <div class="cart-item-info" style="flex: 1; min-width: 0;">
+
+                    <!-- Meta Details -->
+                    <div class="checkout-item-meta">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem;">
-                            <div>
-                                <h5 style="margin: 0 0 0.2rem 0; font-size: 0.92rem; font-weight: 600; color: #ffffff; line-height: 1.3;">${item.name}</h5>
-                                <div style="font-size: 0.72rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 0.4rem;">
-                                    <span>${item.category || _t('leaf_grade_default', 'Tea Reserve')}</span>
-                                    <span>&bull;</span>
-                                    <span>${item.weight || '100g'}</span>
-                                </div>
-                            </div>
-                            <button type="button" class="cart-item-remove-btn" data-cart-key="${item.cartKey}" title="Remove item from bag" style="background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; padding: 0.2rem; display: flex; align-items: center; transition: color 0.2s;">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            <h5 class="checkout-item-name">${item.name}</h5>
+                            <button type="button" class="cart-item-remove-btn" data-cart-key="${item.cartKey}" title="Remove item" style="background: none; border: none; color: rgba(255,255,255,0.35); cursor: pointer; padding: 0.15rem; display: flex; align-items: center; transition: color 0.2s;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                             </button>
+                        </div>
+                        <div class="checkout-item-sub">
+                            <span>${item.category || (window._t ? window._t('leaf_grade_default', 'Tea Reserve') : 'Tea Reserve')}</span>
+                            <span>&bull;</span>
+                            <span>${item.weight || '100g'}</span>
                         </div>
 
                         ${hasGifting ? `
-                            <div class="cart-item-gift-badge" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.68rem; color: var(--color-gold); background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.25); border-radius: 4px; padding: 0.15rem 0.45rem; margin-top: 0.4rem;">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                <span>${_t('bespoke_wax_label', 'Wax Seal')}: ${item.giftOptions.waxSealColor}${item.giftOptions.monogramInitials ? ` &bull; ${_t('bespoke_monogram_label', 'Monogram')}: ${item.giftOptions.monogramInitials}` : ''}</span>
+                            <div style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.68rem; color: var(--color-gold); background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.25); border-radius: 4px; padding: 0.15rem 0.45rem; margin-top: 0.35rem;">
+                                <span>Wax: ${item.giftOptions.waxSealColor}${item.giftOptions.monogramInitials ? ` &bull; ${item.giftOptions.monogramInitials}` : ''}</span>
                             </div>
                         ` : ''}
 
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.65rem;">
-                            <!-- Quantity Stepper -->
-                            <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1px solid rgba(212,175,55,0.3); border-radius: 6px; overflow: hidden; background: rgba(4,14,8,0.6);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                            <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1px solid rgba(212,175,55,0.3); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.5);">
                                 <button type="button" class="cart-qty-btn cart-qty-minus" data-cart-key="${item.cartKey}" style="background: none; border: none; color: var(--color-gold); width: 26px; height: 26px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">-</button>
-                                <span class="cart-qty-val" style="width: 28px; text-align: center; font-size: 0.78rem; font-weight: 600; color: #fff;">${item.quantity}</span>
+                                <span class="cart-qty-val" style="width: 28px; text-align: center; font-size: 0.78rem; font-weight: 600; color: #fff;">${itemQty}</span>
                                 <button type="button" class="cart-qty-btn cart-qty-plus" data-cart-key="${item.cartKey}" style="background: none; border: none; color: var(--color-gold); width: 26px; height: 26px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">+</button>
                             </div>
-
-                            <div style="text-align: right;">
-                                <span class="cart-item-line-total" style="font-size: 0.92rem; font-weight: 700; color: var(--color-gold);">${lineTotal}</span>
-                                ${item.quantity > 1 ? `<div class="cart-item-unit-price" style="font-size: 0.68rem; color: var(--color-text-muted);">${unitPrice} ${_t('cart_qty', 'each')}</div>` : ''}
-                            </div>
+                            <span class="checkout-item-price">${lineTotal}</span>
                         </div>
                     </div>
                 </div>
             `;
         }).join('');
 
+        const signedUser = window.TeaFactoryStore.getCurrentUser ? window.TeaFactoryStore.getCurrentUser() : null;
+        const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+        let defaultFirstName = '';
+        let defaultLastName = '';
+        if (signedUser && signedUser.full_name) {
+            const parts = signedUser.full_name.trim().split(' ');
+            defaultFirstName = parts[0] || '';
+            defaultLastName = parts.slice(1).join(' ') || '';
+        }
+        const cartMinDate = new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0];
+
+        // 3. Render Modern Split Layout
         container.innerHTML = `
-            <div class="cart-drawer-inner" style="display: flex; flex-direction: column; gap: 1.15rem; padding-bottom: 2rem;">
-                
+            <div class="checkout-split-layout">
                 <!-- ==============================================
-                     1. ORDER SUMMARY & BAG ITEMS (TOP OF CHECKOUT)
+                     LEFT COLUMN: ADDRESS, SHIPPING & PAYMENT
                      ============================================== -->
-                <div class="cart-step-card" style="background: rgba(4,14,8,0.78); border: 1.5px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 1.15rem; box-shadow: 0 4px 18px rgba(0,0,0,0.35);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.6rem; margin-bottom: 0.75rem;">
-                        <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold);">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-                            <span>1. Order Summary &amp; Allocations</span>
-                        </div>
-                        <span style="font-size: 0.72rem; color: #86efac; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 0.15rem 0.55rem; font-weight: 600;">${totalCount} ${_t('cart_qty', 'item')}${totalCount === 1 ? '' : 's'}</span>
-                    </div>
-
-                    <!-- Items List -->
-                    <div class="cart-items-list" style="display: flex; flex-direction: column;">
-                        ${itemsHtml}
-                    </div>
-
-                    <!-- Financial Subtotal & Total Breakdown -->
-                    <div style="margin-top: 0.85rem; padding-top: 0.75rem; border-top: 1px dashed rgba(212,175,55,0.2); display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.82rem;">
-                        <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
-                            <span>${_t('cart_subtotal_label', 'Items Allocation Subtotal')}</span>
-                            <strong id="cart-summary-subtotal" data-base-usd="${subtotalUSD}" style="color: #ffffff;">${formattedSubtotal}</strong>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
-                            <span id="cart-summary-shipping-label">${isSriLanka ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS International Priority Air'}</span>
-                            <span id="cart-summary-shipping" data-base-usd="${shippingUSD}" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-weight: 600;">${formattedShipping}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid rgba(212,175,55,0.25); padding-top: 0.55rem; margin-top: 0.25rem;">
-                            <div>
-                                <strong id="cart-summary-total-title" style="font-size: 0.95rem; color: #ffffff;">${_t('common_price', 'Total Due')} (${currInfo.code})</strong>
+                <div class="checkout-left-col">
+                    <!-- Patron Banner -->
+                    <div class="checkout-step-card" style="padding: 0.95rem 1.15rem;">
+                        ${signedUser ? `
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
+                                    <div>
+                                        <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Patron Account: <span style="color: var(--color-gold);">${esc(signedUser.full_name || signedUser.email)}</span></div>
+                                        <div style="font-size: 0.7rem; color: #86efac;">${esc(signedUser.email)} &bull; Linked to Estate Master Ledger</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); window.UIComponents.renderCartDrawer('cart-drawer-body'); window.appBindCartDrawerEvents &amp;&amp; window.appBindCartDrawerEvents();" style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: rgba(255,255,255,0.2); color: var(--color-text-muted);">
+                                    Switch Account
+                                </button>
                             </div>
-                            <strong id="cart-summary-total" data-base-usd="${grandTotalUSD}" style="font-size: 1.35rem; color: var(--color-gold); font-family: var(--font-serif);">${formattedGrandTotal}</strong>
-                        </div>
+                        ` : `
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 210px;">
+                                    <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.2rem;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                        <span>Guest Checkout Active (No Sign-In Required)</span>
+                                    </div>
+                                    <p style="font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.4; margin: 0;">
+                                        You can order immediately as an anonymous guest. Or sign in to track your allocation in your patron portal.
+                                    </p>
+                                </div>
+                                <button type="button" id="cart-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: var(--color-gold); color: var(--color-gold); white-space: nowrap;">
+                                    Sign In / Register
+                                </button>
+                            </div>
+                        `}
                     </div>
-                </div>
 
-                <!-- ==============================================
-                     2. PATRON ACCOUNT / GUEST CHECKOUT BANNER
-                     ============================================== -->
-                <div class="cart-step-card" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.95rem 1.15rem;">
-                    ${(() => {
-                        const u = window.TeaFactoryStore.getCurrentUser ? window.TeaFactoryStore.getCurrentUser() : null;
-                        const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-                        if (u) {
-                            return `
-                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                        <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
-                                        <div>
-                                            <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Patron Account: <span style="color: var(--color-gold);">${esc(u.full_name || u.email)}</span></div>
-                                            <div style="font-size: 0.7rem; color: #86efac;">${esc(u.email)} &bull; Linked to Estate Master Ledger</div>
-                                        </div>
-                                    </div>
-                                    <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); window.UIComponents.renderCartDrawer('cart-drawer-body'); window.appBindCartDrawerEvents &amp;&amp; window.appBindCartDrawerEvents();" style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: rgba(255,255,255,0.2); color: var(--color-text-muted);">
-                                        Switch Account
-                                    </button>
+                    <!-- Checkout Form -->
+                    <form id="cart-checkout-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- Destination Section -->
+                        <div class="checkout-step-card">
+                            <div class="checkout-step-header">
+                                <div class="checkout-step-title">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                    <span>1. Delivery Destination</span>
                                 </div>
-                            `;
-                        } else {
-                            return `
-                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                                    <div style="flex: 1; min-width: 210px;">
-                                        <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.2rem;">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                            <span>Guest Checkout Active (No Sign-In Required)</span>
-                                        </div>
-                                        <p style="font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.4; margin: 0;">
-                                            You can checkout immediately as a guest. Or sign in to track your allocation in the patron portal.
-                                        </p>
-                                    </div>
-                                    <button type="button" id="cart-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: var(--color-gold); color: var(--color-gold); white-space: nowrap;">
-                                        Sign In / Register
-                                    </button>
-                                </div>
-                            `;
-                        }
-                    })()}
-                </div>
-
-                <!-- ==============================================
-                     3. CHECKOUT FORM (DESTINATION, ADDRESS, SHIPPING & PAYMENT)
-                     ============================================== -->
-                <form id="cart-checkout-form" style="display: flex; flex-direction: column; gap: 1rem;">
-                    
-                    ${(() => {
-                        const u = window.TeaFactoryStore.getCurrentUser ? window.TeaFactoryStore.getCurrentUser() : null;
-                        const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-                        let defaultFirstName = '';
-                        let defaultLastName = '';
-                        if (u && u.full_name) {
-                            const parts = u.full_name.trim().split(' ');
-                            defaultFirstName = parts[0] || '';
-                            defaultLastName = parts.slice(1).join(' ') || '';
-                        }
-                        const cartMinDate = new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0];
-
-                        return `
-                        <!-- Section: Destination & Delivery -->
-                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                                <span>2. Delivery Destination</span>
                             </div>
 
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                                <!-- Country Selector -->
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label class="form-label" for="cart-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Destination Country *</label>
                                     <select class="form-input" id="cart-cust-country" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
@@ -6608,7 +6568,6 @@ const UIComponents = {
                                     </select>
                                 </div>
 
-                                <!-- Region / Province (Dynamic) -->
                                 <div class="form-group" style="margin-bottom: 0;" id="cart-region-container">
                                     ${isSriLanka ? `
                                         <label class="form-label" for="cart-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Region / Province *</label>
@@ -6631,14 +6590,15 @@ const UIComponents = {
                             </div>
                         </div>
 
-                        <!-- Section: Recipient & Delivery Address -->
-                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                <span>3. Recipient &amp; Delivery Address</span>
+                        <!-- Recipient Details Section -->
+                        <div class="checkout-step-card">
+                            <div class="checkout-step-header">
+                                <div class="checkout-step-title">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                    <span>2. Recipient &amp; Delivery Address</span>
+                                </div>
                             </div>
 
-                            <!-- First Name & Last Name -->
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label class="form-label" for="cart-cust-firstname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">First Name *</label>
@@ -6650,141 +6610,100 @@ const UIComponents = {
                                 </div>
                             </div>
 
-                            <!-- Email & Phone -->
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
                                 <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="cart-cust-email" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Email Address *</label>
-                                    <input class="form-input" type="email" id="cart-cust-email" value="${esc(u ? u.email : '')}" required placeholder="name@domain.com" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    <label class="form-label" for="cart-cust-email" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Email Address (Tracking &amp; Certificate) *</label>
+                                    <input class="form-input" type="email" id="cart-cust-email" value="${esc(signedUser ? signedUser.email : '')}" required placeholder="e.g. patron@rockonewild.com" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;" ${signedUser ? 'readonly style="opacity:0.88;"' : ''}>
                                 </div>
                                 <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="cart-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Mobile / WhatsApp *</label>
-                                    <input class="form-input" type="tel" id="cart-cust-phone" value="${esc(u ? u.phone : '')}" required placeholder="+94 77 123 4567" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    <label class="form-label" for="cart-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Mobile Phone (Courier Updates) *</label>
+                                    <input class="form-input" type="tel" id="cart-cust-phone" value="${esc(signedUser ? signedUser.phone || '' : '')}" required placeholder="e.g. +94 77 123 4567" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
                                 </div>
                             </div>
 
-                            <!-- Street Address -->
                             <div class="form-group" style="margin-bottom: 0.75rem;">
                                 <label class="form-label" for="cart-cust-address" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Street Address *</label>
-                                <input class="form-input" type="text" id="cart-cust-address" value="${esc(u ? u.address : '')}" required placeholder="House No., Street Name, Neighborhood" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                <input class="form-input" type="text" id="cart-cust-address" required placeholder="e.g. 42 Highland View Road" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
                             </div>
 
-                            <!-- Apartment / Suite (Optional) -->
-                            <div class="form-group" style="margin-bottom: 0.75rem;">
-                                <label class="form-label" for="cart-cust-suite" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7);">Apartment / Suite / Unit / Floor (Optional)</label>
-                                <input class="form-input" type="text" id="cart-cust-suite" placeholder="e.g. Apt 4B, Level 2" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                            </div>
-
-                            <!-- City & Postal Code -->
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="cart-cust-suite" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Apt / Suite</label>
+                                    <input class="form-input" type="text" id="cart-cust-suite" placeholder="e.g. Apt 4B" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label class="form-label" for="cart-cust-city" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">City / Town *</label>
-                                    <input class="form-input" type="text" id="cart-cust-city" required placeholder="e.g. Colombo / Badulla" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    <input class="form-input" type="text" id="cart-cust-city" required placeholder="e.g. Colombo / London" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
                                 </div>
                                 <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="cart-cust-postal" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Postal / ZIP Code *</label>
-                                    <input class="form-input" type="text" id="cart-cust-postal" required placeholder="e.g. 00100" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
-                            </div>
-
-                            <!-- Preferred Date & Courier Notes -->
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="cart-pref-date" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Preferred Dispatch Date *</label>
-                                    <input class="form-input" type="date" id="cart-pref-date" min="${cartMinDate}" value="${cartMinDate}" required style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="cart-cust-notes" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Courier Notes</label>
-                                    <input class="form-input" type="text" id="cart-cust-notes" placeholder="e.g. Call before arrival" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    <label class="form-label" for="cart-cust-postal" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Postal Code *</label>
+                                    <input class="form-input" type="text" id="cart-cust-postal" required placeholder="e.g. 00700 / SW1A 1AA" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Section: Shipping Method & Courier Charges -->
-                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-                                <span>4. Shipping Method &amp; Courier Charges</span>
+                        <!-- Insured Shipping Method -->
+                        <div class="checkout-step-card">
+                            <div class="checkout-step-header">
+                                <div class="checkout-step-title">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                                    <span>3. Insured Courier Delivery</span>
+                                </div>
                             </div>
 
-                            <div id="cart-shipping-methods-container" style="display: flex; flex-direction: column; gap: 0.65rem;">
-                                <!-- Option 1: Sri Lanka Post EMS Express (Pre-paid) -->
-                                <label class="shipping-option-card active" id="cart-shipping-card-ems" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid var(--color-gold); border-radius: 8px; background: rgba(212,175,55,0.08); cursor: pointer;">
-                                    <input type="radio" name="cart-shipping-method" value="ems_express" id="cart-ship-ems" checked style="margin-top: 0.2rem; accent-color: var(--color-gold);">
+                            <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                                <label class="radio-card" id="cart-shipping-card-ems" style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 1rem; border: 1.5px solid var(--color-gold); border-radius: 10px; background: rgba(212,175,55,0.08); cursor: pointer;">
+                                    <input type="radio" name="cart-shipping-method" id="cart-ship-ems" value="ems_express" checked style="margin-top: 0.25rem;">
                                     <div style="flex: 1;">
-                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
                                             <strong id="cart-shipping-ems-title" style="color: #ffffff; font-size: 0.88rem;">${isSriLanka ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air'}</strong>
-                                            <div style="display: flex; align-items: center; gap: 0.4rem;">
-                                                <span style="font-size: 0.72rem; color: #86efac; font-weight: 700;">Tracked Dispatch</span>
-                                                <span id="cart-shipping-ems-price-pill" style="font-size: 0.78rem; color: var(--color-gold); font-weight: 700; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; padding: 0.2rem 0.55rem;">${formattedShipping}</span>
-                                            </div>
+                                            <span id="cart-shipping-ems-price-pill" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-size: 0.8rem; font-weight: 700;">${formattedShipping}</span>
                                         </div>
-                                        <p id="cart-shipping-ems-desc" style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
+                                        <p id="cart-shipping-ems-desc" style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; margin: 0;">
                                             ${isSriLanka ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
                                         </p>
                                     </div>
                                 </label>
 
-                                <!-- Option 2: Cash on Delivery (COD) - Sri Lanka Only -->
-                                <label class="shipping-option-card" id="cart-shipping-card-cod" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 8px; background: rgba(0,0,0,0.3); cursor: pointer;">
-                                    <input type="radio" name="cart-shipping-method" value="cod" id="cart-ship-cod" style="margin-top: 0.2rem; accent-color: #25d366;">
+                                <label class="radio-card" id="cart-shipping-card-cod" style="display: ${isSriLanka ? 'flex' : 'none'}; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 1rem; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 10px; background: rgba(0,0,0,0.3); cursor: pointer;">
+                                    <input type="radio" name="cart-shipping-method" id="cart-ship-cod" value="cod" style="margin-top: 0.25rem;">
                                     <div style="flex: 1;">
-                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
-                                            <strong style="color: #ffffff; font-size: 0.88rem; display: flex; align-items: center; gap: 0.4rem;">
-                                                <span>Cash on Delivery (COD)</span>
-                                                <span style="font-size: 0.62rem; padding: 0.1rem 0.45rem; border-radius: 3px; background: rgba(37,211,102,0.2); color: #4ade80; font-weight: 700;">SRI LANKA ONLY</span>
-                                            </strong>
-                                            <div style="display: flex; align-items: center; gap: 0.4rem;">
-                                                <span style="font-size: 0.72rem; color: #4ade80; font-weight: 700;">Pay at Doorstep</span>
-                                                <span id="cart-shipping-cod-price-pill" style="font-size: 0.78rem; color: #4ade80; font-weight: 700; background: rgba(37,211,102,0.15); border: 1px solid rgba(37,211,102,0.35); border-radius: 6px; padding: 0.2rem 0.55rem;">${formattedShipping}</span>
-                                            </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
+                                            <strong style="color: #ffffff; font-size: 0.88rem;">Cash on Delivery (COD &bull; Pay to Courier)</strong>
+                                            <span id="cart-shipping-cod-price-pill" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-size: 0.8rem; font-weight: 700;">${formattedShipping}</span>
                                         </div>
-                                        <p style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
-                                            Pay cash to the Sri Lanka Post courier upon receiving your tea package. No upfront digital transaction required.
+                                        <p style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; margin: 0;">
+                                            Pay cash upon parcel delivery at your doorstep anywhere in Sri Lanka.
                                         </p>
                                     </div>
                                 </label>
                             </div>
-
-                            <!-- Courier Shipping Charges Breakdown Banner -->
-                            <div style="margin-top: 0.65rem; padding: 0.65rem 0.85rem; background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.25); border-radius: 8px; font-size: 0.72rem; color: #cbd5e1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem;">
-                                <div style="display: flex; align-items: center; gap: 0.35rem;">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                                    <span>Standard Insured Courier Dispatch:</span>
-                                </div>
-                                <span id="cart-shipping-rate-note" style="color: var(--color-gold); font-weight: 600;">${isSriLanka ? 'Rs 650 LKR (Complimentary over $80)' : (window.formatAmountInCurrency ? window.formatAmountInCurrency(15, currInfo) : '$15.00') + ' International EMS (Complimentary over $150)'}</span>
-                            </div>
                         </div>
 
-                        <!-- Section: Payment Method & Order Confirmation -->
-                        <div class="cart-step-card" id="cart-payment-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                <span>5. Payment Method &amp; Order Confirmation</span>
+                        <!-- Payment Method Section -->
+                        <div class="checkout-step-card" id="cart-payment-step-card">
+                            <div class="checkout-step-header">
+                                <div class="checkout-step-title">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                    <span>4. Payment Method &amp; Order Confirmation</span>
+                                </div>
                             </div>
 
-                            <!-- COD Panel (Visible when COD selected) -->
+                            <!-- COD Panel -->
                             <div id="cart-pay-panel-cod" style="display: none;">
                                 <div style="background: rgba(37,211,102,0.08); border: 1.5px solid rgba(37,211,102,0.4); border-radius: 10px; padding: 1.15rem; text-align: center; margin-bottom: 1rem;">
-                                    <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(37,211,102,0.15); border: 1.5px solid #25d366; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto; color: #25d366;">
-                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                                    </div>
-                                    <h4 style="color: #4ade80; font-size: 1.05rem; margin-bottom: 0.35rem; font-weight: 700;">Cash on Delivery (COD) Selected</h4>
+                                    <h4 style="color: #4ade80; font-size: 1.05rem; margin-bottom: 0.35rem; font-weight: 700;">Cash on Delivery (COD) Active</h4>
                                     <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5; margin: 0 0 0.85rem 0;">
-                                        No online payment is needed now. The Sri Lanka Post EMS courier will collect the cash amount upon parcel handover.
+                                        The Sri Lanka Post EMS courier will collect the cash amount upon parcel handover.
                                     </p>
                                     <div style="background: rgba(0,0,0,0.45); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.65rem 1rem; display: inline-flex; align-items: center; gap: 0.75rem;">
-                                        <span style="font-size: 0.78rem; color: #9ca3af;">Amount Payable to Courier:</span>
+                                        <span style="font-size: 0.78rem; color: #9ca3af;">Payable to Courier:</span>
                                         <strong id="cart-cod-amount-display" style="font-size: 1.25rem; color: var(--color-gold); font-family: monospace;">Rs ${grandTotalLKR.toLocaleString()} LKR</strong>
                                     </div>
                                 </div>
-
-                                <button type="submit" id="btn-submit-cart-cod" class="btn btn-primary" style="padding: 0.95rem 1.5rem; font-size: 0.95rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; box-shadow: 0 4px 18px rgba(37,211,102,0.3);">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                    <span id="cart-cod-btn-text">Confirm Order via Cash on Delivery (COD) &bull; Rs ${grandTotalLKR.toLocaleString()} LKR</span>
-                                </button>
                             </div>
 
-                            <!-- Pre-Paid Panels (Visible when EMS Pre-paid selected) -->
+                            <!-- Pre-Paid Panels -->
                             <div id="cart-pay-panel-prepaid">
                                 <div class="payment-method-tabs" style="margin-bottom: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.35rem;">
                                     <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
@@ -6811,23 +6730,16 @@ const UIComponents = {
                                         <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#ffffff;">Ettampitiya branch</strong></div>
                                         <div class="bank-detail-row" style="display:flex; justify-content:space-between; border-top:1px dashed rgba(212,175,55,0.2); padding-top:0.45rem; margin-top:0.35rem; font-size:0.85rem;"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="cart-bank-amount-display" style="color:var(--color-gold); font-size:1rem;">${bankAmountFormatted}</strong></div>
                                     </div>
-                                    <span class="field-hint" style="margin-top:0.5rem;display:block;font-size:0.72rem;color:var(--color-text-muted);">After transferring to Bank of Ceylon, please upload your transfer slip/receipt below.</span>
                                     <div class="form-group" style="margin-top:0.65rem; margin-bottom: 0;">
                                         <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Bank Transfer Slip *</label>
                                         <div class="file-upload-zone" id="cart-bank-slip-zone">
-                                            <div class="file-upload-icon">
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-                                            </div>
+                                            <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
                                             <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse receipt file</span></div>
                                             <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
                                             <input type="file" id="cart-bank-slip" accept="image/*,.pdf" style="display:none;">
                                         </div>
                                         <div id="cart-slip-preview" class="slip-preview" style="display:none;"></div>
                                     </div>
-                                    <button type="submit" id="btn-submit-cart-bank" class="btn btn-primary" style="margin-top: 0.85rem; padding: 0.85rem 1.5rem; font-size: 0.92rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 4px 18px rgba(212,175,55,0.25);">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                        <span id="cart-bank-btn-text">Place Bank Transfer Order &bull; ${formattedGrandTotal}</span>
-                                    </button>
                                 </div>
 
                                 <!-- Cash Deposit Panel -->
@@ -6839,23 +6751,16 @@ const UIComponents = {
                                         <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#ffffff;">Ettampitiya branch</strong></div>
                                         <div class="bank-detail-row" style="display:flex; justify-content:space-between; border-top:1px dashed rgba(212,175,55,0.2); padding-top:0.45rem; margin-top:0.35rem; font-size:0.85rem;"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="cart-deposit-amount-display" style="color:var(--color-gold); font-size:1rem;">${bankAmountFormatted}</strong></div>
                                     </div>
-                                    <span class="field-hint" style="margin-top:0.5rem;display:block;font-size:0.72rem;color:var(--color-text-muted);">Deposit at any Bank of Ceylon counter and attach the stamped cash deposit slip.</span>
                                     <div class="form-group" style="margin-top:0.65rem; margin-bottom: 0;">
                                         <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Cash Deposit Slip *</label>
                                         <div class="file-upload-zone" id="cart-cash-slip-zone">
-                                            <div class="file-upload-icon">
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-                                            </div>
+                                            <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
                                             <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse deposit slip</span></div>
                                             <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
                                             <input type="file" id="cart-cash-slip" accept="image/*,.pdf" style="display:none;">
                                         </div>
                                         <div id="cart-cash-slip-preview" class="slip-preview" style="display:none;"></div>
                                     </div>
-                                    <button type="submit" id="btn-submit-cart-slip" class="btn btn-primary" style="margin-top: 0.85rem; padding: 0.85rem 1.5rem; font-size: 0.92rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 4px 18px rgba(212,175,55,0.25);">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                        <span id="cart-slip-btn-text">Submit Cash Deposit Slip &bull; ${formattedGrandTotal}</span>
-                                    </button>
                                 </div>
 
                                 <!-- PayPal Panel -->
@@ -6866,16 +6771,7 @@ const UIComponents = {
                                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
                                                 <strong style="color: #ffffff; font-size: 0.95rem;">PayPal &bull; Instant Online Settlement</strong>
                                             </div>
-                                            <div style="display: flex; gap: 4px; align-items: center;">
-                                                <span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-weight: 600;">PayPal</span>
-                                                <span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-weight: 600;">Visa</span>
-                                                <span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-weight: 600;">Mastercard</span>
-                                                <span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; background: rgba(255,255,255,0.08); color: #e2e8f0; font-weight: 600;">AMEX</span>
-                                            </div>
                                         </div>
-                                        <p style="font-size: 0.78rem; color: #d1d5db; line-height: 1.45; margin: 0 0 0.75rem 0;">
-                                            Pay securely in USD via your PayPal account or International Credit / Debit Card. Instant booking into the estate master ledger and automatic luxury certificate generation.
-                                        </p>
                                         <div style="background: rgba(0,0,0,0.35); border-radius: 6px; padding: 0.55rem 0.85rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
                                             <span style="font-size: 0.76rem; color: #9ca3af;">USD Settlement Amount:</span>
                                             <strong id="cart-paypal-amount-display" style="font-size: 1.05rem; color: #38bdf8; font-family: monospace;">${currInfo.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`}</strong>
@@ -6885,15 +6781,99 @@ const UIComponents = {
                                 </div>
                             </div>
                         </div>
-                        `;
-                    })()}
-                </form>
 
-                <!-- Clear Cart link -->
-                <div style="text-align: center; margin-top: -0.25rem;">
-                    <button type="button" id="btn-clear-cart" style="background: none; border: none; color: var(--color-text-muted); font-size: 0.75rem; cursor: pointer; text-decoration: underline;">
-                        ${_t('btn_clear_cart', 'Empty Entire Reserve Bag')}
-                    </button>
+                        <!-- Bespoke Notes -->
+                        <div class="checkout-step-card">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label" for="cart-cust-notes" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Concierge Notes &amp; Special Handling</label>
+                                <textarea class="form-input" id="cart-cust-notes" rows="2" placeholder="e.g. Please include bespoke wax seal on the Silver Tips tin, gift wrapping instructions, etc." style="font-size: 0.82rem; padding: 0.65rem 0.75rem;"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- ==============================================
+                     RIGHT COLUMN: LUXURY SUMMARY SIDEBAR (EBAY/SHOPIFY)
+                     ============================================== -->
+                <div class="checkout-right-col">
+                    <div class="checkout-summary-sidebar">
+                        <div class="checkout-summary-header">
+                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                                <span>Reserve Bag Summary</span>
+                            </div>
+                            <span style="font-size: 0.72rem; color: #86efac; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 0.15rem 0.55rem; font-weight: 600;">${totalCount} ${totalCount === 1 ? 'item' : 'items'}</span>
+                        </div>
+
+                        <!-- Cart Items List with Badge Counts -->
+                        <div class="checkout-items-scroll" style="display: flex; flex-direction: column; max-height: 320px; overflow-y: auto;">
+                            ${itemsHtml}
+                        </div>
+
+                        <!-- Promo Code / Voucher Box -->
+                        <div class="checkout-discount-box">
+                            <input type="text" id="cart-promo-code" class="checkout-discount-input" placeholder="Discount code or gift card" value="${activePromo ? activePromo.code : ''}">
+                            <button type="button" id="cart-apply-promo-btn" class="checkout-discount-btn">${activePromo ? 'Remove' : 'Apply'}</button>
+                        </div>
+
+                        <!-- Savings Pill -->
+                        <div class="checkout-savings-pill" id="cart-savings-pill" style="display: ${promoDiscountUSD > 0 ? 'flex' : 'none'};">
+                            <span style="display: flex; align-items: center; gap: 0.35rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                                <span id="cart-savings-label">${activePromo ? activePromo.label.toUpperCase() : 'TOTAL SAVINGS'}</span>
+                            </span>
+                            <strong id="cart-savings-amt">-${formattedDiscount}</strong>
+                        </div>
+
+                        <!-- Line Items Breakdown -->
+                        <div style="display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.84rem; padding-top: 0.25rem;">
+                            <div class="checkout-totals-row">
+                                <span>Subtotal</span>
+                                <strong id="cart-summary-subtotal" style="color: #ffffff;">${formattedSubtotal}</strong>
+                            </div>
+                            <div class="checkout-totals-row" id="cart-discount-row" style="display: ${promoDiscountUSD > 0 ? 'flex' : 'none'}; color: #4ade80;">
+                                <span>Promotional Savings</span>
+                                <strong id="cart-discount-amt">-${formattedDiscount}</strong>
+                            </div>
+                            <div class="checkout-totals-row">
+                                <span id="cart-summary-shipping-label">${isSriLanka ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS Priority Air'}</span>
+                                <span id="cart-summary-shipping" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-weight: 600;">${formattedShipping}</span>
+                            </div>
+                            <div class="checkout-grand-total-row">
+                                <div>
+                                    <strong id="cart-summary-total-title" style="font-size: 0.95rem; color: #ffffff;">Total Due (${currInfo.code})</strong>
+                                    <span id="cart-lkr-approx" style="display: block; font-size: 0.72rem; color: #94a3b8; font-weight: normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>
+                                </div>
+                                <strong id="cart-summary-total" style="font-size: 1.45rem; color: var(--color-gold); font-family: var(--font-serif);">${formattedGrandTotal}</strong>
+                            </div>
+                        </div>
+
+                        <!-- Master Action Button -->
+                        <button type="button" id="cart-summary-submit-btn" class="checkout-action-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span id="cart-action-btn-text">Complete Reserve Order &bull; ${formattedGrandTotal}</span>
+                        </button>
+
+                        <!-- Trust Badges -->
+                        <div class="checkout-trust-badges">
+                            <span>🔒 256-Bit SSL Encrypted</span>
+                            <span>🇱🇰 Direct Single-Estate Dispatch</span>
+                            <span>📜 Heritage Certified</span>
+                        </div>
+
+                        <div class="checkout-footer-links">
+                            <a href="#terms" onclick="event.preventDefault();">Terms and policies</a>
+                            <span>&bull;</span>
+                            <a href="#privacy" onclick="event.preventDefault();">Your Privacy Choices <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></a>
+                        </div>
+
+                        <!-- Clear cart link -->
+                        <div style="text-align: center; margin-top: 0.25rem;">
+                            <button type="button" id="btn-clear-cart" style="background: none; border: none; color: var(--color-text-muted); font-size: 0.75rem; cursor: pointer; text-decoration: underline;">
+                                ${window._t ? window._t('btn_clear_cart', 'Empty Entire Reserve Bag') : 'Empty Entire Reserve Bag'}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;

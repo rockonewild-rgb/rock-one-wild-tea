@@ -1965,6 +1965,32 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast("Currency Updated", `Settlement currency set to ${code}.`, "info");
     };
 
+
+    // Global Promotional / VIP Voucher Engine
+    window.validatePromoCode = function(code, subtotalUSD) {
+        if (!code) return { valid: false, message: 'Please enter a voucher code.' };
+        const clean = String(code).trim().toUpperCase();
+        const discounts = {
+            'ESTATE15': { percent: 15, label: '15% OFF Championship Reserve' },
+            'WILD10': { percent: 10, label: '10% OFF Single-Estate Harvest' },
+            'CEYLON20': { percent: 20, label: '20% OFF Highland Flush' },
+            'COLLECTOR': { percent: 10, label: '10% OFF Collector Allocation' },
+            'ROCKONE': { percent: 10, label: '10% OFF Welcome Privilege' }
+        };
+        if (discounts[clean]) {
+            const d = discounts[clean];
+            const savingsUSD = Number((subtotalUSD * (d.percent / 100)).toFixed(2));
+            return {
+                valid: true,
+                code: clean,
+                label: d.label,
+                percent: d.percent,
+                savingsUSD
+            };
+        }
+        return { valid: false, code: clean, message: 'Invalid or expired promotional code.' };
+    };
+
     // 5. Drawer Controls
     function openDrawer(type, id, data = {}) {
         const signedInUser = window.TeaFactoryStore && window.TeaFactoryStore.getCurrentUser
@@ -1987,6 +2013,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentDrawerContext = { type, id, data };
         drawerOverlay.classList.add('active');
+        const drawerContainer = drawerOverlay.querySelector('.drawer-container');
+        if (drawerContainer) {
+            if (type === 'product' || type === 'box' || type === 'box_quoted_pay') {
+                drawerContainer.classList.add('checkout-mode');
+                if (drawerFooter) drawerFooter.style.display = 'none';
+            } else {
+                drawerContainer.classList.remove('checkout-mode');
+                if (drawerFooter) drawerFooter.style.display = '';
+            }
+        }
 
         if (type === 'box' || type === 'box_quoted_pay') {
             const isQuotedPay = type === 'box_quoted_pay';
@@ -2006,11 +2042,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const currInfo = window.getCountryCurrency ? window.getCountryCurrency(selectedCountry) : (isSriLanka ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
 
             let currentBoxQty = isQuotedPay ? (booking.quantity || 1) : 1;
+            let activeBoxPromo = null; // { code, percent, label, savingsUSD }
+
             let subtotalUSD = unitPriceUSD * currentBoxQty;
+            let discountUSD = 0;
+            let discountedSubtotalUSD = subtotalUSD;
             let shippingUSD = isQuotedPay && booking.quotedShipping !== undefined 
                 ? booking.quotedShipping 
-                : (window.calculateShippingFee ? window.calculateShippingFee(subtotalUSD, selectedCountry) : (isSriLanka ? 2.13 : 15.0));
-            let grandTotalUSD = subtotalUSD + shippingUSD;
+                : (window.calculateShippingFee ? window.calculateShippingFee(discountedSubtotalUSD, selectedCountry) : (isSriLanka ? 2.13 : 15.0));
+            let grandTotalUSD = discountedSubtotalUSD + shippingUSD;
 
             let formattedSubtotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(subtotalUSD, currInfo) : `$${subtotalUSD.toFixed(2)}`;
             let formattedShipping = shippingUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(shippingUSD, currInfo) : `$${shippingUSD.toFixed(2)}`) : 'Complimentary';
@@ -2035,396 +2075,400 @@ document.addEventListener('DOMContentLoaded', () => {
             const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
             drawerFormContainer.innerHTML = `
-                <div class="cart-drawer-inner" style="display: flex; flex-direction: column; gap: 1.15rem; padding-bottom: 2rem;">
-                    
-                    <!-- 1. ORDER SUMMARY & ALLOCATIONS CARD -->
-                    <div class="cart-step-card" style="background: rgba(4,14,8,0.78); border: 1.5px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 1.15rem; box-shadow: 0 4px 18px rgba(0,0,0,0.35);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.6rem; margin-bottom: 0.75rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold);">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-                                <span>1. Collector Chest Allocation</span>
-                            </div>
-                            <span style="font-size: 0.72rem; color: #86efac; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 0.15rem 0.55rem; font-weight: 600;">${isQuotedPay ? 'Quotation Approved' : 'Numbered Reserve'}</span>
+                <div class="checkout-split-layout">
+                    <!-- ==============================================
+                         LEFT COLUMN: PATRON BANNER, ADDRESS, SHIPPING & PAYMENT
+                         ============================================== -->
+                    <div class="checkout-left-col">
+                        <!-- Patron Account / Guest Banner -->
+                        <div class="checkout-step-card" style="padding: 0.95rem 1.15rem;">
+                            ${signedUser ? `
+                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
+                                        <div>
+                                            <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Patron Collector: <span style="color: var(--color-gold);">${esc(signedUser.full_name || signedUser.email)}</span></div>
+                                            <div style="font-size: 0.7rem; color: #86efac;">${esc(signedUser.email)} &bull; Certificate Registered</div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); openDrawer('${type}', '${id}', ${JSON.stringify(data)});" style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: rgba(255,255,255,0.2); color: var(--color-text-muted);">
+                                        Switch Account
+                                    </button>
+                                </div>
+                            ` : `
+                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                    <div style="flex: 1; min-width: 210px;">
+                                        <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.2rem;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                            <span>Direct Checkout Active (No Sign-In Required)</span>
+                                        </div>
+                                        <p style="font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.4; margin: 0;">
+                                            Order your teak chest immediately as a guest. Or sign in to link with your patron ledger.
+                                        </p>
+                                    </div>
+                                    <button type="button" id="box-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: var(--color-gold); color: var(--color-gold); white-space: nowrap;">
+                                        Sign In / Register
+                                    </button>
+                                </div>
+                            `}
                         </div>
 
-                        <!-- Chest Overview -->
-                        <div style="display: flex; gap: 1rem; align-items: flex-start; padding-bottom: 0.85rem; border-bottom: 1px solid rgba(212,175,55,0.15);">
-                            <div style="width: 76px; height: 76px; border-radius: 10px; overflow: hidden; background: rgba(0,0,0,0.5); border: 1.5px solid rgba(212,175,55,0.35); flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
-                                <img src="${box.image || 'images/Gift Box.jpeg'}" alt="${box.name}" style="width: 100%; height: 100%; object-fit: contain;" onerror="window.handleImageError &amp;&amp; window.handleImageError(this, 'box')" loading="lazy" decoding="async">
-                            </div>
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem; flex-wrap: wrap;">
-                                    <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.3); padding: 0.15rem 0.5rem; border-radius: 4px;">Series ${season.seriesNumber} &bull; ${season.name}</span>
-                                    <span style="font-size: 0.65rem; color: #a3b8ad; font-weight: 600;">Solid Teak Chest</span>
-                                </div>
-                                <h4 style="margin: 0 0 0.25rem 0; font-family: var(--font-serif); font-size: 1.05rem; color: #ffffff; line-height: 1.3;">${box.name}</h4>
-                                <div style="font-size: 0.72rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 0.5rem;">
-                                    <span>500g Assortment</span>
-                                    <span>&bull;</span>
-                                    <span id="box-order-unit-price" style="color: var(--color-gold); font-weight: 600;">${window.formatAmountInCurrency ? window.formatAmountInCurrency(unitPriceUSD, currInfo) : '$' + unitPriceUSD.toFixed(2)} / chest</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Stepper -->
-                        ${!isQuotedPay ? `
-                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px dashed rgba(212,175,55,0.2);">
-                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Quantity Allocation:</span>
-                                <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.5);">
-                                    <button type="button" id="box-qty-minus" style="background: none; border: none; color: var(--color-gold); width: 28px; height: 28px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">-</button>
-                                    <span id="box-qty-val" style="width: 32px; text-align: center; font-size: 0.82rem; font-weight: 700; color: #fff;">1</span>
-                                    <button type="button" id="box-qty-plus" style="background: none; border: none; color: var(--color-gold); width: 28px; height: 28px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">+</button>
-                                </div>
-                            </div>
-                        ` : `
-                            <div style="padding: 0.55rem 0; border-bottom: 1px dashed rgba(212,175,55,0.2); font-size: 0.75rem; display: flex; justify-content: space-between;">
-                                <span style="color: var(--color-text-muted);">Quotation Reference:</span>
-                                <strong style="color: var(--color-gold); font-family: monospace;">${booking.id}</strong>
-                            </div>
-                        `}
-
-                        <!-- Financial Breakdown -->
-                        <div style="margin-top: 0.65rem; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.82rem;">
-                            <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
-                                <span>Collector Chest Subtotal</span>
-                                <strong id="box-summary-subtotal" style="color: #ffffff;">${formattedSubtotal}</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
-                                <span id="box-summary-shipping-label">${isSriLanka ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS International Priority Air'}</span>
-                                <span id="box-summary-shipping" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-weight: 600;">${formattedShipping}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid rgba(212,175,55,0.25); padding-top: 0.55rem; margin-top: 0.25rem;">
-                                <div>
-                                    <strong id="box-summary-total-title" style="font-size: 0.95rem; color: #ffffff;">Total Due (${currInfo.code})</strong>
-                                </div>
-                                <strong id="box-summary-total" style="font-size: 1.35rem; color: var(--color-gold); font-family: var(--font-serif);">${formattedGrandTotal}</strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. PATRON ACCOUNT / GUEST BANNER -->
-                    <div class="cart-step-card" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.95rem 1.15rem;">
-                        ${signedUser ? `
-                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
-                                    <div>
-                                        <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Patron Collector: <span style="color: var(--color-gold);">${esc(signedUser.full_name || signedUser.email)}</span></div>
-                                        <div style="font-size: 0.7rem; color: #86efac;">${esc(signedUser.email)} &bull; Certificate Registered</div>
+                        <!-- Form -->
+                        <form id="box-checkout-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <!-- Destination Section -->
+                            <div class="checkout-step-card">
+                                <div class="checkout-step-header">
+                                    <div class="checkout-step-title">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                        <span>1. Delivery Destination</span>
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); openDrawer('${type}', '${id}', ${JSON.stringify(data)});" style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: rgba(255,255,255,0.2); color: var(--color-text-muted);">
-                                    Switch Account
-                                </button>
-                            </div>
-                        ` : `
-                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                                <div style="flex: 1; min-width: 210px;">
-                                    <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.2rem;">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                        <span>Direct Checkout Active (No Sign-In Required)</span>
-                                    </div>
-                                    <p style="font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.4; margin: 0;">
-                                        Order your teak chest immediately as a guest. Or sign in to link with your patron ledger.
-                                    </p>
-                                </div>
-                                <button type="button" id="box-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: var(--color-gold); color: var(--color-gold); white-space: nowrap;">
-                                    Sign In / Register
-                                </button>
-                            </div>
-                        `}
-                    </div>
 
-                    <!-- 3. FORM: DESTINATION, RECIPIENT & ADDRESS -->
-                    <form id="box-checkout-form" style="display: flex; flex-direction: column; gap: 1rem;">
-                        <!-- Destination Section -->
-                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                                <span>2. Delivery Destination</span>
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                                <!-- Country Selector -->
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="box-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Destination Country *</label>
-                                    <select class="form-input" id="box-cust-country" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
-                                        <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>🇱🇰 Sri Lanka (LKR Rs)</option>
-                                        <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>🇺🇸 United States (USD $)</option>
-                                        <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom (GBP £)</option>
-                                        <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>🇦🇺 Australia (AUD A$)</option>
-                                        <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>🇨🇦 Canada (CAD C$)</option>
-                                        <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>🇩🇪 Germany (EUR €)</option>
-                                        <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>🇫🇷 France (EUR €)</option>
-                                        <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>🇯🇵 Japan (JPY ¥)</option>
-                                        <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>🇦🇪 United Arab Emirates (AED)</option>
-                                        <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>🇸🇬 Singapore (SGD S$)</option>
-                                        <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>🇮🇳 India (INR ₹)</option>
-                                        <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>🇨🇭 Switzerland (CHF)</option>
-                                        <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>🇨🇳 China (CNY ¥)</option>
-                                        <option value="Worldwide" ${selectedCountry === 'Worldwide' ? 'selected' : ''}>🌐 Rest of World (USD $)</option>
-                                    </select>
-                                </div>
-
-                                <!-- Dynamic Region Container -->
-                                <div class="form-group" style="margin-bottom: 0;" id="box-region-container">
-                                    ${isSriLanka ? `
-                                        <label class="form-label" for="box-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Region / Province *</label>
-                                        <select class="form-input" id="box-cust-region" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
-                                            <option value="Western Province (Colombo, Gampaha, Kalutara)">Western Province (Colombo, Gampaha)</option>
-                                            <option value="Central Province (Kandy, Nuwara Eliya, Matale)">Central Province (Kandy, Nuwara Eliya)</option>
-                                            <option value="Uva Province (Badulla, Bandarawela, Ettampitiya)" selected>Uva Province (Badulla, Ettampitiya)</option>
-                                            <option value="Southern Province (Galle, Matara, Hambantota)">Southern Province (Galle, Matara)</option>
-                                            <option value="Sabaragamuwa Province (Ratnapura, Kegalle)">Sabaragamuwa Province (Ratnapura)</option>
-                                            <option value="North Western Province (Kurunegala, Puttalam)">North Western Province (Kurunegala)</option>
-                                            <option value="North Central Province (Anuradhapura, Polonnaruwa)">North Central Province (Anuradhapura)</option>
-                                            <option value="Northern Province (Jaffna, Kilinochchi, Vavuniya)">Northern Province (Jaffna)</option>
-                                            <option value="Eastern Province (Batticaloa, Trincomalee, Ampara)">Eastern Province (Batticaloa, Trincomalee)</option>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="box-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Destination Country *</label>
+                                        <select class="form-input" id="box-cust-country" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                            <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>🇱🇰 Sri Lanka (LKR Rs)</option>
+                                            <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>🇺🇸 United States (USD $)</option>
+                                            <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom (GBP £)</option>
+                                            <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>🇦🇺 Australia (AUD A$)</option>
+                                            <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>🇨🇦 Canada (CAD C$)</option>
+                                            <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>🇩🇪 Germany (EUR €)</option>
+                                            <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>🇫🇷 France (EUR €)</option>
+                                            <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>🇯🇵 Japan (JPY ¥)</option>
+                                            <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>🇦🇪 United Arab Emirates (AED)</option>
+                                            <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>🇸🇬 Singapore (SGD S$)</option>
+                                            <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>🇮🇳 India (INR ₹)</option>
+                                            <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>🇨🇭 Switzerland (CHF)</option>
+                                            <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>🇨🇳 China (CNY ¥)</option>
+                                            <option value="Worldwide" ${selectedCountry === 'Worldwide' ? 'selected' : ''}>🌐 Rest of World (USD $)</option>
                                         </select>
-                                    ` : `
-                                        <label class="form-label" for="box-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">State / Province / County *</label>
-                                        <input class="form-input" type="text" id="box-cust-region" placeholder="e.g. California / London / Tokyo" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
-                                    `}
-                                </div>
-                            </div>
-                        </div>
+                                    </div>
 
-                        <!-- Recipient Details Section -->
-                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                <span>3. Recipient &amp; Delivery Address</span>
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="box-cust-firstname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">First Name *</label>
-                                    <input class="form-input" type="text" id="box-cust-firstname" value="${esc(defaultFirstName)}" required placeholder="e.g. Ruwan" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="box-cust-lastname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Last Name *</label>
-                                    <input class="form-input" type="text" id="box-cust-lastname" value="${esc(defaultLastName)}" required placeholder="e.g. Perera" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="box-cust-email" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Email Address *</label>
-                                    <input class="form-input" type="email" id="box-cust-email" value="${esc(signedUser ? signedUser.email : (isQuotedPay ? booking.email : ''))}" required placeholder="name@domain.com" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="box-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Mobile / WhatsApp *</label>
-                                    <input class="form-input" type="tel" id="box-cust-phone" value="${esc(signedUser ? signedUser.phone : (isQuotedPay ? booking.phone : ''))}" required placeholder="+94 77 123 4567" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    <div class="form-group" style="margin-bottom: 0;" id="box-region-container">
+                                        ${isSriLanka ? `
+                                            <label class="form-label" for="box-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Region / Province *</label>
+                                            <select class="form-input" id="box-cust-region" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                                <option value="Western Province (Colombo, Gampaha, Kalutara)">Western Province (Colombo, Gampaha)</option>
+                                                <option value="Central Province (Kandy, Nuwara Eliya, Matale)">Central Province (Kandy, Nuwara Eliya)</option>
+                                                <option value="Uva Province (Badulla, Bandarawela, Ettampitiya)" selected>Uva Province (Badulla, Ettampitiya)</option>
+                                                <option value="Southern Province (Galle, Matara, Hambantota)">Southern Province (Galle, Matara)</option>
+                                                <option value="Sabaragamuwa Province (Ratnapura, Kegalle)">Sabaragamuwa Province (Ratnapura)</option>
+                                                <option value="North Western Province (Kurunegala, Puttalam)">North Western Province (Kurunegala)</option>
+                                                <option value="North Central Province (Anuradhapura, Polonnaruwa)">North Central Province (Anuradhapura)</option>
+                                                <option value="Northern Province (Jaffna, Kilinochchi, Vavuniya)">Northern Province (Jaffna)</option>
+                                                <option value="Eastern Province (Batticaloa, Trincomalee, Ampara)">Eastern Province (Batticaloa, Trincomalee)</option>
+                                            </select>
+                                        ` : `
+                                            <label class="form-label" for="box-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">State / Province / County *</label>
+                                            <input class="form-input" type="text" id="box-cust-region" placeholder="e.g. California / London / Tokyo" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
+                                        `}
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="form-group" style="margin-bottom: 0.75rem;">
-                                <label class="form-label" for="box-cust-address" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Street Address *</label>
-                                <input class="form-input" type="text" id="box-cust-address" value="${esc(signedUser ? signedUser.address : (isQuotedPay ? booking.address : ''))}" required placeholder="House No., Street Name, Neighborhood" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                            </div>
-
-                            <div class="form-group" style="margin-bottom: 0.75rem;">
-                                <label class="form-label" for="box-cust-suite" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7);">Apartment / Suite / Unit / Floor (Optional)</label>
-                                <input class="form-input" type="text" id="box-cust-suite" placeholder="e.g. Apt 4B, Level 2" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="box-cust-city" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">City / Town *</label>
-                                    <input class="form-input" type="text" id="box-cust-city" required placeholder="e.g. Colombo / Badulla" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                            <!-- Recipient Details Section -->
+                            <div class="checkout-step-card">
+                                <div class="checkout-step-header">
+                                    <div class="checkout-step-title">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                        <span>2. Recipient &amp; Delivery Address</span>
+                                    </div>
                                 </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="box-cust-postal" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Postal / ZIP Code *</label>
-                                    <input class="form-input" type="text" id="box-cust-postal" required placeholder="e.g. 00100" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="box-cust-firstname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">First Name *</label>
+                                        <input class="form-input" type="text" id="box-cust-firstname" value="${esc(defaultFirstName)}" required placeholder="e.g. Ruwan" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="box-cust-lastname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Last Name *</label>
+                                        <input class="form-input" type="text" id="box-cust-lastname" value="${esc(defaultLastName)}" required placeholder="e.g. Perera" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    </div>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="box-cust-email" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Email (Allocation Certificate &amp; Tracking) *</label>
+                                        <input class="form-input" type="email" id="box-cust-email" value="${esc(signedUser ? signedUser.email : (isQuotedPay ? booking.customerEmail || '' : ''))}" required placeholder="e.g. collector@rockonewild.com" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;" ${signedUser ? 'readonly style="opacity:0.88;"' : ''}>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="box-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Mobile Phone (Courier Updates) *</label>
+                                        <input class="form-input" type="tel" id="box-cust-phone" value="${esc(signedUser ? signedUser.phone || '' : (isQuotedPay ? booking.phone || '' : ''))}" required placeholder="e.g. +94 77 123 4567" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="margin-bottom: 0.75rem;">
+                                    <label class="form-label" for="box-cust-address" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Street Address *</label>
+                                    <input class="form-input" type="text" id="box-cust-address" required placeholder="e.g. 42 Highland View Road" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="box-cust-suite" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Apt / Suite</label>
+                                        <input class="form-input" type="text" id="box-cust-suite" placeholder="e.g. Suite 12" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="box-cust-city" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">City / Town *</label>
+                                        <input class="form-input" type="text" id="box-cust-city" required placeholder="e.g. Colombo / London" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="box-cust-postal" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Postal Code *</label>
+                                        <input class="form-input" type="text" id="box-cust-postal" required placeholder="e.g. 00700 / SW1A 1AA" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    </div>
                                 </div>
                             </div>
 
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="box-pref-date" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Preferred Dispatch Date *</label>
-                                    <input class="form-input" type="date" id="box-pref-date" min="${boxMinDate}" value="${boxMinDate}" required style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                            <!-- Insured Courier Method -->
+                            <div class="checkout-step-card">
+                                <div class="checkout-step-header">
+                                    <div class="checkout-step-title">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                                        <span>3. Insured Courier Delivery</span>
+                                    </div>
                                 </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="box-cust-notes" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Courier Notes</label>
-                                    <input class="form-input" type="text" id="box-cust-notes" placeholder="e.g. Call before arrival" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
-                            </div>
 
-                            <!-- Bespoke Wax Seal & Monogram -->
-                            ${window.UIComponents.renderBespokeGiftOptions('box')}
-                        </div>
-
-                        <!-- Section: Shipping Method & Courier Charges -->
-                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-                                <span>4. Shipping Method &amp; Courier Charges</span>
-                            </div>
-
-                            <div id="box-shipping-methods-container" style="display: flex; flex-direction: column; gap: 0.65rem;">
-                                <!-- Option 1: Sri Lanka Post EMS Express (Pre-paid) -->
-                                <label class="shipping-option-card active" id="box-shipping-card-ems" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid var(--color-gold); border-radius: 8px; background: rgba(212,175,55,0.08); cursor: pointer;">
-                                    <input type="radio" name="box-shipping-method" value="ems_express" id="box-ship-ems" checked style="margin-top: 0.2rem; accent-color: var(--color-gold);">
-                                    <div style="flex: 1;">
-                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
-                                            <strong id="box-shipping-ems-title" style="color: #ffffff; font-size: 0.88rem;">${isSriLanka ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air'}</strong>
-                                            <div style="display: flex; align-items: center; gap: 0.4rem;">
-                                                <span style="font-size: 0.72rem; color: #86efac; font-weight: 700;">Tracked Dispatch</span>
-                                                <span id="box-shipping-ems-price-pill" style="font-size: 0.78rem; color: var(--color-gold); font-weight: 700; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; padding: 0.2rem 0.55rem;">${formattedShipping}</span>
+                                <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                                    <label class="radio-card" id="box-shipping-card-ems" style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 1rem; border: 1.5px solid var(--color-gold); border-radius: 10px; background: rgba(212,175,55,0.08); cursor: pointer;">
+                                        <input type="radio" name="box-shipping-method" id="box-ship-ems" value="ems_express" checked style="margin-top: 0.25rem;">
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
+                                                <strong id="box-shipping-ems-title" style="color: #ffffff; font-size: 0.88rem;">${isSriLanka ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air'}</strong>
+                                                <span id="box-shipping-ems-price-pill" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-size: 0.8rem; font-weight: 700;">${formattedShipping}</span>
                                             </div>
+                                            <p id="box-shipping-ems-desc" style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; margin: 0;">
+                                                ${isSriLanka ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
+                                            </p>
                                         </div>
-                                        <p id="box-shipping-ems-desc" style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
-                                            ${isSriLanka ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
-                                        </p>
-                                    </div>
-                                </label>
+                                    </label>
 
-                                <!-- Option 2: Cash on Delivery (COD) - Sri Lanka Only -->
-                                <label class="shipping-option-card" id="box-shipping-card-cod" style="display: ${isSriLanka ? 'flex' : 'none'}; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 8px; background: rgba(0,0,0,0.3); cursor: pointer;">
-                                    <input type="radio" name="box-shipping-method" value="cod" id="box-ship-cod" style="margin-top: 0.2rem; accent-color: #25d366;">
-                                    <div style="flex: 1;">
-                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
-                                            <strong style="color: #ffffff; font-size: 0.88rem; display: flex; align-items: center; gap: 0.4rem;">
-                                                <span>Cash on Delivery (COD)</span>
-                                                <span style="font-size: 0.62rem; padding: 0.1rem 0.45rem; border-radius: 3px; background: rgba(37,211,102,0.2); color: #4ade80; font-weight: 700;">SRI LANKA ONLY</span>
-                                            </strong>
-                                            <div style="display: flex; align-items: center; gap: 0.4rem;">
-                                                <span style="font-size: 0.72rem; color: #4ade80; font-weight: 700;">Pay at Doorstep</span>
-                                                <span id="box-shipping-cod-price-pill" style="font-size: 0.78rem; color: #4ade80; font-weight: 700; background: rgba(37,211,102,0.15); border: 1px solid rgba(37,211,102,0.35); border-radius: 6px; padding: 0.2rem 0.55rem;">${formattedShipping}</span>
+                                    <label class="radio-card" id="box-shipping-card-cod" style="display: ${isSriLanka ? 'flex' : 'none'}; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 1rem; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 10px; background: rgba(0,0,0,0.3); cursor: pointer;">
+                                        <input type="radio" name="box-shipping-method" id="box-ship-cod" value="cod" style="margin-top: 0.25rem;">
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
+                                                <strong style="color: #ffffff; font-size: 0.88rem;">Cash on Delivery (COD &bull; Pay to Courier)</strong>
+                                                <span id="box-shipping-cod-price-pill" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-size: 0.8rem; font-weight: 700;">${formattedShipping}</span>
                                             </div>
+                                            <p style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; margin: 0;">
+                                                Pay cash upon parcel handover at your doorstep in Sri Lanka.
+                                            </p>
                                         </div>
-                                        <p style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
-                                            Pay cash to the Sri Lanka Post courier upon receiving your tea package. No upfront digital transaction required.
-                                        </p>
-                                    </div>
-                                </label>
+                                    </label>
+                                </div>
                             </div>
 
-                            <!-- Courier Shipping Breakdown Note -->
-                            <div style="margin-top: 0.65rem; padding: 0.65rem 0.85rem; background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.25); border-radius: 8px; font-size: 0.72rem; color: #cbd5e1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem;">
-                                <div style="display: flex; align-items: center; gap: 0.35rem;">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                                    <span>Standard Insured Courier Dispatch:</span>
+                            <!-- Payment Method Section -->
+                            <div class="checkout-step-card" id="box-payment-step-card">
+                                <div class="checkout-step-header">
+                                    <div class="checkout-step-title">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                        <span>4. Payment Method &amp; Order Confirmation</span>
+                                    </div>
                                 </div>
-                                <span id="box-shipping-rate-note" style="color: var(--color-gold); font-weight: 600;">${isSriLanka ? 'Rs 650 LKR (Complimentary over $80)' : (window.formatAmountInCurrency ? window.formatAmountInCurrency(15, currInfo) : '$15.00') + ' International EMS (Complimentary over $150)'}</span>
+
+                                <!-- COD Panel -->
+                                <div id="box-pay-panel-cod" style="display: none;">
+                                    <div style="background: rgba(37,211,102,0.08); border: 1.5px solid rgba(37,211,102,0.4); border-radius: 10px; padding: 1.15rem; text-align: center; margin-bottom: 1rem;">
+                                        <h4 style="color: #4ade80; font-size: 1.05rem; margin-bottom: 0.35rem; font-weight: 700;">Cash on Delivery (COD) Selected</h4>
+                                        <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5; margin: 0 0 0.85rem 0;">
+                                            The Sri Lanka Post EMS courier will collect the cash amount upon parcel handover.
+                                        </p>
+                                        <div style="background: rgba(0,0,0,0.45); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.65rem 1rem; display: inline-flex; align-items: center; gap: 0.75rem;">
+                                            <span style="font-size: 0.78rem; color: #9ca3af;">Payable to Courier:</span>
+                                            <strong id="box-cod-amount-display" style="font-size: 1.25rem; color: var(--color-gold); font-family: monospace;">Rs ${grandTotalLKR.toLocaleString()} LKR</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Pre-Paid Panels -->
+                                <div id="box-pay-panel-prepaid">
+                                    <div class="payment-method-tabs" style="margin-bottom: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.35rem;">
+                                        <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
+                                            Bank Transfer (Live)
+                                        </button>
+                                        <button type="button" class="pay-tab" data-method="slip" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                            Cash Deposit Slip (Live)
+                                        </button>
+                                        <button type="button" class="pay-tab" data-method="paypal" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(0,121,193,0.5);">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
+                                            <span style="font-weight:700;"><span style="color:#0079C1;">Pay</span><span style="color:#00457C;">Pal</span></span>
+                                            <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(0,121,193,0.2); color:#38bdf8; font-weight:700;">LIVE</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Bank Transfer Panel -->
+                                    <div id="box-pay-panel-bank" class="pay-panel pay-panel-bank active">
+                                        <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.95rem;">
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#ffffff;">Bank of Ceylon</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:var(--color-gold);">Rock one wild tea</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:#ffffff; font-family:monospace; font-size:0.95rem; letter-spacing:1px;">94945708</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#ffffff;">Ettampitiya branch</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; border-top:1px dashed rgba(212,175,55,0.2); padding-top:0.45rem; margin-top:0.35rem; font-size:0.85rem;"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="box-bank-amount-display" style="color:var(--color-gold); font-size:1rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong></div>
+                                        </div>
+                                        <div class="form-group" style="margin-top:0.65rem; margin-bottom: 0;">
+                                            <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Bank Transfer Slip *</label>
+                                            <div class="file-upload-zone" id="box-bank-slip-zone">
+                                                <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
+                                                <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse receipt file</span></div>
+                                                <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
+                                                <input type="file" id="box-bank-slip" accept="image/*,.pdf" style="display:none;">
+                                            </div>
+                                            <div id="box-bank-slip-preview" class="slip-preview" style="display:none;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cash Deposit Panel -->
+                                    <div id="box-pay-panel-slip" class="pay-panel pay-panel-slip">
+                                        <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.95rem;">
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#ffffff;">Bank of Ceylon</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:var(--color-gold);">Rock one wild tea</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:#ffffff; font-family:monospace; font-size:0.95rem; letter-spacing:1px;">94945708</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#ffffff;">Ettampitiya branch</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; border-top:1px dashed rgba(212,175,55,0.2); padding-top:0.45rem; margin-top:0.35rem; font-size:0.85rem;"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="box-deposit-amount-display" style="color:var(--color-gold); font-size:1rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong></div>
+                                        </div>
+                                        <div class="form-group" style="margin-top:0.65rem; margin-bottom: 0;">
+                                            <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Cash Deposit Slip *</label>
+                                            <div class="file-upload-zone" id="box-cash-slip-zone">
+                                                <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
+                                                <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse deposit slip</span></div>
+                                                <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
+                                                <input type="file" id="box-cash-slip" accept="image/*,.pdf" style="display:none;">
+                                            </div>
+                                            <div id="box-cash-slip-preview" class="slip-preview" style="display:none;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- PayPal Panel -->
+                                    <div id="box-pay-panel-paypal" class="pay-panel pay-panel-paypal">
+                                        <div style="background: linear-gradient(135deg, rgba(0,121,193,0.12) 0%, rgba(4,14,8,0.92) 100%); border: 1.5px solid rgba(0,121,193,0.45); border-radius: 8px; padding: 1.15rem;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.5rem;">
+                                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
+                                                    <strong style="color: #ffffff; font-size: 0.95rem;">PayPal &bull; Instant Online Settlement</strong>
+                                                </div>
+                                            </div>
+                                            <div style="background: rgba(0,0,0,0.35); border-radius: 6px; padding: 0.55rem 0.85rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+                                                <span style="font-size: 0.76rem; color: #9ca3af;">USD Settlement Amount:</span>
+                                                <strong id="box-paypal-amount-display" style="font-size: 1.05rem; color: #38bdf8; font-family: monospace;">${currInfo.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`}</strong>
+                                            </div>
+                                            <div id="box-paypal-button-container" class="paypal-smart-container" style="min-height: 44px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bespoke Notes -->
+                            <div class="checkout-step-card">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="box-cust-notes" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Concierge Notes &amp; Numbered Chest Dedication</label>
+                                    <textarea class="form-input" id="box-cust-notes" rows="2" placeholder="e.g. Please engrave personalized dedication brass plaque, special gift wrap, etc." style="font-size: 0.82rem; padding: 0.65rem 0.75rem;"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- ==============================================
+                         RIGHT COLUMN: LUXURY SUMMARY SIDEBAR (EBAY/SHOPIFY)
+                         ============================================== -->
+                    <div class="checkout-right-col">
+                        <div class="checkout-summary-sidebar">
+                            <div class="checkout-summary-header">
+                                <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold);">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                                    <span>Collector Chest Allocation</span>
+                                </div>
+                                <span style="font-size: 0.72rem; color: #86efac; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 0.15rem 0.55rem; font-weight: 600;">${isQuotedPay ? 'Quotation Approved' : 'Numbered Reserve'}</span>
+                            </div>
+
+                            <!-- Chest Row with Count Badge -->
+                            <div class="checkout-item-row">
+                                <div class="checkout-thumb-wrap">
+                                    <img src="${box.image || 'images/Gift Box.jpeg'}" alt="${box.name}" onerror="window.handleImageError &amp;&amp; window.handleImageError(this, 'box')" loading="lazy" decoding="async">
+                                    <span class="checkout-count-badge" id="box-badge-qty">${currentBoxQty}</span>
+                                </div>
+                                <div class="checkout-item-meta">
+                                    <h4 class="checkout-item-name">${box.name}</h4>
+                                    <div class="checkout-item-sub">
+                                        <span>Series ${season.seriesNumber} &bull; ${season.name}</span>
+                                        <span>&bull;</span>
+                                        <span>Solid Teak Chest</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.45rem;">
+                                        ${!isQuotedPay ? `
+                                            <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.5);">
+                                                <button type="button" id="box-qty-minus" style="background: none; border: none; color: var(--color-gold); width: 26px; height: 26px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">-</button>
+                                                <span id="box-qty-val" style="width: 28px; text-align: center; font-size: 0.8rem; font-weight: 700; color: #fff;">${currentBoxQty}</span>
+                                                <button type="button" id="box-qty-plus" style="background: none; border: none; color: var(--color-gold); width: 26px; height: 26px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">+</button>
+                                            </div>
+                                        ` : `
+                                            <span style="font-size: 0.72rem; color: var(--color-gold); font-family: monospace;">Ref: ${booking.id}</span>
+                                        `}
+                                        <span id="box-order-unit-price" style="font-size: 0.78rem; color: var(--color-text-muted);">${window.formatAmountInCurrency ? window.formatAmountInCurrency(unitPriceUSD, currInfo) : '$' + unitPriceUSD.toFixed(2)} / chest</span>
+                                    </div>
+                                </div>
+                                <div class="checkout-item-price" id="box-item-line-price">${formattedSubtotal}</div>
+                            </div>
+
+                            <!-- Discount Code Box -->
+                            <div class="checkout-discount-box">
+                                <input type="text" id="box-promo-code" class="checkout-discount-input" placeholder="Discount code or gift card">
+                                <button type="button" id="box-apply-promo-btn" class="checkout-discount-btn">Apply</button>
+                            </div>
+
+                            <!-- Savings Pill -->
+                            <div class="checkout-savings-pill" id="box-savings-pill" style="display: none;">
+                                <span style="display: flex; align-items: center; gap: 0.35rem;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                                    <span id="box-savings-label">TOTAL SAVINGS</span>
+                                </span>
+                                <strong id="box-savings-amt">-$0.00</strong>
+                            </div>
+
+                            <!-- Line Items Breakdown -->
+                            <div style="display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.84rem; padding-top: 0.25rem;">
+                                <div class="checkout-totals-row">
+                                    <span>Subtotal</span>
+                                    <strong id="box-summary-subtotal" style="color: #ffffff;">${formattedSubtotal}</strong>
+                                </div>
+                                <div class="checkout-totals-row" id="box-discount-row" style="display: none; color: #4ade80;">
+                                    <span>Promotional Savings</span>
+                                    <strong id="box-discount-amt">-$0.00</strong>
+                                </div>
+                                <div class="checkout-totals-row">
+                                    <span id="box-summary-shipping-label">${isSriLanka ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS Priority Air'}</span>
+                                    <span id="box-summary-shipping" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-weight: 600;">${formattedShipping}</span>
+                                </div>
+                                <div class="checkout-grand-total-row">
+                                    <div>
+                                        <strong id="box-summary-total-title" style="font-size: 0.95rem; color: #ffffff;">Total Due (${currInfo.code})</strong>
+                                        <span id="box-lkr-approx" style="display: block; font-size: 0.72rem; color: #94a3b8; font-weight: normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>
+                                    </div>
+                                    <strong id="box-summary-total" style="font-size: 1.45rem; color: var(--color-gold); font-family: var(--font-serif);">${formattedGrandTotal}</strong>
+                                </div>
+                            </div>
+
+                            <!-- Master Action Button -->
+                            <button type="button" id="box-summary-submit-btn" class="checkout-action-btn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span id="box-action-btn-text">${isQuotedPay ? 'Settle Quotation Order' : 'Complete Reserve Order'} &bull; ${formattedGrandTotal}</span>
+                            </button>
+
+                            <!-- Trust Badges -->
+                            <div class="checkout-trust-badges">
+                                <span>🔒 256-Bit SSL Encrypted</span>
+                                <span>🇱🇰 Estate Direct Dispatch</span>
+                                <span>📜 Certified Heritage Origin</span>
+                            </div>
+
+                            <div class="checkout-footer-links">
+                                <a href="#terms" onclick="event.preventDefault();">Terms and policies</a>
+                                <span>&bull;</span>
+                                <a href="#privacy" onclick="event.preventDefault();">Your Privacy Choices <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></a>
                             </div>
                         </div>
-
-                        <!-- Section: Payment Method & Order Confirmation -->
-                        <div class="cart-step-card" id="box-payment-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                <span>5. Payment Method &amp; Order Confirmation</span>
-                            </div>
-
-                            <!-- COD Panel (Sri Lanka Only) -->
-                            <div id="box-pay-panel-cod" style="display: none;">
-                                <div style="background: rgba(37,211,102,0.08); border: 1.5px solid rgba(37,211,102,0.4); border-radius: 10px; padding: 1.15rem; text-align: center; margin-bottom: 1rem;">
-                                    <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(37,211,102,0.15); border: 1.5px solid #25d366; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto; color: #25d366;">
-                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                                    </div>
-                                    <h4 style="color: #4ade80; font-size: 1.05rem; margin-bottom: 0.35rem; font-weight: 700;">Cash on Delivery (COD) Selected</h4>
-                                    <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5; margin: 0 0 0.85rem 0;">
-                                        No online payment is needed now. The Sri Lanka Post EMS courier will collect the cash amount upon parcel handover.
-                                    </p>
-                                    <div style="background: rgba(0,0,0,0.45); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.65rem 1rem; display: inline-flex; align-items: center; gap: 0.75rem;">
-                                        <span style="font-size: 0.78rem; color: #9ca3af;">Amount Payable to Courier:</span>
-                                        <strong id="box-cod-amount-display" style="font-size: 1.25rem; color: var(--color-gold); font-family: monospace;">Rs ${grandTotalLKR.toLocaleString()} LKR</strong>
-                                    </div>
-                                </div>
-
-                                <button type="submit" id="btn-submit-box-cod" class="btn btn-primary" style="padding: 0.95rem 1.5rem; font-size: 0.95rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; box-shadow: 0 4px 18px rgba(37,211,102,0.3);">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                    <span id="box-cod-btn-text">Confirm Order via Cash on Delivery (COD) &bull; Rs ${grandTotalLKR.toLocaleString()} LKR</span>
-                                </button>
-                            </div>
-
-                            <!-- Pre-Paid Panels -->
-                            <div id="box-pay-panel-prepaid">
-                                <div class="payment-method-tabs" style="margin-bottom: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.35rem;">
-                                    <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
-                                        Bank Transfer (Live)
-                                    </button>
-                                    <button type="button" class="pay-tab" data-method="slip" style="display:inline-flex; align-items:center; gap:0.35rem;">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                        Cash Deposit Slip (Live)
-                                    </button>
-                                    <button type="button" class="pay-tab" data-method="paypal" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(0,121,193,0.5);">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
-                                        <span style="font-weight:700;"><span style="color:#0079C1;">Pay</span><span style="color:#00457C;">Pal</span></span>
-                                        <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(0,121,193,0.2); color:#38bdf8; font-weight:700;">LIVE</span>
-                                    </button>
-                                </div>
-
-                                <!-- Method A: Direct Bank Transfer -->
-                                <div id="pay-panel-bank" class="pay-panel active" style="margin-top: 0.5rem;">
-                                    <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.85rem; font-size: 0.8rem; margin-bottom: 0.75rem;">
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#fff;">Bank of Ceylon</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:#fff;">Rock one wild tea</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:var(--color-gold); font-family:monospace; font-size:0.95rem;">94945708</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#fff;">Ettampitiya branch</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; padding-top:0.4rem; border-top:1px dashed rgba(212,175,55,0.2);"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="box-bank-amount-display" style="color:var(--color-gold); font-size:1.05rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong></div>
-                                    </div>
-                                    <div class="form-group" style="margin-bottom: 0.75rem;">
-                                        <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Bank Transfer Slip *</label>
-                                        <div class="file-upload-zone" id="box-bank-slip-zone">
-                                            <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
-                                            <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse receipt</span></div>
-                                            <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
-                                            <input type="file" id="box-bank-slip" accept="image/*,.pdf" style="display:none;">
-                                        </div>
-                                        <div id="box-bank-slip-preview" class="slip-preview" style="display:none;"></div>
-                                    </div>
-                                    <button type="submit" id="btn-submit-box-bank" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                                        <span id="box-bank-btn-text">Place Bank Transfer Order &bull; ${formattedGrandTotal}</span>
-                                    </button>
-                                </div>
-
-                                <!-- Method B: Cash Deposit Slip -->
-                                <div id="pay-panel-slip" class="pay-panel" style="margin-top: 0.5rem;">
-                                    <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.85rem; font-size: 0.8rem; margin-bottom: 0.75rem;">
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#fff;">Bank of Ceylon</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:#fff;">Rock one wild tea</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:var(--color-gold); font-family:monospace; font-size:0.95rem;">94945708</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#fff;">Ettampitiya branch</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; padding-top:0.4rem; border-top:1px dashed rgba(212,175,55,0.2);"><span style="color:var(--color-text-muted);">Exact Deposit Amount:</span><strong id="box-deposit-amount-display" style="color:var(--color-gold); font-size:1.05rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong></div>
-                                    </div>
-                                    <div class="form-group" style="margin-bottom: 0.75rem;">
-                                        <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Cash Deposit Slip *</label>
-                                        <div class="file-upload-zone" id="box-cash-slip-zone">
-                                            <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
-                                            <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse deposit slip</span></div>
-                                            <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
-                                            <input type="file" id="box-cash-slip" accept="image/*,.pdf" style="display:none;">
-                                        </div>
-                                        <div id="box-cash-slip-preview" class="slip-preview" style="display:none;"></div>
-                                    </div>
-                                    <button type="submit" id="btn-submit-box-slip" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                                        <span id="box-slip-btn-text">Submit Cash Deposit Slip &bull; ${formattedGrandTotal}</span>
-                                    </button>
-                                </div>
-
-                                <!-- Method C: PayPal / Cards -->
-                                <div id="pay-panel-paypal" class="pay-panel" style="margin-top: 0.5rem;">
-                                    <div style="background: rgba(0, 121, 193, 0.06); border: 1.5px solid rgba(0, 121, 193, 0.35); border-radius: 10px; padding: 1.15rem; margin-bottom: 0.75rem;">
-                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.3rem;">
-                                            <strong style="color: #ffffff; font-size: 0.95rem;">Instant PayPal &amp; International Cards</strong>
-                                            <span style="background: rgba(0,121,193,0.2); color: #38bdf8; font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 4px; text-transform: uppercase;">Instant Clearance</span>
-                                        </div>
-                                        <p style="font-size: 0.76rem; color: #cbd5e1; line-height: 1.45; margin: 0 0 0.75rem 0;">
-                                            Settle immediately with your PayPal balance, Visa, Mastercard, or AMEX. Your official Allocation Certificate signed by CEO Prasanga will be activated instantly.
-                                        </p>
-                                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0.75rem; background: rgba(0,0,0,0.4); border-radius: 6px; margin-bottom: 0.85rem;">
-                                            <span style="font-size: 0.75rem; color: #9ca3af;">PayPal Settlement Total:</span>
-                                            <strong id="box-paypal-amount-display" style="font-size: 1rem; color: var(--color-gold); font-family: monospace;">${currInfo.code === 'USD' ? '$' + grandTotalUSD.toFixed(2) + ' USD' : formattedGrandTotal + ' ($' + grandTotalUSD.toFixed(2) + ' USD)'}</strong>
-                                        </div>
-                                        <div id="box-paypal-button-container" class="paypal-smart-container" style="min-height: 44px;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             `;
 
@@ -2520,12 +2564,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cur = window.getCountryCurrency ? window.getCountryCurrency(country) : (isLK ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
 
                 subtotalUSD = unitPriceUSD * currentBoxQty;
+                discountUSD = 0;
+                if (activeBoxPromo) {
+                    discountUSD = Number((subtotalUSD * (activeBoxPromo.percent / 100)).toFixed(2));
+                }
+                discountedSubtotalUSD = Math.max(0, subtotalUSD - discountUSD);
+
                 shippingUSD = isQuotedPay && booking.quotedShipping !== undefined 
                     ? booking.quotedShipping 
-                    : (window.calculateShippingFee ? window.calculateShippingFee(subtotalUSD, country) : (isLK ? 2.13 : 15.0));
-                grandTotalUSD = subtotalUSD + shippingUSD;
+                    : (window.calculateShippingFee ? window.calculateShippingFee(discountedSubtotalUSD, country) : (isLK ? 2.13 : 15.0));
+                grandTotalUSD = discountedSubtotalUSD + shippingUSD;
 
                 formattedSubtotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(subtotalUSD, cur) : `$${subtotalUSD.toFixed(2)}`;
+                const formattedDiscount = discountUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(discountUSD, cur) : `$${discountUSD.toFixed(2)}`) : '';
                 formattedShipping = shippingUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(shippingUSD, cur) : `$${shippingUSD.toFixed(2)}`) : 'Complimentary';
                 formattedGrandTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(grandTotalUSD, cur) : `$${grandTotalUSD.toFixed(2)}`;
                 grandTotalLKR = Math.round(grandTotalUSD * 305);
@@ -2534,10 +2585,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (unitPriceEl && window.formatAmountInCurrency) {
                     unitPriceEl.textContent = `${window.formatAmountInCurrency(unitPriceUSD, cur)} / chest`;
                 }
+                const badgeQtyEl = document.getElementById('box-badge-qty');
+                if (badgeQtyEl) badgeQtyEl.textContent = currentBoxQty;
+                const linePriceEl = document.getElementById('box-item-line-price');
+                if (linePriceEl) linePriceEl.textContent = formattedSubtotal;
+
                 const subEl = document.getElementById('box-summary-subtotal');
                 if (subEl) subEl.textContent = formattedSubtotal;
                 const shipLabel = document.getElementById('box-summary-shipping-label');
-                if (shipLabel) shipLabel.textContent = isLK ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS International Priority Air';
+                if (shipLabel) shipLabel.textContent = isLK ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS Priority Air';
                 const shipEl = document.getElementById('box-summary-shipping');
                 if (shipEl) {
                     shipEl.textContent = formattedShipping;
@@ -2547,6 +2603,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (totalTitle) totalTitle.textContent = `Total Due (${cur.code})`;
                 const totalEl = document.getElementById('box-summary-total');
                 if (totalEl) totalEl.textContent = formattedGrandTotal;
+                const lkrEl = document.getElementById('box-lkr-approx');
+                if (lkrEl) lkrEl.textContent = `(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)`;
+
+                // Savings pill & discount row
+                const savingsPill = document.getElementById('box-savings-pill');
+                const savingsLabel = document.getElementById('box-savings-label');
+                const savingsAmt = document.getElementById('box-savings-amt');
+                const discountRow = document.getElementById('box-discount-row');
+                const discountAmt = document.getElementById('box-discount-amt');
+                if (discountUSD > 0 && activeBoxPromo) {
+                    if (savingsPill) savingsPill.style.display = 'flex';
+                    if (savingsLabel) savingsLabel.textContent = activeBoxPromo.label.toUpperCase();
+                    if (savingsAmt) savingsAmt.textContent = `-${formattedDiscount}`;
+                    if (discountRow) discountRow.style.display = 'flex';
+                    if (discountAmt) discountAmt.textContent = `-${formattedDiscount}`;
+                } else {
+                    if (savingsPill) savingsPill.style.display = 'none';
+                    if (discountRow) discountRow.style.display = 'none';
+                }
+
+                // Master submit button text
+                const masterBtnText = document.getElementById('box-action-btn-text');
+                if (masterBtnText) {
+                    masterBtnText.textContent = isQuotedPay 
+                        ? `Settle Quotation Order • ${formattedGrandTotal}`
+                        : `Complete Reserve Order • ${formattedGrandTotal}`;
+                }
 
                 const emsTitle = document.getElementById('box-shipping-ems-title');
                 if (emsTitle) emsTitle.textContent = isLK ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air';
@@ -2568,31 +2651,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     syncBoxShippingSelection();
                 }
 
-                const rateNote = document.getElementById('box-shipping-rate-note');
-                if (rateNote) {
-                    rateNote.textContent = isLK 
-                        ? 'Rs 650 LKR (Complimentary over $80)' 
-                        : (window.formatAmountInCurrency ? window.formatAmountInCurrency(15, cur) : '$15.00') + ' International EMS (Complimentary over $150)';
-                }
-
                 const codAmt = document.getElementById('box-cod-amount-display');
                 if (codAmt) codAmt.textContent = `Rs ${grandTotalLKR.toLocaleString()} LKR`;
-                const codBtn = document.getElementById('box-cod-btn-text');
-                if (codBtn) codBtn.textContent = `Confirm Order via Cash on Delivery (COD) • Rs ${grandTotalLKR.toLocaleString()} LKR`;
 
                 const bankAmt = document.getElementById('box-bank-amount-display');
                 if (bankAmt) {
                     bankAmt.innerHTML = isLK ? `Rs ${grandTotalLKR.toLocaleString()} LKR` : `${formattedGrandTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>`;
                 }
-                const bankBtn = document.getElementById('box-bank-btn-text');
-                if (bankBtn) bankBtn.textContent = `Place Bank Transfer Order • ${formattedGrandTotal}`;
 
                 const depAmt = document.getElementById('box-deposit-amount-display');
                 if (depAmt) {
                     depAmt.innerHTML = isLK ? `Rs ${grandTotalLKR.toLocaleString()} LKR` : `${formattedGrandTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>`;
                 }
-                const slipBtn = document.getElementById('box-slip-btn-text');
-                if (slipBtn) slipBtn.textContent = `Submit Cash Deposit Slip • ${formattedGrandTotal}`;
 
                 const ppAmt = document.getElementById('box-paypal-amount-display');
                 if (ppAmt) {
@@ -2629,6 +2699,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
+                // Re-render PayPal if open
                 const activeTab = document.querySelector('#box-checkout-form .pay-tab.active');
                 if (activeTab && activeTab.getAttribute('data-method') === 'paypal') {
                     initBoxPayPal();
@@ -2667,7 +2738,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             };
 
-            // Stepper (if not quoted pay)
+            // Stepper controls
             if (!isQuotedPay) {
                 const minusBtn = document.getElementById('box-qty-minus');
                 const plusBtn = document.getElementById('box-qty-plus');
@@ -2691,6 +2762,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+            // Promo code wiring
+            const boxPromoBtn = document.getElementById('box-apply-promo-btn');
+            const boxPromoInput = document.getElementById('box-promo-code');
+            if (boxPromoBtn && boxPromoInput) {
+                const handleBoxPromo = () => {
+                    const val = boxPromoInput.value.trim();
+                    if (!val) {
+                        activeBoxPromo = null;
+                        updateBoxPricing();
+                        showToast("Voucher Cleared", "Promotional code has been removed.", "info");
+                        return;
+                    }
+                    const res = window.validatePromoCode(val, unitPriceUSD * currentBoxQty);
+                    if (res.valid) {
+                        activeBoxPromo = res;
+                        updateBoxPricing();
+                        showToast("Voucher Applied!", `${res.label} (${res.percent}%) applied successfully.`, "success");
+                    } else {
+                        activeBoxPromo = null;
+                        updateBoxPricing();
+                        showToast("Invalid Voucher", res.message || "Invalid promotional code.", "warning");
+                    }
+                };
+                boxPromoBtn.onclick = handleBoxPromo;
+                boxPromoInput.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleBoxPromo();
+                    }
+                };
+            }
+
             const countryInput = document.getElementById('box-cust-country');
             if (countryInput) countryInput.onchange = updateBoxPricing;
 
@@ -2699,7 +2802,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             bindPaymentTabs('box-checkout-form');
-            bindBespokeGiftEvents('box');
             bindFileUpload('box-bank-slip', 'box-bank-slip-zone', 'box-bank-slip-preview', (b64) => {
                 selectedBoxSlipBase64 = b64;
             });
@@ -2738,15 +2840,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         const suite = document.getElementById('box-cust-suite')?.value?.trim() || '';
                         const city = document.getElementById('box-cust-city')?.value?.trim() || '';
                         const postal = document.getElementById('box-cust-postal')?.value?.trim() || '';
-                        const region = document.getElementById('box-cust-region')?.value?.trim() || '';
+                        const region = document.getElementById('box-cust-region')?.value || '';
                         const country = document.getElementById('box-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
-                        const prefDate = document.getElementById('box-pref-date')?.value || '';
                         const notes = document.getElementById('box-cust-notes')?.value?.trim() || '';
-                        
-                        const isGift = document.getElementById('box-enable-gift')?.checked || false;
-                        const giftWax = document.getElementById('box-wax-val')?.value || 'Imperial Gold';
-                        const giftMonogram = document.getElementById('box-monogram-input')?.value?.trim().toUpperCase() || '';
-                        const giftMsg = document.getElementById('box-gift-msg')?.value?.trim() || '';
 
                         const fullAddress = `${street}${suite ? ', ' + suite : ''}, ${city}, ${region ? region + ', ' : ''}${postal}, ${country}`;
 
@@ -2759,11 +2855,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             city,
                             message: notes,
                             quantity: currentBoxQty,
-                            preferredDate: prefDate,
-                            giftPackaging: isGift,
-                            waxSealColor: isGift ? giftWax : '',
-                            monogramInitials: isGift ? giftMonogram : '',
-                            giftMessage: isGift ? giftMsg : '',
                             paymentMethod: 'paypal',
                             slipImage: ''
                         });
@@ -2804,7 +2895,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const paymentMethod = shippingMethod === 'cod' ? 'cod' : selectedMethod;
 
                 if (paymentMethod === 'paypal') {
-                    showToast("PayPal Active", "Please use the official PayPal button above to complete checkout.", "info");
+                    const ppCont = document.getElementById('box-paypal-button-container');
+                    if (ppCont) {
+                        ppCont.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        showToast("PayPal Active", "Please click the yellow PayPal button to authorize payment.", "info");
+                    }
                     return;
                 }
 
@@ -2817,15 +2912,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const suite = document.getElementById('box-cust-suite')?.value?.trim() || '';
                 const city = document.getElementById('box-cust-city')?.value?.trim() || '';
                 const postal = document.getElementById('box-cust-postal')?.value?.trim() || '';
-                const region = document.getElementById('box-cust-region')?.value?.trim() || '';
+                const region = document.getElementById('box-cust-region')?.value || '';
                 const country = document.getElementById('box-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
-                const prefDate = document.getElementById('box-pref-date')?.value || '';
                 const notes = document.getElementById('box-cust-notes')?.value?.trim() || '';
-                
-                const isGift = document.getElementById('box-enable-gift')?.checked || false;
-                const giftWax = document.getElementById('box-wax-val')?.value || 'Imperial Gold';
-                const giftMonogram = document.getElementById('box-monogram-input')?.value?.trim().toUpperCase() || '';
-                const giftMsg = document.getElementById('box-gift-msg')?.value?.trim() || '';
 
                 const fullAddress = `${street}${suite ? ', ' + suite : ''}, ${city}, ${region ? region + ', ' : ''}${postal}, ${country}`;
 
@@ -2847,11 +2936,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     city,
                     message: notes,
                     quantity: currentBoxQty,
-                    preferredDate: prefDate,
-                    giftPackaging: isGift,
-                    waxSealColor: isGift ? giftWax : '',
-                    monogramInitials: isGift ? giftMonogram : '',
-                    giftMessage: giftMsg,
                     paymentMethod,
                     shippingMethod,
                     slipImage: slipImg
@@ -2877,6 +2961,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const boxForm = document.getElementById('box-checkout-form');
             if (boxForm) boxForm.onsubmit = handleBoxCheckoutSubmit;
 
+            // Master Action Button in right column
+            const boxSummaryBtn = document.getElementById('box-summary-submit-btn');
+            if (boxSummaryBtn) {
+                boxSummaryBtn.onclick = () => {
+                    handleBoxCheckoutSubmit();
+                };
+            }
+
             document.getElementById('box-guest-signin-btn')?.addEventListener('click', () => {
                 if (typeof window.requireCustomerAuth === 'function') {
                     window.requireCustomerAuth('Sign in or register to record your collector chest in your patron history.', () => {
@@ -2884,6 +2976,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             });
+        
         } else if (type === 'tour') {
             const timeSlot = data.timeSlot || '09:30 AM';
             selectedTourSlipBase64 = '';
@@ -3582,9 +3675,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const currInfo = window.getCountryCurrency ? window.getCountryCurrency(selectedCountry) : (isSriLanka ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
             
             let currentQuickQty = 1;
+            let activeProdPromo = null; // { code, percent, label, savingsUSD }
+
             let subtotalUSD = unitPriceUSD * currentQuickQty;
-            let shippingUSD = window.calculateShippingFee ? window.calculateShippingFee(subtotalUSD, selectedCountry, itemDefinedShipping) : (isSriLanka ? 2.13 : 15.0);
-            let grandTotalUSD = subtotalUSD + shippingUSD;
+            let discountUSD = 0;
+            let discountedSubtotalUSD = subtotalUSD;
+            let shippingUSD = window.calculateShippingFee ? window.calculateShippingFee(discountedSubtotalUSD, selectedCountry, itemDefinedShipping) : (isSriLanka ? 2.13 : 15.0);
+            let grandTotalUSD = discountedSubtotalUSD + shippingUSD;
 
             let formattedSubtotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(subtotalUSD, currInfo) : `$${subtotalUSD.toFixed(2)}`;
             let formattedShipping = shippingUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(shippingUSD, currInfo) : `$${shippingUSD.toFixed(2)}`) : 'Complimentary';
@@ -3605,391 +3702,411 @@ document.addEventListener('DOMContentLoaded', () => {
             const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
             drawerFormContainer.innerHTML = `
-                <div class="cart-drawer-inner" style="display: flex; flex-direction: column; gap: 1.15rem; padding-bottom: 2rem;">
-                    
-                    <!-- 1. ORDER SUMMARY & ALLOCATIONS CARD -->
-                    <div class="cart-step-card" style="background: rgba(4,14,8,0.78); border: 1.5px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 1.15rem; box-shadow: 0 4px 18px rgba(0,0,0,0.35);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.6rem; margin-bottom: 0.75rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold);">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-                                <span>1. Order Summary &amp; Allocations</span>
-                            </div>
-                            <span style="font-size: 0.72rem; color: #86efac; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 0.15rem 0.55rem; font-weight: 600;">Single-Estate Reserve</span>
-                        </div>
-
-                        <!-- Product Overview -->
-                        <div style="display: flex; gap: 1rem; align-items: flex-start; padding-bottom: 0.85rem; border-bottom: 1px solid rgba(212,175,55,0.15);">
-                            <div style="width: 72px; height: 72px; border-radius: 10px; overflow: hidden; background: rgba(0,0,0,0.5); border: 1.5px solid rgba(212,175,55,0.35); flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
-                                <img src="${product.image || 'images/Product.jpeg'}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: contain;" onerror="window.handleImageError &amp;&amp; window.handleImageError(this, 'product')" loading="lazy" decoding="async">
-                            </div>
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem; flex-wrap: wrap;">
-                                    <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.3); padding: 0.15rem 0.5rem; border-radius: 4px;">${product.category || 'Single-Estate Tea'}</span>
-                                    <span style="font-size: 0.65rem; color: #a3b8ad; font-weight: 600;">${product.leafGrade || 'Montane Flush'}</span>
+                <div class="checkout-split-layout">
+                    <!-- ==============================================
+                         LEFT COLUMN: PATRON BANNER, ADDRESS, SHIPPING & PAYMENT
+                         ============================================== -->
+                    <div class="checkout-left-col">
+                        <!-- Patron Banner -->
+                        <div class="checkout-step-card" style="padding: 0.95rem 1.15rem;">
+                            ${signedUser ? `
+                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
+                                        <div>
+                                            <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Patron Account: <span style="color: var(--color-gold);">${esc(signedUser.full_name || signedUser.email)}</span></div>
+                                            <div style="font-size: 0.7rem; color: #86efac;">${esc(signedUser.email)} &bull; Linked to Estate Master Ledger</div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); openDrawer('product', '${id}');" style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: rgba(255,255,255,0.2); color: var(--color-text-muted);">
+                                        Switch Account
+                                    </button>
                                 </div>
-                                <h4 style="margin: 0 0 0.25rem 0; font-family: var(--font-serif); font-size: 1.05rem; color: #ffffff; line-height: 1.3;">${product.name}</h4>
-                                <div style="font-size: 0.72rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 0.5rem;">
-                                    <span>${product.weight || '100g'} Tin</span>
-                                    <span>&bull;</span>
-                                    <span id="quick-order-unit-price" style="color: var(--color-gold); font-weight: 600;">${window.formatAmountInCurrency ? window.formatAmountInCurrency(unitPriceUSD, currInfo) : '$' + unitPriceUSD.toFixed(2)} / tin</span>
+                            ` : `
+                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                    <div style="flex: 1; min-width: 210px;">
+                                        <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.2rem;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                            <span>Guest Checkout Active (No Sign-In Required)</span>
+                                        </div>
+                                        <p style="font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.4; margin: 0;">
+                                            You can order immediately as an anonymous guest. Or sign in to save your allocation in the patron portal.
+                                        </p>
+                                    </div>
+                                    <button type="button" id="quick-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: var(--color-gold); color: var(--color-gold); white-space: nowrap;">
+                                        Sign In / Register
+                                    </button>
                                 </div>
-                            </div>
+                            `}
                         </div>
 
-                        <!-- Quantity Stepper -->
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px dashed rgba(212,175,55,0.2);">
-                            <span style="font-size: 0.8rem; color: var(--color-text-muted);">Quantity Allocation:</span>
-                            <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.5);">
-                                <button type="button" id="quick-order-qty-minus" style="background: none; border: none; color: var(--color-gold); width: 28px; height: 28px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">-</button>
-                                <span id="quick-order-qty-val" style="width: 32px; text-align: center; font-size: 0.82rem; font-weight: 700; color: #fff;">1</span>
-                                <button type="button" id="quick-order-qty-plus" style="background: none; border: none; color: var(--color-gold); width: 28px; height: 28px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">+</button>
-                            </div>
-                        </div>
-
-                        <!-- Subtotal & Shipping Breakdown -->
-                        <div style="margin-top: 0.65rem; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.82rem;">
-                            <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
-                                <span>Items Allocation Subtotal</span>
-                                <strong id="quick-summary-subtotal" style="color: #ffffff;">${formattedSubtotal}</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
-                                <span id="quick-summary-shipping-label">${isSriLanka ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS International Priority Air'}</span>
-                                <span id="quick-summary-shipping" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-weight: 600;">${formattedShipping}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid rgba(212,175,55,0.25); padding-top: 0.55rem; margin-top: 0.25rem;">
-                                <div>
-                                    <strong id="quick-summary-total-title" style="font-size: 0.95rem; color: #ffffff;">Total Due (${currInfo.code})</strong>
-                                </div>
-                                <strong id="quick-summary-total" style="font-size: 1.35rem; color: var(--color-gold); font-family: var(--font-serif);">${formattedGrandTotal}</strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. PATRON ACCOUNT / GUEST CHECKOUT BANNER -->
-                    <div class="cart-step-card" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.95rem 1.15rem;">
-                        ${signedUser ? `
-                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
-                                    <div>
-                                        <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Patron Account: <span style="color: var(--color-gold);">${esc(signedUser.full_name || signedUser.email)}</span></div>
-                                        <div style="font-size: 0.7rem; color: #86efac;">${esc(signedUser.email)} &bull; Linked to Estate Master Ledger</div>
+                        <!-- Form -->
+                        <form id="quick-checkout-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <!-- Destination Section -->
+                            <div class="checkout-step-card">
+                                <div class="checkout-step-header">
+                                    <div class="checkout-step-title">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                        <span>1. Delivery Destination</span>
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); openDrawer('product', '${id}');" style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: rgba(255,255,255,0.2); color: var(--color-text-muted);">
-                                    Switch Account
-                                </button>
-                            </div>
-                        ` : `
-                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                                <div style="flex: 1; min-width: 210px;">
-                                    <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.2rem;">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                        <span>Guest Checkout Active (No Sign-In Required)</span>
-                                    </div>
-                                    <p style="font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.4; margin: 0;">
-                                        You can order immediately as an anonymous guest. Or sign in to save your allocation in the patron portal.
-                                    </p>
-                                </div>
-                                <button type="button" id="quick-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: var(--color-gold); color: var(--color-gold); white-space: nowrap;">
-                                    Sign In / Register
-                                </button>
-                            </div>
-                        `}
-                    </div>
 
-                    <!-- 3. FORM: DESTINATION, RECIPIENT & ADDRESS -->
-                    <form id="quick-checkout-form" style="display: flex; flex-direction: column; gap: 1rem;">
-                        <!-- Destination Section -->
-                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                                <span>2. Delivery Destination</span>
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                                <!-- Country Selector -->
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="quick-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Destination Country *</label>
-                                    <select class="form-input" id="quick-cust-country" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
-                                        <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>🇱🇰 Sri Lanka (LKR Rs)</option>
-                                        <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>🇺🇸 United States (USD $)</option>
-                                        <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom (GBP £)</option>
-                                        <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>🇦🇺 Australia (AUD A$)</option>
-                                        <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>🇨🇦 Canada (CAD C$)</option>
-                                        <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>🇩🇪 Germany (EUR €)</option>
-                                        <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>🇫🇷 France (EUR €)</option>
-                                        <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>🇯🇵 Japan (JPY ¥)</option>
-                                        <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>🇦🇪 United Arab Emirates (AED)</option>
-                                        <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>🇸🇬 Singapore (SGD S$)</option>
-                                        <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>🇮🇳 India (INR ₹)</option>
-                                        <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>🇨🇭 Switzerland (CHF)</option>
-                                        <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>🇨🇳 China (CNY ¥)</option>
-                                        <option value="Worldwide" ${selectedCountry === 'Worldwide' ? 'selected' : ''}>🌐 Rest of World (USD $)</option>
-                                    </select>
-                                </div>
-
-                                <!-- Dynamic Region Container -->
-                                <div class="form-group" style="margin-bottom: 0;" id="quick-region-container">
-                                    ${isSriLanka ? `
-                                        <label class="form-label" for="quick-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Region / Province *</label>
-                                        <select class="form-input" id="quick-cust-region" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
-                                            <option value="Western Province (Colombo, Gampaha, Kalutara)">Western Province (Colombo, Gampaha)</option>
-                                            <option value="Central Province (Kandy, Nuwara Eliya, Matale)">Central Province (Kandy, Nuwara Eliya)</option>
-                                            <option value="Uva Province (Badulla, Bandarawela, Ettampitiya)" selected>Uva Province (Badulla, Ettampitiya)</option>
-                                            <option value="Southern Province (Galle, Matara, Hambantota)">Southern Province (Galle, Matara)</option>
-                                            <option value="Sabaragamuwa Province (Ratnapura, Kegalle)">Sabaragamuwa Province (Ratnapura)</option>
-                                            <option value="North Western Province (Kurunegala, Puttalam)">North Western Province (Kurunegala)</option>
-                                            <option value="North Central Province (Anuradhapura, Polonnaruwa)">North Central Province (Anuradhapura)</option>
-                                            <option value="Northern Province (Jaffna, Kilinochchi, Vavuniya)">Northern Province (Jaffna)</option>
-                                            <option value="Eastern Province (Batticaloa, Trincomalee, Ampara)">Eastern Province (Batticaloa, Trincomalee)</option>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="quick-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Destination Country *</label>
+                                        <select class="form-input" id="quick-cust-country" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                            <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>🇱🇰 Sri Lanka (LKR Rs)</option>
+                                            <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>🇺🇸 United States (USD $)</option>
+                                            <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom (GBP £)</option>
+                                            <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>🇦🇺 Australia (AUD A$)</option>
+                                            <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>🇨🇦 Canada (CAD C$)</option>
+                                            <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>🇩🇪 Germany (EUR €)</option>
+                                            <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>🇫🇷 France (EUR €)</option>
+                                            <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>🇯🇵 Japan (JPY ¥)</option>
+                                            <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>🇦🇪 United Arab Emirates (AED)</option>
+                                            <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>🇸🇬 Singapore (SGD S$)</option>
+                                            <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>🇮🇳 India (INR ₹)</option>
+                                            <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>🇨🇭 Switzerland (CHF)</option>
+                                            <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>🇨🇳 China (CNY ¥)</option>
+                                            <option value="Worldwide" ${selectedCountry === 'Worldwide' ? 'selected' : ''}>🌐 Rest of World (USD $)</option>
                                         </select>
-                                    ` : `
-                                        <label class="form-label" for="quick-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">State / Province / County *</label>
-                                        <input class="form-input" type="text" id="quick-cust-region" placeholder="e.g. California / London / Tokyo" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
-                                    `}
-                                </div>
-                            </div>
-                        </div>
+                                    </div>
 
-                        <!-- Recipient Details Section -->
-                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                <span>3. Recipient &amp; Delivery Address</span>
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="quick-cust-firstname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">First Name *</label>
-                                    <input class="form-input" type="text" id="quick-cust-firstname" value="${esc(defaultFirstName)}" required placeholder="e.g. Ruwan" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="quick-cust-lastname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Last Name *</label>
-                                    <input class="form-input" type="text" id="quick-cust-lastname" value="${esc(defaultLastName)}" required placeholder="e.g. Perera" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="quick-cust-email" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Email Address *</label>
-                                    <input class="form-input" type="email" id="quick-cust-email" value="${esc(signedUser ? signedUser.email : '')}" required placeholder="name@domain.com" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="quick-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Mobile / WhatsApp *</label>
-                                    <input class="form-input" type="tel" id="quick-cust-phone" value="${esc(signedUser ? signedUser.phone : '')}" required placeholder="+94 77 123 4567" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    <div class="form-group" style="margin-bottom: 0;" id="quick-region-container">
+                                        ${isSriLanka ? `
+                                            <label class="form-label" for="quick-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Region / Province *</label>
+                                            <select class="form-input" id="quick-cust-region" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                                <option value="Western Province (Colombo, Gampaha, Kalutara)">Western Province (Colombo, Gampaha)</option>
+                                                <option value="Central Province (Kandy, Nuwara Eliya, Matale)">Central Province (Kandy, Nuwara Eliya)</option>
+                                                <option value="Uva Province (Badulla, Bandarawela, Ettampitiya)" selected>Uva Province (Badulla, Ettampitiya)</option>
+                                                <option value="Southern Province (Galle, Matara, Hambantota)">Southern Province (Galle, Matara)</option>
+                                                <option value="Sabaragamuwa Province (Ratnapura, Kegalle)">Sabaragamuwa Province (Ratnapura)</option>
+                                                <option value="North Western Province (Kurunegala, Puttalam)">North Western Province (Kurunegala)</option>
+                                                <option value="North Central Province (Anuradhapura, Polonnaruwa)">North Central Province (Anuradhapura)</option>
+                                                <option value="Northern Province (Jaffna, Kilinochchi, Vavuniya)">Northern Province (Jaffna)</option>
+                                                <option value="Eastern Province (Batticaloa, Trincomalee, Ampara)">Eastern Province (Batticaloa, Trincomalee)</option>
+                                            </select>
+                                        ` : `
+                                            <label class="form-label" for="quick-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">State / Province / County *</label>
+                                            <input class="form-input" type="text" id="quick-cust-region" placeholder="e.g. California / London / Tokyo" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
+                                        `}
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="form-group" style="margin-bottom: 0.75rem;">
-                                <label class="form-label" for="quick-cust-address" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Street Address *</label>
-                                <input class="form-input" type="text" id="quick-cust-address" value="${esc(signedUser ? signedUser.address : '')}" required placeholder="House No., Street Name, Neighborhood" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                            </div>
-
-                            <div class="form-group" style="margin-bottom: 0.75rem;">
-                                <label class="form-label" for="quick-cust-suite" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7);">Apartment / Suite / Unit / Floor (Optional)</label>
-                                <input class="form-input" type="text" id="quick-cust-suite" placeholder="e.g. Apt 4B, Level 2" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="quick-cust-city" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">City / Town *</label>
-                                    <input class="form-input" type="text" id="quick-cust-city" required placeholder="e.g. Colombo / Badulla" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                            <!-- Recipient Details Section -->
+                            <div class="checkout-step-card">
+                                <div class="checkout-step-header">
+                                    <div class="checkout-step-title">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                        <span>2. Recipient &amp; Delivery Address</span>
+                                    </div>
                                 </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="quick-cust-postal" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Postal / ZIP Code *</label>
-                                    <input class="form-input" type="text" id="quick-cust-postal" required placeholder="e.g. 00100" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="quick-cust-firstname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">First Name *</label>
+                                        <input class="form-input" type="text" id="quick-cust-firstname" value="${esc(defaultFirstName)}" required placeholder="e.g. Ruwan" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="quick-cust-lastname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Last Name *</label>
+                                        <input class="form-input" type="text" id="quick-cust-lastname" value="${esc(defaultLastName)}" required placeholder="e.g. Perera" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    </div>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="quick-cust-email" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Email (Tracking &amp; Certificate) *</label>
+                                        <input class="form-input" type="email" id="quick-cust-email" value="${esc(signedUser ? signedUser.email : '')}" required placeholder="e.g. patron@rockonewild.com" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;" ${signedUser ? 'readonly style="opacity:0.88;"' : ''}>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="quick-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Mobile Phone (Courier Updates) *</label>
+                                        <input class="form-input" type="tel" id="quick-cust-phone" value="${esc(signedUser ? signedUser.phone || '' : '')}" required placeholder="e.g. +94 77 123 4567" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="margin-bottom: 0.75rem;">
+                                    <label class="form-label" for="quick-cust-address" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Street Address *</label>
+                                    <input class="form-input" type="text" id="quick-cust-address" required placeholder="e.g. 42 Highland View Road" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="quick-cust-suite" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Apt / Suite</label>
+                                        <input class="form-input" type="text" id="quick-cust-suite" placeholder="e.g. Apt 4B" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="quick-cust-city" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">City / Town *</label>
+                                        <input class="form-input" type="text" id="quick-cust-city" required placeholder="e.g. Colombo / London" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="quick-cust-postal" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Postal Code *</label>
+                                        <input class="form-input" type="text" id="quick-cust-postal" required placeholder="e.g. 00700 / SW1A 1AA" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    </div>
                                 </div>
                             </div>
 
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="quick-pref-date" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Preferred Dispatch Date *</label>
-                                    <input class="form-input" type="date" id="quick-pref-date" min="${prodMinDate}" value="${prodMinDate}" required style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                            <!-- Insured Courier Method -->
+                            <div class="checkout-step-card">
+                                <div class="checkout-step-header">
+                                    <div class="checkout-step-title">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                                        <span>3. Insured Courier Delivery</span>
+                                    </div>
                                 </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="quick-cust-notes" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Courier Notes</label>
-                                    <input class="form-input" type="text" id="quick-cust-notes" placeholder="e.g. Call before arrival" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
-                            </div>
 
-                            <!-- Bespoke Gift Packaging Accordion -->
-                            ${window.UIComponents.renderBespokeGiftOptions('quick')}
-                        </div>
-
-                        <!-- Section: Shipping Method & Courier Charges -->
-                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-                                <span>4. Shipping Method &amp; Courier Charges</span>
-                            </div>
-
-                            <div id="quick-shipping-methods-container" style="display: flex; flex-direction: column; gap: 0.65rem;">
-                                <!-- Option 1: Sri Lanka Post EMS Express (Pre-paid) -->
-                                <label class="shipping-option-card active" id="quick-shipping-card-ems" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid var(--color-gold); border-radius: 8px; background: rgba(212,175,55,0.08); cursor: pointer;">
-                                    <input type="radio" name="quick-shipping-method" value="ems_express" id="quick-ship-ems" checked style="margin-top: 0.2rem; accent-color: var(--color-gold);">
-                                    <div style="flex: 1;">
-                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
-                                            <strong id="quick-shipping-ems-title" style="color: #ffffff; font-size: 0.88rem;">${isSriLanka ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air'}</strong>
-                                            <div style="display: flex; align-items: center; gap: 0.4rem;">
-                                                <span style="font-size: 0.72rem; color: #86efac; font-weight: 700;">Tracked Dispatch</span>
-                                                <span id="quick-shipping-ems-price-pill" style="font-size: 0.78rem; color: var(--color-gold); font-weight: 700; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; padding: 0.2rem 0.55rem;">${formattedShipping}</span>
+                                <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                                    <label class="radio-card" id="quick-shipping-card-ems" style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 1rem; border: 1.5px solid var(--color-gold); border-radius: 10px; background: rgba(212,175,55,0.08); cursor: pointer;">
+                                        <input type="radio" name="quick-shipping-method" id="quick-ship-ems" value="ems_express" checked style="margin-top: 0.25rem;">
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
+                                                <strong id="quick-shipping-ems-title" style="color: #ffffff; font-size: 0.88rem;">${isSriLanka ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air'}</strong>
+                                                <span id="quick-shipping-ems-price-pill" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-size: 0.8rem; font-weight: 700;">${formattedShipping}</span>
                                             </div>
+                                            <p id="quick-shipping-ems-desc" style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; margin: 0;">
+                                                ${isSriLanka ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
+                                            </p>
                                         </div>
-                                        <p id="quick-shipping-ems-desc" style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
-                                            ${isSriLanka ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
-                                        </p>
-                                    </div>
-                                </label>
+                                    </label>
 
-                                <!-- Option 2: Cash on Delivery (COD) - Sri Lanka Only -->
-                                <label class="shipping-option-card" id="quick-shipping-card-cod" style="display: ${isSriLanka ? 'flex' : 'none'}; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 8px; background: rgba(0,0,0,0.3); cursor: pointer;">
-                                    <input type="radio" name="quick-shipping-method" value="cod" id="quick-ship-cod" style="margin-top: 0.2rem; accent-color: #25d366;">
-                                    <div style="flex: 1;">
-                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
-                                            <strong style="color: #ffffff; font-size: 0.88rem; display: flex; align-items: center; gap: 0.4rem;">
-                                                <span>Cash on Delivery (COD)</span>
-                                                <span style="font-size: 0.62rem; padding: 0.1rem 0.45rem; border-radius: 3px; background: rgba(37,211,102,0.2); color: #4ade80; font-weight: 700;">SRI LANKA ONLY</span>
-                                            </strong>
-                                            <div style="display: flex; align-items: center; gap: 0.4rem;">
-                                                <span style="font-size: 0.72rem; color: #4ade80; font-weight: 700;">Pay at Doorstep</span>
-                                                <span id="quick-shipping-cod-price-pill" style="font-size: 0.78rem; color: #4ade80; font-weight: 700; background: rgba(37,211,102,0.15); border: 1px solid rgba(37,211,102,0.35); border-radius: 6px; padding: 0.2rem 0.55rem;">${formattedShipping}</span>
+                                    <label class="radio-card" id="quick-shipping-card-cod" style="display: ${isSriLanka ? 'flex' : 'none'}; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 1rem; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 10px; background: rgba(0,0,0,0.3); cursor: pointer;">
+                                        <input type="radio" name="quick-shipping-method" id="quick-ship-cod" value="cod" style="margin-top: 0.25rem;">
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
+                                                <strong style="color: #ffffff; font-size: 0.88rem;">Cash on Delivery (COD &bull; Pay to Courier)</strong>
+                                                <span id="quick-shipping-cod-price-pill" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-size: 0.8rem; font-weight: 700;">${formattedShipping}</span>
                                             </div>
+                                            <p style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; margin: 0;">
+                                                Pay cash upon parcel delivery at your doorstep anywhere in Sri Lanka.
+                                            </p>
                                         </div>
-                                        <p style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
-                                            Pay cash to the Sri Lanka Post courier upon receiving your tea package. No upfront digital transaction required.
-                                        </p>
-                                    </div>
-                                </label>
+                                    </label>
+                                </div>
                             </div>
 
-                            <!-- Courier Shipping Breakdown Note -->
-                            <div style="margin-top: 0.65rem; padding: 0.65rem 0.85rem; background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.25); border-radius: 8px; font-size: 0.72rem; color: #cbd5e1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem;">
-                                <div style="display: flex; align-items: center; gap: 0.35rem;">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                                    <span>Standard Insured Courier Dispatch:</span>
+                            <!-- Payment Method Section -->
+                            <div class="checkout-step-card" id="quick-payment-step-card">
+                                <div class="checkout-step-header">
+                                    <div class="checkout-step-title">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                        <span>4. Payment Method &amp; Order Confirmation</span>
+                                    </div>
                                 </div>
-                                <span id="quick-shipping-rate-note" style="color: var(--color-gold); font-weight: 600;">${isSriLanka ? 'Rs 650 LKR (Complimentary over $80)' : (window.formatAmountInCurrency ? window.formatAmountInCurrency(15, currInfo) : '$15.00') + ' International EMS (Complimentary over $150)'}</span>
+
+                                <!-- COD Panel -->
+                                <div id="quick-pay-panel-cod" style="display: none;">
+                                    <div style="background: rgba(37,211,102,0.08); border: 1.5px solid rgba(37,211,102,0.4); border-radius: 10px; padding: 1.15rem; text-align: center; margin-bottom: 1rem;">
+                                        <h4 style="color: #4ade80; font-size: 1.05rem; margin-bottom: 0.35rem; font-weight: 700;">Cash on Delivery (COD) Active</h4>
+                                        <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5; margin: 0 0 0.85rem 0;">
+                                            The Sri Lanka Post EMS courier will collect the cash amount upon parcel handover.
+                                        </p>
+                                        <div style="background: rgba(0,0,0,0.45); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.65rem 1rem; display: inline-flex; align-items: center; gap: 0.75rem;">
+                                            <span style="font-size: 0.78rem; color: #9ca3af;">Payable to Courier:</span>
+                                            <strong id="quick-cod-amount-display" style="font-size: 1.25rem; color: var(--color-gold); font-family: monospace;">Rs ${grandTotalLKR.toLocaleString()} LKR</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Pre-Paid Panels -->
+                                <div id="quick-pay-panel-prepaid">
+                                    <div class="payment-method-tabs" style="margin-bottom: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.35rem;">
+                                        <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
+                                            Bank Transfer (Live)
+                                        </button>
+                                        <button type="button" class="pay-tab" data-method="slip" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                            Cash Deposit Slip (Live)
+                                        </button>
+                                        <button type="button" class="pay-tab" data-method="paypal" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(0,121,193,0.5);">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
+                                            <span style="font-weight:700;"><span style="color:#0079C1;">Pay</span><span style="color:#00457C;">Pal</span></span>
+                                            <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(0,121,193,0.2); color:#38bdf8; font-weight:700;">LIVE</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Bank Transfer Panel -->
+                                    <div id="quick-pay-panel-bank" class="pay-panel pay-panel-bank active">
+                                        <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.95rem;">
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#ffffff;">Bank of Ceylon</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:var(--color-gold);">Rock one wild tea</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:#ffffff; font-family:monospace; font-size:0.95rem; letter-spacing:1px;">94945708</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#ffffff;">Ettampitiya branch</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; border-top:1px dashed rgba(212,175,55,0.2); padding-top:0.45rem; margin-top:0.35rem; font-size:0.85rem;"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="quick-bank-amount-display" style="color:var(--color-gold); font-size:1rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong></div>
+                                        </div>
+                                        <div class="form-group" style="margin-top:0.65rem; margin-bottom: 0;">
+                                            <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Bank Transfer Slip *</label>
+                                            <div class="file-upload-zone" id="quick-bank-slip-zone">
+                                                <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
+                                                <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse receipt file</span></div>
+                                                <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
+                                                <input type="file" id="quick-bank-slip" accept="image/*,.pdf" style="display:none;">
+                                            </div>
+                                            <div id="quick-bank-slip-preview" class="slip-preview" style="display:none;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cash Deposit Panel -->
+                                    <div id="quick-pay-panel-slip" class="pay-panel pay-panel-slip">
+                                        <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.95rem;">
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#ffffff;">Bank of Ceylon</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:var(--color-gold);">Rock one wild tea</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:#ffffff; font-family:monospace; font-size:0.95rem; letter-spacing:1px;">94945708</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#ffffff;">Ettampitiya branch</strong></div>
+                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; border-top:1px dashed rgba(212,175,55,0.2); padding-top:0.45rem; margin-top:0.35rem; font-size:0.85rem;"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="quick-deposit-amount-display" style="color:var(--color-gold); font-size:1rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong></div>
+                                        </div>
+                                        <div class="form-group" style="margin-top:0.65rem; margin-bottom: 0;">
+                                            <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Cash Deposit Slip *</label>
+                                            <div class="file-upload-zone" id="quick-cash-slip-zone">
+                                                <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
+                                                <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse deposit slip</span></div>
+                                                <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
+                                                <input type="file" id="quick-cash-slip" accept="image/*,.pdf" style="display:none;">
+                                            </div>
+                                            <div id="quick-cash-slip-preview" class="slip-preview" style="display:none;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- PayPal Panel -->
+                                    <div id="quick-pay-panel-paypal" class="pay-panel pay-panel-paypal">
+                                        <div style="background: linear-gradient(135deg, rgba(0,121,193,0.12) 0%, rgba(4,14,8,0.92) 100%); border: 1.5px solid rgba(0,121,193,0.45); border-radius: 8px; padding: 1.15rem;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.5rem;">
+                                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
+                                                    <strong style="color: #ffffff; font-size: 0.95rem;">PayPal &bull; Instant Online Settlement</strong>
+                                                </div>
+                                            </div>
+                                            <div style="background: rgba(0,0,0,0.35); border-radius: 6px; padding: 0.55rem 0.85rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+                                                <span style="font-size: 0.76rem; color: #9ca3af;">USD Settlement Amount:</span>
+                                                <strong id="quick-paypal-amount-display" style="font-size: 1.05rem; color: #38bdf8; font-family: monospace;">${currInfo.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`}</strong>
+                                            </div>
+                                            <div id="quick-paypal-button-container" class="paypal-smart-container" style="min-height: 44px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bespoke Gifting & Notes -->
+                            <div class="checkout-step-card">
+                                <div class="checkout-step-header">
+                                    <div class="checkout-step-title">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+                                        <span>5. Bespoke Gifting &amp; Concierge Notes</span>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="quick-pref-date" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Preferred Dispatch Date</label>
+                                        <input class="form-input" type="date" id="quick-pref-date" min="${prodMinDate}" value="${prodMinDate}" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="quick-cust-notes" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Concierge Instructions / Special Notes</label>
+                                        <textarea class="form-input" id="quick-cust-notes" rows="2" placeholder="e.g. Please include complimentary estate tasting booklet, leave at front porch, etc." style="font-size: 0.82rem; padding: 0.65rem 0.75rem;"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- ==============================================
+                         RIGHT COLUMN: LUXURY SUMMARY SIDEBAR (EBAY/SHOPIFY)
+                         ============================================== -->
+                    <div class="checkout-right-col">
+                        <div class="checkout-summary-sidebar">
+                            <div class="checkout-summary-header">
+                                <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold);">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                                    <span>Reserve Allocation</span>
+                                </div>
+                                <span style="font-size: 0.72rem; color: #86efac; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 0.15rem 0.55rem; font-weight: 600;">Single-Estate Reserve</span>
+                            </div>
+
+                            <!-- Product Row with Count Badge -->
+                            <div class="checkout-item-row">
+                                <div class="checkout-thumb-wrap">
+                                    <img src="${product.image || 'images/Product.jpeg'}" alt="${product.name}" onerror="window.handleImageError &amp;&amp; window.handleImageError(this, 'product')" loading="lazy" decoding="async">
+                                    <span class="checkout-count-badge" id="quick-badge-qty">${currentQuickQty}</span>
+                                </div>
+                                <div class="checkout-item-meta">
+                                    <h4 class="checkout-item-name">${product.name}</h4>
+                                    <div class="checkout-item-sub">
+                                        <span>${product.category || 'Single-Estate Tea'}</span>
+                                        <span>&bull;</span>
+                                        <span>${product.leafGrade || 'Silver Tips'}</span>
+                                        <span>&bull;</span>
+                                        <span>${product.weight || '100g'} Tin</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.45rem;">
+                                        <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.5);">
+                                            <button type="button" id="quick-order-qty-minus" style="background: none; border: none; color: var(--color-gold); width: 26px; height: 26px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">-</button>
+                                            <span id="quick-order-qty-val" style="width: 28px; text-align: center; font-size: 0.8rem; font-weight: 700; color: #fff;">${currentQuickQty}</span>
+                                            <button type="button" id="quick-order-qty-plus" style="background: none; border: none; color: var(--color-gold); width: 26px; height: 26px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">+</button>
+                                        </div>
+                                        <span id="quick-order-unit-price" style="font-size: 0.78rem; color: var(--color-text-muted);">${window.formatAmountInCurrency ? window.formatAmountInCurrency(unitPriceUSD, currInfo) : '$' + unitPriceUSD.toFixed(2)} / tin</span>
+                                    </div>
+                                </div>
+                                <div class="checkout-item-price" id="quick-item-line-price">${formattedSubtotal}</div>
+                            </div>
+
+                            <!-- Discount Code Box -->
+                            <div class="checkout-discount-box">
+                                <input type="text" id="quick-promo-code" class="checkout-discount-input" placeholder="Discount code or gift card">
+                                <button type="button" id="quick-apply-promo-btn" class="checkout-discount-btn">Apply</button>
+                            </div>
+
+                            <!-- Savings Pill -->
+                            <div class="checkout-savings-pill" id="quick-savings-pill" style="display: none;">
+                                <span style="display: flex; align-items: center; gap: 0.35rem;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                                    <span id="quick-savings-label">TOTAL SAVINGS</span>
+                                </span>
+                                <strong id="quick-savings-amt">-$0.00</strong>
+                            </div>
+
+                            <!-- Line Items Breakdown -->
+                            <div style="display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.84rem; padding-top: 0.25rem;">
+                                <div class="checkout-totals-row">
+                                    <span>Subtotal</span>
+                                    <strong id="quick-summary-subtotal" style="color: #ffffff;">${formattedSubtotal}</strong>
+                                </div>
+                                <div class="checkout-totals-row" id="quick-discount-row" style="display: none; color: #4ade80;">
+                                    <span>Promotional Savings</span>
+                                    <strong id="quick-discount-amt">-$0.00</strong>
+                                </div>
+                                <div class="checkout-totals-row">
+                                    <span id="quick-summary-shipping-label">${isSriLanka ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS Priority Air'}</span>
+                                    <span id="quick-summary-shipping" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-weight: 600;">${formattedShipping}</span>
+                                </div>
+                                <div class="checkout-grand-total-row">
+                                    <div>
+                                        <strong id="quick-summary-total-title" style="font-size: 0.95rem; color: #ffffff;">Total Due (${currInfo.code})</strong>
+                                        <span id="quick-lkr-approx" style="display: block; font-size: 0.72rem; color: #94a3b8; font-weight: normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>
+                                    </div>
+                                    <strong id="quick-summary-total" style="font-size: 1.45rem; color: var(--color-gold); font-family: var(--font-serif);">${formattedGrandTotal}</strong>
+                                </div>
+                            </div>
+
+                            <!-- Master Action Button -->
+                            <button type="button" id="quick-summary-submit-btn" class="checkout-action-btn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span id="quick-action-btn-text">Complete Reserve Order &bull; ${formattedGrandTotal}</span>
+                            </button>
+
+                            <!-- Trust Badges -->
+                            <div class="checkout-trust-badges">
+                                <span>🔒 256-Bit SSL Encrypted</span>
+                                <span>🇱🇰 Estate Direct Dispatch</span>
+                                <span>📜 Certified Heritage Origin</span>
+                            </div>
+
+                            <div class="checkout-footer-links">
+                                <a href="#terms" onclick="event.preventDefault();">Terms and policies</a>
+                                <span>&bull;</span>
+                                <a href="#privacy" onclick="event.preventDefault();">Your Privacy Choices <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></a>
                             </div>
                         </div>
-
-                        <!-- Section: Payment Method & Order Confirmation -->
-                        <div class="cart-step-card" id="quick-payment-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                <span>5. Payment Method &amp; Order Confirmation</span>
-                            </div>
-
-                            <!-- COD Panel (Sri Lanka Only) -->
-                            <div id="quick-pay-panel-cod" style="display: none;">
-                                <div style="background: rgba(37,211,102,0.08); border: 1.5px solid rgba(37,211,102,0.4); border-radius: 10px; padding: 1.15rem; text-align: center; margin-bottom: 1rem;">
-                                    <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(37,211,102,0.15); border: 1.5px solid #25d366; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto; color: #25d366;">
-                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                                    </div>
-                                    <h4 style="color: #4ade80; font-size: 1.05rem; margin-bottom: 0.35rem; font-weight: 700;">Cash on Delivery (COD) Selected</h4>
-                                    <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5; margin: 0 0 0.85rem 0;">
-                                        No online payment is needed now. The Sri Lanka Post EMS courier will collect the cash amount upon parcel handover.
-                                    </p>
-                                    <div style="background: rgba(0,0,0,0.45); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.65rem 1rem; display: inline-flex; align-items: center; gap: 0.75rem;">
-                                        <span style="font-size: 0.78rem; color: #9ca3af;">Amount Payable to Courier:</span>
-                                        <strong id="quick-cod-amount-display" style="font-size: 1.25rem; color: var(--color-gold); font-family: monospace;">Rs ${grandTotalLKR.toLocaleString()} LKR</strong>
-                                    </div>
-                                </div>
-
-                                <button type="submit" id="btn-submit-quick-cod" class="btn btn-primary" style="padding: 0.95rem 1.5rem; font-size: 0.95rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; box-shadow: 0 4px 18px rgba(37,211,102,0.3);">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                    <span id="quick-cod-btn-text">Confirm Order via Cash on Delivery (COD) &bull; Rs ${grandTotalLKR.toLocaleString()} LKR</span>
-                                </button>
-                            </div>
-
-                            <!-- Pre-Paid Panels -->
-                            <div id="quick-pay-panel-prepaid">
-                                <div class="payment-method-tabs" style="margin-bottom: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.35rem;">
-                                    <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
-                                        Bank Transfer (Live)
-                                    </button>
-                                    <button type="button" class="pay-tab" data-method="slip" style="display:inline-flex; align-items:center; gap:0.35rem;">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                        Cash Deposit Slip (Live)
-                                    </button>
-                                    <button type="button" class="pay-tab" data-method="paypal" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(0,121,193,0.5);">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
-                                        <span style="font-weight:700;"><span style="color:#0079C1;">Pay</span><span style="color:#00457C;">Pal</span></span>
-                                        <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(0,121,193,0.2); color:#38bdf8; font-weight:700;">LIVE</span>
-                                    </button>
-                                </div>
-
-                                <!-- Method A: Direct Bank Transfer -->
-                                <div id="pay-panel-bank" class="pay-panel active" style="margin-top: 0.5rem;">
-                                    <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.85rem; font-size: 0.8rem; margin-bottom: 0.75rem;">
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#fff;">Bank of Ceylon</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:#fff;">Rock one wild tea</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:var(--color-gold); font-family:monospace; font-size:0.95rem;">94945708</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#fff;">Ettampitiya branch</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; padding-top:0.4rem; border-top:1px dashed rgba(212,175,55,0.2);"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="quick-bank-amount-display" style="color:var(--color-gold); font-size:1.05rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong></div>
-                                    </div>
-                                    <div class="form-group" style="margin-bottom: 0.75rem;">
-                                        <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Bank Transfer Slip *</label>
-                                        <div class="file-upload-zone" id="quick-bank-slip-zone">
-                                            <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
-                                            <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse receipt</span></div>
-                                            <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
-                                            <input type="file" id="quick-bank-slip" accept="image/*,.pdf" style="display:none;">
-                                        </div>
-                                        <div id="quick-bank-slip-preview" class="slip-preview" style="display:none;"></div>
-                                    </div>
-                                    <button type="submit" id="btn-submit-quick-bank" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                                        <span id="quick-bank-btn-text">Place Bank Transfer Order &bull; ${formattedGrandTotal}</span>
-                                    </button>
-                                </div>
-
-                                <!-- Method B: Cash Deposit Slip -->
-                                <div id="pay-panel-slip" class="pay-panel" style="margin-top: 0.5rem;">
-                                    <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.85rem; font-size: 0.8rem; margin-bottom: 0.75rem;">
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#fff;">Bank of Ceylon</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:#fff;">Rock one wild tea</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:var(--color-gold); font-family:monospace; font-size:0.95rem;">94945708</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#fff;">Ettampitiya branch</strong></div>
-                                        <div class="bank-detail-row" style="display:flex; justify-content:space-between; padding-top:0.4rem; border-top:1px dashed rgba(212,175,55,0.2);"><span style="color:var(--color-text-muted);">Exact Deposit Amount:</span><strong id="quick-deposit-amount-display" style="color:var(--color-gold); font-size:1.05rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong></div>
-                                    </div>
-                                    <div class="form-group" style="margin-bottom: 0.75rem;">
-                                        <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Cash Deposit Slip *</label>
-                                        <div class="file-upload-zone" id="quick-cash-slip-zone">
-                                            <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
-                                            <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse deposit slip</span></div>
-                                            <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
-                                            <input type="file" id="quick-cash-slip" accept="image/*,.pdf" style="display:none;">
-                                        </div>
-                                        <div id="quick-cash-slip-preview" class="slip-preview" style="display:none;"></div>
-                                    </div>
-                                    <button type="submit" id="btn-submit-quick-slip" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                                        <span id="quick-slip-btn-text">Submit Cash Deposit Slip &bull; ${formattedGrandTotal}</span>
-                                    </button>
-                                </div>
-
-                                <!-- Method C: PayPal / Credit Cards -->
-                                <div id="pay-panel-paypal" class="pay-panel" style="margin-top: 0.5rem;">
-                                    <div style="background: rgba(0, 121, 193, 0.06); border: 1.5px solid rgba(0, 121, 193, 0.35); border-radius: 10px; padding: 1.15rem; margin-bottom: 0.75rem;">
-                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.3rem;">
-                                            <div style="display: flex; align-items: center; gap: 0.4rem;">
-                                                <strong style="color: #ffffff; font-size: 0.95rem;">Instant PayPal &amp; International Cards</strong>
-                                            </div>
-                                            <span style="background: rgba(0,121,193,0.2); color: #38bdf8; font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 4px; text-transform: uppercase;">Instant Clearance</span>
-                                        </div>
-                                        <p style="font-size: 0.76rem; color: #cbd5e1; line-height: 1.45; margin: 0 0 0.75rem 0;">
-                                            Settle immediately with your PayPal balance, Visa, Mastercard, or AMEX. Your Luxury Allocation Certificate signed by CEO Prasanga will be activated instantly.
-                                        </p>
-                                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0.75rem; background: rgba(0,0,0,0.4); border-radius: 6px; margin-bottom: 0.85rem;">
-                                            <span style="font-size: 0.75rem; color: #9ca3af;">PayPal Settlement Total:</span>
-                                            <strong id="quick-paypal-amount-display" style="font-size: 1rem; color: var(--color-gold); font-family: monospace;">${currInfo.code === 'USD' ? '$' + grandTotalUSD.toFixed(2) + ' USD' : formattedGrandTotal + ' ($' + grandTotalUSD.toFixed(2) + ' USD)'}</strong>
-                                        </div>
-                                        <div id="quick-paypal-button-container" class="paypal-smart-container" style="min-height: 44px;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             `;
 
@@ -4085,10 +4202,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cur = window.getCountryCurrency ? window.getCountryCurrency(country) : (isLK ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
                 
                 subtotalUSD = unitPriceUSD * currentQuickQty;
-                shippingUSD = window.calculateShippingFee ? window.calculateShippingFee(subtotalUSD, country, itemDefinedShipping) : (isLK ? 2.13 : 15.0);
-                grandTotalUSD = subtotalUSD + shippingUSD;
+                discountUSD = 0;
+                if (activeProdPromo) {
+                    discountUSD = Number((subtotalUSD * (activeProdPromo.percent / 100)).toFixed(2));
+                }
+                discountedSubtotalUSD = Math.max(0, subtotalUSD - discountUSD);
+
+                shippingUSD = window.calculateShippingFee ? window.calculateShippingFee(discountedSubtotalUSD, country, itemDefinedShipping) : (isLK ? 2.13 : 15.0);
+                grandTotalUSD = discountedSubtotalUSD + shippingUSD;
 
                 formattedSubtotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(subtotalUSD, cur) : `$${subtotalUSD.toFixed(2)}`;
+                const formattedDiscount = discountUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(discountUSD, cur) : `$${discountUSD.toFixed(2)}`) : '';
                 formattedShipping = shippingUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(shippingUSD, cur) : `$${shippingUSD.toFixed(2)}`) : 'Complimentary';
                 formattedGrandTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(grandTotalUSD, cur) : `$${grandTotalUSD.toFixed(2)}`;
                 grandTotalLKR = Math.round(grandTotalUSD * 305);
@@ -4097,10 +4221,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (unitPriceEl && window.formatAmountInCurrency) {
                     unitPriceEl.textContent = `${window.formatAmountInCurrency(unitPriceUSD, cur)} / tin`;
                 }
+                const badgeQtyEl = document.getElementById('quick-badge-qty');
+                if (badgeQtyEl) badgeQtyEl.textContent = currentQuickQty;
+                const linePriceEl = document.getElementById('quick-item-line-price');
+                if (linePriceEl) linePriceEl.textContent = formattedSubtotal;
+
                 const subEl = document.getElementById('quick-summary-subtotal');
                 if (subEl) subEl.textContent = formattedSubtotal;
                 const shipLabel = document.getElementById('quick-summary-shipping-label');
-                if (shipLabel) shipLabel.textContent = isLK ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS International Priority Air';
+                if (shipLabel) shipLabel.textContent = isLK ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS Priority Air';
                 const shipEl = document.getElementById('quick-summary-shipping');
                 if (shipEl) {
                     shipEl.textContent = formattedShipping;
@@ -4110,6 +4239,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (totalTitle) totalTitle.textContent = `Total Due (${cur.code})`;
                 const totalEl = document.getElementById('quick-summary-total');
                 if (totalEl) totalEl.textContent = formattedGrandTotal;
+                const lkrEl = document.getElementById('quick-lkr-approx');
+                if (lkrEl) lkrEl.textContent = `(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)`;
+
+                // Savings pill & discount row
+                const savingsPill = document.getElementById('quick-savings-pill');
+                const savingsLabel = document.getElementById('quick-savings-label');
+                const savingsAmt = document.getElementById('quick-savings-amt');
+                const discountRow = document.getElementById('quick-discount-row');
+                const discountAmt = document.getElementById('quick-discount-amt');
+                if (discountUSD > 0 && activeProdPromo) {
+                    if (savingsPill) savingsPill.style.display = 'flex';
+                    if (savingsLabel) savingsLabel.textContent = activeProdPromo.label.toUpperCase();
+                    if (savingsAmt) savingsAmt.textContent = `-${formattedDiscount}`;
+                    if (discountRow) discountRow.style.display = 'flex';
+                    if (discountAmt) discountAmt.textContent = `-${formattedDiscount}`;
+                } else {
+                    if (savingsPill) savingsPill.style.display = 'none';
+                    if (discountRow) discountRow.style.display = 'none';
+                }
+
+                // Master action button text
+                const masterBtnText = document.getElementById('quick-action-btn-text');
+                if (masterBtnText) {
+                    masterBtnText.textContent = `Complete Reserve Order • ${formattedGrandTotal}`;
+                }
 
                 const emsTitle = document.getElementById('quick-shipping-ems-title');
                 if (emsTitle) emsTitle.textContent = isLK ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air';
@@ -4131,31 +4285,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     syncQuickShippingSelection();
                 }
 
-                const rateNote = document.getElementById('quick-shipping-rate-note');
-                if (rateNote) {
-                    rateNote.textContent = isLK 
-                        ? 'Rs 650 LKR (Complimentary over $80)' 
-                        : (window.formatAmountInCurrency ? window.formatAmountInCurrency(15, cur) : '$15.00') + ' International EMS (Complimentary over $150)';
-                }
-
                 const codAmt = document.getElementById('quick-cod-amount-display');
                 if (codAmt) codAmt.textContent = `Rs ${grandTotalLKR.toLocaleString()} LKR`;
-                const codBtn = document.getElementById('quick-cod-btn-text');
-                if (codBtn) codBtn.textContent = `Confirm Order via Cash on Delivery (COD) • Rs ${grandTotalLKR.toLocaleString()} LKR`;
 
                 const bankAmt = document.getElementById('quick-bank-amount-display');
                 if (bankAmt) {
                     bankAmt.innerHTML = isLK ? `Rs ${grandTotalLKR.toLocaleString()} LKR` : `${formattedGrandTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>`;
                 }
-                const bankBtn = document.getElementById('quick-bank-btn-text');
-                if (bankBtn) bankBtn.textContent = `Place Bank Transfer Order • ${formattedGrandTotal}`;
 
                 const depAmt = document.getElementById('quick-deposit-amount-display');
                 if (depAmt) {
                     depAmt.innerHTML = isLK ? `Rs ${grandTotalLKR.toLocaleString()} LKR` : `${formattedGrandTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>`;
                 }
-                const slipBtn = document.getElementById('quick-slip-btn-text');
-                if (slipBtn) slipBtn.textContent = `Submit Cash Deposit Slip • ${formattedGrandTotal}`;
 
                 const ppAmt = document.getElementById('quick-paypal-amount-display');
                 if (ppAmt) {
@@ -4253,17 +4394,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             }
 
-            const countryInput = document.getElementById('quick-cust-country');
-            if (countryInput) {
-                countryInput.onchange = updateQuickPricing;
+            // Promo code wiring
+            const prodPromoBtn = document.getElementById('quick-apply-promo-btn');
+            const prodPromoInput = document.getElementById('quick-promo-code');
+            if (prodPromoBtn && prodPromoInput) {
+                const handleProdPromo = () => {
+                    const val = prodPromoInput.value.trim();
+                    if (!val) {
+                        activeProdPromo = null;
+                        updateQuickPricing();
+                        showToast("Voucher Cleared", "Promotional voucher removed.", "info");
+                        return;
+                    }
+                    const res = window.validatePromoCode(val, unitPriceUSD * currentQuickQty);
+                    if (res.valid) {
+                        activeProdPromo = res;
+                        updateQuickPricing();
+                        showToast("Voucher Applied!", `${res.label} (${res.percent}%) applied successfully.`, "success");
+                    } else {
+                        activeProdPromo = null;
+                        updateQuickPricing();
+                        showToast("Invalid Voucher", res.message || "Invalid promotional code.", "warning");
+                    }
+                };
+                prodPromoBtn.onclick = handleProdPromo;
+                prodPromoInput.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleProdPromo();
+                    }
+                };
             }
+
+            const countryInput = document.getElementById('quick-cust-country');
+            if (countryInput) countryInput.onchange = updateQuickPricing;
 
             drawerFormContainer.querySelectorAll('input[name="quick-shipping-method"]').forEach(r => {
                 r.onchange = syncQuickShippingSelection;
             });
 
             bindPaymentTabs('quick-checkout-form');
-            bindBespokeGiftEvents('quick');
             bindFileUpload('quick-bank-slip', 'quick-bank-slip-zone', 'quick-bank-slip-preview', (b64) => {
                 selectedProdSlipBase64 = b64;
             });
@@ -4300,15 +4470,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         const suite = document.getElementById('quick-cust-suite')?.value?.trim() || '';
                         const city = document.getElementById('quick-cust-city')?.value?.trim() || '';
                         const postal = document.getElementById('quick-cust-postal')?.value?.trim() || '';
-                        const region = document.getElementById('quick-cust-region')?.value?.trim() || '';
+                        const region = document.getElementById('quick-cust-region')?.value || '';
                         const country = document.getElementById('quick-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
                         const prefDate = document.getElementById('quick-pref-date')?.value || '';
                         const notes = document.getElementById('quick-cust-notes')?.value?.trim() || '';
-                        
-                        const isGift = document.getElementById('quick-enable-gift')?.checked || false;
-                        const giftWax = document.getElementById('quick-wax-val')?.value || 'Imperial Gold';
-                        const giftMonogram = document.getElementById('quick-monogram-input')?.value?.trim().toUpperCase() || '';
-                        const giftMsg = document.getElementById('quick-gift-msg')?.value?.trim() || '';
 
                         const fullAddress = `${street}${suite ? ', ' + suite : ''}, ${city}, ${region ? region + ', ' : ''}${postal}, ${country}`;
 
@@ -4322,10 +4487,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             notes,
                             quantity: currentQuickQty,
                             preferredDate: prefDate,
-                            giftPackaging: isGift,
-                            waxSealColor: isGift ? giftWax : '',
-                            monogramInitials: isGift ? giftMonogram : '',
-                            giftMessage: isGift ? giftMsg : '',
                             paymentMethod: 'paypal',
                             slipImage: ''
                         });
@@ -4343,12 +4504,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                     customer_phone: phone,
                                     shipping_address: fullAddress,
                                     subtotal_usd: subtotalUSD,
+                                    discount_usd: discountUSD,
                                     shipping_usd: shippingUSD,
                                     total_usd: grandTotalUSD,
                                     currency_code: currInfo.code,
                                     total_in_currency: grandTotalUSD,
                                     payment_method: 'paypal',
-                                    bespoke_notes: notes,
+                                    bespoke_notes: (activeProdPromo ? `Promo: ${activeProdPromo.code} (${activeProdPromo.percent}% off) | ` : '') + notes,
                                     items: [{ id: product.id, name: product.name, quantity: currentQuickQty, price: unitPriceUSD, shippingCharge: shippingUSD }]
                                 }).catch(e => console.warn('Order sync:', e.message));
                             }
@@ -4367,7 +4529,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            // Quick Checkout Submission for COD, Bank Transfer, Deposit Slip
+            // Quick Checkout Submission
             const handleQuickCheckoutFormSubmit = (e) => {
                 if (e) e.preventDefault();
                 const form = document.getElementById('quick-checkout-form');
@@ -4382,7 +4544,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const paymentMethod = shippingMethod === 'cod' ? 'cod' : selectedMethod;
 
                 if (paymentMethod === 'paypal') {
-                    showToast("PayPal Active", "Please use the official PayPal button above to complete checkout.", "info");
+                    const ppCont = document.getElementById('quick-paypal-button-container');
+                    if (ppCont) {
+                        ppCont.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        showToast("PayPal Active", "Please click the yellow PayPal button to authorize payment.", "info");
+                    }
                     return;
                 }
 
@@ -4395,15 +4561,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const suite = document.getElementById('quick-cust-suite')?.value?.trim() || '';
                 const city = document.getElementById('quick-cust-city')?.value?.trim() || '';
                 const postal = document.getElementById('quick-cust-postal')?.value?.trim() || '';
-                const region = document.getElementById('quick-cust-region')?.value?.trim() || '';
+                const region = document.getElementById('quick-cust-region')?.value || '';
                 const country = document.getElementById('quick-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
                 const prefDate = document.getElementById('quick-pref-date')?.value || '';
                 const notes = document.getElementById('quick-cust-notes')?.value?.trim() || '';
-                
-                const isGift = document.getElementById('quick-enable-gift')?.checked || false;
-                const giftWax = document.getElementById('quick-wax-val')?.value || 'Imperial Gold';
-                const giftMonogram = document.getElementById('quick-monogram-input')?.value?.trim().toUpperCase() || '';
-                const giftMsg = document.getElementById('quick-gift-msg')?.value?.trim() || '';
 
                 const fullAddress = `${street}${suite ? ', ' + suite : ''}, ${city}, ${region ? region + ', ' : ''}${postal}, ${country}`;
 
@@ -4426,10 +4587,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     notes,
                     quantity: currentQuickQty,
                     preferredDate: prefDate,
-                    giftPackaging: isGift,
-                    waxSealColor: isGift ? giftWax : '',
-                    monogramInitials: isGift ? giftMonogram : '',
-                    giftMessage: isGift ? giftMsg : '',
                     paymentMethod,
                     shippingMethod,
                     slipImage: slipImg
@@ -4452,12 +4609,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             customer_phone: phone,
                             shipping_address: fullAddress,
                             subtotal_usd: subtotalUSD,
+                            discount_usd: discountUSD,
                             shipping_usd: shippingUSD,
                             total_usd: grandTotalUSD,
                             currency_code: currInfo.code,
                             total_in_currency: grandTotalUSD,
                             payment_method: paymentMethod,
-                            bespoke_notes: notes,
+                            bespoke_notes: (activeProdPromo ? `Promo: ${activeProdPromo.code} (${activeProdPromo.percent}% off) | ` : '') + notes,
                             items: [{ id: product.id, name: product.name, quantity: currentQuickQty, price: unitPriceUSD, shippingCharge: shippingUSD }]
                         }).catch(e => console.warn('Order sync:', e.message));
                     }
@@ -4470,8 +4628,14 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             const quickForm = document.getElementById('quick-checkout-form');
-            if (quickForm) {
-                quickForm.onsubmit = handleQuickCheckoutFormSubmit;
+            if (quickForm) quickForm.onsubmit = handleQuickCheckoutFormSubmit;
+
+            // Master Action Button in right column
+            const quickSummaryBtn = document.getElementById('quick-summary-submit-btn');
+            if (quickSummaryBtn) {
+                quickSummaryBtn.onclick = () => {
+                    handleQuickCheckoutFormSubmit();
+                };
             }
 
             document.getElementById('quick-guest-signin-btn')?.addEventListener('click', () => {
@@ -4481,6 +4645,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             });
+        
         } else if (type === 'review') {
             drawerTitle.innerText = "Rate & Review Your Experience";
             let selectedRating = 5;
@@ -4733,6 +4898,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeDrawer() {
         drawerOverlay.classList.remove('active');
         drawerOverlay.classList.remove('open');
+        const drawerContainer = drawerOverlay.querySelector('.drawer-container');
+        if (drawerContainer) {
+            drawerContainer.classList.remove('checkout-mode');
+        }
+        if (drawerFooter) drawerFooter.style.display = '';
         currentDrawerContext = null;
     }
 
@@ -12749,6 +12919,10 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             }
 
             window.UIComponents.renderCartDrawer('cart-drawer-body');
+            const cartContainer = cartOverlay.querySelector('.drawer-container');
+            if (cartContainer) {
+                cartContainer.classList.add('checkout-mode');
+            }
             cartOverlay.classList.add('active');
             cartOverlay.classList.add('open');
             cartOverlay.setAttribute('aria-hidden', 'false');
@@ -12758,6 +12932,10 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
 
         function closeCart() {
             if (!cartOverlay) return;
+            const cartContainer = cartOverlay.querySelector('.drawer-container');
+            if (cartContainer) {
+                cartContainer.classList.remove('checkout-mode');
+            }
             cartOverlay.classList.remove('active');
             cartOverlay.classList.remove('open');
             cartOverlay.setAttribute('aria-hidden', 'true');
@@ -13413,6 +13591,73 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 };
             }
         }
+
+        
+            // Master Action Button for Cart
+            const cartSummaryBtn = document.getElementById('cart-summary-submit-btn');
+            if (cartSummaryBtn) {
+                cartSummaryBtn.onclick = () => {
+                    const selectedShipping = document.querySelector('input[name="cart-shipping-method"]:checked')?.value || 'ems_express';
+                    const activeCartTab = checkoutForm ? checkoutForm.querySelector('.pay-tab.active') : null;
+                    const paymentMethod = selectedShipping === 'cod' ? 'cod' : (activeCartTab ? activeCartTab.getAttribute('data-method') : 'bank');
+                    if (paymentMethod === 'paypal') {
+                        const ppCont = document.getElementById('cart-paypal-button-container');
+                        if (ppCont) {
+                            ppCont.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            showToast("PayPal Active", "Please click the yellow PayPal button to complete payment.", "info");
+                        }
+                        return;
+                    }
+                    if (checkoutForm) {
+                        if (typeof checkoutForm.requestSubmit === 'function') {
+                            checkoutForm.requestSubmit();
+                        } else {
+                            checkoutForm.dispatchEvent(new Event('submit', { cancelable: true }));
+                        }
+                    }
+                };
+            }
+
+            // Promo Code wiring for Cart
+            const cartPromoBtn = document.getElementById('cart-apply-promo-btn');
+            const cartPromoInput = document.getElementById('cart-promo-code');
+            if (cartPromoBtn && cartPromoInput) {
+                const handleCartPromo = () => {
+                    if (window.activeCartPromo) {
+                        window.activeCartPromo = null;
+                        if (window.UIComponents && window.UIComponents.renderCartDrawer) {
+                            window.UIComponents.renderCartDrawer('cart-drawer-body');
+                            bindCartDrawerEvents();
+                        }
+                        showToast("Voucher Removed", "Promotional voucher removed from reserve bag.", "info");
+                        return;
+                    }
+                    const val = cartPromoInput.value.trim();
+                    if (!val) {
+                        showToast("Voucher Code", "Please enter a voucher code.", "info");
+                        return;
+                    }
+                    const subtotal = window.TeaFactoryStore.getCartSubtotal();
+                    const res = window.validatePromoCode(val, subtotal);
+                    if (res.valid) {
+                        window.activeCartPromo = res;
+                        if (window.UIComponents && window.UIComponents.renderCartDrawer) {
+                            window.UIComponents.renderCartDrawer('cart-drawer-body');
+                            bindCartDrawerEvents();
+                        }
+                        showToast("Voucher Applied!", `${res.label} (${res.percent}%) applied successfully!`, "success");
+                    } else {
+                        showToast("Invalid Voucher", res.message || "Invalid promotional code.", "warning");
+                    }
+                };
+                cartPromoBtn.onclick = handleCartPromo;
+                cartPromoInput.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleCartPromo();
+                    }
+                };
+            }
 
         window.appBindCartDrawerEvents = bindCartDrawerEvents;
 
