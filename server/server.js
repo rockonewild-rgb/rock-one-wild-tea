@@ -131,7 +131,11 @@ if (require.main === module) {
             console.log(`   Turso Status:    🌿 CONNECTED (${process.env.TURSO_DATABASE_URL})`);
             try {
                 await initTursoSchema();
-                await syncLocalToTurso();
+                if (process.env.TURSO_AUTO_SEED === 'true' || process.env.TURSO_AUTO_SEED === '1') {
+                    await syncLocalToTurso();
+                } else {
+                    console.log('   Turso Auto-Seed: 🔒 DISABLED (Manual database control active; zero auto-repopulation)');
+                }
             } catch (e) {
                 console.warn('   Turso Init Note:', e.message);
             }

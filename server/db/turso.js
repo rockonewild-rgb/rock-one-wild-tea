@@ -190,6 +190,13 @@ async function initTursoSchema() {
 async function syncLocalToTurso() {
     if (!turso || !isTursoAvailable) return false;
 
+    // Check if auto-seed is enabled (defaults to disabled for full manual database control)
+    const isAutoSeedEnabled = process.env.TURSO_AUTO_SEED === 'true' || process.env.TURSO_AUTO_SEED === '1';
+    if (!isAutoSeedEnabled) {
+        console.log('ℹ️ [Turso Cloud] Auto-seeding is disabled (TURSO_AUTO_SEED!=true). Database will not be repopulated.');
+        return false;
+    }
+
     try {
         const prodCheck = await turso.execute('SELECT COUNT(*) as count FROM products');
         const count = prodCheck.rows[0]?.count || 0;
