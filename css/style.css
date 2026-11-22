@@ -5066,182 +5066,207 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 /* Heritage Showcase Column Grid */
 .heritage-container-layout {
-    display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 3.5rem;
-    align-items: center;
-    margin-bottom: 5rem;
-    padding-bottom: 4rem;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: grid !important;
+    grid-template-columns: 1.05fr 0.95fr !important;
+    gap: 3.5rem !important;
+    align-items: center !important;
+    margin-bottom: 4.5rem !important;
+    padding-bottom: 4rem !important;
+    border-bottom: 1px solid #e8e4df !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 /* Heritage Gallery SlideShow */
 .heritage-visual-wrapper {
-    position: relative;
-    border-radius: 18px;
-    overflow: hidden;
-    border: 1.5px solid rgba(212, 175, 55, 0.4);
-    aspect-ratio: 4/3;
-    min-height: 380px;
-    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.15);
-    background: #020a05;
+    position: relative !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    border: 2px solid #b8860b !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08) !important;
+    background: #0d1a12 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-height: 480px !important;
+    height: 520px !important;
 }
 
 .heritage-slides-track {
-    position: relative;
-    width: 100%;
-    height: 100%;
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .heritage-slide {
-    position: absolute;
-    inset: 0;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    opacity: 0;
-    visibility: hidden;
-    transform: scale(1.04);
-    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.9s;
-    cursor: pointer;
+    position: absolute !important;
+    inset: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-size: contain !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-color: #0d1a12 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s !important;
+    cursor: pointer !important;
+    overflow: hidden !important;
 }
 
 .heritage-slide.active {
-    opacity: 1;
-    visibility: visible;
-    transform: scale(1);
-    z-index: 2;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 2 !important;
 }
 
-.heritage-slide-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(2, 10, 5, 0.08) 0%, rgba(2, 10, 5, 0.35) 55%, rgba(2, 10, 5, 0.92) 100%);
-    z-index: 1;
-    pointer-events: none;
+.heritage-slide-blur-bg {
+    position: absolute !important;
+    inset: -25px !important;
+    background-size: cover !important;
+    background-position: center !important;
+    filter: blur(28px) brightness(0.6) !important;
+    opacity: 0.55 !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
 }
 
-.heritage-slide-info {
-    position: absolute;
-    bottom: 3.25rem;
-    left: 1.25rem;
-    right: 1.25rem;
-    z-index: 3;
-    pointer-events: none;
-    animation: fadeInSlideUp 0.6s ease-out;
+.heritage-slide-img {
+    position: relative !important;
+    z-index: 2 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    display: block !important;
+    pointer-events: none !important;
 }
 
-.heritage-slide-tag {
-    display: inline-block;
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--color-gold);
-    font-weight: 700;
-    background: rgba(3, 14, 8, 0.85);
-    border: 1px solid rgba(212, 175, 55, 0.4);
-    border-radius: 50px;
-    padding: 0.2rem 0.75rem;
-    margin-bottom: 0.35rem;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+.heritage-slide-badge {
+    position: absolute !important;
+    top: 1rem !important;
+    right: 1rem !important;
+    z-index: 5 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    background: rgba(17, 24, 39, 0.8) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(212, 175, 55, 0.5) !important;
+    color: #ffd875 !important;
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    padding: 0.35rem 0.85rem !important;
+    border-radius: 20px !important;
+    pointer-events: none !important;
 }
 
-.heritage-slide-caption {
-    font-family: var(--font-serif);
-    font-size: 1.15rem;
-    color: #ffffff;
-    margin: 0;
-    line-height: 1.3;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.heritage-slide-info-bar {
+    position: absolute !important;
+    bottom: 2.85rem !important;
+    left: 1rem !important;
+    right: 1rem !important;
+    z-index: 5 !important;
+    pointer-events: none !important;
+}
+
+.heritage-slide-caption-text {
+    display: inline-block !important;
+    background: rgba(17, 24, 39, 0.75) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    font-size: 0.8rem !important;
+    padding: 0.3rem 0.75rem !important;
+    border-radius: 8px !important;
+    max-width: 90% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
 .heritage-slider-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: rgba(2, 10, 5, 0.7);
-    border: 1px solid rgba(212, 175, 55, 0.35);
-    color: var(--color-gold);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    transition: all 0.25s ease;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    opacity: 0.85;
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1.5px solid #b8860b !important;
+    color: #111827 !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    z-index: 10 !important;
+    transition: all 0.25s ease !important;
 }
 
 .heritage-slider-btn:hover {
-    opacity: 1;
-    background: rgba(6, 22, 12, 0.95);
-    border-color: var(--color-gold);
-    color: #ffffff;
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    background: #b8860b !important;
+    color: #ffffff !important;
+    transform: translateY(-50%) scale(1.08) !important;
 }
 
 .heritage-prev {
-    left: 0.85rem;
+    left: 0.85rem !important;
 }
 
 .heritage-next {
-    right: 0.85rem;
+    right: 0.85rem !important;
 }
 
 .heritage-slider-footer {
-    position: absolute;
-    bottom: 0.85rem;
-    left: 1.25rem;
-    right: 1.25rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 10;
-    background: rgba(3, 14, 8, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 0.35rem 0.85rem;
-    border-radius: 30px;
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    position: absolute !important;
+    bottom: 0.75rem !important;
+    left: 1rem !important;
+    right: 1rem !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    z-index: 10 !important;
+    background: rgba(17, 24, 39, 0.85) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    padding: 0.35rem 0.85rem !important;
+    border-radius: 30px !important;
+    border: 1px solid rgba(212, 175, 55, 0.35) !important;
 }
 
 .heritage-dots-bar {
-    display: flex;
-    gap: 0.35rem;
-    align-items: center;
+    display: flex !important;
+    gap: 0.35rem !important;
+    align-items: center !important;
 }
 
 .heritage-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.35);
-    cursor: pointer;
-    transition: all 0.3s ease;
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.4) !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
 }
 
 .heritage-dot.active {
-    width: 18px;
-    border-radius: 8px;
-    background: var(--color-gold);
-    box-shadow: 0 0 8px rgba(212, 175, 55, 0.8);
+    width: 18px !important;
+    border-radius: 8px !important;
+    background: #b8860b !important;
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.8) !important;
 }
 
 .heritage-counter {
-    font-family: monospace;
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: var(--color-gold);
-    letter-spacing: 1px;
+    font-family: monospace !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    color: #ffd875 !important;
+    letter-spacing: 1px !important;
 }
 
 /* Testimonial slider layouts */
@@ -5844,7 +5869,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
         gap: 2rem;
     }
     .heritage-visual-wrapper {
-        height: 240px !important;
+        min-height: 380px !important;
+        height: 400px !important;
     }
 
     /* Brewing guide */
@@ -6081,7 +6107,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
     /* Heritage image height */
     .heritage-visual-wrapper {
-        height: 200px !important;
+        min-height: 300px !important;
+        height: 320px !important;
     }
 
     /* Testimonial card */
@@ -10019,7 +10046,8 @@ mark.search-match-highlight {
         padding-right: 0 !important;
     }
     .heritage-visual-wrapper {
-        height: 220px !important;
+        min-height: 340px !important;
+        height: 360px !important;
         border-radius: 14px !important;
     }
 
@@ -10485,9 +10513,6 @@ input, select, textarea, button {
         justify-content: center !important;
         color: #96700a !important;
     }
-        justify-content: center !important;
-        color: var(--color-gold) !important;
-    }
     .side-social-pill .pill-icon svg {
         width: 17px !important;
         height: 17px !important;
@@ -10867,7 +10892,8 @@ input, select, textarea, button {
         gap: 1.75rem !important;
     }
     .heritage-visual-wrapper {
-        height: 240px !important;
+        min-height: 340px !important;
+        height: 360px !important;
         width: 100% !important;
         border-radius: 14px !important;
     }
@@ -14867,17 +14893,6 @@ label {
 
 .footer-bottom {
     border-top: 1px solid #e8e4df !important;
-}
-    color: #b4c2ba !important;
-}
-
-.footer-staff-portal-btn:hover,
-.footer-cookie-btn:hover {
-    color: #f3cf65 !important;
-}
-
-.footer-bottom {
-    border-top: 1px solid rgba(255, 255, 255, 0.14) !important;
 }
 
 /* 15. Admin panel header card: light luxury card */

@@ -3680,16 +3680,16 @@ const UIComponents = {
             <!-- Top Heritage Story Showcase -->
             <div class="heritage-container-layout" style="margin-bottom: 3.5rem;">
                 <div class="story-section" style="padding-right: 1rem;">
-                    <span class="section-tag">ROCK ONE WILD TEA (PVT) LIMITED • OUR STORY</span>
-                    <h3 class="home-section-title" style="font-size: 2.2rem; line-height: 1.25; margin-bottom: 1.25rem;">From Our Wild Forest Garden to Your Cup</h3>
-                    <p class="story-text" style="color: var(--color-text-primary); font-size: 0.98rem; line-height: 1.8; margin-bottom: 1.25rem;">
+                    <span class="section-tag" style="color: #7a5a06; font-weight: 700; letter-spacing: 2px;">ROCK ONE WILD TEA (PVT) LIMITED • OUR STORY</span>
+                    <h3 class="home-section-title" style="font-size: 2.2rem; line-height: 1.25; margin-bottom: 1.25rem; color: #111827;">From Our Wild Forest Garden to Your Cup</h3>
+                    <p class="story-text" style="color: #374151; font-size: 0.98rem; line-height: 1.8; margin-bottom: 1.25rem;">
                         <strong>Rock One Wild Tea</strong> began with a simple family vision during the COVID period. My wife and I developed our own tea garden by hand in Sri Lanka’s <strong>Uva Medium region</strong>, surrounded by natural forest and located at the foot of a large rock formation — the inspiration behind our name.
                     </p>
-                    <p class="story-text" style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1.5rem;">
+                    <p class="story-text" style="color: #4b5563; font-size: 0.92rem; line-height: 1.7; margin-bottom: 1.5rem;">
                         From the beginning, we chose to work on a small scale, personally caring for the tea garden and producing our tea in our family factory. What started as a small family effort has gradually grown into a boutique Ceylon Tea brand, with a vision of sharing the unique character of our tea and its story with tea lovers around the world.
                     </p>
-                    <div style="background: rgba(212, 175, 55, 0.08); border-left: 3px solid var(--color-gold); padding: 1rem 1.25rem; border-radius: 0 10px 10px 0; margin-bottom: 1.75rem;">
-                        <p style="font-style: italic; color: #ffd875; font-size: 0.92rem; margin: 0; line-height: 1.5;">
+                    <div style="background: #fbf9f5; border: 1px solid #ebd9b8; border-left: 4px solid #b8860b; padding: 1.1rem 1.35rem; border-radius: 0 12px 12px 0; margin-bottom: 1.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                        <p style="font-style: italic; color: #7a5a06; font-size: 0.95rem; margin: 0; line-height: 1.6; font-weight: 600;">
                             "Rock One Wild Tea — From the wild, crafted by our hands, to your cup."
                         </p>
                     </div>
@@ -3708,11 +3708,24 @@ const UIComponents = {
                     <div class="heritage-slides-track" id="heritage-slides-track">
                         ${galleryImages.length === 0 ? `
                             <div class="heritage-slide active" style="background-image: url('images/1 (1).jpeg');" data-src="images/1 (1).jpeg" data-caption="Rock One Wild Tea Estate Garden">
-                                <div class="heritage-slide-overlay"></div>
+                                <div class="heritage-slide-blur-bg" style="background-image: url('images/1 (1).jpeg');"></div>
+                                <img src="images/1 (1).jpeg" alt="Rock One Wild Tea Estate Garden" class="heritage-slide-img" loading="eager" decoding="async">
+                                <div class="heritage-slide-badge">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                                    <span>Estate &amp; Harvest</span>
+                                </div>
                             </div>
                         ` : galleryImages.map((img, idx) => `
                             <div class="heritage-slide ${idx === 0 ? 'active' : ''}" style="background-image: url('${img.src}');" data-src="${img.src}" data-caption="${(img.caption || '').replace(/"/g, '&quot;')}">
-                                <div class="heritage-slide-overlay"></div>
+                                <div class="heritage-slide-blur-bg" style="background-image: url('${img.src}');"></div>
+                                <img src="${img.src}" alt="${(img.caption || 'Rock One Wild Tea Estate Garden').replace(/"/g, '&quot;')}" class="heritage-slide-img" loading="${idx === 0 ? 'eager' : 'lazy'}" decoding="async">
+                                <div class="heritage-slide-badge">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                                    <span>${(img.tag || 'Estate Terroir')}</span>
+                                </div>
+                                <div class="heritage-slide-info-bar">
+                                    <span class="heritage-slide-caption-text">${(img.caption || 'Rock One Wild Tea Artisanal Estate').replace(/"/g, '&quot;')}</span>
+                                </div>
                             </div>
                         `).join('')}
                     </div>
@@ -3724,6 +3737,14 @@ const UIComponents = {
                     <button class="heritage-slider-btn heritage-next" id="heritage-next-btn" aria-label="Next Gallery Photo">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
+
+                    <!-- Interactive Slider Footer -->
+                    <div class="heritage-slider-footer">
+                        <div class="heritage-dots-bar" id="heritage-dots-bar">
+                            ${galleryImages.slice(0, 8).map((_, i) => `<span class="heritage-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`).join('')}
+                        </div>
+                        <div class="heritage-counter" id="heritage-counter">01 / ${String(galleryImages.length || 1).padStart(2, '0')}</div>
+                    </div>
                 </div>
             </div>
 
