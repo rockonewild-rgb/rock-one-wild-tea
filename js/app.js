@@ -2016,9 +2016,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const drawerContainer = drawerOverlay.querySelector('.drawer-container');
         if (drawerContainer) {
             if (type === 'product' || type === 'box' || type === 'box_quoted_pay') {
+                drawerOverlay.classList.add('checkout-fullscreen');
                 drawerContainer.classList.add('checkout-mode');
+                document.body.style.overflow = 'hidden';
                 if (drawerFooter) drawerFooter.style.display = 'none';
             } else {
+                drawerOverlay.classList.remove('checkout-fullscreen');
                 drawerContainer.classList.remove('checkout-mode');
                 if (drawerFooter) drawerFooter.style.display = '';
             }
@@ -2058,7 +2061,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let grandTotalLKR = Math.round(grandTotalUSD * 305);
 
             selectedBoxSlipBase64 = '';
-            drawerTitle.innerText = isQuotedPay ? `Checkout: ${booking.boxName}` : `Collector Chest: ${box.name}`;
+            drawerTitle.innerHTML = `<div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;"><span>${isQuotedPay ? 'Checkout: ' + booking.boxName : 'Collector Chest: ' + box.name}</span><span style="font-size:0.68rem; font-weight:700; color:#86efac; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); border-radius:20px; padding:0.2rem 0.65rem; display:inline-flex; align-items:center; gap:0.3rem;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 256-Bit SSL Encrypted</span></div>`;
 
             const signedUser = window.TeaFactoryStore && window.TeaFactoryStore.getCurrentUser ? window.TeaFactoryStore.getCurrentUser() : null;
             let defaultFirstName = '';
@@ -3688,7 +3691,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let formattedGrandTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(grandTotalUSD, currInfo) : `$${grandTotalUSD.toFixed(2)}`;
             let grandTotalLKR = Math.round(grandTotalUSD * 305);
 
-            drawerTitle.innerText = `Order: ${product.name}`;
+            drawerTitle.innerHTML = `<div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;"><span>Order: ${product.name}</span><span style="font-size:0.68rem; font-weight:700; color:#86efac; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); border-radius:20px; padding:0.2rem 0.65rem; display:inline-flex; align-items:center; gap:0.3rem;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 256-Bit SSL Encrypted</span></div>`;
             selectedProdSlipBase64 = '';
 
             const signedUser = window.TeaFactoryStore && window.TeaFactoryStore.getCurrentUser ? window.TeaFactoryStore.getCurrentUser() : null;
@@ -4898,11 +4901,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeDrawer() {
         drawerOverlay.classList.remove('active');
         drawerOverlay.classList.remove('open');
+        drawerOverlay.classList.remove('checkout-fullscreen');
         const drawerContainer = drawerOverlay.querySelector('.drawer-container');
         if (drawerContainer) {
             drawerContainer.classList.remove('checkout-mode');
         }
         if (drawerFooter) drawerFooter.style.display = '';
+        document.body.style.overflow = '';
         currentDrawerContext = null;
     }
 
@@ -12923,6 +12928,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             if (cartContainer) {
                 cartContainer.classList.add('checkout-mode');
             }
+            cartOverlay.classList.add('checkout-fullscreen');
             cartOverlay.classList.add('active');
             cartOverlay.classList.add('open');
             cartOverlay.setAttribute('aria-hidden', 'false');
@@ -12936,6 +12942,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             if (cartContainer) {
                 cartContainer.classList.remove('checkout-mode');
             }
+            cartOverlay.classList.remove('checkout-fullscreen');
             cartOverlay.classList.remove('active');
             cartOverlay.classList.remove('open');
             cartOverlay.setAttribute('aria-hidden', 'true');
@@ -12968,6 +12975,13 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 if (e.target === cartOverlay) closeCart();
             });
         }
+
+        // Close Reserve Bag on Escape key press
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && cartOverlay && cartOverlay.classList.contains('active')) {
+                closeCart();
+            }
+        });
 
         // Global Add-To-Cart Event Delegation
         document.addEventListener('click', (e) => {
