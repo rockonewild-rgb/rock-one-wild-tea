@@ -2401,7 +2401,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <span>&bull;</span>
                                         <span>Solid Teak Chest</span>
                                     </div>
-                                    <a href="#checkout-customer-reviews" onclick="document.getElementById('checkout-customer-reviews')?.scrollIntoView({ behavior: 'smooth' }); return false;" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.73rem; color: #b8860b; text-decoration: none; margin-top: 0.25rem; cursor: pointer;">
+                                    <a href="#checkout-customer-reviews" id="quick-summary-reviews-link" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.73rem; color: #b8860b; text-decoration: none; margin-top: 0.25rem; cursor: pointer;">
                                         <span style="color: #eab308; letter-spacing: 1px;">★★★★★</span>
                                         <span style="font-weight: 700; color: #111827;">5.0</span>
                                         <span style="color: #64748b;">(Verified Reviews)</span>
@@ -2463,7 +2463,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <!-- Master Action Button -->
                             <button type="button" id="box-summary-submit-btn" class="checkout-action-btn">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                <span id="box-action-btn-text">${isQuotedPay ? 'Settle Quotation Order' : 'Complete Reserve Order'} &bull; ${formattedGrandTotal}</span>
+                                <span id="box-action-btn-text">${isQuotedPay ? 'Settle Quotation Order' : 'Buy Now'} &bull; ${formattedGrandTotal}</span>
                             </button>
 
                             <!-- Trust Badges -->
@@ -2639,7 +2639,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (masterBtnText) {
                     masterBtnText.textContent = isQuotedPay 
                         ? `Settle Quotation Order • ${formattedGrandTotal}`
-                        : `Complete Reserve Order • ${formattedGrandTotal}`;
+                        : `Buy Now • ${formattedGrandTotal}`;
                 }
 
                 const emsTitle = document.getElementById('box-shipping-ems-title');
@@ -3724,14 +3724,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const displayPreparation = product.preparation || ('Water: ' + (product.steepTemp || '90°C – 95°C (194°F – 203°F)') + ' soft mountain or filtered water. Leaf-to-Water Ratio: 3.5g per 150ml (Gongfu gaiwan) or 2.5g per 250ml (Western teapot). Infusion Timing: 1st: 35s, 2nd: 50s, 3rd: 80s, 4th & 5th: 120s.');
             const displayBenefits = product.benefits || 'Rich in natural polyphenols, EGCG, and theaflavins. Supports daily metabolic wellness, cellular longevity, digestive harmony, and clean sustained alertness without jitters.';
 
+            let currentCheckoutStage = 1;
+
             drawerFormContainer.innerHTML = `
                 <div class="checkout-split-layout">
                     <!-- ==============================================
-                         LEFT COLUMN: PATRON BANNER, ADDRESS, SHIPPING & PAYMENT
+                         LEFT COLUMN: PATRON BANNER, DOSSIER, REVIEWS & DELIVERY/PAYMENT STAGES
                          ============================================== -->
                     <div class="checkout-left-col">
-                        <!-- Patron Banner -->
-                        <div class="checkout-step-card" style="padding: 0.95rem 1.15rem;">
+                        <!-- ================= STAGE 1: PRODUCT OVERVIEW & REVIEWS ================= -->
+                        <div id="quick-stage-overview" class="checkout-stage-view">
+                            <!-- Patron Banner -->
+                            <div class="checkout-step-card" style="padding: 0.95rem 1.15rem;">
                             ${signedUser ? `
                                 <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                                     <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -3831,6 +3835,32 @@ document.addEventListener('DOMContentLoaded', () => {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Customer Reviews Section (Seven Teahouse Style) -->
+                        ${window.UIComponents && window.UIComponents.renderCheckoutReviewsHTML ? window.UIComponents.renderCheckoutReviewsHTML(product.name) : ''}
+
+                        <!-- Bottom Stage 1 Call to Action -->
+                        <div class="checkout-stage1-cta-wrap" style="margin-top: 1.5rem; text-align: center;">
+                            <button type="button" class="btn btn-primary checkout-stage-proceed-btn" id="quick-stage-proceed-btn" style="width: 100%; padding: 1rem 1.5rem; font-size: 1rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; border-radius: 8px; box-shadow: 0 4px 14px rgba(212,175,55,0.25); cursor: pointer;">
+                                <span>Buy Now &bull; Proceed to Delivery &amp; Payment</span>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ================= STAGE 2: DELIVERY DETAILS & PAYMENT OPTIONS ================= -->
+                    <div id="quick-stage-payment" class="checkout-stage-view" style="display: none;">
+                        <!-- Top Step Navigation Bar -->
+                        <div class="checkout-stage-nav-bar">
+                            <button type="button" class="checkout-back-step-btn" id="quick-back-to-overview-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                <span>Back to Tea Details &amp; Reviews</span>
+                            </button>
+                            <div class="checkout-stage-step-pill">
+                                <span class="step-dot"></span>
+                                <span>Step 2 of 2 &bull; Delivery &amp; Payment</span>
                             </div>
                         </div>
 
@@ -4101,10 +4131,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>
                             </div>
                         </form>
-
-                        <!-- Customer Reviews Section (Seven Teahouse Style) -->
-                        ${window.UIComponents && window.UIComponents.renderCheckoutReviewsHTML ? window.UIComponents.renderCheckoutReviewsHTML(product.name) : ''}
                     </div>
+                </div>
 
                     <!-- ==============================================
                          RIGHT COLUMN: LUXURY SUMMARY SIDEBAR (EBAY/SHOPIFY)
@@ -4134,7 +4162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <span>&bull;</span>
                                         <span>${product.weight || '100g'} Tin</span>
                                     </div>
-                                    <a href="#checkout-customer-reviews" onclick="document.getElementById('checkout-customer-reviews')?.scrollIntoView({ behavior: 'smooth' }); return false;" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.73rem; color: #b8860b; text-decoration: none; margin-top: 0.25rem; cursor: pointer;">
+                                    <a href="#checkout-customer-reviews" id="quick-summary-reviews-link" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.73rem; color: #b8860b; text-decoration: none; margin-top: 0.25rem; cursor: pointer;">
                                         <span style="color: #eab308; letter-spacing: 1px;">★★★★★</span>
                                         <span style="font-weight: 700; color: #111827;">5.0</span>
                                         <span style="color: #64748b;">(Verified Reviews)</span>
@@ -4192,7 +4220,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <!-- Master Action Button -->
                             <button type="button" id="quick-summary-submit-btn" class="checkout-action-btn">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                <span id="quick-action-btn-text">Complete Reserve Order &bull; ${formattedGrandTotal}</span>
+                                <span id="quick-action-btn-text">Buy Now &bull; ${formattedGrandTotal}</span>
                             </button>
 
                             <!-- Trust Badges -->
@@ -4296,6 +4324,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             };
 
+            // Two-Stage Checkout Transitions (Stage 1: Dossier & Reviews <-> Stage 2: Delivery & Payment)
+            const setCheckoutStage = (stage) => {
+                currentCheckoutStage = stage;
+                const stageOverview = document.getElementById('quick-stage-overview');
+                const stagePayment = document.getElementById('quick-stage-payment');
+                const masterBtnText = document.getElementById('quick-action-btn-text');
+                const masterBtn = document.getElementById('quick-summary-submit-btn');
+
+                if (stage === 1) {
+                    if (stageOverview) stageOverview.style.display = 'block';
+                    if (stagePayment) stagePayment.style.display = 'none';
+                    if (masterBtnText) {
+                        masterBtnText.innerHTML = `Buy Now &bull; ${formattedGrandTotal}`;
+                    }
+                    if (masterBtn) {
+                        masterBtn.setAttribute('title', 'Proceed to Delivery & Payment');
+                    }
+                    const scrollContainer = document.getElementById('drawer-body-content') || document.querySelector('.drawer-container.checkout-mode') || window;
+                    if (scrollContainer && scrollContainer.scrollTo) {
+                        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                } else {
+                    if (stageOverview) stageOverview.style.display = 'none';
+                    if (stagePayment) stagePayment.style.display = 'block';
+                    if (masterBtnText) {
+                        masterBtnText.innerHTML = `Place Order &bull; ${formattedGrandTotal}`;
+                    }
+                    if (masterBtn) {
+                        masterBtn.setAttribute('title', 'Confirm and Place Order');
+                    }
+                    const scrollContainer = document.getElementById('drawer-body-content') || document.querySelector('.drawer-container.checkout-mode') || window;
+                    if (scrollContainer && scrollContainer.scrollTo) {
+                        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                    setTimeout(() => {
+                        const firstInput = document.getElementById('quick-cust-firstname');
+                        if (firstInput) firstInput.focus();
+                    }, 120);
+                }
+            };
+
             // Dynamic Currency & Shipping Calculation
             const updateQuickPricing = () => {
                 const country = document.getElementById('quick-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
@@ -4364,7 +4433,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Master action button text
                 const masterBtnText = document.getElementById('quick-action-btn-text');
                 if (masterBtnText) {
-                    masterBtnText.textContent = `Complete Reserve Order • ${formattedGrandTotal}`;
+                    masterBtnText.innerHTML = currentCheckoutStage === 1 
+                        ? `Buy Now &bull; ${formattedGrandTotal}`
+                        : `Place Order &bull; ${formattedGrandTotal}`;
                 }
 
                 const emsTitle = document.getElementById('quick-shipping-ems-title');
@@ -4755,11 +4826,45 @@ document.addEventListener('DOMContentLoaded', () => {
             const quickForm = document.getElementById('quick-checkout-form');
             if (quickForm) quickForm.onsubmit = handleQuickCheckoutFormSubmit;
 
-            // Master Action Button in right column
+            // Master Action Button in right column (Stage 1: Advance to Delivery & Payment | Stage 2: Submit Order)
             const quickSummaryBtn = document.getElementById('quick-summary-submit-btn');
             if (quickSummaryBtn) {
                 quickSummaryBtn.onclick = () => {
-                    handleQuickCheckoutFormSubmit();
+                    if (currentCheckoutStage === 1) {
+                        setCheckoutStage(2);
+                    } else {
+                        handleQuickCheckoutFormSubmit();
+                    }
+                };
+            }
+
+            // Stage 1 Bottom Proceed Button
+            const stageProceedBtn = document.getElementById('quick-stage-proceed-btn');
+            if (stageProceedBtn) {
+                stageProceedBtn.onclick = () => {
+                    setCheckoutStage(2);
+                };
+            }
+
+            // Stage 2 Back Button
+            const backToOverviewBtn = document.getElementById('quick-back-to-overview-btn');
+            if (backToOverviewBtn) {
+                backToOverviewBtn.onclick = () => {
+                    setCheckoutStage(1);
+                };
+            }
+
+            // Reviews snippet click in summary sidebar
+            const summaryReviewsLink = document.getElementById('quick-summary-reviews-link');
+            if (summaryReviewsLink) {
+                summaryReviewsLink.onclick = (e) => {
+                    e.preventDefault();
+                    if (currentCheckoutStage !== 1) {
+                        setCheckoutStage(1);
+                    }
+                    setTimeout(() => {
+                        document.getElementById('checkout-customer-reviews')?.scrollIntoView({ behavior: 'smooth' });
+                    }, 80);
                 };
             }
 
