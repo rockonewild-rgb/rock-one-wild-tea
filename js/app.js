@@ -381,6 +381,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function switchTab(tabId) {
         activeTab = tabId;
         
+        // Toggle view-home class on body for fullscreen hero handling
+        document.body.classList.toggle('view-home', tabId === 'home');
+
         // Auto-close mobile navigation drawer
         if (mobileMenuBtn && mobileNavDrawer) {
             mobileMenuBtn.classList.remove('open');
@@ -2543,7 +2546,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             <!-- Discount Code Box -->
                             <div class="checkout-discount-box">
-                                <input type="text" id="box-promo-code" class="checkout-discount-input" placeholder="Discount code or gift card">
+                                <input type="text" id="box-promo-code" class="checkout-discount-input" placeholder="Discount code or gift card" style="background:#ffffff !important; color:#111827 !important; border:1.5px solid #d1d5db !important;">
                                 <button type="button" id="box-apply-promo-btn" class="checkout-discount-btn">Apply</button>
                             </div>
 
@@ -3925,12 +3928,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                                 <div class="checkout-accordions">
                                     <!-- 1. About This Tea -->
-                                    <div class="checkout-accordion-item open" data-accordion="about">
-                                        <button type="button" class="checkout-accordion-header" aria-expanded="true">
+                                    <div class="checkout-accordion-item" data-accordion="about">
+                                        <button type="button" class="checkout-accordion-header" aria-expanded="false">
                                             <span class="checkout-accordion-title">About This Tea</span>
-                                            <span class="checkout-accordion-icon">−</span>
+                                            <span class="checkout-accordion-icon">+</span>
                                         </button>
-                                        <div class="checkout-accordion-body" style="display: block;">
+                                        <div class="checkout-accordion-body" style="display: none;">
                                             <p style="font-weight: 700; font-size: 0.95rem; color: #1e293b; margin-bottom: 0.45rem;">${esc(product.name)}</p>
                                             <p>${esc(displayAbout)}</p>
                                             <div class="checkout-dossier-tags">
@@ -4331,7 +4334,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             <!-- Discount Code Box -->
                             <div class="checkout-discount-box">
-                                <input type="text" id="quick-promo-code" class="checkout-discount-input" placeholder="Discount code or gift card">
+                                <input type="text" id="quick-promo-code" class="checkout-discount-input" placeholder="Discount code or gift card" style="background:#ffffff !important; color:#111827 !important; border:1.5px solid #d1d5db !important;">
                                 <button type="button" id="quick-apply-promo-btn" class="checkout-discount-btn">Apply</button>
                             </div>
 
@@ -12980,30 +12983,34 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         if (slidesWrapper && storeHeroSlides.length > 0) {
             slidesWrapper.innerHTML = storeHeroSlides.map((slideObj, idx) => {
                 const isActive = idx === currentHeroIndex || (idx === 0 && currentHeroIndex >= storeHeroSlides.length);
-                const subtitle = slideObj.subtitle || 'Rock One Wild Tea (Pvt) Limited • Uva Medium Region';
-                const title = slideObj.title || 'Artisanal Ceylon Wild Tea';
-                const description = slideObj.description || 'Hand made with Care, Crafted from Ceylon — born from our own tea garden in Sri Lanka’s Uva Medium region.';
+                const subtitle = slideObj.subtitle || 'Authentic Ceylon Tea Experience';
+                const title = slideObj.title || 'Organic Homemade<br><span>Tea Experience</span>';
+                const description = slideObj.description || "Discover the ancient art of organic tea-making in the heart of Ceylon's mountains. From garden to cup, experience the authentic journey of premium Sri Lankan tea.";
                 const imgSrc = slideObj.image || 'images/1 (1).jpeg';
 
                 return `
                     <div class="hero-slide${isActive ? ' active' : ''}" style="background-image: url('${imgSrc}');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
-                            <div class="hero-logo-box">
-                                <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" class="hero-logo-gold" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
-                            </div>
-                            <span class="hero-subtitle">${subtitle}</span>
+                            <span class="hero-pill-badge">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
+                                <span>${subtitle}</span>
+                            </span>
                             <h1 class="hero-title">${title}</h1>
                             <p class="hero-description">${description}</p>
                             <div class="hero-cta">
-                                <span class="btn btn-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') && document.getElementById('nav-gifts').click())">
-                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
-                                    Reserve Gift Chests
-                                </span>
-                                <span class="btn btn-outline" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') && document.getElementById('nav-tours').click())">
-                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
-                                    Experience the Tour
-                                </span>
+                                <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('booking') : (document.getElementById('nav-booking') && document.getElementById('nav-booking').click());">
+                                    Book Tea Experience &rarr;
+                                </button>
+                                <button type="button" class="btn btn-hero-outline" onclick="window.appSwitchTab ? window.appSwitchTab('catalog') : (document.getElementById('nav-catalog') && document.getElementById('nav-catalog').click());">
+                                    Explore Tea Shop
+                                </button>
+                            </div>
+                            <div class="hero-rating-badge">
+                                <span class="hero-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                <span class="hero-rating-num">5.0</span>
+                                <span class="hero-rating-sep">&bull;</span>
+                                <span class="hero-rating-text">2,000+ Google reviews</span>
                             </div>
                         </div>
                     </div>
@@ -13017,26 +13024,51 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                     <div class="hero-slide${isActive ? ' active' : ''}" style="background-image: url('${imgObj.src}');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
-                            <div class="hero-logo-box">
-                                <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" class="hero-logo-gold" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
-                            </div>
-                            <span class="hero-subtitle">${meta.subtitle}</span>
-                            <h1 class="hero-title">${meta.title}</h1>
-                            <p class="hero-description">${meta.description}</p>
+                            <span class="hero-pill-badge">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
+                                <span>${meta.subtitle || 'Authentic Ceylon Tea Experience'}</span>
+                            </span>
+                            <h1 class="hero-title">${meta.title || 'Artisanal Wild Tea'}</h1>
+                            <p class="hero-description">${meta.description || "Crafted from single-estate Uva montane gardens."}</p>
                             <div class="hero-cta">
-                                <span class="btn btn-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') && document.getElementById('nav-gifts').click())">
-                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
-                                    Reserve Gift Chests
-                                </span>
-                                <span class="btn btn-outline" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') && document.getElementById('nav-tours').click())">
-                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
-                                    Experience the Tour
-                                </span>
+                                <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('booking') : (document.getElementById('nav-booking') && document.getElementById('nav-booking').click());">
+                                    Book Tea Experience &rarr;
+                                </button>
+                                <button type="button" class="btn btn-hero-outline" onclick="window.appSwitchTab ? window.appSwitchTab('catalog') : (document.getElementById('nav-catalog') && document.getElementById('nav-catalog').click());">
+                                    Explore Tea Shop
+                                </button>
+                            </div>
+                            <div class="hero-rating-badge">
+                                <span class="hero-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                <span class="hero-rating-num">5.0</span>
+                                <span class="hero-rating-sep">&bull;</span>
+                                <span class="hero-rating-text">2,000+ Google reviews</span>
                             </div>
                         </div>
                     </div>
                 `;
             }).join('');
+        }
+
+        // Ensure bottom floating stats wrap is always present in hero container
+        if (!sliderContainer.querySelector('.hero-floating-stats-wrap')) {
+            const statsWrap = document.createElement('div');
+            statsWrap.className = 'hero-floating-stats-wrap';
+            statsWrap.innerHTML = `
+                <div class="hero-stat-card">
+                    <div class="hero-stat-val">10,000+</div>
+                    <div class="hero-stat-label">Happy Visitors</div>
+                </div>
+                <div class="hero-stat-card">
+                    <div class="hero-stat-val">100%</div>
+                    <div class="hero-stat-label">Organic Homemade Tea</div>
+                </div>
+                <div class="hero-stat-card">
+                    <div class="hero-stat-val">200+</div>
+                    <div class="hero-stat-label">Years Heritage</div>
+                </div>
+            `;
+            sliderContainer.appendChild(statsWrap);
         }
 
         const slides = sliderContainer.querySelectorAll('.hero-slide');

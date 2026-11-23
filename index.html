@@ -228,7 +228,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png?v=1.26.0">
 
     <!-- Main Style Sheet -->
-    <link rel="stylesheet" href="css/style.css?v=3.48.0">
+    <link rel="stylesheet" href="css/style.css?v=3.49.0">
     
     <!-- Instant Scroll Position Reset (Ensures refresh & load always start at Top Hero Slideshow) -->
     <script>
@@ -259,7 +259,7 @@
         });
     </script>
 </head>
-<body>
+<body class="view-home">
 
     <!-- Luxury Estate Preloader & Brand Loading Screen -->
     <div id="estate-preloader" class="estate-preloader" aria-label="Loading Rock One Wild Tea Estate">
@@ -710,96 +710,118 @@
             <div class="hero-section" id="hero-slider-container">
                 <!-- Slideshow Background & Content Layers -->
                 <div class="hero-slides-wrapper">
-                    <!-- Slide 1: From Our Wild Forest Garden to Your Cup -->
+                    <!-- Slide 1: Organic Homemade Tea Experience (Ella Garden Reference) -->
                     <div class="hero-slide active" style="background-image: url('images/1 (1).jpeg');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
-                            <div class="hero-logo-box">
-                                <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" class="hero-logo-gold" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
-                            </div>
-                            <span class="hero-subtitle">Rock One Wild Tea (Pvt) Limited • Uva Medium Region</span>
-                            <h1 class="hero-title">From Our Wild Forest Garden <span>to Your Cup.</span></h1>
+                            <span class="hero-pill-badge">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
+                                <span>Authentic Ceylon Tea Experience</span>
+                            </span>
+                            <h1 class="hero-title">Organic Homemade<br><span>Tea Experience</span></h1>
                             <p class="hero-description">
-                                Rock One Wild Tea is a family-owned tea business born from our own tea garden in Sri Lanka’s Uva Medium region, nestled in a forested environment at the foot of a large rock formation. Hand made with Care, Crafted from Ceylon — from selecting the tea leaves to small-batch processing in our family factory.
+                                Discover the ancient art of organic tea-making in the heart of Ceylon's mountains. From garden to cup, experience the authentic journey of premium Sri Lankan tea.
                             </p>
                             <div class="hero-cta">
-                                <span class="btn btn-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') && document.getElementById('nav-gifts').click())">
-                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
-                                    Reserve Gift Chests
-                                </span>
-                                <span class="btn btn-outline" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') && document.getElementById('nav-tours').click())">
-                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
-                                    Experience the Tour
-                                </span>
+                                <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('booking') : (document.getElementById('nav-booking') && document.getElementById('nav-booking').click());">
+                                    Book Tea Experience &rarr;
+                                </button>
+                                <button type="button" class="btn btn-hero-outline" onclick="window.appSwitchTab ? window.appSwitchTab('catalog') : (document.getElementById('nav-catalog') && document.getElementById('nav-catalog').click());">
+                                    Explore Tea Shop
+                                </button>
+                            </div>
+                            <div class="hero-rating-badge">
+                                <span class="hero-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                <span class="hero-rating-num">5.0</span>
+                                <span class="hero-rating-sep">&bull;</span>
+                                <span class="hero-rating-text">2,000+ Google reviews</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Slide 2: Forested Mountain Terroir at 1,240m Elevation -->
+                    <!-- Slide 2: Mountain Foothill Heritage -->
                     <div class="hero-slide" style="background-image: url('images/1 (2).jpeg');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
-                            <div class="hero-logo-box">
-                                <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" class="hero-logo-gold" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
-                            </div>
-                            <span class="hero-subtitle">Forested Rock Formation Terroir • 1,240m Elevation</span>
-                            <h1 class="hero-title">Wild Arbor Garden. <span>Mountain Foothill Heritage.</span></h1>
+                            <span class="hero-pill-badge">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
+                                <span>Forested Rock Formation Terroir • 1,240m Elevation</span>
+                            </span>
+                            <h1 class="hero-title">Wild Arbor Garden.<br><span>Mountain Foothill Heritage.</span></h1>
                             <p class="hero-description">
                                 Grown naturally amidst virgin mountain forest and ancient flora at the foot of our iconic rock formation in Ettampitiya, free from chemical fertilizers and synthetic pesticides.
                             </p>
                             <div class="hero-cta">
-                                <span class="btn btn-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') &amp;&amp; document.getElementById('nav-gifts').click())">
-                                    Reserve Gift Chests
-                                </span>
-                                <span class="btn btn-outline" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') &amp;&amp; document.getElementById('nav-tours').click())">
+                                <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') && document.getElementById('nav-gifts').click());">
+                                    Reserve Gift Chests &rarr;
+                                </button>
+                                <button type="button" class="btn btn-hero-outline" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') && document.getElementById('nav-tours').click());">
                                     Experience the Tour
-                                </span>
+                                </button>
+                            </div>
+                            <div class="hero-rating-badge">
+                                <span class="hero-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                <span class="hero-rating-num">5.0</span>
+                                <span class="hero-rating-sep">&bull;</span>
+                                <span class="hero-rating-text">Single-Estate Uva Terroir</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Slide 3: Selective Dawn Two Leaves & A Bud -->
+                    <!-- Slide 3: Dawn Hand-Plucking -->
                     <div class="hero-slide" style="background-image: url('images/1 (5).jpeg');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
-                            <div class="hero-logo-box">
-                                <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" class="hero-logo-gold" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
-                            </div>
-                            <span class="hero-subtitle">Generational Artisans • Selective Two Leaves &amp; A Bud</span>
-                            <h1 class="hero-title">Dawn Hand-Plucking. <span>Artisanal Purity.</span></h1>
+                            <span class="hero-pill-badge">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
+                                <span>Generational Artisans • Selective Two Leaves &amp; A Bud</span>
+                            </span>
+                            <h1 class="hero-title">Dawn Hand-Plucking.<br><span>Artisanal Purity.</span></h1>
                             <p class="hero-description">
                                 Every tender shoot is hand-harvested at first light by skilled generational artisans to preserve precious silver tips, essential oils, and delicate aromatic bouquet.
                             </p>
                             <div class="hero-cta">
-                                <span class="btn btn-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') &amp;&amp; document.getElementById('nav-gifts').click())">
-                                    Reserve Gift Chests
-                                </span>
-                                <span class="btn btn-outline" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') &amp;&amp; document.getElementById('nav-tours').click())">
-                                    Experience the Tour
-                                </span>
+                                <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('catalog') : (document.getElementById('nav-catalog') && document.getElementById('nav-catalog').click());">
+                                    Shop Rare Teas &rarr;
+                                </button>
+                                <button type="button" class="btn btn-hero-outline" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') && document.getElementById('nav-tours').click());">
+                                    View Garden Walk
+                                </button>
+                            </div>
+                            <div class="hero-rating-badge">
+                                <span class="hero-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                <span class="hero-rating-num">100%</span>
+                                <span class="hero-rating-sep">&bull;</span>
+                                <span class="hero-rating-text">Hand-Harvested Whole Leaf</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Slide 4: Traditional Orthodox Brass Rolling -->
+                    <!-- Slide 4: Orthodox Rolling -->
                     <div class="hero-slide" style="background-image: url('images/1 (10).jpeg');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
-                            <div class="hero-logo-box">
-                                <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" class="hero-logo-gold" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
-                            </div>
-                            <span class="hero-subtitle">Time-Honored Orthodox Methods • Fragrant Cedar Air-Withering</span>
-                            <h1 class="hero-title">Orthodox Rolling. <span>Traditional Family Craft.</span></h1>
+                            <span class="hero-pill-badge">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
+                                <span>Time-Honored Orthodox Methods • Fragrant Cedar Air-Withering</span>
+                            </span>
+                            <h1 class="hero-title">Orthodox Rolling.<br><span>Traditional Family Craft.</span></h1>
                             <p class="hero-description">
                                 Leaves undergo natural mountain air-withering on cedar troughs and gentle brass rolling to unlock rich polyphenols and the signature brisk character of Uva Medium teas.
                             </p>
                             <div class="hero-cta">
-                                <span class="btn btn-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') &amp;&amp; document.getElementById('nav-gifts').click())">
-                                    Reserve Gift Chests
-                                </span>
-                                <span class="btn btn-outline" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') &amp;&amp; document.getElementById('nav-tours').click())">
+                                <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') && document.getElementById('nav-gifts').click());">
+                                    Reserve Gift Chests &rarr;
+                                </button>
+                                <button type="button" class="btn btn-hero-outline" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') && document.getElementById('nav-tours').click());">
                                     Experience the Tour
-                                </span>
+                                </button>
+                            </div>
+                            <div class="hero-rating-badge">
+                                <span class="hero-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                <span class="hero-rating-num">4.9</span>
+                                <span class="hero-rating-sep">&bull;</span>
+                                <span class="hero-rating-text">Orthodox Craftsmanship</span>
                             </div>
                         </div>
                     </div>
@@ -808,21 +830,27 @@
                     <div class="hero-slide" style="background-image: url('images/1 (12).jpeg');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
-                            <div class="hero-logo-box">
-                                <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" class="hero-logo-gold" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
-                            </div>
-                            <span class="hero-subtitle">Small-Batch Processing • Precision Temperature Control</span>
-                            <h1 class="hero-title">Historic Wood-Firing. <span>Flavor Perfection.</span></h1>
+                            <span class="hero-pill-badge">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
+                                <span>Small-Batch Processing • Precision Temperature Control</span>
+                            </span>
+                            <h1 class="hero-title">Historic Wood-Firing.<br><span>Flavor Perfection.</span></h1>
                             <p class="hero-description">
                                 Calibrated wood-fired curing locks in volatile aromas and amber liquor notes, crafting an unforgettable Ceylon tea tasting experience.
                             </p>
                             <div class="hero-cta">
-                                <span class="btn btn-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') &amp;&amp; document.getElementById('nav-gifts').click())">
-                                    Reserve Gift Chests
-                                </span>
-                                <span class="btn btn-outline" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') &amp;&amp; document.getElementById('nav-tours').click())">
+                                <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') && document.getElementById('nav-gifts').click());">
+                                    Reserve Gift Chests &rarr;
+                                </button>
+                                <button type="button" class="btn btn-hero-outline" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') && document.getElementById('nav-tours').click());">
                                     Experience the Tour
-                                </span>
+                                </button>
+                            </div>
+                            <div class="hero-rating-badge">
+                                <span class="hero-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                <span class="hero-rating-num">5.0</span>
+                                <span class="hero-rating-sep">&bull;</span>
+                                <span class="hero-rating-text">Estate Wood-Fired Method</span>
                             </div>
                         </div>
                     </div>
@@ -831,21 +859,27 @@
                     <div class="hero-slide" style="background-image: url('images/1 (16).jpeg');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
-                            <div class="hero-logo-box">
-                                <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" class="hero-logo-gold" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
-                            </div>
-                            <span class="hero-subtitle">Solid Light-Wood Teak Chests • Individually Numbered (1 to 10)</span>
-                            <h1 class="hero-title">Limited Ledgers. <span>Collector's Masterpieces.</span></h1>
+                            <span class="hero-pill-badge">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
+                                <span>Solid Light-Wood Teak Chests • Individually Numbered (1 to 10)</span>
+                            </span>
+                            <h1 class="hero-title">Limited Ledgers.<br><span>Collector's Masterpieces.</span></h1>
                             <p class="hero-description">
                                 Each seasonal release yields strictly 10 individually numbered collector chests, hand-sealed with private estate gold bullion wax and registered with certified provenance deeds.
                             </p>
                             <div class="hero-cta">
-                                <span class="btn btn-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') &amp;&amp; document.getElementById('nav-gifts').click())">
-                                    Reserve Gift Chests
-                                </span>
-                                <span class="btn btn-outline" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') &amp;&amp; document.getElementById('nav-tours').click())">
-                                    Experience the Tour
-                                </span>
+                                <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') && document.getElementById('nav-gifts').click());">
+                                    Reserve Collector Chest &rarr;
+                                </button>
+                                <button type="button" class="btn btn-hero-outline" onclick="window.appSwitchTab ? window.appSwitchTab('gallery') : (document.getElementById('nav-gallery') && document.getElementById('nav-gallery').click());">
+                                    Explore Gallery
+                                </button>
+                            </div>
+                            <div class="hero-rating-badge">
+                                <span class="hero-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                <span class="hero-rating-num">Strictly 10</span>
+                                <span class="hero-rating-sep">&bull;</span>
+                                <span class="hero-rating-text">Chests Per Seasonal Pluck</span>
                             </div>
                         </div>
                     </div>
@@ -854,21 +888,27 @@
                     <div class="hero-slide" style="background-image: url('images/1 (14).jpeg');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
-                            <div class="hero-logo-box">
-                                <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" class="hero-logo-gold" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
-                            </div>
-                            <span class="hero-subtitle">Private Tours (Mon–Sat) • Max 10 Visitors Per Session</span>
-                            <h1 class="hero-title">Visit Our Family Factory. <span>Artisanal Tea Tasting.</span></h1>
+                            <span class="hero-pill-badge">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
+                                <span>Private Tours (Mon–Sat) • Max 10 Visitors Per Session</span>
+                            </span>
+                            <h1 class="hero-title">Visit Our Family Factory.<br><span>Artisanal Tea Tasting.</span></h1>
                             <p class="hero-description">
                                 Discover the story of Rock One Wild Tea with guided walkthroughs, tea leaf selection, orthodox processing, and sommelier cupping (9:30 AM, 11:00 AM, 1:30 PM, 3:30 PM).
                             </p>
                             <div class="hero-cta">
-                                <span class="btn btn-primary" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') &amp;&amp; document.getElementById('nav-tours').click())">
-                                    Book Factory Tour
-                                </span>
-                                <span class="btn btn-outline" onclick="window.appSwitchTab ? window.appSwitchTab('gallery') : (document.getElementById('nav-gallery') &amp;&amp; document.getElementById('nav-gallery').click())">
+                                <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('tours') : (document.getElementById('nav-tours') && document.getElementById('nav-tours').click());">
+                                    Book Factory Tour &rarr;
+                                </button>
+                                <button type="button" class="btn btn-hero-outline" onclick="window.appSwitchTab ? window.appSwitchTab('gallery') : (document.getElementById('nav-gallery') && document.getElementById('nav-gallery').click());">
                                     Explore Gallery
-                                </span>
+                                </button>
+                            </div>
+                            <div class="hero-rating-badge">
+                                <span class="hero-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                <span class="hero-rating-num">5.0</span>
+                                <span class="hero-rating-sep">&bull;</span>
+                                <span class="hero-rating-text">VIP Cupping Sessions</span>
                             </div>
                         </div>
                     </div>
@@ -877,23 +917,45 @@
                     <div class="hero-slide" style="background-image: url('images/Gift box 2.jpeg');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
-                            <div class="hero-logo-box">
-                                <img src="images/logo-gold.png" alt="Rock One Wild Tea Logo" class="hero-logo-gold" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
-                            </div>
-                            <span class="hero-subtitle">Artisanal Packaging • Handcrafted from Sri Lankan Teak</span>
-                            <h1 class="hero-title">Artisanal Packaging. <span>The Perfect Gift.</span></h1>
+                            <span class="hero-pill-badge">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
+                                <span>Artisanal Packaging • Handcrafted from Sri Lankan Teak</span>
+                            </span>
+                            <h1 class="hero-title">Artisanal Packaging.<br><span>The Perfect Gift.</span></h1>
                             <p class="hero-description">
                                 Presentation boxes handcrafted by local carpenters from solid Sri Lankan teak, containing our finest whole-leaf Ceylon black and green tea selections.
                             </p>
                             <div class="hero-cta">
-                                <span class="btn btn-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') &amp;&amp; document.getElementById('nav-gifts').click())">
-                                    Reserve Gift Chests
-                                </span>
-                                <span class="btn btn-outline" onclick="window.appSwitchTab ? window.appSwitchTab('gallery') : (document.getElementById('nav-gallery') &amp;&amp; document.getElementById('nav-gallery').click())">
+                                <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('gifts') : (document.getElementById('nav-gifts') && document.getElementById('nav-gifts').click());">
+                                    Reserve Gift Chests &rarr;
+                                </button>
+                                <button type="button" class="btn btn-hero-outline" onclick="window.appSwitchTab ? window.appSwitchTab('gallery') : (document.getElementById('nav-gallery') && document.getElementById('nav-gallery').click());">
                                     Explore Gallery
-                                </span>
+                                </button>
+                            </div>
+                            <div class="hero-rating-badge">
+                                <span class="hero-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                <span class="hero-rating-num">200+</span>
+                                <span class="hero-rating-sep">&bull;</span>
+                                <span class="hero-rating-text">Years Heritage Craft</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Floating Stat Cards (Ella Organic Tea Garden Reference) -->
+                <div class="hero-floating-stats-wrap">
+                    <div class="hero-stat-card">
+                        <div class="hero-stat-val">10,000+</div>
+                        <div class="hero-stat-label">Happy Visitors</div>
+                    </div>
+                    <div class="hero-stat-card">
+                        <div class="hero-stat-val">100%</div>
+                        <div class="hero-stat-label">Organic Homemade Tea</div>
+                    </div>
+                    <div class="hero-stat-card">
+                        <div class="hero-stat-val">200+</div>
+                        <div class="hero-stat-label">Years Heritage</div>
                     </div>
                 </div>
 
@@ -2144,11 +2206,11 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <!-- Script Loads (Execution dependency order: i18n -> store -> components -> paypal -> app) -->
-    <script defer src="js/i18n.js?v=3.48.0"></script>
-    <script defer src="js/store.js?v=3.48.0"></script>
-    <script defer src="js/components.js?v=3.48.0"></script>
-    <script defer src="js/paypal.js?v=3.48.0"></script>
-    <script defer src="js/app.js?v=3.48.0"></script>
-    <script defer src="js/contrast-guard.js?v=3.48.0"></script>
+    <script defer src="js/i18n.js?v=3.49.0"></script>
+    <script defer src="js/store.js?v=3.49.0"></script>
+    <script defer src="js/components.js?v=3.49.0"></script>
+    <script defer src="js/paypal.js?v=3.49.0"></script>
+    <script defer src="js/app.js?v=3.49.0"></script>
+    <script defer src="js/contrast-guard.js?v=3.49.0"></script>
 </body>
 </html>

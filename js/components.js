@@ -6904,12 +6904,12 @@ const UIComponents = {
 
                                 <div class="checkout-accordions">
                                     <!-- 1. About This Tea -->
-                                    <div class="checkout-accordion-item open" data-accordion="about">
-                                        <button type="button" class="checkout-accordion-header" aria-expanded="true">
-                                            <span class="checkout-accordion-title">About This Tea Selection</span>
-                                            <span class="checkout-accordion-icon">−</span>
+                                    <div class="checkout-accordion-item" data-accordion="about">
+                                        <button type="button" class="checkout-accordion-header" aria-expanded="false">
+                                            <span class="checkout-accordion-title">About This Tea</span>
+                                            <span class="checkout-accordion-icon">+</span>
                                         </button>
-                                        <div class="checkout-accordion-body" style="display: block;">
+                                        <div class="checkout-accordion-body" style="display: none;">
                                             <p style="font-weight: 700; font-size: 0.95rem; color: #1e293b; margin-bottom: 0.45rem;">${esc(matchedProd.name || 'Single-Estate Artisanal Harvest')}</p>
                                             <p>${esc(displayAbout)}</p>
                                             <div class="checkout-dossier-tags">
@@ -6920,10 +6920,10 @@ const UIComponents = {
                                         </div>
                                     </div>
 
-                                    <!-- 2. Origin & Terroir -->
+                                    <!-- 2. Origin -->
                                     <div class="checkout-accordion-item" data-accordion="origin">
                                         <button type="button" class="checkout-accordion-header" aria-expanded="false">
-                                            <span class="checkout-accordion-title">Origin &amp; Terroir</span>
+                                            <span class="checkout-accordion-title">Origin</span>
                                             <span class="checkout-accordion-icon">+</span>
                                         </button>
                                         <div class="checkout-accordion-body" style="display: none;">
@@ -6945,7 +6945,7 @@ const UIComponents = {
                                     <!-- 4. Preparation -->
                                     <div class="checkout-accordion-item" data-accordion="preparation">
                                         <button type="button" class="checkout-accordion-header" aria-expanded="false">
-                                            <span class="checkout-accordion-title">Artisanal Preparation</span>
+                                            <span class="checkout-accordion-title">Preparation</span>
                                             <span class="checkout-accordion-icon">+</span>
                                         </button>
                                         <div class="checkout-accordion-body" style="display: none;">
@@ -6956,7 +6956,7 @@ const UIComponents = {
                                     <!-- 5. Tea Benefits -->
                                     <div class="checkout-accordion-item" data-accordion="benefits">
                                         <button type="button" class="checkout-accordion-header" aria-expanded="false">
-                                            <span class="checkout-accordion-title">Estate Benefits &amp; Wellness</span>
+                                            <span class="checkout-accordion-title">Tea Benefits</span>
                                             <span class="checkout-accordion-icon">+</span>
                                         </button>
                                         <div class="checkout-accordion-body" style="display: none;">
@@ -7270,7 +7270,7 @@ const UIComponents = {
 
                         <!-- Promo Code / Voucher Box -->
                         <div class="checkout-discount-box">
-                            <input type="text" id="cart-promo-code" class="checkout-discount-input" placeholder="Discount code or gift card" value="${activePromo ? activePromo.code : ''}">
+                            <input type="text" id="cart-promo-code" class="checkout-discount-input" placeholder="Discount code or gift card" value="${activePromo ? activePromo.code : ''}" style="background:#ffffff !important; color:#111827 !important; border:1.5px solid #d1d5db !important;">
                             <button type="button" id="cart-apply-promo-btn" class="checkout-discount-btn">${activePromo ? 'Remove' : 'Apply'}</button>
                         </div>
 
