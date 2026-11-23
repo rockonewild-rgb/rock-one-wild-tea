@@ -6806,6 +6806,11 @@ const UIComponents = {
                             <span>&bull;</span>
                             <span>${item.weight || '100g'}</span>
                         </div>
+                        <a href="#checkout-customer-reviews" class="cart-summary-reviews-link" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.73rem; color: #b8860b; text-decoration: none; margin-top: 0.2rem; cursor: pointer;">
+                            <span style="color: #eab308; letter-spacing: 1px;">★★★★★</span>
+                            <span style="font-weight: 700; color: #111827;">5.0</span>
+                            <span style="color: #64748b;">(Verified Reviews)</span>
+                        </a>
 
                         ${hasGifting ? `
                             <div style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.68rem; color: var(--color-gold); background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.25); border-radius: 4px; padding: 0.15rem 0.45rem; margin-top: 0.35rem;">
@@ -6837,48 +6842,159 @@ const UIComponents = {
         }
         const cartMinDate = new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0];
 
-        // 3. Render Modern Split Layout
+        // Seven Teahouse Style Tea Dossier values derived from cart items
+        const products = (window.TeaFactoryStore && window.TeaFactoryStore.getProducts) ? window.TeaFactoryStore.getProducts() : [];
+        const firstCartItem = cart[0] || {};
+        const matchedProd = products.find(p => String(p.id) === String(firstCartItem.id)) || firstCartItem;
+
+        const displayHeadline = matchedProd.headline || (cart.length > 1 ? `Artisanal Reserve Allocation (${cart.length} Handcrafted Selections)` : (matchedProd.name || 'Single-Estate Artisanal Harvest'));
+        const displayAbout = matchedProd.about || matchedProd.desc || matchedProd.description || 'Crafted from tender wild tea buds harvested from high-elevation montane cloud forests. Each selection undergoes patient, traditional artisanal rolling and processing, revealing exceptional smoothness, natural honey sweetness, and layered refinement.';
+        const displayOrigin = matchedProd.origin || ('Passara & Wellawela Sanctuary, Badulla District, Uva Highlands, Sri Lanka (Elevation: ' + (matchedProd.elevation || '1,240m – 1,320m') + '). High montane cloud forest enriched by natural granite springs and dry August katabatic winds.');
+        const displayCaffeine = matchedProd.caffeine || 'Naturally balanced by exceptionally high concentrations of calming L-theanine, promoting alert tranquility and steady cognitive focus.';
+        const displayPreparation = matchedProd.preparation || ('Water: ' + (matchedProd.steepTemp || '90°C – 95°C (194°F – 203°F)') + ' soft mountain or filtered water. Leaf-to-Water Ratio: 3.5g per 150ml (Gongfu gaiwan) or 2.5g per 250ml (Western teapot). Infusion Timing: 1st: 35s, 2nd: 50s, 3rd: 80s, 4th & 5th: 120s.');
+        const displayBenefits = matchedProd.benefits || 'Rich in natural polyphenols, EGCG, and theaflavins. Supports daily metabolic wellness, cellular longevity, digestive harmony, and clean sustained alertness without jitters.';
+
+        // 3. Render Modern Split Layout with Two-Stage Checkout Experience
         container.innerHTML = `
             <div class="checkout-split-layout">
                 <!-- ==============================================
-                     LEFT COLUMN: ADDRESS, SHIPPING & PAYMENT
+                     LEFT COLUMN: STAGE 1 (OVERVIEW & REVIEWS) & STAGE 2 (DELIVERY & PAYMENT)
                      ============================================== -->
                 <div class="checkout-left-col">
-                    <!-- Patron Banner -->
-                    <div class="checkout-step-card" style="padding: 0.95rem 1.15rem;">
-                        ${signedUser ? `
-                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">âœ“</span>
-                                    <div>
-                                        <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Patron Account: <span style="color: var(--color-gold);">${esc(signedUser.full_name || signedUser.email)}</span></div>
-                                        <div style="font-size: 0.7rem; color: #86efac;">${esc(signedUser.email)} &bull; Linked to Estate Master Ledger</div>
+                    <!-- ================= STAGE 1: OVERVIEW, TEA DOSSIER & CUSTOMER REVIEWS ================= -->
+                    <div id="cart-stage-overview" class="checkout-stage-view">
+                        <!-- Patron Banner -->
+                        <div class="checkout-step-card" style="padding: 0.95rem 1.15rem;">
+                            ${signedUser ? `
+                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
+                                        <div>
+                                            <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Patron Account: <span style="color: var(--color-gold);">${esc(signedUser.full_name || signedUser.email)}</span></div>
+                                            <div style="font-size: 0.7rem; color: #86efac;">${esc(signedUser.email)} &bull; Linked to Estate Master Ledger</div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); window.UIComponents.renderCartDrawer('cart-drawer-body'); window.appBindCartDrawerEvents &amp;&amp; window.appBindCartDrawerEvents();" style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: rgba(255,255,255,0.2); color: var(--color-text-muted);">
+                                        Switch Account
+                                    </button>
+                                </div>
+                            ` : `
+                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                    <div style="flex: 1; min-width: 210px;">
+                                        <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.2rem;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                            <span>Guest Checkout Active (No Sign-In Required)</span>
+                                        </div>
+                                        <p style="font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.4; margin: 0;">
+                                            You can order immediately as an anonymous guest. Or sign in to track your allocation in your patron portal.
+                                        </p>
+                                    </div>
+                                    <button type="button" id="cart-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: var(--color-gold); color: var(--color-gold); white-space: nowrap;">
+                                        Sign In / Register
+                                    </button>
+                                </div>
+                            `}
+                        </div>
+
+                        <!-- Seven Teahouse Style Product Dossier & Accordions Card -->
+                        <div class="checkout-step-card checkout-dossier-card">
+                            <div class="checkout-dossier-inner">
+                                <h3 class="checkout-dossier-headline">${esc(displayHeadline)}</h3>
+                                <hr class="checkout-dossier-divider">
+
+                                <div class="checkout-accordions">
+                                    <!-- 1. About This Tea -->
+                                    <div class="checkout-accordion-item open" data-accordion="about">
+                                        <button type="button" class="checkout-accordion-header" aria-expanded="true">
+                                            <span class="checkout-accordion-title">About This Tea Selection</span>
+                                            <span class="checkout-accordion-icon">−</span>
+                                        </button>
+                                        <div class="checkout-accordion-body" style="display: block;">
+                                            <p style="font-weight: 700; font-size: 0.95rem; color: #1e293b; margin-bottom: 0.45rem;">${esc(matchedProd.name || 'Single-Estate Artisanal Harvest')}</p>
+                                            <p>${esc(displayAbout)}</p>
+                                            <div class="checkout-dossier-tags">
+                                                <span class="checkout-dossier-tag">🌿 ${esc(matchedProd.leafGrade || 'Single Estate')}</span>
+                                                <span class="checkout-dossier-tag">🏔️ ${esc(matchedProd.elevation || '1,240m - 1,320m')}</span>
+                                                <span class="checkout-dossier-tag">🍃 ${totalCount} Reserve Item${totalCount === 1 ? '' : 's'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 2. Origin & Terroir -->
+                                    <div class="checkout-accordion-item" data-accordion="origin">
+                                        <button type="button" class="checkout-accordion-header" aria-expanded="false">
+                                            <span class="checkout-accordion-title">Origin &amp; Terroir</span>
+                                            <span class="checkout-accordion-icon">+</span>
+                                        </button>
+                                        <div class="checkout-accordion-body" style="display: none;">
+                                            <p>${esc(displayOrigin)}</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- 3. Caffeine Level -->
+                                    <div class="checkout-accordion-item" data-accordion="caffeine">
+                                        <button type="button" class="checkout-accordion-header" aria-expanded="false">
+                                            <span class="checkout-accordion-title">Caffeine Level</span>
+                                            <span class="checkout-accordion-icon">+</span>
+                                        </button>
+                                        <div class="checkout-accordion-body" style="display: none;">
+                                            <p>${esc(displayCaffeine)}</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- 4. Preparation -->
+                                    <div class="checkout-accordion-item" data-accordion="preparation">
+                                        <button type="button" class="checkout-accordion-header" aria-expanded="false">
+                                            <span class="checkout-accordion-title">Artisanal Preparation</span>
+                                            <span class="checkout-accordion-icon">+</span>
+                                        </button>
+                                        <div class="checkout-accordion-body" style="display: none;">
+                                            <p>${esc(displayPreparation)}</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- 5. Tea Benefits -->
+                                    <div class="checkout-accordion-item" data-accordion="benefits">
+                                        <button type="button" class="checkout-accordion-header" aria-expanded="false">
+                                            <span class="checkout-accordion-title">Estate Benefits &amp; Wellness</span>
+                                            <span class="checkout-accordion-icon">+</span>
+                                        </button>
+                                        <div class="checkout-accordion-body" style="display: none;">
+                                            <p>${esc(displayBenefits)}</p>
+                                        </div>
                                     </div>
                                 </div>
-                                <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); window.UIComponents.renderCartDrawer('cart-drawer-body'); window.appBindCartDrawerEvents &amp;&amp; window.appBindCartDrawerEvents();" style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: rgba(255,255,255,0.2); color: var(--color-text-muted);">
-                                    Switch Account
-                                </button>
                             </div>
-                        ` : `
-                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                                <div style="flex: 1; min-width: 210px;">
-                                    <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.2rem;">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                        <span>Guest Checkout Active (No Sign-In Required)</span>
-                                    </div>
-                                    <p style="font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.4; margin: 0;">
-                                        You can order immediately as an anonymous guest. Or sign in to track your allocation in your patron portal.
-                                    </p>
-                                </div>
-                                <button type="button" id="cart-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: var(--color-gold); color: var(--color-gold); white-space: nowrap;">
-                                    Sign In / Register
-                                </button>
-                            </div>
-                        `}
+                        </div>
+
+                        <!-- Customer Reviews Section (Seven Teahouse Style) -->
+                        ${window.UIComponents && window.UIComponents.renderCheckoutReviewsHTML ? window.UIComponents.renderCheckoutReviewsHTML(matchedProd.name || 'Single-Estate Artisanal Harvest') : ''}
+
+                        <!-- Bottom Stage 1 Call to Action -->
+                        <div class="checkout-stage1-cta-wrap" style="margin-top: 1.5rem; text-align: center;">
+                            <button type="button" class="btn btn-primary checkout-stage-proceed-btn" id="cart-stage-proceed-btn" style="width: 100%; padding: 1rem 1.5rem; font-size: 1rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; border-radius: 8px; box-shadow: 0 4px 14px rgba(212,175,55,0.25); cursor: pointer;">
+                                <span>Buy Now &bull; Proceed to Delivery &amp; Payment</span>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Checkout Form -->
-                    <form id="cart-checkout-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <!-- ================= STAGE 2: DELIVERY DETAILS & PAYMENT OPTIONS ================= -->
+                    <div id="cart-stage-payment" class="checkout-stage-view" style="display: none;">
+                        <!-- Top Step Navigation Bar -->
+                        <div class="checkout-stage-nav-bar">
+                            <button type="button" class="checkout-back-step-btn" id="cart-back-to-overview-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                <span>Back to Bag Items &amp; Reviews</span>
+                            </button>
+                            <div class="checkout-stage-step-pill">
+                                <span class="step-dot"></span>
+                                <span>Step 2 of 2 &bull; Delivery &amp; Payment</span>
+                            </div>
+                        </div>
+
+                        <!-- Checkout Form -->
+                        <form id="cart-checkout-form" style="display: flex; flex-direction: column; gap: 1rem;">
                         <!-- Destination Section -->
                         <div class="checkout-step-card">
                             <div class="checkout-step-header">
@@ -7131,6 +7247,7 @@ const UIComponents = {
                             </div>
                         </div>
                     </form>
+                    </div>
                 </div>
 
                 <!-- ==============================================

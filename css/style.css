@@ -14058,23 +14058,44 @@ img, video, canvas, iframe {
     box-shadow: 0 4px 12px rgba(184, 134, 11, 0.25) !important;
 }
 
-[data-theme="dark"] .checkout-discount-input,
-body:not(.light-theme) .checkout-discount-input {
+/* Only apply dark mode to checkout-discount if explicitly inside a dark container and NOT in checkout mode */
+.checkout-dark-container .checkout-discount-input {
     background: rgba(0, 0, 0, 0.6) !important;
     border-color: rgba(212, 175, 55, 0.35) !important;
     color: #ffffff !important;
 }
 
-[data-theme="dark"] .checkout-discount-input::placeholder,
-body:not(.light-theme) .checkout-discount-input::placeholder {
+.checkout-dark-container .checkout-discount-input::placeholder {
     color: #9ca3af !important;
 }
 
-[data-theme="dark"] .checkout-discount-btn,
-body:not(.light-theme) .checkout-discount-btn {
+.checkout-dark-container .checkout-discount-btn {
     background: rgba(212, 175, 55, 0.15) !important;
     border-color: var(--color-gold) !important;
     color: var(--color-gold) !important;
+}
+
+/* Enforce crisp luxury white theme for checkout discount input */
+.checkout-split-layout .checkout-discount-input,
+.checkout-mode .checkout-discount-input {
+    background: #ffffff !important;
+    border: 1.5px solid #d1d5db !important;
+    color: #111827 !important;
+    font-weight: 600 !important;
+}
+
+.checkout-split-layout .checkout-discount-input::placeholder,
+.checkout-mode .checkout-discount-input::placeholder {
+    color: #64748b !important;
+    opacity: 1 !important;
+    font-weight: 400 !important;
+}
+
+.checkout-split-layout .checkout-discount-btn,
+.checkout-mode .checkout-discount-btn {
+    background: #fdfaf2 !important;
+    border: 1.5px solid #b8860b !important;
+    color: #92400e !important;
 }
 
 /* Available Coupons Pill Strip in Checkout */

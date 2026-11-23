@@ -13823,6 +13823,51 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             const body = document.getElementById('cart-drawer-body');
             if (!body) return;
 
+            // Two-Stage Checkout Transitions (Stage 1: Overview, Dossier & Reviews <-> Stage 2: Delivery & Payment)
+            let currentCartCheckoutStage = 1;
+            const setCartCheckoutStage = (stage) => {
+                currentCartCheckoutStage = stage;
+                const stageOverview = document.getElementById('cart-stage-overview');
+                const stagePayment = document.getElementById('cart-stage-payment');
+                const masterBtnText = document.getElementById('cart-action-btn-text');
+                const masterBtn = document.getElementById('cart-summary-submit-btn');
+
+                const totalEl = document.getElementById('cart-summary-total');
+                const totalText = totalEl ? totalEl.textContent : '';
+
+                if (stage === 1) {
+                    if (stageOverview) stageOverview.style.display = 'block';
+                    if (stagePayment) stagePayment.style.display = 'none';
+                    if (masterBtnText) {
+                        masterBtnText.innerHTML = totalText ? `Buy Now &bull; ${totalText}` : 'Buy Now';
+                    }
+                    if (masterBtn) {
+                        masterBtn.setAttribute('title', 'Proceed to Delivery & Payment');
+                    }
+                    const scrollContainer = document.getElementById('cart-drawer-body') || document.querySelector('.drawer-container.checkout-mode') || window;
+                    if (scrollContainer && scrollContainer.scrollTo) {
+                        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                } else {
+                    if (stageOverview) stageOverview.style.display = 'none';
+                    if (stagePayment) stagePayment.style.display = 'block';
+                    if (masterBtnText) {
+                        masterBtnText.innerHTML = totalText ? `Place Order &bull; ${totalText}` : 'Place Order';
+                    }
+                    if (masterBtn) {
+                        masterBtn.setAttribute('title', 'Confirm and Place Order');
+                    }
+                    const scrollContainer = document.getElementById('cart-drawer-body') || document.querySelector('.drawer-container.checkout-mode') || window;
+                    if (scrollContainer && scrollContainer.scrollTo) {
+                        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                    setTimeout(() => {
+                        const firstInput = document.getElementById('cart-cust-firstname');
+                        if (firstInput) firstInput.focus();
+                    }, 120);
+                }
+            };
+
             // 1. Quantity Plus
             body.querySelectorAll('.cart-qty-plus').forEach(btn => {
                 btn.onclick = () => {
@@ -13955,6 +14000,14 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 const totalTitleEl = document.getElementById('cart-summary-total-title');
                 if (totalTitleEl) {
                     totalTitleEl.textContent = `Total Due (${currInfo.code})`;
+                }
+
+                // Update master action button
+                const masterBtnText = document.getElementById('cart-action-btn-text');
+                if (masterBtnText) {
+                    masterBtnText.innerHTML = currentCartCheckoutStage === 1
+                        ? `Buy Now &bull; ${formattedGrandTotal}`
+                        : `Place Order &bull; ${formattedGrandTotal}`;
                 }
 
                 // Update Section 4 Shipping Badges and Rate Note
@@ -14405,10 +14458,14 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             }
 
         
-            // Master Action Button for Cart
+            // Master Action Button for Cart (Stage 1: Advance to Delivery & Payment | Stage 2: Submit Order)
             const cartSummaryBtn = document.getElementById('cart-summary-submit-btn');
             if (cartSummaryBtn) {
                 cartSummaryBtn.onclick = () => {
+                    if (currentCartCheckoutStage === 1) {
+                        setCartCheckoutStage(2);
+                        return;
+                    }
                     const selectedShipping = document.querySelector('input[name="cart-shipping-method"]:checked')?.value || 'ems_express';
                     const activeCartTab = checkoutForm ? checkoutForm.querySelector('.pay-tab.active') : null;
                     const paymentMethod = selectedShipping === 'cod' ? 'cod' : (activeCartTab ? activeCartTab.getAttribute('data-method') : 'bank');
@@ -14429,6 +14486,59 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                     }
                 };
             }
+
+            // Stage 1 Bottom Proceed Button
+            const cartStageProceedBtn = document.getElementById('cart-stage-proceed-btn');
+            if (cartStageProceedBtn) {
+                cartStageProceedBtn.onclick = () => {
+                    setCartCheckoutStage(2);
+                };
+            }
+
+            // Stage 2 Back Button
+            const cartBackToOverviewBtn = document.getElementById('cart-back-to-overview-btn');
+            if (cartBackToOverviewBtn) {
+                cartBackToOverviewBtn.onclick = () => {
+                    setCartCheckoutStage(1);
+                };
+            }
+
+            // Accordion toggle click listeners for cart checkout dossier
+            const cartAccordionHeaders = body.querySelectorAll('.checkout-accordion-header');
+            cartAccordionHeaders.forEach(hdr => {
+                hdr.addEventListener('click', () => {
+                    const item = hdr.closest('.checkout-accordion-item');
+                    if (!item) return;
+                    const accBody = item.querySelector('.checkout-accordion-body');
+                    const icon = item.querySelector('.checkout-accordion-icon');
+                    const isOpen = item.classList.contains('open');
+                    if (isOpen) {
+                        item.classList.remove('open');
+                        hdr.setAttribute('aria-expanded', 'false');
+                        if (accBody) accBody.style.display = 'none';
+                        if (icon) icon.textContent = '+';
+                    } else {
+                        item.classList.add('open');
+                        hdr.setAttribute('aria-expanded', 'true');
+                        if (accBody) accBody.style.display = 'block';
+                        if (icon) icon.textContent = '−';
+                    }
+                });
+            });
+
+            // Reviews snippet links in summary sidebar
+            body.querySelectorAll('.cart-summary-reviews-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    setCartCheckoutStage(1);
+                    setTimeout(() => {
+                        const revSection = document.getElementById('checkout-customer-reviews');
+                        if (revSection) {
+                            revSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }, 100);
+                });
+            });
 
             // Promo Code wiring for Cart
             const cartPromoBtn = document.getElementById('cart-apply-promo-btn');
