@@ -6291,12 +6291,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Seven Teahouse Style Purchasing View for Products
+        // Quick Order button in Shop menu directly opens the fullscreen Checkout screen
         document.querySelectorAll('.btn-book-prod').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const productId = btn.getAttribute('data-id');
-                window.openProductDetail(productId, 'product');
+                openDrawer('product', productId);
             });
         });
 
