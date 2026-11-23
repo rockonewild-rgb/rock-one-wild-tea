@@ -196,7 +196,32 @@ function initSchema() {
             password_hash TEXT NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
+
+        -- 12. Promotional Coupons & Vouchers Table
+        CREATE TABLE IF NOT EXISTS coupons (
+            id TEXT PRIMARY KEY,
+            code TEXT UNIQUE NOT NULL,
+            percent INTEGER NOT NULL,
+            label TEXT NOT NULL,
+            min_spend REAL DEFAULT 0,
+            expiry_date TEXT,
+            status TEXT DEFAULT 'active',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
     `);
+
+    // Seed initial promotional coupons if empty
+    try {
+        const cpnCount = db.prepare("SELECT COUNT(*) as count FROM coupons").get();
+        if (cpnCount && cpnCount.count === 0) {
+            const insertCpn = db.prepare("INSERT INTO coupons (id, code, percent, label, min_spend, status) VALUES (?, ?, ?, ?, ?, ?)");
+            insertCpn.run('cpn-1', 'ESTATE15', 15, '15% OFF Championship Reserve', 0, 'active');
+            insertCpn.run('cpn-2', 'WILD10', 10, '10% OFF Single-Estate Harvest', 0, 'active');
+            insertCpn.run('cpn-3', 'CEYLON20', 20, '20% OFF Highland Flush', 0, 'active');
+            insertCpn.run('cpn-4', 'COLLECTOR', 10, '10% OFF Collector Allocation', 0, 'active');
+            insertCpn.run('cpn-5', 'ROCKONE', 10, '10% OFF Welcome Privilege', 0, 'active');
+        }
+    } catch (e) {}
 
     // Safe migration checks for new columns
     try {

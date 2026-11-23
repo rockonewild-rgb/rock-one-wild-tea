@@ -1970,25 +1970,137 @@ document.addEventListener('DOMContentLoaded', () => {
     window.validatePromoCode = function(code, subtotalUSD) {
         if (!code) return { valid: false, message: 'Please enter a voucher code.' };
         const clean = String(code).trim().toUpperCase();
-        const discounts = {
-            'ESTATE15': { percent: 15, label: '15% OFF Championship Reserve' },
-            'WILD10': { percent: 10, label: '10% OFF Single-Estate Harvest' },
-            'CEYLON20': { percent: 20, label: '20% OFF Highland Flush' },
-            'COLLECTOR': { percent: 10, label: '10% OFF Collector Allocation' },
-            'ROCKONE': { percent: 10, label: '10% OFF Welcome Privilege' }
-        };
-        if (discounts[clean]) {
-            const d = discounts[clean];
-            const savingsUSD = Number((subtotalUSD * (d.percent / 100)).toFixed(2));
+
+        // 1. Check dynamic coupons from TeaFactoryStore first
+        let foundCoupon = null;
+        if (window.TeaFactoryStore && typeof window.TeaFactoryStore.getCoupons === 'function') {
+            const allCoupons = window.TeaFactoryStore.getCoupons() || [];
+            foundCoupon = allCoupons.find(c => String(c.code).trim().toUpperCase() === clean);
+        }
+
+        // 2. Fallback to default dictionary if not found in store
+        if (!foundCoupon) {
+            const discounts = {
+                'ESTATE15': { percent: 15, label: '15% OFF Championship Reserve', min_spend: 0, status: 'active' },
+                'WILD10': { percent: 10, label: '10% OFF Single-Estate Harvest', min_spend: 0, status: 'active' },
+                'CEYLON20': { percent: 20, label: '20% OFF Highland Flush', min_spend: 0, status: 'active' },
+                'COLLECTOR': { percent: 10, label: '10% OFF Collector Allocation', min_spend: 0, status: 'active' },
+                'ROCKONE': { percent: 10, label: '10% OFF Welcome Privilege', min_spend: 0, status: 'active' }
+            };
+            if (discounts[clean]) {
+                foundCoupon = {
+                    code: clean,
+                    percent: discounts[clean].percent,
+                    label: discounts[clean].label,
+                    min_spend: discounts[clean].min_spend || 0,
+                    status: discounts[clean].status || 'active'
+                };
+            }
+        }
+
+        if (foundCoupon) {
+            if (foundCoupon.status === 'paused') {
+                return { valid: false, code: clean, message: 'This coupon is currently paused.' };
+            }
+            if (foundCoupon.expiry_date) {
+                const today = new Date().toISOString().slice(0, 10);
+                if (foundCoupon.expiry_date < today) {
+                    return { valid: false, code: clean, message: 'This coupon has expired.' };
+                }
+            }
+            const minSpend = Number(foundCoupon.min_spend) || 0;
+            const currentSubtotal = Number(subtotalUSD) || 0;
+            if (minSpend > 0 && currentSubtotal < minSpend) {
+                return { 
+                    valid: false, 
+                    code: clean, 
+                    message: `Minimum order of $${minSpend.toFixed(2)} USD required for this coupon.` 
+                };
+            }
+
+            const percent = Number(foundCoupon.percent || foundCoupon.discount_percent || 10);
+            const savingsUSD = Number((currentSubtotal * (percent / 100)).toFixed(2));
             return {
                 valid: true,
                 code: clean,
-                label: d.label,
-                percent: d.percent,
+                label: foundCoupon.label || `${percent}% OFF Privilege`,
+                percent: percent,
                 savingsUSD
             };
         }
         return { valid: false, code: clean, message: 'Invalid or expired promotional code.' };
+    };
+
+    // Helper to render clickable coupon suggestion pills in checkout
+    window.renderCheckoutCouponsHTML = function(activeCode, inputId) {
+        let coupons = [];
+        if (window.TeaFactoryStore && typeof window.TeaFactoryStore.getActiveCoupons === 'function') {
+            coupons = window.TeaFactoryStore.getActiveCoupons() || [];
+        }
+        if (!coupons || coupons.length === 0) {
+            coupons = [
+                { code: 'ESTATE15', percent: 15, label: '15% OFF Championship Reserve' },
+                { code: 'WILD10', percent: 10, label: '10% OFF Single-Estate Harvest' },
+                { code: 'CEYLON20', percent: 20, label: '20% OFF Highland Flush' },
+                { code: 'COLLECTOR', percent: 10, label: '10% OFF Collector Allocation' },
+                { code: 'ROCKONE', percent: 10, label: '10% OFF Welcome Privilege' }
+            ];
+        }
+
+        const activeClean = String(activeCode || '').trim().toUpperCase();
+
+        return `
+            <div class="checkout-available-coupons-wrap" data-target-input="${inputId}">
+                <div class="checkout-coupons-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                    <span>Available Privilege Coupons &amp; Offers</span>
+                </div>
+                <div class="checkout-coupon-pills">
+                    ${coupons.map(c => {
+                        const code = String(c.code).trim().toUpperCase();
+                        const percent = c.percent || c.discount_percent || 10;
+                        const isSelected = activeClean === code;
+                        return `
+                            <button type="button" 
+                                class="coupon-pill-btn ${isSelected ? 'active' : ''}" 
+                                data-code="${code}" 
+                                data-target-input="${inputId}"
+                                title="${c.label || code}">
+                                <span class="coupon-pill-icon">🎟️</span>
+                                <span class="coupon-pill-code">${code}</span>
+                                <span class="coupon-pill-discount">(${percent}% OFF)</span>
+                                ${isSelected ? '<span class="coupon-pill-check">✓ Applied</span>' : ''}
+                            </button>
+                        `;
+                    }).join('')}
+                </div>
+                <div class="checkout-coupons-hint">
+                    Tap any voucher above to apply savings directly
+                </div>
+            </div>
+        `;
+    };
+
+    // Helper to bind click events on coupon suggestion pills
+    window.bindCheckoutCouponPills = function(container, inputId, onApplyCallback) {
+        if (!container) return;
+        const selector = inputId ? `.coupon-pill-btn[data-target-input="${inputId}"]` : '.coupon-pill-btn';
+        const pills = container.querySelectorAll(selector);
+        pills.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const code = btn.getAttribute('data-code');
+                const targetId = btn.getAttribute('data-target-input') || inputId;
+                const inputEl = document.getElementById(targetId);
+                if (inputEl && code) {
+                    inputEl.value = code;
+                    inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                    if (typeof onApplyCallback === 'function') {
+                        onApplyCallback(code);
+                    }
+                }
+            });
+        });
     };
 
     // 5. Drawer Controls
@@ -2428,6 +2540,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button type="button" id="box-apply-promo-btn" class="checkout-discount-btn">Apply</button>
                             </div>
 
+                            <!-- Available Privilege Coupons -->
+                            ${window.renderCheckoutCouponsHTML ? window.renderCheckoutCouponsHTML(activeBoxPromo ? activeBoxPromo.code : '', 'box-promo-code') : ''}
+
                             <!-- Savings Pill -->
                             <div class="checkout-savings-pill" id="box-savings-pill" style="display: none;">
                                 <span style="display: flex; align-items: center; gap: 0.35rem;">
@@ -2776,12 +2891,32 @@ document.addEventListener('DOMContentLoaded', () => {
             // Promo code wiring
             const boxPromoBtn = document.getElementById('box-apply-promo-btn');
             const boxPromoInput = document.getElementById('box-promo-code');
+            const syncBoxCouponPills = () => {
+                drawerFormContainer.querySelectorAll('.coupon-pill-btn[data-target-input="box-promo-code"]').forEach(pill => {
+                    const pCode = pill.getAttribute('data-code');
+                    if (activeBoxPromo && activeBoxPromo.code === pCode) {
+                        pill.classList.add('active');
+                        if (!pill.querySelector('.coupon-pill-check')) {
+                            const check = document.createElement('span');
+                            check.className = 'coupon-pill-check';
+                            check.textContent = '✓ Applied';
+                            pill.appendChild(check);
+                        }
+                    } else {
+                        pill.classList.remove('active');
+                        const check = pill.querySelector('.coupon-pill-check');
+                        if (check) check.remove();
+                    }
+                });
+            };
+
             if (boxPromoBtn && boxPromoInput) {
                 const handleBoxPromo = () => {
                     const val = boxPromoInput.value.trim();
                     if (!val) {
                         activeBoxPromo = null;
                         updateBoxPricing();
+                        syncBoxCouponPills();
                         showToast("Voucher Cleared", "Promotional code has been removed.", "info");
                         return;
                     }
@@ -2789,10 +2924,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (res.valid) {
                         activeBoxPromo = res;
                         updateBoxPricing();
+                        syncBoxCouponPills();
                         showToast("Voucher Applied!", `${res.label} (${res.percent}%) applied successfully.`, "success");
                     } else {
                         activeBoxPromo = null;
                         updateBoxPricing();
+                        syncBoxCouponPills();
                         showToast("Invalid Voucher", res.message || "Invalid promotional code.", "warning");
                     }
                 };
@@ -2803,6 +2940,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         handleBoxPromo();
                     }
                 };
+            }
+
+            if (window.bindCheckoutCouponPills) {
+                window.bindCheckoutCouponPills(drawerFormContainer, 'box-promo-code', () => {
+                    if (boxPromoBtn) boxPromoBtn.click();
+                });
             }
 
             const countryInput = document.getElementById('box-cust-country');
@@ -4185,6 +4328,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button type="button" id="quick-apply-promo-btn" class="checkout-discount-btn">Apply</button>
                             </div>
 
+                            <!-- Available Privilege Coupons -->
+                            ${window.renderCheckoutCouponsHTML ? window.renderCheckoutCouponsHTML(activeProdPromo ? activeProdPromo.code : '', 'quick-promo-code') : ''}
+
                             <!-- Savings Pill -->
                             <div class="checkout-savings-pill" id="quick-savings-pill" style="display: none;">
                                 <span style="display: flex; align-items: center; gap: 0.35rem;">
@@ -4570,12 +4716,32 @@ document.addEventListener('DOMContentLoaded', () => {
             // Promo code wiring
             const prodPromoBtn = document.getElementById('quick-apply-promo-btn');
             const prodPromoInput = document.getElementById('quick-promo-code');
+            const syncQuickCouponPills = () => {
+                drawerFormContainer.querySelectorAll('.coupon-pill-btn[data-target-input="quick-promo-code"]').forEach(pill => {
+                    const pCode = pill.getAttribute('data-code');
+                    if (activeProdPromo && activeProdPromo.code === pCode) {
+                        pill.classList.add('active');
+                        if (!pill.querySelector('.coupon-pill-check')) {
+                            const check = document.createElement('span');
+                            check.className = 'coupon-pill-check';
+                            check.textContent = '✓ Applied';
+                            pill.appendChild(check);
+                        }
+                    } else {
+                        pill.classList.remove('active');
+                        const check = pill.querySelector('.coupon-pill-check');
+                        if (check) check.remove();
+                    }
+                });
+            };
+
             if (prodPromoBtn && prodPromoInput) {
                 const handleProdPromo = () => {
                     const val = prodPromoInput.value.trim();
                     if (!val) {
                         activeProdPromo = null;
                         updateQuickPricing();
+                        syncQuickCouponPills();
                         showToast("Voucher Cleared", "Promotional voucher removed.", "info");
                         return;
                     }
@@ -4583,10 +4749,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (res.valid) {
                         activeProdPromo = res;
                         updateQuickPricing();
+                        syncQuickCouponPills();
                         showToast("Voucher Applied!", `${res.label} (${res.percent}%) applied successfully.`, "success");
                     } else {
                         activeProdPromo = null;
                         updateQuickPricing();
+                        syncQuickCouponPills();
                         showToast("Invalid Voucher", res.message || "Invalid promotional code.", "warning");
                     }
                 };
@@ -4597,6 +4765,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         handleProdPromo();
                     }
                 };
+            }
+
+            if (window.bindCheckoutCouponPills) {
+                window.bindCheckoutCouponPills(drawerFormContainer, 'quick-promo-code', () => {
+                    if (prodPromoBtn) prodPromoBtn.click();
+                });
             }
 
             const countryInput = document.getElementById('quick-cust-country');
@@ -11448,6 +11622,146 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userAuthFilter) userAuthFilter.addEventListener('change', applyUserFilters);
         if (userRoleFilter) userRoleFilter.addEventListener('change', applyUserFilters);
         if (userStatusFilter) userStatusFilter.addEventListener('change', applyUserFilters);
+
+        // ─── Coupons & Promo Codes Desk ──────────────────────────────────────────
+        const autoGenCouponBtn = document.getElementById('admin-auto-gen-coupon-btn');
+        const cpnCodeInput = document.getElementById('cpn-code-input');
+        const cpnPercentInput = document.getElementById('cpn-percent-input');
+        const cpnLabelInput = document.getElementById('cpn-label-input');
+
+        if (autoGenCouponBtn && cpnCodeInput) {
+            autoGenCouponBtn.addEventListener('click', () => {
+                const prefixes = ['ESTATE', 'HARVEST', 'WILD', 'CEYLON', 'SANCTUARY', 'EXCLUSIVE', 'GOLDEN', 'ROYAL', 'RESERVE', 'ROCKONE'];
+                const pct = cpnPercentInput ? cpnPercentInput.value : '15';
+                const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+                const randomSuffix = Math.floor(10 + Math.random() * 90);
+                const generatedCode = `${randomPrefix}${pct || randomSuffix}`;
+                cpnCodeInput.value = generatedCode;
+                if (cpnLabelInput && (!cpnLabelInput.value || cpnLabelInput.value.includes('% OFF'))) {
+                    cpnLabelInput.value = `${pct}% OFF ${randomPrefix.charAt(0) + randomPrefix.slice(1).toLowerCase()} Highland Privilege`;
+                }
+                showToast("Coupon Code Generated", `Generated privilege code: ${generatedCode}`, "info");
+            });
+        }
+
+        const quickPercentBtns = document.querySelectorAll('.admin-quick-pill-btn');
+        quickPercentBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const val = btn.getAttribute('data-val');
+                quickPercentBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                if (cpnPercentInput) {
+                    cpnPercentInput.value = val;
+                }
+                if (cpnLabelInput && (!cpnLabelInput.value || cpnLabelInput.value.includes('% OFF'))) {
+                    cpnLabelInput.value = `${val}% OFF Single-Estate Highland Harvest`;
+                }
+                if (cpnCodeInput && cpnCodeInput.value) {
+                    const currentCode = cpnCodeInput.value;
+                    const cleanPrefix = currentCode.replace(/\d+$/, '');
+                    if (cleanPrefix) {
+                        cpnCodeInput.value = `${cleanPrefix}${val}`;
+                    }
+                }
+            });
+        });
+
+        const couponForm = document.getElementById('admin-create-coupon-form');
+        if (couponForm) {
+            couponForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const code = (document.getElementById('cpn-code-input')?.value || '').trim().toUpperCase();
+                const percent = Number(document.getElementById('cpn-percent-input')?.value || 10);
+                const label = (document.getElementById('cpn-label-input')?.value || '').trim();
+                const minSpend = Number(document.getElementById('cpn-minspend-input')?.value || 0);
+                const expiry = document.getElementById('cpn-expiry-input')?.value || null;
+                const status = document.getElementById('cpn-status-input')?.value || 'active';
+
+                if (!code) {
+                    showToast("Code Required", "Please specify a promotional coupon code.", "error");
+                    return;
+                }
+
+                if (window.TeaFactoryStore && typeof window.TeaFactoryStore.addCoupon === 'function') {
+                    window.TeaFactoryStore.addCoupon({
+                        code,
+                        percent,
+                        label: label || `${percent}% OFF Privilege Voucher`,
+                        min_spend: minSpend,
+                        expiry_date: expiry,
+                        status
+                    });
+
+                    showToast(
+                        "Coupon Published", 
+                        `Privilege voucher "${code}" (${percent}% OFF) is now active and redeemable at checkout.`, 
+                        "success"
+                    );
+                    renderTabContent('admin');
+                }
+            });
+        }
+
+        // Toggle Coupon Status
+        const toggleCouponBtns = document.querySelectorAll('.btn-toggle-coupon-status');
+        toggleCouponBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const couponId = btn.getAttribute('data-id');
+                if (window.TeaFactoryStore && typeof window.TeaFactoryStore.toggleCouponStatus === 'function') {
+                    const updated = window.TeaFactoryStore.toggleCouponStatus(couponId);
+                    if (updated) {
+                        showToast("Coupon Status Updated", `Coupon "${updated.code}" is now ${updated.status}.`, "success");
+                        renderTabContent('admin');
+                    }
+                }
+            });
+        });
+
+        // Delete Coupon
+        const deleteCouponBtns = document.querySelectorAll('.btn-delete-coupon');
+        deleteCouponBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const couponId = btn.getAttribute('data-id');
+                const couponCode = btn.getAttribute('data-code') || 'Coupon';
+                showDeleteConfirmModal({
+                    title: 'Delete Privilege Coupon',
+                    subtitle: 'Coupons & Promo Codes Desk',
+                    itemName: couponCode,
+                    message: `Are you sure you want to permanently delete privilege coupon "${couponCode}"? Existing patrons will no longer be able to redeem this code at checkout.`,
+                    confirmText: 'Delete Coupon',
+                    onConfirm: () => {
+                        if (window.TeaFactoryStore && typeof window.TeaFactoryStore.deleteCoupon === 'function') {
+                            window.TeaFactoryStore.deleteCoupon(couponId);
+                            showToast("Coupon Removed", `Coupon "${couponCode}" has been deleted.`, "info");
+                            renderTabContent('admin');
+                        }
+                    }
+                });
+            });
+        });
+
+        // Copy Coupon Code
+        const copyCouponBtns = document.querySelectorAll('.btn-copy-coupon-code');
+        copyCouponBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = btn.getAttribute('data-code');
+                if (!code) return;
+                const copySuccess = () => showToast("Code Copied", `Voucher code "${code}" copied to clipboard.`, "info");
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(code).then(copySuccess).catch(() => {
+                        showToast("Coupon Code", code, "info");
+                    });
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = code;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    copySuccess();
+                }
+            });
+        });
     }
 
     // 7e. Announcement Image uploader helper
@@ -14097,6 +14411,29 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                         handleCartPromo();
                     }
                 };
+            }
+
+            if (window.bindCheckoutCouponPills) {
+                window.bindCheckoutCouponPills(body, 'cart-promo-code', (code) => {
+                    if (window.activeCartPromo && window.activeCartPromo.code === code) {
+                        return;
+                    }
+                    if (window.activeCartPromo) {
+                        window.activeCartPromo = null;
+                    }
+                    const subtotal = window.TeaFactoryStore.getCartSubtotal();
+                    const res = window.validatePromoCode(code, subtotal);
+                    if (res.valid) {
+                        window.activeCartPromo = res;
+                        if (window.UIComponents && window.UIComponents.renderCartDrawer) {
+                            window.UIComponents.renderCartDrawer('cart-drawer-body');
+                            bindCartDrawerEvents();
+                        }
+                        showToast("Voucher Applied!", `${res.label} (${res.percent}%) applied successfully!`, "success");
+                    } else {
+                        showToast("Invalid Voucher", res.message || "Invalid promotional code.", "warning");
+                    }
+                });
             }
 
         window.appBindCartDrawerEvents = bindCartDrawerEvents;

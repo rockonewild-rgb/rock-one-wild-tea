@@ -607,6 +607,16 @@ class TeaFactoryStore {
                     this.state.activeCurrency = 'USD';
                     needsSave = true;
                 }
+                if (!this.state.coupons || !Array.isArray(this.state.coupons) || this.state.coupons.length === 0) {
+                    this.state.coupons = [
+                        { id: 'cpn-1', code: 'ESTATE15', percent: 15, label: '15% OFF Championship Reserve', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
+                        { id: 'cpn-2', code: 'WILD10', percent: 10, label: '10% OFF Single-Estate Harvest', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
+                        { id: 'cpn-3', code: 'CEYLON20', percent: 20, label: '20% OFF Highland Flush', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
+                        { id: 'cpn-4', code: 'COLLECTOR', percent: 10, label: '10% OFF Collector Allocation', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
+                        { id: 'cpn-5', code: 'ROCKONE', percent: 10, label: '10% OFF Welcome Privilege', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() }
+                    ];
+                    needsSave = true;
+                }
                 
                 if (needsSave) {
                     this.saveState();
@@ -621,6 +631,77 @@ class TeaFactoryStore {
 
     getDefaultReviews() {
         return [];
+    }
+
+    // ─── Promotional Coupons & VIP Vouchers Engine ──────────────────────────
+    getCoupons() {
+        return this.state.coupons || [];
+    }
+
+    getActiveCoupons() {
+        return (this.state.coupons || []).filter(c => c.status === 'active');
+    }
+
+    addCoupon(couponData) {
+        if (!this.state.coupons) this.state.coupons = [];
+        const code = String(couponData.code || '').trim().toUpperCase();
+        if (!code) throw new Error('Coupon code is required.');
+        
+        if (this.state.coupons.some(c => c.code === code)) {
+            throw new Error(`Coupon with code "${code}" already exists.`);
+        }
+
+        const newCoupon = {
+            id: 'cpn-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 4),
+            code,
+            percent: parseInt(couponData.percent, 10) || 10,
+            label: couponData.label || `${couponData.percent}% OFF Privilege Reserve`,
+            min_spend: Number(couponData.min_spend) || 0,
+            expiry_date: couponData.expiry_date || null,
+            status: couponData.status || 'active',
+            created_at: new Date().toISOString()
+        };
+
+        this.state.coupons.unshift(newCoupon);
+        this.saveState();
+
+        try {
+            if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.createCoupon === 'function') {
+                TeaFactoryAPI.createCoupon(newCoupon).catch(() => {});
+            }
+        } catch (e) {}
+
+        return newCoupon;
+    }
+
+    toggleCouponStatus(id) {
+        if (!this.state.coupons) return false;
+        const cpn = this.state.coupons.find(c => String(c.id) === String(id));
+        if (!cpn) return false;
+        cpn.status = cpn.status === 'active' ? 'paused' : 'active';
+        this.saveState();
+
+        try {
+            if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.updateCoupon === 'function') {
+                TeaFactoryAPI.updateCoupon(id, { status: cpn.status }).catch(() => {});
+            }
+        } catch (e) {}
+
+        return cpn;
+    }
+
+    deleteCoupon(id) {
+        if (!this.state.coupons) return false;
+        this.state.coupons = this.state.coupons.filter(c => String(c.id) !== String(id));
+        this.saveState();
+
+        try {
+            if (typeof TeaFactoryAPI !== 'undefined' && typeof TeaFactoryAPI.deleteCoupon === 'function') {
+                TeaFactoryAPI.deleteCoupon(id).catch(() => {});
+            }
+        } catch (e) {}
+
+        return true;
     }
 
     getReviews() {
@@ -871,7 +952,14 @@ class TeaFactoryStore {
             inquiries: [],
             users: [],
             cart: [],
-            activeCurrency: "USD"
+            activeCurrency: "USD",
+            coupons: [
+                { id: 'cpn-1', code: 'ESTATE15', percent: 15, label: '15% OFF Championship Reserve', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
+                { id: 'cpn-2', code: 'WILD10', percent: 10, label: '10% OFF Single-Estate Harvest', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
+                { id: 'cpn-3', code: 'CEYLON20', percent: 20, label: '20% OFF Highland Flush', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
+                { id: 'cpn-4', code: 'COLLECTOR', percent: 10, label: '10% OFF Collector Allocation', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
+                { id: 'cpn-5', code: 'ROCKONE', percent: 10, label: '10% OFF Welcome Privilege', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() }
+            ]
         };
         this.saveState();
     }
@@ -3013,6 +3101,14 @@ Rock One Wild Tea Sanctuary Concierge Team
                 this.state.users = userRes.value;
             }
 
+            // 10. Sync Promotional Coupons & Vouchers
+            try {
+                const cpnData = await TeaFactoryAPI.fetchCoupons();
+                if (Array.isArray(cpnData) && cpnData.length > 0) {
+                    this.state.coupons = cpnData;
+                }
+            } catch (ce) {}
+
             this.saveState();
             console.log('🌿 [Store] Full Turso Cloud database sync complete.');
 
@@ -3516,6 +3612,54 @@ const TeaFactoryAPI = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    // Coupons CRUD
+    async fetchCoupons() {
+        try {
+            const res = await fetch(`${this.baseUrl}/coupons`);
+            const json = await res.json();
+            return json.success ? json.data : null;
+        } catch (e) {
+            return null;
+        }
+    },
+
+    async createCoupon(data) {
+        try {
+            const res = await fetch(`${this.baseUrl}/coupons`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async updateCoupon(id, updates) {
+        try {
+            const res = await fetch(`${this.baseUrl}/coupons/${encodeURIComponent(id)}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates)
+            });
+            return await res.json();
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    },
+
+    async deleteCoupon(id) {
+        try {
+            const res = await fetch(`${this.baseUrl}/coupons/${encodeURIComponent(id)}`, {
+                method: 'DELETE'
             });
             return await res.json();
         } catch (e) {

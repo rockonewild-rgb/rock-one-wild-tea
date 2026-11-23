@@ -1163,6 +1163,10 @@ const UIComponents = {
             ? window.TeaFactoryStore.getUsers() 
             : [];
         const usersCount = allUsers.length;
+        const allCoupons = (window.TeaFactoryStore && typeof window.TeaFactoryStore.getCoupons === 'function')
+            ? window.TeaFactoryStore.getCoupons()
+            : [];
+        const activeCouponsCount = allCoupons.filter(c => c && c.status === 'active').length;
 
         let html = `
             <div class="admin-dashboard-wrapper">
@@ -1266,6 +1270,11 @@ const UIComponents = {
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     <span>User Accounts Desk</span>
                     <span class="box-badge status-available" style="font-size: 0.6rem; padding: 0.1rem 0.45rem; margin-left: 0.2rem;">${usersCount} Accounts</span>
+                </button>
+                <button class="admin-tab-btn ${activeSubTab === 'coupons' ? 'active' : ''}" data-subtab="coupons" style="display: flex; align-items: center; gap: 0.5rem; ${activeSubTab === 'coupons' ? '' : 'border-color: rgba(212,175,55,0.45); background: rgba(212,175,55,0.08);'}">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                    <span>Coupons &amp; Promo Codes</span>
+                    <span class="box-badge status-available" style="font-size: 0.6rem; padding: 0.1rem 0.45rem; margin-left: 0.2rem;">${activeCouponsCount} Active</span>
                 </button>
             </div>
 
@@ -3478,6 +3487,177 @@ const UIComponents = {
                                 </div>
                             `;
                         }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        if (activeSubTab === 'coupons') {
+            const allCoupons = (window.TeaFactoryStore && typeof window.TeaFactoryStore.getCoupons === 'function')
+                ? window.TeaFactoryStore.getCoupons()
+                : [];
+            const activeCount = allCoupons.filter(c => c && c.status === 'active').length;
+            const maxDiscount = allCoupons.length > 0 ? Math.max(...allCoupons.map(c => Number(c.percent) || 0)) : 0;
+
+            html += `
+                <div style="max-width: 1040px; margin: 0 auto;">
+                    <!-- Header Summary Stats -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div class="stat-card" style="padding: 1.25rem; background: #ffffff; border: 1px solid #e8e4df; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                            <div style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.8px;">Total Registry Vouchers</div>
+                            <div style="font-size: 1.85rem; font-weight: 700; color: #111827; font-family: var(--font-serif); margin-top: 0.25rem;">${allCoupons.length}</div>
+                            <div style="font-size: 0.72rem; color: #b8860b; margin-top: 0.2rem;">Single-Estate Privilege Codes</div>
+                        </div>
+                        <div class="stat-card" style="padding: 1.25rem; background: #ffffff; border: 1px solid #e8e4df; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                            <div style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.8px;">Active Live Coupons</div>
+                            <div style="font-size: 1.85rem; font-weight: 700; color: #15803d; font-family: var(--font-serif); margin-top: 0.25rem;">${activeCount}</div>
+                            <div style="font-size: 0.72rem; color: #16a34a; margin-top: 0.2rem;">Currently Redeemable by Patrons</div>
+                        </div>
+                        <div class="stat-card" style="padding: 1.25rem; background: #ffffff; border: 1px solid #e8e4df; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                            <div style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.8px;">Maximum Privilege Rate</div>
+                            <div style="font-size: 1.85rem; font-weight: 700; color: #b8860b; font-family: var(--font-serif); margin-top: 0.25rem;">${maxDiscount}% OFF</div>
+                            <div style="font-size: 0.72rem; color: #64748b; margin-top: 0.2rem;">Peak Connoisseur Savings</div>
+                        </div>
+                    </div>
+
+                    <!-- Create / Generate Coupon Card -->
+                    <div class="admin-coupon-generator-box">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+                            <div>
+                                <h3 style="font-family: var(--font-serif); font-size: 1.35rem; color: #111827; margin: 0 0 0.35rem 0;">Generate &amp; Issue New Privilege Coupon</h3>
+                                <p style="font-size: 0.82rem; color: #64748b; margin: 0;">Create custom discount codes or auto-generate estate promotional vouchers for patron allocations.</p>
+                            </div>
+                            <button type="button" id="admin-auto-gen-coupon-btn" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.5rem 0.95rem; display: inline-flex; align-items: center; gap: 0.45rem; border-color: #b8860b; color: #92400e; background: #fffcf4; cursor: pointer;">
+                                <span>🎲 Auto-Generate Code</span>
+                            </button>
+                        </div>
+
+                        <form id="admin-create-coupon-form" class="admin-form">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="cpn-code-input" style="font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px; color: #1e293b;">Coupon Code *</label>
+                                    <input type="text" id="cpn-code-input" placeholder="e.g. ESTATE25 or SPRING15" required style="text-transform: uppercase; font-family: monospace; font-size: 0.95rem; font-weight: 700; letter-spacing: 1px;">
+                                    <small style="font-size: 0.7rem; color: #64748b;">Letters &amp; numbers only (automatically capitalized)</small>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="cpn-percent-input" style="font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px; color: #1e293b;">Discount Percentage (%) *</label>
+                                    <input type="number" id="cpn-percent-input" min="1" max="90" value="15" required style="font-size: 0.95rem; font-weight: 700;">
+                                    <div class="admin-coupon-quick-pills">
+                                        <span style="font-size: 0.7rem; color: #64748b; margin-right: 0.2rem; align-self: center;">Quick:</span>
+                                        <button type="button" class="admin-quick-pill-btn" data-val="10">10%</button>
+                                        <button type="button" class="admin-quick-pill-btn active" data-val="15">15%</button>
+                                        <button type="button" class="admin-quick-pill-btn" data-val="20">20%</button>
+                                        <button type="button" class="admin-quick-pill-btn" data-val="25">25%</button>
+                                        <button type="button" class="admin-quick-pill-btn" data-val="30">30%</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="cpn-label-input" style="font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px; color: #1e293b;">Promotional Label / Description *</label>
+                                    <input type="text" id="cpn-label-input" value="15% OFF Single-Estate Highland Harvest" placeholder="e.g. 15% OFF Single-Estate Highland Harvest" required>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="cpn-minspend-input" style="font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px; color: #1e293b;">Min Order ($ USD)</label>
+                                    <input type="number" id="cpn-minspend-input" min="0" value="0" placeholder="0 for no minimum">
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="cpn-expiry-input" style="font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px; color: #1e293b;">Expiration Date (Optional)</label>
+                                    <input type="date" id="cpn-expiry-input">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="cpn-status-input" style="font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px; color: #1e293b;">Initial Status</label>
+                                    <select id="cpn-status-input">
+                                        <option value="active" selected>Active &bull; Immediately Redeemable in Checkout</option>
+                                        <option value="paused">Paused &bull; Saved but Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" style="padding: 0.85rem 1.75rem; font-size: 0.92rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; background: linear-gradient(135deg, #111827 0%, #1f2937 100%); cursor: pointer;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>Publish &amp; Issue Coupon</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Existing Coupons Registry Table -->
+                    <div style="background: #ffffff; border: 1px solid #e8e4df; border-radius: 12px; padding: 1.75rem 2rem; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+                            <div>
+                                <h4 style="font-family: var(--font-serif); font-size: 1.25rem; color: #111827; margin: 0 0 0.25rem 0;">Master Coupons &amp; Vouchers Registry</h4>
+                                <p style="font-size: 0.8rem; color: #64748b; margin: 0;">Active vouchers are immediately recognized at checkout and suggested to patrons.</p>
+                            </div>
+                            <span style="font-size: 0.78rem; font-weight: 700; color: #b8860b; background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3); padding: 0.3rem 0.75rem; border-radius: 20px;">
+                                ${allCoupons.length} Vouchers Issued
+                            </span>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Coupon Code</th>
+                                        <th>Discount</th>
+                                        <th>Promotion Label</th>
+                                        <th>Order Rules</th>
+                                        <th>Status</th>
+                                        <th style="text-align: right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${allCoupons.length === 0 ? `
+                                        <tr>
+                                            <td colspan="6" style="text-align: center; padding: 2rem; color: #64748b;">
+                                                No coupons created yet. Generate one above to offer discounts.
+                                            </td>
+                                        </tr>
+                                    ` : allCoupons.map(c => `
+                                        <tr>
+                                            <td>
+                                                <div class="admin-coupon-code-badge">
+                                                    <span>${c.code}</span>
+                                                    <button type="button" class="admin-coupon-copy-btn btn-copy-coupon-code" data-code="${c.code}" title="Copy coupon code">
+                                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="admin-coupon-percent-badge">${c.percent}% OFF</span>
+                                            </td>
+                                            <td>
+                                                <strong style="color: #1e293b; font-size: 0.85rem;">${c.label}</strong>
+                                            </td>
+                                            <td>
+                                                <div style="font-size: 0.76rem; color: #64748b;">
+                                                    ${c.min_spend > 0 ? `Min: $${c.min_spend} USD` : 'No minimum'}
+                                                    ${c.expiry_date ? ` &bull; Exp: ${c.expiry_date}` : ''}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="box-badge ${c.status === 'active' ? 'status-available' : 'status-booked'}" style="font-size: 0.72rem; padding: 0.2rem 0.6rem;">
+                                                    ${c.status === 'active' ? '● Active' : '○ Paused'}
+                                                </span>
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <div style="display: inline-flex; align-items: center; gap: 0.4rem;">
+                                                    <button type="button" class="btn btn-outline btn-toggle-coupon-status" data-id="${c.id}" style="font-size: 0.72rem; padding: 0.3rem 0.65rem; border-color: ${c.status === 'active' ? '#f59e0b' : '#10b981'}; color: ${c.status === 'active' ? '#b45309' : '#047857'}; background: ${c.status === 'active' ? '#fffbeb' : '#ecfdf5'}; cursor: pointer;">
+                                                        ${c.status === 'active' ? 'Pause' : 'Activate'}
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline btn-delete-coupon" data-id="${c.id}" data-code="${c.code}" style="font-size: 0.72rem; padding: 0.3rem 0.6rem; border-color: rgba(239,68,68,0.4); color: #dc2626; background: #fff5f5; cursor: pointer;">
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             `;
@@ -6916,6 +7096,9 @@ const UIComponents = {
                             <input type="text" id="cart-promo-code" class="checkout-discount-input" placeholder="Discount code or gift card" value="${activePromo ? activePromo.code : ''}">
                             <button type="button" id="cart-apply-promo-btn" class="checkout-discount-btn">${activePromo ? 'Remove' : 'Apply'}</button>
                         </div>
+
+                        <!-- Available Privilege Coupons -->
+                        ${window.renderCheckoutCouponsHTML ? window.renderCheckoutCouponsHTML(activePromo ? activePromo.code : '', 'cart-promo-code') : ''}
 
                         <!-- Savings Pill -->
                         <div class="checkout-savings-pill" id="cart-savings-pill" style="display: ${promoDiscountUSD > 0 ? 'flex' : 'none'};">

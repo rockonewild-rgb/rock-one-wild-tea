@@ -100,6 +100,7 @@ app.use('/api/announcements', require('./routes/announcements'));
 app.use('/api/newsletter', require('./routes/newsletter'));
 app.use('/api/stats', require('./routes/stats'));
 app.use('/api/paypal', require('./routes/paypal'));
+app.use('/api/coupons', require('./routes/coupons'));
 
 // 404 Handler for undefined API routes
 app.use('/api', (req, res) => {
