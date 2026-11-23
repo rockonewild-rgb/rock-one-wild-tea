@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
  */
 router.post('/', async (req, res) => {
     try {
-        let { code, percent, label, min_spend = 0, expiry_date = null, status = 'active' } = req.body;
+        let { code, percent, label, min_spend = 0, start_date = null, expiry_date = null, visibility = 'private', status = 'active' } = req.body;
 
         if (!code || !percent) {
             return res.status(400).json({ success: false, error: 'Coupon code and discount percentage are required.' });
@@ -51,22 +51,23 @@ router.post('/', async (req, res) => {
 
         const id = 'cpn-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 4);
         const createdAt = new Date().toISOString();
+        visibility = visibility === 'public' ? 'public' : 'private';
 
         // 1. SQLite primary write
         const stmt = db.prepare(`
-            INSERT INTO coupons (id, code, percent, label, min_spend, expiry_date, status, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO coupons (id, code, percent, label, min_spend, start_date, expiry_date, visibility, status, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
-        stmt.run(id, code, percent, label, Number(min_spend) || 0, expiry_date || null, status, createdAt);
+        stmt.run(id, code, percent, label, Number(min_spend) || 0, start_date || null, expiry_date || null, visibility, status, createdAt);
 
-        const newCoupon = { id, code, percent, label, min_spend: Number(min_spend) || 0, expiry_date, status, created_at: createdAt };
+        const newCoupon = { id, code, percent, label, min_spend: Number(min_spend) || 0, start_date, expiry_date, visibility, status, created_at: createdAt };
 
         // 2. Turso Cloud sync (async best-effort)
         if (isTursoAvailable()) {
             executeTurso(`
-                INSERT INTO coupons (id, code, percent, label, min_spend, expiry_date, status, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            `, [id, code, percent, label, Number(min_spend) || 0, expiry_date || null, status, createdAt]).catch(() => {});
+                INSERT INTO coupons (id, code, percent, label, min_spend, start_date, expiry_date, visibility, status, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `, [id, code, percent, label, Number(min_spend) || 0, start_date || null, expiry_date || null, visibility, status, createdAt]).catch(() => {});
         }
 
         res.status(201).json({ success: true, data: newCoupon });
@@ -85,7 +86,7 @@ router.post('/', async (req, res) => {
 router.patch('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { status, label, percent, min_spend, expiry_date } = req.body;
+        const { status, label, percent, min_spend, start_date, expiry_date, visibility } = req.body;
 
         const existing = db.prepare('SELECT * FROM coupons WHERE id = ?').get(id);
         if (!existing) {
@@ -96,20 +97,22 @@ router.patch('/:id', async (req, res) => {
         const newLabel = label !== undefined ? label : existing.label;
         const newPercent = percent !== undefined ? parseInt(percent, 10) : existing.percent;
         const newMinSpend = min_spend !== undefined ? Number(min_spend) : existing.min_spend;
+        const newStartDate = start_date !== undefined ? start_date : existing.start_date;
         const newExpiry = expiry_date !== undefined ? expiry_date : existing.expiry_date;
+        const newVisibility = visibility !== undefined ? visibility : (existing.visibility || 'private');
 
         db.prepare(`
             UPDATE coupons 
-            SET status = ?, label = ?, percent = ?, min_spend = ?, expiry_date = ?
+            SET status = ?, label = ?, percent = ?, min_spend = ?, start_date = ?, expiry_date = ?, visibility = ?
             WHERE id = ?
-        `).run(newStatus, newLabel, newPercent, newMinSpend, newExpiry, id);
+        `).run(newStatus, newLabel, newPercent, newMinSpend, newStartDate, newExpiry, newVisibility, id);
 
         if (isTursoAvailable()) {
             executeTurso(`
                 UPDATE coupons 
-                SET status = ?, label = ?, percent = ?, min_spend = ?, expiry_date = ?
+                SET status = ?, label = ?, percent = ?, min_spend = ?, start_date = ?, expiry_date = ?, visibility = ?
                 WHERE id = ?
-            `, [newStatus, newLabel, newPercent, newMinSpend, newExpiry, id]).catch(() => {});
+            `, [newStatus, newLabel, newPercent, newMinSpend, newStartDate, newExpiry, newVisibility, id]).catch(() => {});
         }
 
         const updated = db.prepare('SELECT * FROM coupons WHERE id = ?').get(id);

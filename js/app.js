@@ -2002,10 +2002,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (foundCoupon.status === 'paused') {
                 return { valid: false, code: clean, message: 'This coupon is currently paused.' };
             }
-            if (foundCoupon.expiry_date) {
+            if (foundCoupon.start_date && String(foundCoupon.start_date).trim()) {
                 const today = new Date().toISOString().slice(0, 10);
-                if (foundCoupon.expiry_date < today) {
-                    return { valid: false, code: clean, message: 'This coupon has expired.' };
+                if (today < String(foundCoupon.start_date).trim()) {
+                    return { valid: false, code: clean, message: `This promotional voucher activates on ${foundCoupon.start_date}.` };
+                }
+            }
+            if (foundCoupon.expiry_date && String(foundCoupon.expiry_date).trim()) {
+                const today = new Date().toISOString().slice(0, 10);
+                if (today > String(foundCoupon.expiry_date).trim()) {
+                    return { valid: false, code: clean, message: `This promotional voucher expired on ${foundCoupon.expiry_date}.` };
                 }
             }
             const minSpend = Number(foundCoupon.min_spend) || 0;
@@ -2033,30 +2039,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Helper to render clickable coupon suggestion pills in checkout
     window.renderCheckoutCouponsHTML = function(activeCode, inputId) {
-        let coupons = [];
-        if (window.TeaFactoryStore && typeof window.TeaFactoryStore.getActiveCoupons === 'function') {
-            coupons = window.TeaFactoryStore.getActiveCoupons() || [];
-        }
-        if (!coupons || coupons.length === 0) {
-            coupons = [
-                { code: 'ESTATE15', percent: 15, label: '15% OFF Championship Reserve' },
-                { code: 'WILD10', percent: 10, label: '10% OFF Single-Estate Harvest' },
-                { code: 'CEYLON20', percent: 20, label: '20% OFF Highland Flush' },
-                { code: 'COLLECTOR', percent: 10, label: '10% OFF Collector Allocation' },
-                { code: 'ROCKONE', percent: 10, label: '10% OFF Welcome Privilege' }
-            ];
+        let publicCoupons = [];
+        if (window.TeaFactoryStore && typeof window.TeaFactoryStore.getActivePublicCoupons === 'function') {
+            publicCoupons = window.TeaFactoryStore.getActivePublicCoupons() || [];
         }
 
         const activeClean = String(activeCode || '').trim().toUpperCase();
+
+        // If there are NO public campaign coupons active right now, show discrete hint for private codes
+        if (!publicCoupons || publicCoupons.length === 0) {
+            return `
+                <div class="checkout-coupons-private-hint" style="margin-top: 0.35rem; font-size: 0.74rem; color: #64748b; display: flex; align-items: center; gap: 0.35rem;">
+                    <span>🔒</span>
+                    <span>Received a private VIP reward or seasonal privilege code? Enter it above to apply.</span>
+                </div>
+            `;
+        }
 
         return `
             <div class="checkout-available-coupons-wrap" data-target-input="${inputId}">
                 <div class="checkout-coupons-title">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
-                    <span>Available Privilege Coupons &amp; Offers</span>
+                    <span>Public Seasonal Offers &amp; Privileges</span>
                 </div>
                 <div class="checkout-coupon-pills">
-                    ${coupons.map(c => {
+                    ${publicCoupons.map(c => {
                         const code = String(c.code).trim().toUpperCase();
                         const percent = c.percent || c.discount_percent || 10;
                         const isSelected = activeClean === code;
@@ -2066,7 +2073,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 data-code="${code}" 
                                 data-target-input="${inputId}"
                                 title="${c.label || code}">
-                                <span class="coupon-pill-icon">🎟️</span>
+                                <span class="coupon-pill-icon">🌐</span>
                                 <span class="coupon-pill-code">${code}</span>
                                 <span class="coupon-pill-discount">(${percent}% OFF)</span>
                                 ${isSelected ? '<span class="coupon-pill-check">✓ Applied</span>' : ''}
@@ -2075,7 +2082,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }).join('')}
                 </div>
                 <div class="checkout-coupons-hint">
-                    Tap any voucher above to apply savings directly
+                    Tap any public offer above, or enter your private VIP voucher code
                 </div>
             </div>
         `;
@@ -11674,7 +11681,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const percent = Number(document.getElementById('cpn-percent-input')?.value || 10);
                 const label = (document.getElementById('cpn-label-input')?.value || '').trim();
                 const minSpend = Number(document.getElementById('cpn-minspend-input')?.value || 0);
+                const startDate = document.getElementById('cpn-start-input')?.value || null;
                 const expiry = document.getElementById('cpn-expiry-input')?.value || null;
+                const visibility = document.getElementById('cpn-visibility-input')?.value || 'private';
                 const status = document.getElementById('cpn-status-input')?.value || 'active';
 
                 if (!code) {
@@ -11688,19 +11697,69 @@ document.addEventListener('DOMContentLoaded', () => {
                         percent,
                         label: label || `${percent}% OFF Privilege Voucher`,
                         min_spend: minSpend,
+                        start_date: startDate,
                         expiry_date: expiry,
+                        visibility,
                         status
                     });
 
+                    const typeName = visibility === 'public' ? 'Public Offer' : 'Private VIP Voucher';
                     showToast(
                         "Coupon Published", 
-                        `Privilege voucher "${code}" (${percent}% OFF) is now active and redeemable at checkout.`, 
+                        `${typeName} "${code}" (${percent}% OFF) has been issued successfully.`, 
                         "success"
                     );
                     renderTabContent('admin');
                 }
             });
         }
+
+        // WhatsApp VIP Private Dispatch
+        const dispatchWhatsappBtns = document.querySelectorAll('.btn-dispatch-coupon-whatsapp');
+        dispatchWhatsappBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = btn.getAttribute('data-code');
+                const percent = btn.getAttribute('data-percent');
+                const label = btn.getAttribute('data-label') || 'Artisanal Privilege';
+                const expiry = btn.getAttribute('data-expiry') || '';
+
+                const originUrl = window.location.origin;
+                const msg = `🌿 *Rock One Wild Tea — Private VIP Privilege* 🌿\n\nDear Connoisseur,\n\nWe are pleased to extend you an exclusive private harvest privilege for *${percent}% OFF* on our rare single-estate reserves.\n\n🎟️ *Privilege Code:* *${code}*\n📋 *Allocation:* ${label}${expiry ? `\n⏳ *Valid Until:* ${expiry}` : ''}\n\nTo redeem, simply enter your private code in the checkout discount box:\n${originUrl}\n\nWarmest regards,\n*The Master Sommelier & Concierge*\nRock One Wild Tea Estate`;
+
+                const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+                window.open(url, '_blank');
+                showToast("WhatsApp VIP Dispatch", `Bespoke invitation for "${code}" opened in WhatsApp.`, "success");
+            });
+        });
+
+        // Copy VIP Invitation Letter
+        const copyInviteBtns = document.querySelectorAll('.btn-copy-coupon-invite');
+        copyInviteBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = btn.getAttribute('data-code');
+                const percent = btn.getAttribute('data-percent');
+                const label = btn.getAttribute('data-label') || 'Artisanal Privilege';
+                const expiry = btn.getAttribute('data-expiry') || '';
+
+                const originUrl = window.location.origin;
+                const letter = `Dear Valued Connoisseur,\n\nRock One Wild Tea Estate is delighted to extend you a private patronage allocation privilege.\n\nPrivilege Voucher Code: ${code}\nPrivilege Value: ${percent}% OFF\nAllocation Description: ${label}${expiry ? `\nValid Through: ${expiry}` : '\nValidity: Open Privilege Period'}\n\nHow to Redeem:\nVisit our private reserve portal at ${originUrl}, select your handcrafted harvest tins or numbered collector chests, and enter voucher code "${code}" at checkout to receive your ${percent}% concession.\n\nShould you require bespoke assistance or private sommelier curation, please do not hesitate to contact our Concierge Desk directly.\n\nWith our highest compliments,\n\nRock One Wild Tea Concierge Desk\nSanctuary: Gannilawaththa, Wellawela, Ettampitiya, Sri Lanka\nWhatsApp / Direct: +94 77 320 9950`;
+
+                const copySuccess = () => showToast("VIP Letter Copied", `Formal private invitation for "${code}" copied to clipboard. Ready to paste into patron email.`, "success");
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(letter).then(copySuccess).catch(() => {
+                        showToast("Voucher Code", code, "info");
+                    });
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = letter;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    copySuccess();
+                }
+            });
+        });
 
         // Toggle Coupon Status
         const toggleCouponBtns = document.querySelectorAll('.btn-toggle-coupon-status');

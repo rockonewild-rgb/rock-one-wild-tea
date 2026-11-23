@@ -609,11 +609,11 @@ class TeaFactoryStore {
                 }
                 if (!this.state.coupons || !Array.isArray(this.state.coupons) || this.state.coupons.length === 0) {
                     this.state.coupons = [
-                        { id: 'cpn-1', code: 'ESTATE15', percent: 15, label: '15% OFF Championship Reserve', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
-                        { id: 'cpn-2', code: 'WILD10', percent: 10, label: '10% OFF Single-Estate Harvest', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
-                        { id: 'cpn-3', code: 'CEYLON20', percent: 20, label: '20% OFF Highland Flush', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
-                        { id: 'cpn-4', code: 'COLLECTOR', percent: 10, label: '10% OFF Collector Allocation', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
-                        { id: 'cpn-5', code: 'ROCKONE', percent: 10, label: '10% OFF Welcome Privilege', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() }
+                        { id: 'cpn-1', code: 'ESTATE15', percent: 15, label: '15% OFF Championship Reserve', status: 'active', min_spend: 0, start_date: null, expiry_date: null, visibility: 'private', created_at: new Date().toISOString() },
+                        { id: 'cpn-2', code: 'WILD10', percent: 10, label: '10% OFF Single-Estate Harvest', status: 'active', min_spend: 0, start_date: null, expiry_date: null, visibility: 'private', created_at: new Date().toISOString() },
+                        { id: 'cpn-3', code: 'CEYLON20', percent: 20, label: '20% OFF Highland Flush', status: 'active', min_spend: 0, start_date: null, expiry_date: null, visibility: 'private', created_at: new Date().toISOString() },
+                        { id: 'cpn-4', code: 'COLLECTOR', percent: 10, label: '10% OFF Collector Allocation', status: 'active', min_spend: 0, start_date: null, expiry_date: null, visibility: 'private', created_at: new Date().toISOString() },
+                        { id: 'cpn-5', code: 'ROCKONE', percent: 10, label: '10% OFF Welcome Privilege', status: 'active', min_spend: 0, start_date: null, expiry_date: null, visibility: 'public', created_at: new Date().toISOString() }
                     ];
                     needsSave = true;
                 }
@@ -638,8 +638,26 @@ class TeaFactoryStore {
         return this.state.coupons || [];
     }
 
+    isCouponInActivePeriod(coupon) {
+        if (!coupon) return false;
+        const today = new Date().toISOString().slice(0, 10);
+        if (coupon.start_date && String(coupon.start_date).trim() && today < String(coupon.start_date).trim()) {
+            return false;
+        }
+        if (coupon.expiry_date && String(coupon.expiry_date).trim() && today > String(coupon.expiry_date).trim()) {
+            return false;
+        }
+        return true;
+    }
+
     getActiveCoupons() {
-        return (this.state.coupons || []).filter(c => c.status === 'active');
+        return (this.state.coupons || []).filter(c => c && c.status === 'active');
+    }
+
+    getActivePublicCoupons() {
+        return (this.state.coupons || []).filter(c => {
+            return c && c.status === 'active' && c.visibility === 'public' && this.isCouponInActivePeriod(c);
+        });
     }
 
     addCoupon(couponData) {
@@ -657,7 +675,9 @@ class TeaFactoryStore {
             percent: parseInt(couponData.percent, 10) || 10,
             label: couponData.label || `${couponData.percent}% OFF Privilege Reserve`,
             min_spend: Number(couponData.min_spend) || 0,
-            expiry_date: couponData.expiry_date || null,
+            start_date: couponData.start_date ? String(couponData.start_date).trim() : null,
+            expiry_date: couponData.expiry_date ? String(couponData.expiry_date).trim() : null,
+            visibility: couponData.visibility === 'public' ? 'public' : 'private',
             status: couponData.status || 'active',
             created_at: new Date().toISOString()
         };
@@ -954,11 +974,11 @@ class TeaFactoryStore {
             cart: [],
             activeCurrency: "USD",
             coupons: [
-                { id: 'cpn-1', code: 'ESTATE15', percent: 15, label: '15% OFF Championship Reserve', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
-                { id: 'cpn-2', code: 'WILD10', percent: 10, label: '10% OFF Single-Estate Harvest', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
-                { id: 'cpn-3', code: 'CEYLON20', percent: 20, label: '20% OFF Highland Flush', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
-                { id: 'cpn-4', code: 'COLLECTOR', percent: 10, label: '10% OFF Collector Allocation', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() },
-                { id: 'cpn-5', code: 'ROCKONE', percent: 10, label: '10% OFF Welcome Privilege', status: 'active', min_spend: 0, expiry_date: null, created_at: new Date().toISOString() }
+                { id: 'cpn-1', code: 'ESTATE15', percent: 15, label: '15% OFF Championship Reserve', status: 'active', min_spend: 0, start_date: null, expiry_date: null, visibility: 'private', created_at: new Date().toISOString() },
+                { id: 'cpn-2', code: 'WILD10', percent: 10, label: '10% OFF Single-Estate Harvest', status: 'active', min_spend: 0, start_date: null, expiry_date: null, visibility: 'private', created_at: new Date().toISOString() },
+                { id: 'cpn-3', code: 'CEYLON20', percent: 20, label: '20% OFF Highland Flush', status: 'active', min_spend: 0, start_date: null, expiry_date: null, visibility: 'private', created_at: new Date().toISOString() },
+                { id: 'cpn-4', code: 'COLLECTOR', percent: 10, label: '10% OFF Collector Allocation', status: 'active', min_spend: 0, start_date: null, expiry_date: null, visibility: 'private', created_at: new Date().toISOString() },
+                { id: 'cpn-5', code: 'ROCKONE', percent: 10, label: '10% OFF Welcome Privilege', status: 'active', min_spend: 0, start_date: null, expiry_date: null, visibility: 'public', created_at: new Date().toISOString() }
             ]
         };
         this.saveState();

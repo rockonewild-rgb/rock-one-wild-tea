@@ -3564,17 +3564,34 @@ const UIComponents = {
                                 </div>
                             </div>
 
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
                                 <div class="form-group" style="margin-bottom: 0;">
-                                    <label for="cpn-expiry-input" style="font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px; color: #1e293b;">Expiration Date (Optional)</label>
-                                    <input type="date" id="cpn-expiry-input">
+                                    <label for="cpn-visibility-input" style="font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px; color: #1e293b;">Distribution &amp; Visibility *</label>
+                                    <select id="cpn-visibility-input" style="font-size: 0.88rem; font-weight: 600;">
+                                        <option value="private" selected>🔒 Private VIP Reward &bull; Sent Privately (Hidden at Checkout)</option>
+                                        <option value="public">🌐 Public Campaign &bull; Shown on Checkout Screen (Open Offer)</option>
+                                    </select>
+                                    <small style="font-size: 0.7rem; color: #64748b;">Private vouchers are hidden from public view; patrons must enter them manually.</small>
                                 </div>
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label for="cpn-status-input" style="font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px; color: #1e293b;">Initial Status</label>
                                     <select id="cpn-status-input">
-                                        <option value="active" selected>Active &bull; Immediately Redeemable in Checkout</option>
+                                        <option value="active" selected>Active &bull; Immediately Redeemable</option>
                                         <option value="paused">Paused &bull; Saved but Inactive</option>
                                     </select>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="cpn-start-input" style="font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px; color: #1e293b;">Start Date (Optional)</label>
+                                    <input type="date" id="cpn-start-input">
+                                    <small style="font-size: 0.7rem; color: #64748b;">Immediate if empty</small>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="cpn-expiry-input" style="font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px; color: #1e293b;">Expiration Date (Optional)</label>
+                                    <input type="date" id="cpn-expiry-input">
+                                    <small style="font-size: 0.7rem; color: #64748b;">Automatically expires after this date</small>
                                 </div>
                             </div>
 
@@ -3590,7 +3607,7 @@ const UIComponents = {
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
                             <div>
                                 <h4 style="font-family: var(--font-serif); font-size: 1.25rem; color: #111827; margin: 0 0 0.25rem 0;">Master Coupons &amp; Vouchers Registry</h4>
-                                <p style="font-size: 0.8rem; color: #64748b; margin: 0;">Active vouchers are immediately recognized at checkout and suggested to patrons.</p>
+                                <p style="font-size: 0.8rem; color: #64748b; margin: 0;">Manage public campaigns, dispatch private VIP rewards via WhatsApp &amp; Email, and enforce promotional periods.</p>
                             </div>
                             <span style="font-size: 0.78rem; font-weight: 700; color: #b8860b; background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3); padding: 0.3rem 0.75rem; border-radius: 20px;">
                                 ${allCoupons.length} Vouchers Issued
@@ -3602,11 +3619,11 @@ const UIComponents = {
                                 <thead>
                                     <tr>
                                         <th>Coupon Code</th>
+                                        <th>Distribution</th>
                                         <th>Discount</th>
-                                        <th>Promotion Label</th>
-                                        <th>Order Rules</th>
+                                        <th>Promotion Period</th>
                                         <th>Status</th>
-                                        <th style="text-align: right;">Actions</th>
+                                        <th style="text-align: right;">Private Dispatch &amp; Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -3616,7 +3633,19 @@ const UIComponents = {
                                                 No coupons created yet. Generate one above to offer discounts.
                                             </td>
                                         </tr>
-                                    ` : allCoupons.map(c => `
+                                    ` : allCoupons.map(c => {
+                                        const isPublic = c.visibility === 'public';
+                                        const today = new Date().toISOString().slice(0, 10);
+                                        const isUpcoming = c.start_date && today < c.start_date;
+                                        const isExpired = c.expiry_date && today > c.expiry_date;
+                                        let periodBadge = '<span style="color: #15803d; font-weight: 600;">Active Now</span>';
+                                        if (isExpired) {
+                                            periodBadge = '<span style="color: #dc2626; font-weight: 600;">Expired</span>';
+                                        } else if (isUpcoming) {
+                                            periodBadge = `<span style="color: #d97706; font-weight: 600;">Starts ${c.start_date}</span>`;
+                                        }
+
+                                        return `
                                         <tr>
                                             <td>
                                                 <div class="admin-coupon-code-badge">
@@ -3627,15 +3656,27 @@ const UIComponents = {
                                                 </div>
                                             </td>
                                             <td>
+                                                ${isPublic ? `
+                                                    <span style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.55rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; background: #ecfdf5; color: #047857; border: 1px solid rgba(16,185,129,0.3);">
+                                                        🌐 Public Offer
+                                                    </span>
+                                                ` : `
+                                                    <span style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.55rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; background: #f5f3ff; color: #6d28d9; border: 1px solid rgba(109,40,217,0.25);">
+                                                        🔒 Private VIP
+                                                    </span>
+                                                `}
+                                            </td>
+                                            <td>
                                                 <span class="admin-coupon-percent-badge">${c.percent}% OFF</span>
+                                                <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">${c.label}</div>
                                             </td>
                                             <td>
-                                                <strong style="color: #1e293b; font-size: 0.85rem;">${c.label}</strong>
-                                            </td>
-                                            <td>
-                                                <div style="font-size: 0.76rem; color: #64748b;">
-                                                    ${c.min_spend > 0 ? `Min: $${c.min_spend} USD` : 'No minimum'}
-                                                    ${c.expiry_date ? ` &bull; Exp: ${c.expiry_date}` : ''}
+                                                <div style="font-size: 0.76rem; color: #1e293b;">
+                                                    ${periodBadge}
+                                                </div>
+                                                <div style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">
+                                                    ${c.start_date || c.expiry_date ? `${c.start_date || 'Immediate'} &rarr; ${c.expiry_date || 'No Expiry'}` : 'Open Period'}
+                                                    ${c.min_spend > 0 ? ` &bull; Min $${c.min_spend}` : ''}
                                                 </div>
                                             </td>
                                             <td>
@@ -3644,17 +3685,36 @@ const UIComponents = {
                                                 </span>
                                             </td>
                                             <td style="text-align: right;">
-                                                <div style="display: inline-flex; align-items: center; gap: 0.4rem;">
-                                                    <button type="button" class="btn btn-outline btn-toggle-coupon-status" data-id="${c.id}" style="font-size: 0.72rem; padding: 0.3rem 0.65rem; border-color: ${c.status === 'active' ? '#f59e0b' : '#10b981'}; color: ${c.status === 'active' ? '#b45309' : '#047857'}; background: ${c.status === 'active' ? '#fffbeb' : '#ecfdf5'}; cursor: pointer;">
+                                                <div style="display: inline-flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; justify-content: flex-end;">
+                                                    <button type="button" class="btn btn-outline btn-dispatch-coupon-whatsapp" 
+                                                        data-code="${c.code}" 
+                                                        data-percent="${c.percent}" 
+                                                        data-label="${c.label}" 
+                                                        data-expiry="${c.expiry_date || ''}"
+                                                        style="font-size: 0.72rem; padding: 0.3rem 0.55rem; border-color: #25d366; color: #15803d; background: #f0fdf4; cursor: pointer;"
+                                                        title="Send VIP Invitation on WhatsApp">
+                                                        📲 WhatsApp
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline btn-copy-coupon-invite" 
+                                                        data-code="${c.code}" 
+                                                        data-percent="${c.percent}" 
+                                                        data-label="${c.label}" 
+                                                        data-expiry="${c.expiry_date || ''}"
+                                                        style="font-size: 0.72rem; padding: 0.3rem 0.55rem; border-color: #b8860b; color: #92400e; background: #fffcf4; cursor: pointer;"
+                                                        title="Copy VIP Invitation Letter">
+                                                        ✉️ VIP Letter
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline btn-toggle-coupon-status" data-id="${c.id}" style="font-size: 0.72rem; padding: 0.3rem 0.55rem; border-color: ${c.status === 'active' ? '#f59e0b' : '#10b981'}; color: ${c.status === 'active' ? '#b45309' : '#047857'}; background: ${c.status === 'active' ? '#fffbeb' : '#ecfdf5'}; cursor: pointer;">
                                                         ${c.status === 'active' ? 'Pause' : 'Activate'}
                                                     </button>
-                                                    <button type="button" class="btn btn-outline btn-delete-coupon" data-id="${c.id}" data-code="${c.code}" style="font-size: 0.72rem; padding: 0.3rem 0.6rem; border-color: rgba(239,68,68,0.4); color: #dc2626; background: #fff5f5; cursor: pointer;">
+                                                    <button type="button" class="btn btn-outline btn-delete-coupon" data-id="${c.id}" data-code="${c.code}" style="font-size: 0.72rem; padding: 0.3rem 0.5rem; border-color: rgba(239,68,68,0.4); color: #dc2626; background: #fff5f5; cursor: pointer;">
                                                         Delete
                                                     </button>
                                                 </div>
                                             </td>
                                         </tr>
-                                    `).join('')}
+                                    `;
+                                    }).join('')}
                                 </tbody>
                             </table>
                         </div>

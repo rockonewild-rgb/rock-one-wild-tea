@@ -204,7 +204,9 @@ function initSchema() {
             percent INTEGER NOT NULL,
             label TEXT NOT NULL,
             min_spend REAL DEFAULT 0,
+            start_date TEXT,
             expiry_date TEXT,
+            visibility TEXT DEFAULT 'private', -- 'private' | 'public'
             status TEXT DEFAULT 'active',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
@@ -214,12 +216,12 @@ function initSchema() {
     try {
         const cpnCount = db.prepare("SELECT COUNT(*) as count FROM coupons").get();
         if (cpnCount && cpnCount.count === 0) {
-            const insertCpn = db.prepare("INSERT INTO coupons (id, code, percent, label, min_spend, status) VALUES (?, ?, ?, ?, ?, ?)");
-            insertCpn.run('cpn-1', 'ESTATE15', 15, '15% OFF Championship Reserve', 0, 'active');
-            insertCpn.run('cpn-2', 'WILD10', 10, '10% OFF Single-Estate Harvest', 0, 'active');
-            insertCpn.run('cpn-3', 'CEYLON20', 20, '20% OFF Highland Flush', 0, 'active');
-            insertCpn.run('cpn-4', 'COLLECTOR', 10, '10% OFF Collector Allocation', 0, 'active');
-            insertCpn.run('cpn-5', 'ROCKONE', 10, '10% OFF Welcome Privilege', 0, 'active');
+            const insertCpn = db.prepare("INSERT INTO coupons (id, code, percent, label, min_spend, visibility, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            insertCpn.run('cpn-1', 'ESTATE15', 15, '15% OFF Championship Reserve', 0, 'private', 'active');
+            insertCpn.run('cpn-2', 'WILD10', 10, '10% OFF Single-Estate Harvest', 0, 'private', 'active');
+            insertCpn.run('cpn-3', 'CEYLON20', 20, '20% OFF Highland Flush', 0, 'private', 'active');
+            insertCpn.run('cpn-4', 'COLLECTOR', 10, '10% OFF Collector Allocation', 0, 'private', 'active');
+            insertCpn.run('cpn-5', 'ROCKONE', 10, '10% OFF Welcome Privilege', 0, 'public', 'active');
         }
     } catch (e) {}
 
@@ -248,6 +250,10 @@ function initSchema() {
         if (!userCols.includes('role')) db.prepare("ALTER TABLE customer_users ADD COLUMN role TEXT DEFAULT 'staff'").run();
         if (!userCols.includes('status')) db.prepare("ALTER TABLE customer_users ADD COLUMN status TEXT DEFAULT 'active'").run();
         if (!userCols.includes('last_login')) db.prepare("ALTER TABLE customer_users ADD COLUMN last_login TEXT").run();
+
+        const cpnCols = db.prepare("PRAGMA table_info(coupons)").all().map(c => c.name);
+        if (!cpnCols.includes('start_date')) db.prepare("ALTER TABLE coupons ADD COLUMN start_date TEXT").run();
+        if (!cpnCols.includes('visibility')) db.prepare("ALTER TABLE coupons ADD COLUMN visibility TEXT DEFAULT 'private'").run();
     } catch (e) {
         console.warn('SQLite schema column check notice:', e.message);
     }
