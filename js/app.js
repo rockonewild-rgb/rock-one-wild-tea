@@ -3704,6 +3704,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
+            const displayHeadline = product.headline || 'Tender spring buds, roasted chestnut aroma, and fresh natural sweetness';
+            const displayAbout = product.about || product.desc || product.description || 'Golden Sprout delivers a delicate, naturally sweet taste with a smooth, silky finish. Made from young tea buds and crafted through traditional artisanal processing, this rare tea offers a gentle yet layered flavor and a beautiful golden liquor—perfect for anyone who enjoys a clean, comforting cup.';
+            const displayOrigin = product.origin || ('Passara & Wellawela Sanctuary, Badulla District, Uva Highlands, Sri Lanka (Elevation: ' + (product.elevation || '1,240m – 1,320m') + '). High montane cloud forest enriched by natural granite springs and dry August katabatic winds.');
+            const displayCaffeine = product.caffeine || 'Medium (approx. 38mg – 45mg per 250ml brewed cup). Naturally balanced by exceptionally high concentrations of calming L-theanine, promoting alert tranquility and steady cognitive focus.';
+            const displayPreparation = product.preparation || ('Water: ' + (product.steepTemp || '90°C – 95°C (194°F – 203°F)') + ' soft mountain or filtered water. Leaf-to-Water Ratio: 3.5g per 150ml (Gongfu gaiwan) or 2.5g per 250ml (Western teapot). Infusion Timing: 1st: 35s, 2nd: 50s, 3rd: 80s, 4th & 5th: 120s.');
+            const displayBenefits = product.benefits || 'Rich in natural polyphenols, EGCG, and theaflavins. Supports daily metabolic wellness, cellular longevity, digestive harmony, and clean sustained alertness without jitters.';
+
             drawerFormContainer.innerHTML = `
                 <div class="checkout-split-layout">
                     <!-- ==============================================
@@ -3741,6 +3748,77 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </button>
                                 </div>
                             `}
+                        </div>
+
+                        <!-- Seven Teahouse Style Product Dossier & Accordions Card -->
+                        <div class="checkout-step-card checkout-dossier-card">
+                            <div class="checkout-dossier-inner">
+                                <h3 class="checkout-dossier-headline">${esc(displayHeadline)}</h3>
+                                <hr class="checkout-dossier-divider">
+
+                                <div class="checkout-accordions">
+                                    <!-- 1. About This Tea -->
+                                    <div class="checkout-accordion-item open" data-accordion="about">
+                                        <button type="button" class="checkout-accordion-header" aria-expanded="true">
+                                            <span class="checkout-accordion-title">About This Tea</span>
+                                            <span class="checkout-accordion-icon">−</span>
+                                        </button>
+                                        <div class="checkout-accordion-body" style="display: block;">
+                                            <p style="font-weight: 700; font-size: 0.95rem; color: #1e293b; margin-bottom: 0.45rem;">${esc(product.name)}</p>
+                                            <p>${esc(displayAbout)}</p>
+                                            <div class="checkout-dossier-tags">
+                                                <span class="checkout-dossier-tag">🌿 ${esc(product.leafGrade || 'Single Estate')}</span>
+                                                <span class="checkout-dossier-tag">🏔️ ${esc(product.elevation || '1,240m - 1,320m')}</span>
+                                                <span class="checkout-dossier-tag">🍃 ${esc(product.weight || '100g')} Vintage Tin</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 2. Origin -->
+                                    <div class="checkout-accordion-item" data-accordion="origin">
+                                        <button type="button" class="checkout-accordion-header" aria-expanded="false">
+                                            <span class="checkout-accordion-title">Origin</span>
+                                            <span class="checkout-accordion-icon">+</span>
+                                        </button>
+                                        <div class="checkout-accordion-body" style="display: none;">
+                                            <p>${esc(displayOrigin)}</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- 3. Caffeine Level -->
+                                    <div class="checkout-accordion-item" data-accordion="caffeine">
+                                        <button type="button" class="checkout-accordion-header" aria-expanded="false">
+                                            <span class="checkout-accordion-title">Caffeine Level</span>
+                                            <span class="checkout-accordion-icon">+</span>
+                                        </button>
+                                        <div class="checkout-accordion-body" style="display: none;">
+                                            <p>${esc(displayCaffeine)}</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- 4. Preparation -->
+                                    <div class="checkout-accordion-item" data-accordion="preparation">
+                                        <button type="button" class="checkout-accordion-header" aria-expanded="false">
+                                            <span class="checkout-accordion-title">Preparation</span>
+                                            <span class="checkout-accordion-icon">+</span>
+                                        </button>
+                                        <div class="checkout-accordion-body" style="display: none;">
+                                            <p>${esc(displayPreparation)}</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- 5. Tea Benefits -->
+                                    <div class="checkout-accordion-item" data-accordion="benefits">
+                                        <button type="button" class="checkout-accordion-header" aria-expanded="false">
+                                            <span class="checkout-accordion-title">Tea Benefits</span>
+                                            <span class="checkout-accordion-icon">+</span>
+                                        </button>
+                                        <div class="checkout-accordion-body" style="display: none;">
+                                            <p>${esc(displayBenefits)}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Form -->
@@ -4442,6 +4520,29 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             bindFileUpload('quick-cash-slip', 'quick-cash-slip-zone', 'quick-cash-slip-preview', (b64) => {
                 selectedProdSlipBase64 = b64;
+            });
+
+            // Accordion toggle click listeners for product checkout dossier
+            const checkoutAccordionHeaders = drawerFormContainer.querySelectorAll('.checkout-accordion-header');
+            checkoutAccordionHeaders.forEach(hdr => {
+                hdr.addEventListener('click', () => {
+                    const item = hdr.closest('.checkout-accordion-item');
+                    if (!item) return;
+                    const body = item.querySelector('.checkout-accordion-body');
+                    const icon = item.querySelector('.checkout-accordion-icon');
+                    const isOpen = item.classList.contains('open');
+                    if (isOpen) {
+                        item.classList.remove('open');
+                        hdr.setAttribute('aria-expanded', 'false');
+                        if (body) body.style.display = 'none';
+                        if (icon) icon.textContent = '+';
+                    } else {
+                        item.classList.add('open');
+                        hdr.setAttribute('aria-expanded', 'true');
+                        if (body) body.style.display = 'block';
+                        if (icon) icon.textContent = '−';
+                    }
+                });
             });
 
             // Wire PayPal
@@ -9864,6 +9965,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     : (flavorProfile ? flavorProfile.split(',').map(s => s.trim()).filter(Boolean) : ['Single Estate', 'Artisanal Harvest']);
                 const elevation = document.getElementById('prod-elevation')?.value?.trim() || '1,200m Highlands';
 
+                const headline = document.getElementById('prod-headline')?.value?.trim() || '';
+                const about = document.getElementById('prod-about')?.value?.trim() || '';
+                const origin = document.getElementById('prod-origin')?.value?.trim() || '';
+                const caffeine = document.getElementById('prod-caffeine')?.value?.trim() || '';
+                const preparation = document.getElementById('prod-preparation')?.value?.trim() || '';
+                const benefits = document.getElementById('prod-benefits')?.value?.trim() || '';
+
                 // Automatically calculate countdown seconds from single Steep Time field
                 let steepSeconds = 180;
                 const matchedNum = steepTime.match(/(\d+(\.\d+)?)/);
@@ -9890,7 +9998,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     flavor_notes: tastingNotes,
                     elevation,
                     steepSeconds,
-                    sensoryRadar
+                    sensoryRadar,
+                    headline,
+                    about,
+                    origin,
+                    caffeine,
+                    preparation,
+                    benefits
                 };
 
                 if (editId) {
@@ -9917,6 +10031,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (pAmt) pAmt.value = '';
                 const pShipAmt = document.getElementById('prod-shipping-amount-input');
                 if (pShipAmt) pShipAmt.value = '';
+                if (document.getElementById('prod-headline')) document.getElementById('prod-headline').value = '';
+                if (document.getElementById('prod-about')) document.getElementById('prod-about').value = '';
+                if (document.getElementById('prod-origin')) document.getElementById('prod-origin').value = '';
+                if (document.getElementById('prod-caffeine')) document.getElementById('prod-caffeine').value = '';
+                if (document.getElementById('prod-preparation')) document.getElementById('prod-preparation').value = '';
+                if (document.getElementById('prod-benefits')) document.getElementById('prod-benefits').value = '';
+                if (document.getElementById('prod-headline')) document.getElementById('prod-headline').value = '';
+                if (document.getElementById('prod-about')) document.getElementById('prod-about').value = '';
+                if (document.getElementById('prod-origin')) document.getElementById('prod-origin').value = '';
+                if (document.getElementById('prod-caffeine')) document.getElementById('prod-caffeine').value = '';
+                if (document.getElementById('prod-preparation')) document.getElementById('prod-preparation').value = '';
+                if (document.getElementById('prod-benefits')) document.getElementById('prod-benefits').value = '';
                 syncProductPricing();
                 if (prodImageZone) prodImageZone.classList.remove('has-file');
                 if (prodImagePreview) prodImagePreview.style.display = 'none';
@@ -9957,6 +10083,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const flavorProfile = btn.getAttribute('data-flavor-profile') || '';
                 const tastingNotes = btn.getAttribute('data-tasting-notes') || '';
                 const elevation = btn.getAttribute('data-elevation') || '';
+                const headline = btn.getAttribute('data-headline') || '';
+                const about = btn.getAttribute('data-about') || '';
+                const origin = btn.getAttribute('data-origin') || '';
+                const caffeine = btn.getAttribute('data-caffeine') || '';
+                const preparation = btn.getAttribute('data-preparation') || '';
+                const benefits = btn.getAttribute('data-benefits') || '';
                 const steepSeconds = btn.getAttribute('data-steep-seconds') || '180';
                 const radarFloral = btn.getAttribute('data-radar-floral') || '80';
                 const radarMalty = btn.getAttribute('data-radar-malty') || '75';
@@ -10017,6 +10149,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (tastingNotesInput) tastingNotesInput.value = tastingNotes;
                 if (elevationInput) elevationInput.value = elevation;
 
+                const headlineInput = document.getElementById('prod-headline');
+                const aboutInput = document.getElementById('prod-about');
+                const originInput = document.getElementById('prod-origin');
+                const caffeineInput = document.getElementById('prod-caffeine');
+                const preparationInput = document.getElementById('prod-preparation');
+                const benefitsInput = document.getElementById('prod-benefits');
+
+                if (headlineInput) headlineInput.value = headline;
+                if (aboutInput) aboutInput.value = about;
+                if (originInput) originInput.value = origin;
+                if (caffeineInput) caffeineInput.value = caffeine;
+                if (preparationInput) preparationInput.value = preparation;
+                if (benefitsInput) benefitsInput.value = benefits;
+
                 const setRadarVal = (key, val) => {
                     const slider = document.getElementById(`prod-radar-${key}`);
                     const badge = document.getElementById(`badge-radar-${key}`);
@@ -10068,6 +10214,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (pAmt) pAmt.value = '';
                 const pShipAmt = document.getElementById('prod-shipping-amount-input');
                 if (pShipAmt) pShipAmt.value = '';
+                if (document.getElementById('prod-headline')) document.getElementById('prod-headline').value = '';
+                if (document.getElementById('prod-about')) document.getElementById('prod-about').value = '';
+                if (document.getElementById('prod-origin')) document.getElementById('prod-origin').value = '';
+                if (document.getElementById('prod-caffeine')) document.getElementById('prod-caffeine').value = '';
+                if (document.getElementById('prod-preparation')) document.getElementById('prod-preparation').value = '';
+                if (document.getElementById('prod-benefits')) document.getElementById('prod-benefits').value = '';
                 const pCounterpart = document.getElementById('prod-counterpart-price');
                 if (pCounterpart) pCounterpart.innerText = '≈ Rs 13,725 LKR';
                 const sCounterpart = document.getElementById('prod-counterpart-shipping');

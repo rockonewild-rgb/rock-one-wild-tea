@@ -17273,3 +17273,173 @@ div[style*="rgba(6, 24, 14"] p {
         top: 0 !important;
     }
 }
+
+/* ==========================================================================
+   SEVEN TEAHOUSE PRODUCT DOSSIER & ACCORDIONS (CHECKOUT SCREEN)
+   ========================================================================== */
+.checkout-dossier-card {
+    padding: 2.25rem 2rem !important;
+    margin-bottom: 1rem;
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    border-radius: 12px;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.03) !important;
+}
+
+.checkout-dossier-inner {
+    width: 100%;
+}
+
+.checkout-dossier-headline {
+    font-family: var(--font-serif), 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.25rem, 2.2vw, 1.7rem);
+    font-weight: 400;
+    line-height: 1.4;
+    color: #1e293b !important;
+    text-align: center;
+    margin: 0 auto 1.5rem auto;
+    max-width: 680px;
+    letter-spacing: -0.01em;
+}
+
+.checkout-dossier-divider {
+    border: none;
+    border-top: 1px solid #e8e4df;
+    margin: 0 0 0.25rem 0;
+}
+
+.checkout-accordions {
+    display: flex;
+    flex-direction: column;
+}
+
+.checkout-accordion-item {
+    border-bottom: 1px solid #ede8e1;
+    transition: background-color 0.15s ease;
+}
+
+.checkout-accordion-item:last-child {
+    border-bottom: none;
+}
+
+.checkout-accordion-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.15rem 0.25rem;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.checkout-accordion-header:hover .checkout-accordion-title {
+    color: #b8860b !important;
+}
+
+.checkout-accordion-title {
+    font-size: 1.02rem;
+    font-weight: 500;
+    color: #1e293b;
+    font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+    letter-spacing: 0.01em;
+}
+
+.checkout-accordion-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+    font-weight: 300;
+    color: #64748b;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.checkout-accordion-item.open .checkout-accordion-icon {
+    color: #1e293b;
+}
+
+.checkout-accordion-body {
+    padding: 0 0.25rem 1.4rem 0.25rem;
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: #475569;
+}
+
+.checkout-accordion-body p {
+    margin: 0 0 0.75rem 0;
+    color: #475569;
+}
+
+.checkout-accordion-body p:last-child {
+    margin-bottom: 0;
+}
+
+.checkout-accordion-body strong {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.checkout-dossier-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+}
+
+.checkout-dossier-tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    background: #f8f6f2;
+    border: 1px solid #e5e0d8;
+    color: #475569;
+}
+
+/* Admin Panel Dossier & Sensory Panels in White Luxury Theme */
+.admin-dossier-panel,
+.admin-sensory-panel {
+    background: #ffffff !important;
+    border: 1.5px solid #e5e0d8 !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03) !important;
+}
+
+.admin-dossier-panel .form-label,
+.admin-sensory-panel .form-label {
+    color: #855b05 !important;
+}
+
+.admin-dossier-panel .form-input,
+.admin-sensory-panel .form-input {
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    color: #111827 !important;
+}
+
+.admin-dossier-panel .form-input:focus,
+.admin-sensory-panel .form-input:focus {
+    border-color: #855b05 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.12) !important;
+}
+
+@media (max-width: 640px) {
+    .checkout-dossier-card {
+        padding: 1.5rem 1.15rem !important;
+    }
+    .checkout-dossier-headline {
+        font-size: 1.18rem;
+        margin-bottom: 1.15rem;
+    }
+    .checkout-accordion-title {
+        font-size: 0.95rem;
+    }
+}
+

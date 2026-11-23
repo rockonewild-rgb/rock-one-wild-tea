@@ -1036,6 +1036,12 @@ class TeaFactoryStore {
                 const bg = (typeof p.brewing_guide === 'string' ? JSON.parse(p.brewing_guide) : p.brewing_guide) || {};
                 p.steepSeconds = bg.steepSeconds || (parseInt(p.steepTime, 10) ? parseInt(p.steepTime, 10) * 60 : 180);
             }
+            if (!p.headline) p.headline = p.tagline || 'Tender spring buds, roasted chestnut aroma, and fresh natural sweetness';
+            if (!p.about) p.about = p.desc || p.description || 'Golden Sprout delivers a delicate, naturally sweet taste with a smooth, silky finish. Made from young tea buds and crafted through traditional artisanal processing, this rare tea offers a gentle yet layered flavor and a beautiful golden liquor—perfect for anyone who enjoys a clean, comforting cup.';
+            if (!p.origin) p.origin = 'Passara & Wellawela Sanctuary, Badulla District, Uva Highlands, Sri Lanka (Elevation: ' + (p.elevation || '1,240m – 1,320m') + '). High montane cloud forest enriched by natural granite springs and dry August katabatic winds.';
+            if (!p.caffeine) p.caffeine = 'Medium (approx. 38mg – 45mg per 250ml brewed cup). Naturally balanced by exceptionally high concentrations of calming L-theanine, promoting alert tranquility and steady cognitive focus.';
+            if (!p.preparation) p.preparation = 'Water: ' + (p.steepTemp || '90°C – 95°C (194°F – 203°F)') + ' soft mountain or filtered water. Leaf-to-Water Ratio: 3.5g per 150ml (Gongfu gaiwan) or 2.5g per 250ml (Western teapot). Infusion Timing: 1st: 35s, 2nd: 50s, 3rd: 80s, 4th & 5th: 120s.';
+            if (!p.benefits) p.benefits = 'Abundant in polyphenols, EGCG, and theaflavins. Promotes cellular longevity, supports metabolic balance, enhances cardiovascular wellness, and delivers calm sustained clarity.';
             return p;
         });
     }
@@ -1967,6 +1973,12 @@ class TeaFactoryStore {
                 flavorProfile: flavorProfile,
                 tastingNotes: tastingNotes
             },
+            headline: productData.headline || 'Tender spring buds, roasted chestnut aroma, and fresh natural sweetness',
+            about: productData.about || productData.desc || productData.description || '',
+            origin: productData.origin || '',
+            caffeine: productData.caffeine || '',
+            preparation: productData.preparation || '',
+            benefits: productData.benefits || '',
             is_reserve: Boolean(productData.is_reserve)
         };
 
@@ -1999,6 +2011,12 @@ class TeaFactoryStore {
             price: priceVal,
             price_usd: priceVal,
             elevation: elevation,
+            headline: updatedData.headline !== undefined ? updatedData.headline : (current.headline || 'Tender spring buds, roasted chestnut aroma, and fresh natural sweetness'),
+            about: updatedData.about !== undefined ? updatedData.about : (current.about || current.desc || current.description || ''),
+            origin: updatedData.origin !== undefined ? updatedData.origin : (current.origin || ''),
+            caffeine: updatedData.caffeine !== undefined ? updatedData.caffeine : (current.caffeine || ''),
+            preparation: updatedData.preparation !== undefined ? updatedData.preparation : (current.preparation || ''),
+            benefits: updatedData.benefits !== undefined ? updatedData.benefits : (current.benefits || ''),
             description: updatedData.desc !== undefined ? updatedData.desc : (updatedData.description !== undefined ? updatedData.description : current.description),
             flavorProfile: flavorProfile,
             tastingNotes: tastingNotes,

@@ -2643,6 +2643,12 @@ const UIComponents = {
                                                             data-radar-aroma="${radar.aroma ?? 90}" 
                                                             data-steep-seconds="${steepSeconds}" 
                                                             data-elevation="${elevationStr.replace(/"/g, '&quot;')}" 
+                                                            data-headline="${(prod.headline || '').replace(/"/g, '&quot;')}" 
+                                                            data-about="${(prod.about || prod.desc || prod.description || '').replace(/"/g, '&quot;')}" 
+                                                            data-origin="${(prod.origin || '').replace(/"/g, '&quot;')}" 
+                                                            data-caffeine="${(prod.caffeine || '').replace(/"/g, '&quot;')}" 
+                                                            data-preparation="${(prod.preparation || '').replace(/"/g, '&quot;')}" 
+                                                            data-benefits="${(prod.benefits || '').replace(/"/g, '&quot;')}" 
                                                             style="background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); color: var(--color-gold); padding: 0.35rem 0.65rem; font-size: 0.7rem; border-radius: 3px; cursor: pointer; transition: var(--transition-smooth); display: inline-flex; align-items: center; gap: 0.25rem;" 
                                                             title="Edit Product">
                                                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -2881,6 +2887,71 @@ const UIComponents = {
                                             <input type="range" id="prod-radar-aroma" min="0" max="100" value="90" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Product Desk: Connoisseur Description & Seven Teahouse Accordions -->
+                            <div class="admin-sensory-panel admin-dossier-panel" style="background: rgba(4, 14, 8, 0.75); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 12px; padding: 1.35rem 1.25rem; display: flex; flex-direction: column; gap: 1.15rem; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
+                                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 0.65rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                                        <span style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold);">Product Desk &bull; Checkout &amp; Storefront Dossier Accordions</span>
+                                    </div>
+                                    <span style="font-size: 0.68rem; color: #86efac; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Seven Teahouse Style</span>
+                                </div>
+                                <p style="font-size: 0.75rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
+                                    Configure the poetic banner headline and 5 collapsible accordions displayed on checkout and product detail screens.
+                                </p>
+
+                                <!-- Poetic Headline Banner -->
+                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                    <label class="form-label" for="prod-headline" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
+                                        Poetic Headline Banner
+                                    </label>
+                                    <input class="form-input" type="text" id="prod-headline" placeholder="e.g. Tender spring buds, roasted chestnut aroma, and fresh natural sweetness" style="font-weight: 500;">
+                                    <small style="font-size: 0.7rem; color: var(--color-text-muted);">Centered serif headline displayed above the accordions.</small>
+                                </div>
+
+                                <!-- 1. About This Tea -->
+                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                    <label class="form-label" for="prod-about" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
+                                        1. About This Tea (Full Story &amp; Craftsmanship)
+                                    </label>
+                                    <textarea class="form-input" id="prod-about" rows="3" placeholder="Detailed story of the plucking season, handcrafted pan-firing, and taste character..." style="resize: vertical; line-height: 1.5;"></textarea>
+                                </div>
+
+                                <!-- 2. Origin & Terroir -->
+                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                    <label class="form-label" for="prod-origin" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
+                                        2. Origin &amp; Terroir Details
+                                    </label>
+                                    <textarea class="form-input" id="prod-origin" rows="2" placeholder="e.g. Passara Sanctuary, Badulla District, Uva Highlands, 1,320m Montane Ridge..." style="resize: vertical; line-height: 1.5;"></textarea>
+                                </div>
+
+                                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start;">
+                                    <!-- 3. Caffeine Level -->
+                                    <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                        <label class="form-label" for="prod-caffeine" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
+                                            3. Caffeine Level
+                                        </label>
+                                        <input class="form-input" type="text" id="prod-caffeine" placeholder="e.g. Medium (approx. 38mg - 45mg per 250ml cup), high L-theanine">
+                                    </div>
+
+                                    <!-- 4. Preparation & Steeping -->
+                                    <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                        <label class="form-label" for="prod-preparation" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
+                                            4. Preparation &amp; Steeping Guide
+                                        </label>
+                                        <input class="form-input" type="text" id="prod-preparation" placeholder="e.g. 90°C - 95°C water, 3.5g per 150ml, 35s - 50s - 80s infusions">
+                                    </div>
+                                </div>
+
+                                <!-- 5. Tea Benefits -->
+                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                    <label class="form-label" for="prod-benefits" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
+                                        5. Tea Benefits &amp; Purity Guarantee
+                                    </label>
+                                    <textarea class="form-input" id="prod-benefits" rows="2" placeholder="e.g. High in polyphenols & L-theanine, promotes focus, sustained antioxidant balance..." style="resize: vertical; line-height: 1.5;"></textarea>
                                 </div>
                             </div>
                             
@@ -7003,11 +7074,11 @@ const UIComponents = {
                 ? 'An heirloom collector chest crafted from certified sustainable mountain teak with hand-cast brass hardware, wax-sealed vials of single-origin leaves, and a numbered estate provenance certificate.'
                 : 'Rare and patiently crafted, this single-estate tea undergoes traditional artisanal processing, revealing a mellow sweetness, silky texture, and remarkable depth across successive infusions.'));
 
-        const quoteBanner = isTour 
+        const quoteBanner = item.headline || (isTour 
             ? 'Handcrafted Gongfu brewing rituals celebrating 1,320m high-elevation Uva terroir'
             : (isBox 
                 ? 'Numbered heirloom teak chests housing the pinnacle of our wild harvest'
-                : 'Patiently crafted for a smooth, mellow sweetness and lingering floral finish');
+                : 'Patiently crafted for a smooth, mellow sweetness and lingering floral finish'));
 
         const accordions = [
             {
@@ -7018,13 +7089,17 @@ const UIComponents = {
                     ? '<p>Immerse yourself in our private tea sanctuary. Your estate host introduces the biodiverse terroir of our 1,320m mountain ridges, the art of hand plucking, and leads you through multi-step Gongfu infusions in authentic purple clay gaiwans.</p><ul style="padding-left:1.2rem; margin-top:0.5rem; line-height:1.7;"><li>Introduction to Uva Medium wild tea gardens</li><li>Observation of whole-leaf leaf opening under controlled heat</li><li>Tasting across 5 separate infusions with flavor notes journal</li></ul>'
                     : (isBox
                         ? '<p>Each collector chest is an individual work of art made from seasoned highland teakwood with hand-burnished solid brass accents. Inside are serialized glass vials preserved under inert nitrogen seal, a numbered estate certificate signed by our Master Tea Maker, and tasting accessories.</p>'
-                        : '<p><strong>' + title + '</strong></p><p>' + shortDesc + '</p><p>Crafted exclusively from tender shoots plucked during the dry August-September quality season when cool mountain winds concentrate natural sugars, aromatic linalools, and floral antioxidants in every bud.</p>')
+                        : (item.about 
+                            ? '<p><strong>' + title + '</strong></p><p>' + item.about + '</p><p>Crafted exclusively from tender shoots plucked during the dry August-September quality season when cool mountain winds concentrate natural sugars, aromatic linalools, and floral antioxidants in every bud.</p>'
+                            : '<p><strong>' + title + '</strong></p><p>' + shortDesc + '</p><p>Crafted exclusively from tender shoots plucked during the dry August-September quality season when cool mountain winds concentrate natural sugars, aromatic linalools, and floral antioxidants in every bud.</p>'))
             },
             {
                 id: 'origin',
                 title: 'Origin & Terroir',
                 open: false,
-                content: '<p><strong>Estate Sanctuary:</strong> Rock One Wild Tea Sanctuary, Passara, Badulla District, Uva Highlands, Sri Lanka.</p><p><strong>Elevation:</strong> 1,240m &ndash; 1,320m above sea level (High Montane Cloud Forest).</p><p><strong>Terroir Dynamics:</strong> Pristine organic soil enriched by centuries of wild montane leaf litter, natural granite springs, and the famous dry-cold August katabatic winds that produce the distinctive Uva seasonal character.</p>'
+                content: item.origin 
+                    ? '<p>' + item.origin + '</p>'
+                    : '<p><strong>Estate Sanctuary:</strong> Rock One Wild Tea Sanctuary, Passara, Badulla District, Uva Highlands, Sri Lanka.</p><p><strong>Elevation:</strong> 1,240m &ndash; 1,320m above sea level (High Montane Cloud Forest).</p><p><strong>Terroir Dynamics:</strong> Pristine organic soil enriched by centuries of wild montane leaf litter, natural granite springs, and the famous dry-cold August katabatic winds that produce the distinctive Uva seasonal character.</p>'
             },
             {
                 id: 'caffeine',
@@ -7032,7 +7107,9 @@ const UIComponents = {
                 open: false,
                 content: isTour
                     ? '<p><strong>Duration:</strong> Approximately 1.5 to 2 hours of unhurried ceremonial steeping.</p><p><strong>Group Size:</strong> Intimate private group (maximum 8 guests per session) to ensure personalized master sommelier guidance.</p><p><strong>Sanctuary Schedule:</strong> Monday through Saturday (Closed Sundays for sanctuary biodiversity rest).</p>'
-                    : '<p><strong>Caffeine Classification:</strong> Medium (approx. 38mg &ndash; 45mg per 250ml brewed cup).</p><p>Naturally balanced by exceptionally high concentrations of calming L-theanine, promoting alert tranquility and steady cognitive focus without jittery spikes or crashes.</p>'
+                    : (item.caffeine 
+                        ? '<p>' + item.caffeine + '</p>'
+                        : '<p><strong>Caffeine Classification:</strong> Medium (approx. 38mg &ndash; 45mg per 250ml brewed cup).</p><p>Naturally balanced by exceptionally high concentrations of calming L-theanine, promoting alert tranquility and steady cognitive focus without jittery spikes or crashes.</p>')
             },
             {
                 id: 'preparation',
@@ -7040,7 +7117,9 @@ const UIComponents = {
                 open: false,
                 content: isTour
                     ? '<p><strong>Attire:</strong> Comfortable mountain footwear and light casual attire suitable for cool highland mornings (18&deg;C &ndash; 24&deg;C).</p><p><strong>Photography:</strong> Personal photography of our terraced gardens and ceremonial tables is warmly welcomed.</p><p><strong>Arrival:</strong> Please arrive 10 minutes prior to your reserved slot at the Welcome Pavilion.</p>'
-                    : '<p><strong>Water Temperature:</strong> 90&deg;C &ndash; 95&deg;C (194&deg;F &ndash; 203&deg;F), soft mountain or filtered water recommended.</p><p><strong>Leaf-to-Water Ratio:</strong> 3.5g per 150ml (Gongfu gaiwan) or 2.5g per 250ml (Western teapot).</p><p><strong>Infusion Timing:</strong></p><ul style="padding-left:1.2rem; line-height:1.7;"><li>1st Infusion: 35 seconds (bright aroma & floral bouquet)</li><li>2nd Infusion: 50 seconds (silky body & caramel notes)</li><li>3rd Infusion: 80 seconds (deep mineral sweetness)</li><li>4th & 5th Infusions: 120 seconds (lingering honey finish)</li></ul>'
+                    : (item.preparation 
+                        ? '<p>' + item.preparation + '</p>'
+                        : '<p><strong>Water Temperature:</strong> 90&deg;C &ndash; 95&deg;C (194&deg;F &ndash; 203&deg;F), soft mountain or filtered water recommended.</p><p><strong>Leaf-to-Water Ratio:</strong> 3.5g per 150ml (Gongfu gaiwan) or 2.5g per 250ml (Western teapot).</p><p><strong>Infusion Timing:</strong></p><ul style="padding-left:1.2rem; line-height:1.7;"><li>1st Infusion: 35 seconds (bright aroma & floral bouquet)</li><li>2nd Infusion: 50 seconds (silky body & caramel notes)</li><li>3rd Infusion: 80 seconds (deep mineral sweetness)</li><li>4th & 5th Infusions: 120 seconds (lingering honey finish)</li></ul>')
             },
             {
                 id: 'benefits',
@@ -7048,7 +7127,9 @@ const UIComponents = {
                 open: false,
                 content: isTour
                     ? '<p>Every guest receives a complimentary commemorative Estate Tasting Cup, a personalized Sommelier Certificate, and a sample tin of the dayâ€™s featured harvest.</p>'
-                    : '<p><strong>Antioxidant Richness:</strong> Abundant theaflavins, thearubigins, and polyphenols supporting cardiovascular wellness and cellular rejuvenation.</p><p><strong>Nitrogen Vacuum Seal:</strong> Packed fresh on the estate within 48 hours of sorting to lock in volatile essential oils and pristine garden freshness for up to 24 months.</p>'
+                    : (item.benefits 
+                        ? '<p>' + item.benefits + '</p>'
+                        : '<p><strong>Antioxidant Richness:</strong> Abundant theaflavins, thearubigins, and polyphenols supporting cardiovascular wellness and cellular rejuvenation.</p><p><strong>Nitrogen Vacuum Seal:</strong> Packed fresh on the estate within 48 hours of sorting to lock in volatile essential oils and pristine garden freshness for up to 24 months.</p>')
             }
         ];
 
