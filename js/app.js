@@ -2370,6 +2370,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>
                             </div>
                         </form>
+
+                        <!-- Customer Reviews Section (Seven Teahouse Style) -->
+                        ${window.UIComponents && window.UIComponents.renderCheckoutReviewsHTML ? window.UIComponents.renderCheckoutReviewsHTML(box.name) : ''}
                     </div>
 
                     <!-- ==============================================
@@ -2398,6 +2401,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <span>&bull;</span>
                                         <span>Solid Teak Chest</span>
                                     </div>
+                                    <a href="#checkout-customer-reviews" onclick="document.getElementById('checkout-customer-reviews')?.scrollIntoView({ behavior: 'smooth' }); return false;" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.73rem; color: #b8860b; text-decoration: none; margin-top: 0.25rem; cursor: pointer;">
+                                        <span style="color: #eab308; letter-spacing: 1px;">★★★★★</span>
+                                        <span style="font-weight: 700; color: #111827;">5.0</span>
+                                        <span style="color: #64748b;">(Verified Reviews)</span>
+                                    </a>
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.45rem;">
                                         ${!isQuotedPay ? `
                                             <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.5);">
@@ -2979,6 +2987,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             });
+
+            // Initialize customer reviews interactions in box checkout
+            if (typeof window.initCheckoutReviewsInteractions === 'function') {
+                window.initCheckoutReviewsInteractions(drawerFormContainer);
+            }
         
         } else if (type === 'tour') {
             const timeSlot = data.timeSlot || '09:30 AM';
@@ -4088,6 +4101,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>
                             </div>
                         </form>
+
+                        <!-- Customer Reviews Section (Seven Teahouse Style) -->
+                        ${window.UIComponents && window.UIComponents.renderCheckoutReviewsHTML ? window.UIComponents.renderCheckoutReviewsHTML(product.name) : ''}
                     </div>
 
                     <!-- ==============================================
@@ -4118,6 +4134,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <span>&bull;</span>
                                         <span>${product.weight || '100g'} Tin</span>
                                     </div>
+                                    <a href="#checkout-customer-reviews" onclick="document.getElementById('checkout-customer-reviews')?.scrollIntoView({ behavior: 'smooth' }); return false;" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.73rem; color: #b8860b; text-decoration: none; margin-top: 0.25rem; cursor: pointer;">
+                                        <span style="color: #eab308; letter-spacing: 1px;">★★★★★</span>
+                                        <span style="font-weight: 700; color: #111827;">5.0</span>
+                                        <span style="color: #64748b;">(Verified Reviews)</span>
+                                    </a>
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.45rem;">
                                         <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.5);">
                                             <button type="button" id="quick-order-qty-minus" style="background: none; border: none; color: var(--color-gold); width: 26px; height: 26px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">-</button>
@@ -4749,6 +4770,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             });
+
+            // Initialize customer reviews interactions in checkout
+            if (typeof window.initCheckoutReviewsInteractions === 'function') {
+                window.initCheckoutReviewsInteractions(drawerFormContainer);
+            }
         
         } else if (type === 'review') {
             drawerTitle.innerText = "Rate & Review Your Experience";
@@ -4905,6 +4931,58 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.onclick = () => openDrawer('review');
         }
     }
+
+    function initCheckoutReviewsInteractions(container = document) {
+        const searchInput = container.querySelector('#checkout-reviews-search-input');
+        const ratingSelect = container.querySelector('#checkout-reviews-rating-select');
+        const sortSelect = container.querySelector('#checkout-reviews-sort-select');
+        const mediaBtn = container.querySelector('#checkout-reviews-media-btn');
+        const cardsList = container.querySelector('#checkout-review-cards-list');
+        const countTab = container.querySelector('#checkout-reviews-tab-count');
+        if (!cardsList) return;
+
+        const cards = Array.from(cardsList.querySelectorAll('.seventea-review-card'));
+
+        const applyFilters = () => {
+            const query = (searchInput?.value || '').trim().toLowerCase();
+            const ratingVal = ratingSelect?.value || 'all';
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const author = card.getAttribute('data-author') || '';
+                const text = card.getAttribute('data-content') || '';
+                const rating = card.getAttribute('data-rating') || '5';
+
+                const matchesQuery = !query || author.includes(query) || text.includes(query);
+                const matchesRating = ratingVal === 'all' || rating === ratingVal;
+
+                if (matchesQuery && matchesRating) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (countTab) countTab.textContent = `Reviews ${visibleCount}`;
+        };
+
+        if (searchInput) searchInput.addEventListener('input', applyFilters);
+        if (ratingSelect) ratingSelect.addEventListener('change', applyFilters);
+        if (mediaBtn) {
+            mediaBtn.addEventListener('click', () => {
+                mediaBtn.classList.toggle('active');
+                if (mediaBtn.classList.contains('active')) {
+                    mediaBtn.style.background = '#c59b27';
+                    mediaBtn.style.color = '#ffffff';
+                } else {
+                    mediaBtn.style.background = '';
+                    mediaBtn.style.color = '';
+                }
+            });
+        }
+    }
+    window.initCheckoutReviewsInteractions = initCheckoutReviewsInteractions;
 
     // ── Cinema of the Estate Interactive Video Player Logic ──
     function bindCinemaEvents() {

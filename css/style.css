@@ -17443,3 +17443,46 @@ div[style*="rgba(6, 24, 14"] p {
     }
 }
 
+/* Checkout Customer Reviews Section (Seven Teahouse Parity) */
+.checkout-reviews-card {
+    padding: 2.25rem 2rem !important;
+    margin-top: 1.25rem !important;
+    background: #ffffff !important;
+    border: 1px solid #e8e4df !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.03) !important;
+}
+
+.checkout-reviews-card .seventea-reviews-summary-grid {
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #ede8e1;
+}
+
+.checkout-reviews-card .seventea-review-card {
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #ede8e1;
+}
+
+.checkout-reviews-card .seventea-review-card:last-child {
+    border-bottom: none;
+    padding-bottom: 0.5rem;
+}
+
+@media (max-width: 640px) {
+    .checkout-reviews-card {
+        padding: 1.5rem 1.15rem !important;
+    }
+    .checkout-reviews-card .seventea-reviews-summary-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+    .checkout-reviews-card .seventea-filter-tools {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .checkout-reviews-card .seventea-search-reviews-input {
+        width: 100px;
+    }
+}
+
+
