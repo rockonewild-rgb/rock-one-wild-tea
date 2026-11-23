@@ -220,6 +220,47 @@ window.renderUserTableRow = function(u) {
 const _t = (key, fallback) => (window.TeaFactoryI18n ? window.TeaFactoryI18n.t(key, fallback) : (fallback !== undefined ? fallback : key));
 
 const UIComponents = {
+    /**
+     * Renders a full-bleed luxury page hero banner matching the Ella Organic Tea Garden reference style.
+     */
+    renderPageHeroBanner({
+        pretitle = "Rock One's Organic",
+        title = "Tea Heritage",
+        tagline = "Where Virgin Nature Meets Generational Ceylon Tradition",
+        image = "images/luxury_tea_estate.jpg",
+        badge = "Authentic Ceylon Organic Estate",
+        pillTag = "Our Story",
+        sectionHeading = "Rooted in Ceylon's Tea Heritage",
+        sectionSubheading = ""
+    } = {}) {
+        const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+        return `
+            <div class="page-hero-banner" style="background-image: url('${image}');">
+                <div class="page-hero-overlay"></div>
+                <div class="page-hero-content">
+                    <div class="page-hero-text">
+                        ${badge ? `
+                            <span class="page-hero-pill-badge">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
+                                <span>${esc(badge)}</span>
+                            </span>
+                        ` : ''}
+                        <span class="page-hero-pretitle">${esc(pretitle)}</span>
+                        <h1 class="page-hero-title">${esc(title)}</h1>
+                        <p class="page-hero-tagline">${esc(tagline)}</p>
+                    </div>
+                </div>
+            </div>
+            ${(pillTag || sectionHeading) ? `
+                <div class="page-intro-header">
+                    ${pillTag ? `<span class="page-intro-pill">${esc(pillTag)}</span>` : ''}
+                    ${sectionHeading ? `<h2 class="page-intro-heading">${esc(sectionHeading)}</h2>` : ''}
+                    ${sectionSubheading ? `<p class="page-intro-subheading">${esc(sectionSubheading)}</p>` : ''}
+                </div>
+            ` : ''}
+        `;
+    },
+
     // 1. Render Announcements & Events
     renderAnnouncements(containerId) {
         const container = document.getElementById(containerId);
@@ -260,12 +301,16 @@ const UIComponents = {
 
         const announcements = window.TeaFactoryStore.getAnnouncements();
 
-        let html = `
-            <div class="tour-header-block" style="margin-bottom: 3rem;">
-                <span class="section-tag">Estate Happenings</span>
-                <h2 class="view-title">Announcements</h2>
-                <p class="view-subtitle">Stay informed on our latest organic tea harvest notes, estate events, and exclusive sommelier updates.</p>
-            </div>
+        let html = UIComponents.renderPageHeroBanner({
+            pretitle: "Official Dispatches",
+            title: "Estate Bulletins & News",
+            tagline: "Seasonal Plucking Updates, Reserve Allocations & Plantation Weather",
+            image: "images/luxury_tea_announcement.jpg",
+            badge: "Live Plantation Ledger • Ettampitiya",
+            pillTag: "Estate Happenings",
+            sectionHeading: "Artisanal Harvest Announcements & Bulletins",
+            sectionSubheading: "Stay informed with direct dispatches from our family estate on rare seasonal flushes, tasting events, and reserve updates."
+        }) + `
 
             <!-- Announcements Showcase Block (Ultra-Luxury Ivory Card with Gold Accent) -->
             <div class="announcements-showcase-card" style="background: #ffffff; border: 1.5px solid #ebd9b8; border-left: 6px solid #b8860b; border-radius: 18px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04); padding: 3rem 3rem; position: relative; overflow: hidden;">
@@ -331,12 +376,16 @@ const UIComponents = {
         const whiteCount = products.filter(p => p.category === 'White Tea').length;
         const greenCount = products.filter(p => p.category === 'Green Tea').length;
 
-        let html = `
-            <div class="tour-header-block">
-                <span class="section-tag">${_t('section_catalog_tag', 'Signature Collections')}</span>
-                <h2 class="view-title">${_t('catalog_title', 'The Product Catalog')}</h2>
-                <p class="view-subtitle">${_t('catalog_subtitle', 'Select from our artisanal standard tins harvested from our high-elevation organic slopes.')}</p>
-            </div>
+        let html = UIComponents.renderPageHeroBanner({
+            pretitle: "Single-Estate Artisanal",
+            title: "Rare Tea Collection",
+            tagline: "Hand-Harvested Whole Leaf & Silver Tips from High Montane Slopes",
+            image: "images/1 (5).jpeg",
+            badge: "100% Organic Ceylon Wild Harvest",
+            pillTag: "Pure Ceylon",
+            sectionHeading: "Artisanal Tea Collection & Standard Tins",
+            sectionSubheading: "Select from our generational artisanal standard tins, hand-plucked at dawn and orthodox wood-fired in our family factory."
+        }) + `
 
             <!-- Search, Filter & B2B Lookbook Controls Bar -->
             <div class="catalog-controls-bar">
@@ -619,13 +668,16 @@ const UIComponents = {
 
         let headerHtml = '';
         if (containerId === 'gifts-container') {
-            headerHtml = `
-                <div class="tour-header-block" style="margin-bottom: 3rem;">
-                    <span class="section-tag">${_t('gift_catalog_tag', 'Limited Edition Release')}</span>
-                    <h2 class="view-title">${_t('gift_catalog_title', 'The Gift Catalog')}</h2>
-                    <p class="view-subtitle">${_t('gift_catalog_sub', 'Reserve an individually numbered, handcrafted cedar wood chest containing single-estate premium harvests.')}</p>
-                </div>
-            `;
+            headerHtml = UIComponents.renderPageHeroBanner({
+                pretitle: "Artisanal Teak Wood",
+                title: "Collector Gift Chests",
+                tagline: "Individually Numbered & Hand-Sealed With Private Estate Wax Deeds",
+                image: "images/Gift box 2.jpeg",
+                badge: "Strictly Limited to 10 Numbered Chests",
+                pillTag: "Numbered Releases",
+                sectionHeading: "The Limited Collector Chest Catalog",
+                sectionSubheading: "Each seasonal release yields strictly 10 individually numbered presentation chests, hand-crafted from solid Sri Lankan teak."
+            });
         }
 
         // If no collector boxes exist in the database, render elegant empty allocation state
@@ -790,21 +842,18 @@ const UIComponents = {
             image: "images/luxury_tea_tour.jpg"
         };
 
-        let html = `
-            <!-- Header Block -->
-            <div class="tour-header-block" style="text-align: center; max-width: 860px; margin: 0 auto 2.5rem auto;">
-                <span class="section-tag" style="background: rgba(212,175,55,0.12); color: var(--color-gold); border: 1px solid rgba(212,175,55,0.3); padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 2px; display: inline-block; margin-bottom: 0.75rem;">
-                    Artisanal Ceylon Tea Experience
-                </span>
-                <h2 class="view-title" style="font-size: 2.4rem; font-family: var(--font-serif); color: var(--color-white); margin-bottom: 0.85rem;">
-                    Factory Tour Time Slots
-                </h2>
-                <p class="view-subtitle" style="font-size: 1.05rem; color: var(--color-text-muted); line-height: 1.7; margin-bottom: 1.75rem;">
-                    Experience the story of Rock One Wild Tea and discover how our handcrafted Ceylon Tea is made in our small family factory.
-                </p>
-
-                <!-- Tour Highlights Key Badges -->
-                <div style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem;">
+        let html = UIComponents.renderPageHeroBanner({
+            pretitle: "Authentic Ceylon",
+            title: "Factory Tours & Tastings",
+            tagline: "Step Inside Our Living Family Factory & Sommelier Cupping Pavilion",
+            image: "images/luxury_tea_tour.jpg",
+            badge: "Daily Guided Tours • Mon to Sat (Max 10 Guests)",
+            pillTag: "Guided Experience",
+            sectionHeading: "Daily Estate Walkthroughs & Sensory Tea Tastings",
+            sectionSubheading: "Experience the story of Rock One Wild Tea and discover how our handcrafted Ceylon Tea is made in our small family factory."
+        }) + `
+            <!-- Tour Highlights Key Badges -->
+            <div style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2.5rem;">
                     <span style="background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,55,0.25); color: #e5e7eb; padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.4rem;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                         <strong>Monday â€“ Saturday</strong> (Advance Booking)
@@ -3889,14 +3938,17 @@ const UIComponents = {
         const estateCount = galleryImages.filter(g => (g.tag || '').includes('Estate') || (g.tag || '').includes('Harvest')).length;
         const packagingCount = galleryImages.filter(g => (g.tag || '').includes('Packaging') || (g.tag || '').includes('Reserve')).length;
 
-        let html = `
+        let html = UIComponents.renderPageHeroBanner({
+            pretitle: "Living Estate Chronicle",
+            title: "Visual Gallery & Terroir",
+            tagline: "A Visual Journey Through Our Wild Montane Sanctuary & Generational Artisans",
+            image: "images/1 (2).jpeg",
+            badge: "Photographic Archive • Ettampitiya Sanctuary",
+            pillTag: "Estate Photography",
+            sectionHeading: "Rock One Wild Tea Photographic Chronicle",
+            sectionSubheading: "Immerse yourself in authentic visuals from our family tea garden in Ettampitiya (elevation 1,240m), artisanal hand-harvesting, orthodox brass rolling, and wood-fired curing."
+        }) + `
             <div class="gallery-header-block" style="margin-bottom: 2.5rem; text-align: center;">
-                <span class="section-tag">Visual Terroir &amp; Craft</span>
-                <h2 class="view-title">Rock One Wild Tea Photographic Gallery</h2>
-                <p class="view-subtitle" style="max-width: 780px; margin: 0 auto 1.75rem auto;">
-                    Immerse yourself in authentic visuals from our family tea garden in Ettampitiya (elevation 1,240m), artisanal hand-harvesting, orthodox brass rolling, and wood-fired curing.
-                </p>
-
                 <!-- Category Filter Pills -->
                 <div class="gallery-filter-bar" style="display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem;">
                     <button type="button" class="gallery-filter-btn active" data-filter="all" style="padding: 0.5rem 1.1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.25s ease; background: var(--color-gold); color: #040e08; border: 1px solid var(--color-gold);">
@@ -4267,29 +4319,27 @@ const UIComponents = {
         `;
     },
 
-    // â”€â”€ Dedicated About Us & Estate Terroir Page â”€â”€
+    // ── Dedicated About Us & Estate Terroir Page ──
     renderAboutUsPage(containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        container.innerHTML = `
-            <div class="about-page-wrapper" style="max-width: 1200px; margin: 0 auto; padding: 1.5rem 0.5rem 4rem 0.5rem;">
-                
-                <!-- 1. Editorial Hero Header -->
-                <div class="about-hero-editorial" style="text-align: center; max-width: 880px; margin: 0 auto 3.5rem auto;">
-                    <span class="section-tag" style="font-size: 0.82rem; letter-spacing: 2.5px; color: var(--color-gold); font-weight: 700; display: inline-block; margin-bottom: 0.75rem;">
-                        ROCK ONE WILD TEA (PVT) LIMITED â€¢ UVA MEDIUM REGION
-                    </span>
-                    <h1 style="font-family: var(--font-serif); font-size: 2.8rem; line-height: 1.2; color: var(--color-white); margin-bottom: 0.85rem;">
-                        From the Wild, Crafted by Our Hands
-                    </h1>
-                    <p style="font-size: 1.15rem; color: var(--color-gold); font-family: var(--font-serif); margin-bottom: 1.25rem; letter-spacing: 0.5px; font-weight: 500;">
-                        From Our Wild Forest Garden to Your Cup
-                    </p>
-                    <p style="font-size: 1.02rem; color: var(--color-text-primary); line-height: 1.85; margin-bottom: 1.75rem;">
-                        <strong>Rock One Wild Tea</strong> is a family-owned Ceylon Tea business born from our own tea garden in Sri Lankaâ€™s Uva Medium region, nestled in a forested environment at the foot of a large rock formation. Hand made with Care, Crafted from Ceylon.
-                    </p>
+        const heroBannerHtml = UIComponents.renderPageHeroBanner({
+            pretitle: "Rock One's Organic",
+            title: "Tea Heritage",
+            tagline: "Where Virgin Nature Meets Generational Ceylon Tradition",
+            image: "images/luxury_tea_estate.jpg",
+            badge: "Uva Medium Forest Garden • 1,240m Elevation",
+            pillTag: "Our Story",
+            sectionHeading: "Rooted in Ceylon's Tea Heritage",
+            sectionSubheading: "Rock One Wild Tea is a family-owned Ceylon tea business born from our own tea garden in Sri Lanka's Uva Medium region, nestled in a forested environment at the foot of a large rock formation."
+        });
 
+        container.innerHTML = heroBannerHtml + `
+            <div class="about-page-wrapper" style="max-width: 1200px; margin: 0 auto; padding: 0.5rem 0.5rem 4rem 0.5rem;">
+                
+                <!-- 1. Editorial Hero Trust Badges -->
+                <div class="about-hero-editorial" style="text-align: center; max-width: 880px; margin: 0 auto 3.5rem auto;">
                     <!-- Trust Badges with SVG Icons -->
                     <div style="display: flex; align-items: center; justify-content: center; gap: 0.85rem; flex-wrap: wrap;">
                         <span style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #86efac; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.3); padding: 0.45rem 0.95rem; border-radius: 20px; font-weight: 600;">
@@ -4929,18 +4979,20 @@ const UIComponents = {
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        container.innerHTML = `
+        const heroBannerHtml = UIComponents.renderPageHeroBanner({
+            pretitle: "Bespoke Concierge",
+            title: "Direct Enquiry Desk",
+            tagline: "Direct Consultation for Private Allocations, Wholesale & Rare Vintages",
+            image: "images/1 (12).jpeg",
+            badge: "Direct Estate Concierge • Badulla Highlands",
+            pillTag: "Enquiry Desk",
+            sectionHeading: "Connect with Our Tea Concierge",
+            sectionSubheading: "Have a question about our single-estate harvests, bespoke gift chests, factory tours, or wholesale distribution? Send us your message below."
+        });
+
+        container.innerHTML = heroBannerHtml + `
             <div class="enquiry-page-wrapper">
-                <!-- Hero Header -->
                 <div class="enquiry-hero-header">
-                    <div class="reserve-badge-pill">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                        <span>ESTATE CONCIERGE &bull; DIRECT ENQUIRY DESK</span>
-                    </div>
-                    <h2 class="view-title">Connect with Our Tea Concierge</h2>
-                    <p class="view-subtitle" style="max-width: 760px; margin: 0 auto 1.75rem auto;">
-                        Have a question about our single-estate harvests, bespoke gift chests, factory tours, or wholesale distribution? Send us your message below and our team will get back to you promptly.
-                    </p>
                     <div style="text-align: center; margin-bottom: 2.5rem;">
                         <button type="button" id="btn-reserve-open-lookbook" class="btn btn-outline" style="color: var(--color-gold); border-color: rgba(212,175,55,0.4); font-size: 0.8rem; padding: 0.65rem 1.4rem; border-radius: 20px; display: inline-flex; align-items: center; gap: 0.5rem;">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
@@ -6028,14 +6080,19 @@ const UIComponents = {
             `;
         }
 
-        container.innerHTML = `
-            <div style="max-width: 700px; margin: 0 auto; padding: 2rem 0;">
-                <div class="tour-header-block" style="margin-bottom: 2.5rem; text-align: center;">
-                    <span class="section-tag">Order &amp; Tour Booking Tracking</span>
-                    <h2 class="view-title">My Orders &amp; Tour Reservations</h2>
-                    <p class="view-subtitle">Enter your Order Reference or Tour Booking Pass ID (e.g. <span style="font-family: monospace; color: var(--color-gold);">ORD-12345678</span> or <span style="font-family: monospace; color: var(--color-gold);">TB-XXXXX</span> / <span style="font-family: monospace; color: var(--color-gold);">TR-XXXXX</span>) to view status, check slip authorization, or upload payment verification.</p>
-                </div>
+        const heroBannerHtml = UIComponents.renderPageHeroBanner({
+            pretitle: "Patron Concierge",
+            title: "Order Tracking & Ledger",
+            tagline: "Track Express Courier Shipments & Verify Authentic Estate Deeds",
+            image: "images/1 (16).jpeg",
+            badge: "Live Courier Dispatch & Concierge Verification",
+            pillTag: "Order Concierge",
+            sectionHeading: "Live Consignment & Parcel Tracking",
+            sectionSubheading: "Enter your order reference code or tour pass ID to track express courier delivery status, inspect dispatch deeds, and download official receipts."
+        });
 
+        container.innerHTML = heroBannerHtml + `
+            <div style="max-width: 780px; margin: 0 auto; padding: 0.5rem 0 3rem 0;">
                 ${recentOrdersHtml}
 
                 <!-- Order Lookup Form -->

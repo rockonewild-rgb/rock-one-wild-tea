@@ -1053,13 +1053,13 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     line-height: 1.2 !important;
 }
 
-/* Page content Layout container (With Dedicated Left & Right Safe Inset Gutters) */
+/* Page content Layout container (Full-Bleed Canvas for Edge-to-Edge Hero Banners) */
 .main-content {
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 2.5rem clamp(72px, 6vw, 92px) 5rem clamp(58px, 5vw, 76px);
-    box-sizing: border-box;
-    width: 100%;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 0 5rem 0 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
 }
 
 .view-section {
@@ -1078,28 +1078,223 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* =========================================================================
-   FULLSCREEN HERO SHOWCASE SLIDESHOW (REFERENCE: ELLA ORGANIC TEA GARDEN)
-   ========================================================================= */
-
-/* Expand main content container when home view is active so hero is edge-to-edge full screen */
-.main-content:has(#home-section.active),
-body.view-home .main-content {
+/* Ensure all section container divs are 100% full-width so page-hero-banner bleeds edge-to-edge */
+.view-section,
+#about-page-container,
+#catalog-full-container,
+#gifts-container,
+#tours-timeline-container,
+#tours-location-container,
+#gallery-container,
+#announcements-full-container,
+#order-container,
+#reserve-container {
+    width: 100% !important;
     max-width: 100% !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
-    padding-top: 0 !important;
-    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
 }
 
-/* Constrain all sub-sections of home page below the hero */
-#home-section > :not(.hero-section) {
+/* Constrain all page content below full-width hero banners */
+.view-section > div > :not(.page-hero-banner),
+.view-section > :not(.page-hero-banner):not(.hero-section),
+#home-section > :not(.hero-section),
+.page-intro-header {
     max-width: 1440px !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    padding-left: clamp(24px, 5vw, 76px) !important;
-    padding-right: clamp(24px, 5vw, 76px) !important;
+    padding-left: clamp(20px, 4.5vw, 68px) !important;
+    padding-right: clamp(20px, 4.5vw, 68px) !important;
     box-sizing: border-box !important;
+}
+
+/* =========================================================================
+   CINEMATIC PAGE HERO BANNER (REFERENCE: ELLA ORGANIC TEA GARDEN HERITAGE STYLE)
+   ========================================================================= */
+.page-hero-banner {
+    position: relative !important;
+    width: 100% !important;
+    height: clamp(340px, 42vh, 450px) !important;
+    min-height: 300px !important;
+    margin: 0 0 clamp(1.75rem, 3.5vh, 3rem) 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+    background-color: #030e07 !important;
+}
+
+/* Dark nature Ceylon gradient overlay (darker on left for crystal-clear readability) */
+.page-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(3, 14, 8, 0.90) 0%, rgba(3, 14, 8, 0.74) 42%, rgba(2, 10, 5, 0.38) 75%, rgba(2, 10, 5, 0.16) 100%),
+                linear-gradient(180deg, rgba(2, 10, 5, 0.35) 0%, transparent 60%, rgba(2, 8, 4, 0.6) 100%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.page-hero-content {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 clamp(24px, 5vw, 76px);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+}
+
+.page-hero-text {
+    max-width: 720px;
+    text-align: left;
+    animation: heroFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.page-hero-pill-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.28rem 0.85rem;
+    border-radius: 9999px;
+    background: rgba(16, 185, 129, 0.18);
+    border: 1px solid rgba(74, 222, 128, 0.38);
+    color: #86efac;
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    margin-bottom: 0.75rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.page-hero-pretitle {
+    display: block;
+    font-family: var(--font-serif), Georgia, serif;
+    font-size: clamp(1.75rem, 3.6vw, 2.75rem);
+    font-weight: 700;
+    color: #facc15;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.2rem;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
+}
+
+.page-hero-title {
+    font-family: var(--font-serif), Georgia, serif;
+    font-size: clamp(2.1rem, 4.4vw, 3.4rem);
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.1;
+    margin: 0 0 0.75rem 0;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.8);
+}
+
+.page-hero-tagline {
+    font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+    font-size: clamp(0.92rem, 1.35vw, 1.15rem);
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.92);
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    margin: 0;
+    line-height: 1.5;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+/* Page Intro Block directly below the banner (Reference: 'Our Story' pill & bold title) */
+.page-intro-header {
+    text-align: center;
+    margin: clamp(2rem, 3.8vh, 3.5rem) auto clamp(1.75rem, 3vh, 2.75rem) auto;
+    max-width: 860px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.page-intro-pill {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #15803d;
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.32);
+    padding: 0.32rem 1.05rem;
+    border-radius: 9999px;
+    margin-bottom: 0.75rem;
+}
+
+.page-intro-heading {
+    font-family: var(--font-serif), Georgia, serif;
+    font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+}
+
+.page-intro-subheading {
+    font-size: clamp(0.92rem, 1.25vw, 1.05rem);
+    color: #64748b;
+    line-height: 1.65;
+    margin: 0 auto;
+    max-width: 680px;
+}
+
+/* Responsive adjustments for Page Hero Banners */
+@media (max-width: 768px) {
+    .page-hero-banner {
+        height: clamp(260px, 35vh, 340px) !important;
+        min-height: 240px !important;
+    }
+    .page-hero-content {
+        padding: 0 1.25rem;
+    }
+    .page-hero-pretitle {
+        font-size: clamp(1.35rem, 5.5vw, 1.85rem) !important;
+    }
+    .page-hero-title {
+        font-size: clamp(1.65rem, 6.8vw, 2.25rem) !important;
+    }
+    .page-hero-tagline {
+        font-size: 0.88rem !important;
+    }
+    .page-intro-heading {
+        font-size: clamp(1.4rem, 5.5vw, 1.95rem) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-hero-banner {
+        height: clamp(220px, 30vh, 280px) !important;
+        min-height: 210px !important;
+    }
+    .page-hero-content {
+        padding: 0 1rem;
+    }
+    .page-hero-pretitle {
+        font-size: 1.25rem !important;
+    }
+    .page-hero-title {
+        font-size: 1.5rem !important;
+    }
+    .page-hero-tagline {
+        font-size: 0.8rem !important;
+        line-height: 1.4 !important;
+    }
 }
 
 .hero-section,
