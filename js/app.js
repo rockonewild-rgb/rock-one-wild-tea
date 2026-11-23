@@ -14344,7 +14344,6 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                     }
                 };
             }
-        }
 
         
             // Master Action Button for Cart
@@ -14435,6 +14434,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                     }
                 });
             }
+        }
 
         window.appBindCartDrawerEvents = bindCartDrawerEvents;
 
