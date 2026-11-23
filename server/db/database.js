@@ -448,28 +448,28 @@ function seedInitialData() {
         const defaultAnnouncements = [
             {
                 id: 'ann-01',
-                tag: 'HARVEST ALLOCATION',
+                tag: 'SINGLE-ESTATE HARVEST',
                 date_str: 'September 2026',
-                heading: '2026 Autumn Equinox Reserve Chests Released',
-                content: 'Our autumn equinox flush yields only 10 individually numbered collector teak chests, hand-sealed with private estate gold stamps and registered in the central cellar ledger.',
+                heading: '2026 Autumn Reserve Teak Chests Released',
+                content: 'Our autumn harvest yields only 10 individually numbered collector teak chests, hand-crafted by local artisans and sealed with the family estate stamp.',
                 image: 'images/tea_box.png',
                 link: '#gifts'
             },
             {
                 id: 'ann-02',
-                tag: 'SANCTUARY EXPEDITIONS',
+                tag: 'ESTATE TOURS & TASTINGS',
                 date_str: 'September 2026',
-                heading: 'Private Sunrise Cupping Flights Now Open',
-                content: 'Book an exclusive 5:30 AM sunrise harvesting trek with Chief Plucker Kalyani Kumari followed by private wood-kiln roasting workshops and cellar tasting flights.',
+                heading: 'Sunrise Garden Plucking & Tea Tasting Tours Now Open',
+                content: 'Join our guided dawn tea-plucking experience followed by orthodox factory processing walkthroughs and fresh cupping sessions in Ettampitiya.',
                 image: 'images/luxury_tea_estate.jpg',
                 link: '#tours'
             },
             {
                 id: 'ann-03',
-                tag: 'GLOBAL CERTIFICATION',
+                tag: 'ORGANIC CERTIFICATION',
                 date_str: 'August 2026',
-                heading: '100% Glyphosate & Chemical-Free Montane Sanctuary Certified',
-                content: 'Rock One Wild Tea sanctuary receives permanent rainforest watershed biodiversity protection certification, guaranteeing zero synthetic fertilizers or artificial sprays.',
+                heading: '100% Chemical-Free & Natural Wild Garden Certified',
+                content: 'Rock One Wild Tea garden is certified pesticide and synthetic fertilizer free, grown naturally in our mountain forest ecosystem at 1,240m elevation.',
                 image: 'images/estate_terroir.png',
                 link: '#about'
             }
