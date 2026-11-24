@@ -7709,21 +7709,56 @@ const UIComponents = {
                     <!-- LEFT COLUMN: HERO IMAGE, THUMBNAILS, QUOTE & ACCORDIONS -->
                     <div class="seventea-left-col">
                         
-                        <!-- Hero Image Display -->
-                        <div class="seventea-hero-box" id="seventea-hero-box">
+                        <!-- Luxury Hero Image Display with Graphics & Interactive Cursor Zoom -->
+                        <div class="seventea-hero-box" id="seventea-hero-box" title="Move cursor over image to magnify details">
+                            <!-- 4 Gold Heritage Corner Brackets -->
+                            <div class="hero-corner-filigree corner-tl" aria-hidden="true"></div>
+                            <div class="hero-corner-filigree corner-tr" aria-hidden="true"></div>
+                            <div class="hero-corner-filigree corner-bl" aria-hidden="true"></div>
+                            <div class="hero-corner-filigree corner-br" aria-hidden="true"></div>
+
+                            <!-- Top Graphic Badges -->
+                            <div class="hero-graphic-badge-row">
+                                <span class="hero-origin-badge">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    Pure Ceylon &bull; Single-Estate Reserve
+                                </span>
+                                <span class="hero-lot-badge">
+                                    <span class="pulse-dot"></span> Lot: RW-2025-UVA
+                                </span>
+                            </div>
+
                             <img src="${primaryImg}" id="seventea-hero-img" alt="${title}" class="seventea-hero-img" decoding="async">
-                            <button type="button" class="seventea-zoom-badge" id="seventea-zoom-badge" aria-label="Zoom Image">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+
+                            <!-- Bottom Floating Dynamic Caption & Hover Zoom Indicator -->
+                            <div class="hero-bottom-floating-bar">
+                                <div class="hero-caption-box">
+                                    <span class="hero-photo-counter" id="hero-photo-counter">Photo 1 of ${galleryImages.length}</span>
+                                    <span class="hero-photo-name" id="hero-photo-caption">Signature Estate Reserve &amp; Teaware Flatlay</span>
+                                </div>
+                                <div class="hero-zoom-lens-indicator" id="hero-zoom-lens-indicator">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                                    <span>Hover to zoom (2.2&times;)</span>
+                                </div>
+                            </div>
+
+                            <!-- Optional Click Zoom Toggle Badge -->
+                            <button type="button" class="seventea-zoom-badge" id="seventea-zoom-badge" aria-label="Toggle Magnification">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                             </button>
                         </div>
 
                         <!-- 6 to 8 Thumbnail Preview Strip -->
                         <div class="seventea-thumb-strip" id="seventea-thumb-strip">
                             ${galleryImages.map((imgSrc, idx) => `
-                                <button type="button" class="seventea-thumb-item ${idx === 0 ? 'active' : ''}" data-src="${imgSrc}" aria-label="View photo ${idx + 1}">
+                                <button type="button" class="seventea-thumb-item ${idx === 0 ? 'active' : ''}" data-src="${imgSrc}" data-index="${idx}" aria-label="View photo ${idx + 1}">
+                                    <span class="thumb-index-tag">${idx + 1}</span>
                                     <img src="${imgSrc}" alt="Thumbnail ${idx + 1}" onerror="window.handleImageError && window.handleImageError(this, 'product')">
                                 </button>
                             `).join('')}
+                        </div>
+                        <div class="seventea-thumb-guide">
+                            <span>Select photo &bull; Hover over main image for ultra-close leaf &amp; brew texture</span>
                         </div>
 
                         <!-- Poetic Sub-Banner Quote -->
@@ -8021,29 +8056,96 @@ const UIComponents = {
             }
         };
 
-        // Thumbnail switcher
+        // Thumbnail switcher & dynamic caption update
+        const photoCaptions = [
+            "Signature Estate Reserve & Teaware Flatlay",
+            "Double-Wall Glass Cup & Hand-Rolled Leaves",
+            "Handcrafted Crimson Packaging Pouches",
+            "Amber-Gold Brewed Liquor & Estate Pouch",
+            "Infused Wet Leaves & Mountain Tea Sprig",
+            "Macro View: Wiry Whole-Leaf Orthodox Roll",
+            "Tasting Bowl of Loose Ceylon Black Tea"
+        ];
         const thumbs = container.querySelectorAll('.seventea-thumb-item');
         const heroImg = document.getElementById('seventea-hero-img');
+        const heroBox = document.getElementById('seventea-hero-box');
+        const counterEl = document.getElementById('hero-photo-counter');
+        const captionEl = document.getElementById('hero-photo-caption');
+        const zoomIndicator = document.getElementById('hero-zoom-lens-indicator');
+
         thumbs.forEach(btn => {
             btn.addEventListener('click', () => {
                 thumbs.forEach(t => t.classList.remove('active'));
                 btn.classList.add('active');
                 const src = btn.getAttribute('data-src');
+                const idx = parseInt(btn.getAttribute('data-index') || '0', 10);
                 if (heroImg && src) {
-                    heroImg.style.opacity = '0.4';
+                    heroImg.style.opacity = '0.35';
                     heroImg.src = src;
-                    setTimeout(() => { heroImg.style.opacity = '1'; }, 100);
+                    setTimeout(() => { heroImg.style.opacity = '1'; }, 120);
                 }
+                if (counterEl) counterEl.innerText = `Photo ${idx + 1} of ${galleryImages.length}`;
+                if (captionEl) captionEl.innerText = photoCaptions[idx] || `Estate Harvest Perspective ${idx + 1}`;
             });
         });
 
-        // Zoom button
+        // Interactive Cursor-Follow Magnification (Smooth Mouse Proximity Zoom)
+        let isHoverZooming = false;
+        if (heroBox && heroImg) {
+            heroBox.addEventListener('mouseenter', () => {
+                isHoverZooming = true;
+                heroImg.style.transition = 'transform 0.12s ease-out';
+                heroImg.style.transform = 'scale(2.2)';
+                heroBox.classList.add('is-magnified');
+                if (zoomIndicator) zoomIndicator.style.opacity = '0.3';
+            });
+
+            heroBox.addEventListener('mousemove', (e) => {
+                if (!isHoverZooming) return;
+                const rect = heroBox.getBoundingClientRect();
+                const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+                const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+                heroImg.style.transformOrigin = `${x}% ${y}%`;
+            });
+
+            heroBox.addEventListener('mouseleave', () => {
+                isHoverZooming = false;
+                heroImg.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+                heroImg.style.transform = 'scale(1)';
+                heroImg.style.transformOrigin = 'center center';
+                heroBox.classList.remove('is-magnified');
+                if (zoomIndicator) zoomIndicator.style.opacity = '1';
+            });
+
+            // Touch device panning support
+            heroBox.addEventListener('touchmove', (e) => {
+                if (!e.touches || e.touches.length === 0) return;
+                const touch = e.touches[0];
+                const rect = heroBox.getBoundingClientRect();
+                const x = Math.max(0, Math.min(100, ((touch.clientX - rect.left) / rect.width) * 100));
+                const y = Math.max(0, Math.min(100, ((touch.clientY - rect.top) / rect.height) * 100));
+                heroImg.style.transform = 'scale(2.0)';
+                heroImg.style.transformOrigin = `${x}% ${y}%`;
+            }, { passive: true });
+
+            heroBox.addEventListener('touchend', () => {
+                heroImg.style.transition = 'transform 0.3s ease';
+                heroImg.style.transform = 'scale(1)';
+                heroImg.style.transformOrigin = 'center center';
+            });
+        }
+
+        // Toggle Zoom Badge
         const zoomBadge = document.getElementById('seventea-zoom-badge');
         if (zoomBadge && heroImg) {
-            zoomBadge.addEventListener('click', () => {
-                heroImg.classList.toggle('zoomed');
-                if (window.showToast) {
-                    window.showToast('High-Resolution Zoom', heroImg.classList.contains('zoomed') ? 'Zoomed to 150% magnification.' : 'Returned to default view.', 'info');
+            zoomBadge.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (heroImg.style.transform && heroImg.style.transform.includes('2.2')) {
+                    heroImg.style.transform = 'scale(1)';
+                    heroImg.style.transformOrigin = 'center center';
+                } else {
+                    heroImg.style.transform = 'scale(2.2)';
+                    heroImg.style.transformOrigin = 'center center';
                 }
             });
         }
