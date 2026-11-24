@@ -18347,22 +18347,27 @@ div[style*="rgba(6, 24, 14"] p {
 .seventea-btn-express {
     width: 100%;
     height: 48px;
-    background: #5a31f4;
-    border: none;
+    background: #111827;
+    border: 1.5px solid #111827;
     border-radius: 6px;
     color: #ffffff;
-    font-size: 0.95rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.35rem;
-    transition: background 0.2s ease, transform 0.1s ease;
+    gap: 0.45rem;
+    transition: all 0.2s ease;
 }
 
 .seventea-btn-express:hover {
-    background: #4922dc;
+    background: #1f2937;
+    border-color: #1f2937;
     transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 }
 
 .seventea-more-opts-wrap {

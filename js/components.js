@@ -7841,9 +7841,9 @@ const UIComponents = {
                                 </button>
                             </div>
 
-                            <!-- Buy with Shop / Express Checkout Button -->
-                            <button type="button" class="seventea-btn-express" id="seventea-btn-express-buy">
-                                <span>Buy with</span> <strong style="letter-spacing: -0.5px;">shop</strong>
+                            <!-- Buy Now / Express Checkout Button -->
+                            <button type="button" class="seventea-btn-express" id="seventea-btn-express-buy" aria-label="Buy Now">
+                                <span>Buy Now</span>
                             </button>
 
                             <!-- More Payment Options Link -->
