@@ -5149,10 +5149,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     const starVal = parseInt(s.getAttribute('data-val'), 10);
                     if (starVal <= val) {
                         s.style.color = "var(--color-gold)";
+                        s.style.opacity = "1";
                         s.innerText = "★";
                     } else {
-                        s.style.color = "rgba(255,255,255,0.2)";
-                        s.innerText = "☆";
+                        s.style.color = "var(--color-gold)";
+                        s.style.opacity = "0.25";
+                        s.innerText = "★";
                     }
                 });
                 if (ratingText) ratingText.innerText = ratingDescriptions[val] || `${val} Stars`;

@@ -70,7 +70,7 @@ window.renderUserTableRow = function(u) {
         case 'admin':
             roleBadge = `<span style="background: rgba(212,175,55,0.15); color: var(--color-gold); border: 1px solid rgba(212,175,55,0.4); padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3 7h7l-5.5 4.5 2 7.5L12 17l-6.5 4 2-7.5L2 9h7z"/></svg>
-                ${isOwner ? 'ðŸ‘‘ Primary Admin' : 'Administrator'}
+                ${isOwner ? '👑 Primary Admin' : 'Administrator'}
             </span>`;
             break;
         case 'manager':
@@ -220,6 +220,22 @@ window.renderUserTableRow = function(u) {
 const _t = (key, fallback) => (window.TeaFactoryI18n ? window.TeaFactoryI18n.t(key, fallback) : (fallback !== undefined ? fallback : key));
 
 const UIComponents = {
+    /**
+     * Renders luxury gold 5-star ratings with solid stars and softly dimmed empty stars.
+     * Eliminates encoding issues, character corruption, and missing star glyphs.
+     */
+    renderStars(rating = 5, max = 5) {
+        const r = Math.max(0, Math.min(max, Math.round(Number(rating) || 5)));
+        let out = '';
+        for (let i = 1; i <= max; i++) {
+            if (i <= r) {
+                out += '<span class="star-glyph filled" style="color: var(--color-gold, #d4af37);">★</span>';
+            } else {
+                out += '<span class="star-glyph empty" style="color: var(--color-gold, #d4af37); opacity: 0.28;">★</span>';
+            }
+        }
+        return out;
+    },
     /**
      * Renders a full-bleed luxury page hero banner matching the Ella Organic Tea Garden reference style.
      */
@@ -605,11 +621,11 @@ const UIComponents = {
                         <!-- 6-Point Calibrated Sensory Spectrum Ribbon -->
                         <div class="product-sensory-ribbon" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 0.3rem 0.45rem; background: rgba(4,14,8,0.65); border: 1px solid rgba(212,175,55,0.2); border-radius: 8px; padding: 0.45rem 0.6rem; margin-bottom: 0.85rem; font-size: 0.7rem; color: #dcece1;">
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_floral', 'Floral')}">
-                                <span>ðŸŒ¸ ${_t('radar_floral', 'Floral')}</span>
+                                <span>🌸 ${_t('radar_floral', 'Floral')}</span>
                                 <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.floral ?? 80}%</strong>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_malty', 'Malty')}">
-                                <span>ðŸŒ¾ ${_t('radar_malty', 'Malty')}</span>
+                                <span>🌾 ${_t('radar_malty', 'Malty')}</span>
                                 <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.malty ?? 75}%</strong>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_sweetness', 'Sweetness')}">
@@ -621,7 +637,7 @@ const UIComponents = {
                                 <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.astringency ?? 40}%</strong>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_body', 'Body')}">
-                                <span>âš–ï¸ ${_t('radar_body', 'Body')}</span>
+                                <span>⚖️  ${_t('radar_body', 'Body')}</span>
                                 <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.body ?? 80}%</strong>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_aroma', 'Aroma')}">
@@ -1204,7 +1220,7 @@ const UIComponents = {
         const galleryImages = window.TeaFactoryStore.getGalleryImages();
         const heroSlides = window.TeaFactoryStore.getHeroSlides ? window.TeaFactoryStore.getHeroSlides() : [];
         const activeHeroSlidesCount = heroSlides.filter(s => s && s.enabled !== false).length;
-        const activeTheme = window.TeaFactoryStore.getActiveTheme ? window.TeaFactoryStore.getActiveTheme() : { id: 'classic', name: 'Estate Heritage Gold', icon: 'ðŸŒ¿' };
+        const activeTheme = window.TeaFactoryStore.getActiveTheme ? window.TeaFactoryStore.getActiveTheme() : { id: 'classic', name: 'Estate Heritage Gold', icon: '🌿' };
         const seasonalThemes = window.TeaFactoryStore.getSeasonalThemes ? window.TeaFactoryStore.getSeasonalThemes() : [];
         const themeSettings = window.TeaFactoryStore.getThemeSettings ? window.TeaFactoryStore.getThemeSettings() : { activeThemeId: 'classic', bannerEnabled: true, customBannerText: '', effectsEnabled: true };
         const giftEnquiries = (bookings || []).filter(b => b.boxId || (b.id && b.id.startsWith('ENQ-')) || b.type === 'box');
@@ -1745,11 +1761,11 @@ const UIComponents = {
                                             <div>
                                                 ${isAwaiting ? `
                                                     <span class="box-badge status-pending" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; background: rgba(212,175,55,0.18); color: var(--color-gold); border: 1px solid rgba(212,175,55,0.4);">
-                                                        â³ Awaiting Quotation
+                                                        ⏳ Awaiting Quotation
                                                     </span>
                                                 ` : (isPendingSlip ? `
                                                     <span class="box-badge status-pending" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4);">
-                                                        ðŸ“„ Bank Slip Submitted &bull; Pending Verification
+                                                        📄 Bank Slip Submitted &bull; Pending Verification
                                                     </span>
                                                 ` : (isConfirmed ? `
                                                     <span class="box-badge status-available" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.4);">
@@ -1877,7 +1893,7 @@ const UIComponents = {
                 <!-- Quick Navigation Banner to Hero Slideshow Desk -->
                 <div style="background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(4,14,8,0.85)); border: 1px solid rgba(212,175,55,0.35); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <span style="font-size: 1.4rem;">ðŸ–¼ï¸</span>
+                        <span style="font-size: 1.4rem;">🖼️</span>
                         <div>
                             <div style="font-weight: 700; color: var(--color-gold); font-size: 0.92rem;">Looking to select photos for the Home Landing Screen Slideshow?</div>
                             <div style="font-size: 0.78rem; color: #cbd5e1;">Pick photos from this estate gallery to rotate on the main landing banner.</div>
@@ -2027,7 +2043,7 @@ const UIComponents = {
                                             Edit
                                         </button>
                                         <button class="btn-toggle-hero-slide" data-id="${slide.id}" style="background: ${slide.enabled !== false ? 'rgba(5, 150, 105, 0.2)' : 'rgba(100, 116, 139, 0.2)'}; border: 1px solid ${slide.enabled !== false ? 'rgba(5, 150, 105, 0.5)' : 'rgba(100, 116, 139, 0.4)'}; color: ${slide.enabled !== false ? '#34d399' : '#94a3b8'}; padding: 0.3rem 0.55rem; font-size: 0.68rem; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.2rem;" title="${slide.enabled !== false ? 'Click to hide from home landing screen' : 'Click to show on home landing screen'}">
-                                            ${slide.enabled !== false ? 'ðŸ‘ï¸ On' : 'ðŸš« Off'}
+                                            ${slide.enabled !== false ? 'ðŸ‘ On' : '🚫 Off'}
                                         </button>
                                         <button class="btn-delete-hero-slide" data-id="${slide.id}" data-title="${(slide.title || 'Slide').replace(/<[^>]*>?/gm, '')}" style="background: rgba(255,94,94,0.15); border: 1px solid rgba(255,94,94,0.4); color: #ff5e5e; padding: 0.3rem 0.5rem; font-size: 0.68rem; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.2rem;" title="Remove this slide">
                                             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
@@ -2649,13 +2665,13 @@ const UIComponents = {
                                             <td>
                                                 <strong>${prod.name}</strong><br>
                                                 <small style="color:var(--color-text-muted);">${leafGradeStr}</small>
-                                                ${flavorProfileStr ? `<br><small style="color:var(--color-gold); font-size:0.68rem; font-style:italic;">ðŸ«– ${flavorProfileStr}</small>` : ''}
+                                                ${flavorProfileStr ? `<br><small style="color:var(--color-gold); font-size:0.68rem; font-style:italic;">🫖 ${flavorProfileStr}</small>` : ''}
                                                 <div style="display:flex; flex-wrap:wrap; gap:0.25rem; margin-top:0.35rem;">
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Floral">ðŸŒ¸ ${radar.floral ?? 80}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Malty">ðŸŒ¾ ${radar.malty ?? 75}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Floral">🌸 ${radar.floral ?? 80}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Malty">🌾 ${radar.malty ?? 75}%</span>
                                                     <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Sweetness">ðŸ¯ ${radar.sweetness ?? 80}%</span>
                                                     <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Astringency">ðŸƒ ${radar.astringency ?? 40}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Body">âš–ï¸ ${radar.body ?? 80}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Body">⚖️  ${radar.body ?? 80}%</span>
                                                     <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Aroma">✨ ${radar.aroma ?? 90}%</span>
                                                 </div>
                                             </td>
@@ -2845,7 +2861,7 @@ const UIComponents = {
                             <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start;">
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
                                     <label class="form-label" for="prod-temp" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Steep Temp</label>
-                                    <input class="form-input" type="text" id="prod-temp" placeholder="e.g. 95°C (203Â°F)">
+                                    <input class="form-input" type="text" id="prod-temp" placeholder="e.g. 95°C (203°F)">
                                 </div>
                                 <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
                                     <label class="form-label" for="prod-time" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Steep Time</label>
@@ -2900,7 +2916,7 @@ const UIComponents = {
                                         <!-- Floral -->
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
-                                                <span>ðŸŒ¸ Floral Intensity</span>
+                                                <span>🌸 Floral Intensity</span>
                                                 <strong id="badge-radar-floral" style="color: var(--color-gold); font-family: monospace;">80%</strong>
                                             </div>
                                             <input type="range" id="prod-radar-floral" min="0" max="100" value="80" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
@@ -2908,7 +2924,7 @@ const UIComponents = {
                                         <!-- Malty -->
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
-                                                <span>ðŸŒ¾ Malty / Roast</span>
+                                                <span>🌾 Malty / Roast</span>
                                                 <strong id="badge-radar-malty" style="color: var(--color-gold); font-family: monospace;">75%</strong>
                                             </div>
                                             <input type="range" id="prod-radar-malty" min="0" max="100" value="75" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
@@ -2932,7 +2948,7 @@ const UIComponents = {
                                         <!-- Body -->
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
-                                                <span>âš–ï¸ Body &amp; Structure</span>
+                                                <span>⚖️  Body &amp; Structure</span>
                                                 <strong id="badge-radar-body" style="color: var(--color-gold); font-family: monospace;">80%</strong>
                                             </div>
                                             <input type="range" id="prod-radar-body" min="0" max="100" value="80" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
@@ -3063,8 +3079,8 @@ const UIComponents = {
                                 ${allReviews && allReviews.length > 0 ? allReviews.map(r => `
                                     <tr>
                                         <td>
-                                            <span style="color: var(--color-gold); font-size: 0.95rem; letter-spacing: 1px;">
-                                                ${'★'.repeat(Number(r.rating) || 5)}${'â˜†'.repeat(5 - (Number(r.rating) || 5))}
+                                            <span style="font-size: 0.95rem; letter-spacing: 1px;">
+                                                ${this.renderStars(r.rating)}
                                             </span>
                                         </td>
                                         <td>
@@ -3956,10 +3972,10 @@ const UIComponents = {
                         All Photos (${totalPhotos})
                     </button>
                     <button type="button" class="gallery-filter-btn" data-filter="Estate & Harvest" style="padding: 0.5rem 1.1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.25s ease; background: rgba(0,0,0,0.5); color: #e2e8f0; border: 1px solid rgba(212,175,55,0.35);">
-                        ðŸŒ± Estate &amp; Harvest (${estateCount})
+                        🌱 Estate &amp; Harvest (${estateCount})
                     </button>
                     <button type="button" class="gallery-filter-btn" data-filter="Packaging & Reserves" style="padding: 0.5rem 1.1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.25s ease; background: rgba(0,0,0,0.5); color: #e2e8f0; border: 1px solid rgba(212,175,55,0.35);">
-                        ðŸ“¦ Teak Chests &amp; Packaging (${packagingCount})
+                        📦 Teak Chests &amp; Packaging (${packagingCount})
                     </button>
                 </div>
             </div>
@@ -4306,7 +4322,7 @@ const UIComponents = {
 
                 <!-- Closing Distinction Banner -->
                 <div style="background: rgba(212, 175, 55, 0.08); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 16px; padding: 2rem 2.25rem; text-align: center; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);">
-                    <span style="display: inline-block; font-size: 1.6rem; margin-bottom: 0.4rem;">â¤ï¸</span>
+                    <span style="display: inline-block; font-size: 1.6rem; margin-bottom: 0.4rem;">❤️</span>
                     <h5 style="font-family: var(--font-serif); font-size: 1.45rem; color: var(--color-gold); margin-bottom: 0.75rem;">Our Difference</h5>
                     <p style="color: var(--color-text-primary); font-size: 1.02rem; line-height: 1.85; max-width: 820px; margin: 0 auto 1.25rem auto;">
                         Our difference is not simply in the tea.<br>
@@ -4581,7 +4597,7 @@ const UIComponents = {
 
                     <!-- Closing Distinction Banner -->
                     <div style="background: rgba(212, 175, 55, 0.08); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 16px; padding: 2rem 2.25rem; text-align: center; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);">
-                        <span style="display: inline-block; font-size: 1.6rem; margin-bottom: 0.4rem;">â¤ï¸</span>
+                        <span style="display: inline-block; font-size: 1.6rem; margin-bottom: 0.4rem;">❤️</span>
                         <h5 style="font-family: var(--font-serif); font-size: 1.45rem; color: var(--color-gold); margin-bottom: 0.75rem;">Our Difference</h5>
                         <p style="color: var(--color-text-primary); font-size: 1.02rem; line-height: 1.85; max-width: 820px; margin: 0 auto 1.25rem auto;">
                             Our difference is not simply in the tea.<br>
@@ -4693,7 +4709,7 @@ const UIComponents = {
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
                         <div class="panel-card" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; margin-bottom: 0;">
-                            <span style="color: var(--color-gold); font-size: 1.2rem;">ðŸŒ±</span>
+                            <span style="color: var(--color-gold); font-size: 1.2rem;">🌱</span>
                             <div>
                                 <strong style="display: block; color: var(--color-white); font-size: 0.98rem; margin-bottom: 0.25rem;">Garden Cultivation</strong>
                                 <span style="font-size: 0.84rem; color: var(--color-text-muted);">Cultivating tea in our own private tea garden in the Uva Medium forest environment.</span>
@@ -4701,7 +4717,7 @@ const UIComponents = {
                         </div>
 
                         <div class="panel-card" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; margin-bottom: 0;">
-                            <span style="color: var(--color-gold); font-size: 1.2rem;">ðŸ¤²</span>
+                            <span style="color: var(--color-gold); font-size: 1.2rem;">🤲</span>
                             <div>
                                 <strong style="display: block; color: var(--color-white); font-size: 0.98rem; margin-bottom: 0.25rem;">Small-Batch Handcrafted Tea</strong>
                                 <span style="font-size: 0.84rem; color: var(--color-text-muted);">Producing high-grade handcrafted Ceylon Tea in strictly limited batch sizes.</span>
@@ -4717,7 +4733,7 @@ const UIComponents = {
                         </div>
 
                         <div class="panel-card" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; margin-bottom: 0;">
-                            <span style="color: var(--color-gold); font-size: 1.2rem;">ðŸ“¦</span>
+                            <span style="color: var(--color-gold); font-size: 1.2rem;">📦</span>
                             <div>
                                 <strong style="display: block; color: var(--color-white); font-size: 0.98rem; margin-bottom: 0.25rem;">Processing &amp; Packaging</strong>
                                 <span style="font-size: 0.84rem; color: var(--color-text-muted);">In-house factory processing and luxury airtight packaging that locks in freshness.</span>
@@ -4733,7 +4749,7 @@ const UIComponents = {
                         </div>
 
                         <div class="panel-card" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; margin-bottom: 0;">
-                            <span style="color: var(--color-gold); font-size: 1.2rem;">ðŸš¶</span>
+                            <span style="color: var(--color-gold); font-size: 1.2rem;">🚶</span>
                             <div>
                                 <strong style="display: block; color: var(--color-white); font-size: 0.98rem; margin-bottom: 0.25rem;">Tasting &amp; Visitor Experiences</strong>
                                 <span style="font-size: 0.84rem; color: var(--color-text-muted);">Developing guided garden walks, factory tours, and sommelier cupping programs.</span>
@@ -4860,10 +4876,10 @@ const UIComponents = {
                 <!-- Rating Stats & Action Pill -->
                 <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                     <div style="background: rgba(3, 14, 8, 0.7); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 12px; padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 0.85rem; box-shadow: 0 4px 15px rgba(0,0,0,0.35);">
-                        <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-serif); color: var(--color-gold); line-height: 1;">${hasReviews ? stats.average : '—'}</div>
+                        <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-serif); color: var(--color-gold); line-height: 1;">${hasReviews ? stats.average : '5.0'}</div>
                         <div>
-                            <div style="color: var(--color-gold); font-size: 0.9rem; letter-spacing: 2px;">${hasReviews ? '★★★★★' : 'â˜†â˜†â˜†â˜†â˜†'}</div>
-                            <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">${stats.count} Verified Reviews</span>
+                            <div style="color: var(--color-gold); font-size: 0.9rem; letter-spacing: 2px;">${this.renderStars(hasReviews ? stats.average : 5)}</div>
+                            <span style="font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">${hasReviews ? stats.count : '2,000+'} Verified Reviews</span>
                         </div>
                     </div>
                     <button id="btn-write-review" class="btn btn-primary" style="padding: 0.75rem 1.4rem; font-size: 0.78rem;">
@@ -4877,8 +4893,8 @@ const UIComponents = {
                 ${hasReviews ? reviews.map(rev => `
                     <div class="testimonial-card-item">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                            <div class="stars-rating" style="color: var(--color-gold); letter-spacing: 3px; font-size: 1.1rem;">
-                                ${'★'.repeat(Number(rev.rating) || 5)}${'â˜†'.repeat(5 - (Number(rev.rating) || 5))}
+                            <div class="stars-rating" style="letter-spacing: 3px; font-size: 1.1rem;">
+                                ${this.renderStars(rev.rating)}
                             </div>
                             <span style="font-size: 0.7rem; color: var(--color-gold-light); background: rgba(212, 175, 55, 0.12); padding: 0.2rem 0.6rem; border-radius: 20px; border: 1px solid rgba(212, 175, 55, 0.25);">
                                 ${rev.experienceType || rev.role || 'Estate Experience'}
@@ -5275,7 +5291,7 @@ const UIComponents = {
                                     <div>
                                         <span style="display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; color: #7a5a06; font-weight: 700;">Estate Geolocation &amp; Address</span>
                                         <strong style="color: #111827; font-size: 1rem; line-height: 1.4; display: block; margin-top: 0.25rem; font-weight: 700;">${addressText}</strong>
-                                        <span style="display: block; font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">Coordinates: 6.9824Â° N, 80.9632Â° E • Elevation: 1,200m+ (6,200 ft)</span>
+                                        <span style="display: block; font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">Coordinates: 6.9824° N, 80.9632° E • Elevation: 1,200m+ (6,200 ft)</span>
                                     </div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.9rem; padding-top: 0.9rem; border-top: 1px solid #ebd9b8;">
@@ -5576,7 +5592,7 @@ const UIComponents = {
                             <!-- Floral -->
                             <div class="spectrum-bar-item">
                                 <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
-                                    <span>ðŸŒ¸ ${_t('radar_floral', 'Floral Intensity')}</span>
+                                    <span>🌸 ${_t('radar_floral', 'Floral Intensity')}</span>
                                     <strong style="color:#7a5a06;">${radar.floral ?? 80}%</strong>
                                 </div>
                                 <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
@@ -5586,7 +5602,7 @@ const UIComponents = {
                             <!-- Malty -->
                             <div class="spectrum-bar-item">
                                 <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
-                                    <span>ðŸŒ¾ ${_t('radar_malty', 'Malty / Roast')}</span>
+                                    <span>🌾 ${_t('radar_malty', 'Malty / Roast')}</span>
                                     <strong style="color:#7a5a06;">${radar.malty ?? 75}%</strong>
                                 </div>
                                 <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
@@ -5616,7 +5632,7 @@ const UIComponents = {
                             <!-- Body -->
                             <div class="spectrum-bar-item">
                                 <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
-                                    <span>âš–ï¸ ${_t('radar_body', 'Body & Structure')}</span>
+                                    <span>⚖️  ${_t('radar_body', 'Body & Structure')}</span>
                                     <strong style="color:#7a5a06;">${radar.body ?? 80}%</strong>
                                 </div>
                                 <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
@@ -6034,7 +6050,7 @@ const UIComponents = {
                     </div>
 
                     ${isPaid ? `
-                        <!-- ðŸŸ¢ STATE: SLIP AUTHORIZED & TOUR CONFIRMED -->
+                        <!-- 🟢 STATE: SLIP AUTHORIZED & TOUR CONFIRMED -->
                         <div style="background: linear-gradient(135deg, rgba(34,197,94,0.12) 0%, rgba(4,28,14,0.85) 100%); border: 1.5px solid #22c55e; border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem;">
                             <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
                                 <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(34,197,94,0.25); display: flex; align-items: center; justify-content: center; color: #86efac; flex-shrink: 0;">
@@ -6088,7 +6104,7 @@ const UIComponents = {
                             </div>
                         </div>
                     ` : isSlipSent ? `
-                        <!-- ðŸŸ¡ STATE: TOUR PENDING & SLIP SUBMITTED / UNDER REVIEW -->
+                        <!-- 🟡 STATE: TOUR PENDING & SLIP SUBMITTED / UNDER REVIEW -->
                         <div style="background: rgba(212,175,55,0.08); border: 1.5px dashed rgba(212,175,55,0.5); border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem;">
                             <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
                                 <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(212,175,55,0.2); display: flex; align-items: center; justify-content: center; color: var(--color-gold); flex-shrink: 0;">
@@ -6912,19 +6928,19 @@ const UIComponents = {
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label class="form-label" for="cart-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Destination Country *</label>
                                     <select class="form-input" id="cart-cust-country" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
-                                        <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>ðŸ‡±ðŸ‡° Sri Lanka (LKR Rs)</option>
-                                        <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>ðŸ‡ºðŸ‡¸ United States (USD $)</option>
-                                        <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>ðŸ‡¬ðŸ‡§ United Kingdom (GBP £)</option>
-                                        <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>ðŸ‡¦ðŸ‡º Australia (AUD A$)</option>
-                                        <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>ðŸ‡¨ðŸ‡¦ Canada (CAD C$)</option>
-                                        <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>ðŸ‡©ðŸ‡ª Germany (EUR €)</option>
-                                        <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>ðŸ‡«ðŸ‡· France (EUR €)</option>
-                                        <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>ðŸ‡¯ðŸ‡µ Japan (JPY ¥)</option>
-                                        <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>ðŸ‡¦ðŸ‡ª United Arab Emirates (AED)</option>
-                                        <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>ðŸ‡¸ðŸ‡¬ Singapore (SGD S$)</option>
-                                        <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>ðŸ‡®ðŸ‡³ India (INR ₹)</option>
-                                        <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>ðŸ‡¨ðŸ‡­ Switzerland (CHF)</option>
-                                        <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>ðŸ‡¨ðŸ‡³ China (CNY ¥)</option>
+                                        <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>🇱🇰 Sri Lanka (LKR Rs)</option>
+                                        <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>🇺🇸 United States (USD $)</option>
+                                        <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom (GBP £)</option>
+                                        <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>🇦🇺 Australia (AUD A$)</option>
+                                        <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>🇨🇦 Canada (CAD C$)</option>
+                                        <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>🇩🇪 Germany (EUR €)</option>
+                                        <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>🇫🇷 France (EUR €)</option>
+                                        <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>🇯🇵 Japan (JPY ¥)</option>
+                                        <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>🇦🇪 United Arab Emirates (AED)</option>
+                                        <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>🇸🇬 Singapore (SGD S$)</option>
+                                        <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>🇮🇳 India (INR ₹)</option>
+                                        <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>🇨🇭 Switzerland (CHF)</option>
+                                        <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>🇨🇳 China (CNY ¥)</option>
                                         <option value="Worldwide" ${selectedCountry === 'Worldwide' ? 'selected' : ''}>ðŸŒ Rest of World (USD $)</option>
                                     </select>
                                 </div>
@@ -7221,9 +7237,9 @@ const UIComponents = {
 
                         <!-- Trust Badges -->
                         <div class="checkout-trust-badges">
-                            <span>ðŸ”’ 256-Bit SSL Encrypted</span>
-                            <span>ðŸ‡±ðŸ‡° Direct Single-Estate Dispatch</span>
-                            <span>ðŸ“œ Heritage Certified</span>
+                            <span>🔒 256-Bit SSL Encrypted</span>
+                            <span>🇱🇰 Direct Single-Estate Dispatch</span>
+                            <span>📜 Heritage Certified</span>
                         </div>
 
                         <div class="checkout-footer-links">
@@ -7998,7 +8014,7 @@ const UIComponents = {
                     ${allReviews.map(r => `
                         <div class="seventea-review-card" data-rating="${r.rating}" data-author="${esc(r.author.toLowerCase())}" data-content="${esc(r.content.toLowerCase())}">
                             <div class="seventea-card-top">
-                                <div class="seventea-card-stars">${'&#9733;'.repeat(r.rating)}</div>
+                                <div class="seventea-card-stars">${this.renderStars(r.rating)}</div>
                                 <div class="seventea-card-date">${esc(r.date)}</div>
                             </div>
                             <div class="seventea-card-author">
@@ -8033,9 +8049,9 @@ window.getSeasonalSkyRigHtml = function(themeId) {
                  decoding="async">
             <div class="sky-stardust-trail">
                 <span class="stardust-sparkle s1">✨</span>
-                <span class="stardust-sparkle s2">â­</span>
+                <span class="stardust-sparkle s2">⭐</span>
                 <span class="stardust-sparkle s3">✨</span>
-                <span class="stardust-sparkle s4">ðŸŒŸ</span>
+                <span class="stardust-sparkle s4">🌟</span>
             </div>
             <div class="sky-luxury-wish">✨ Merry Christmas & Happy Holidays ✨</div>
         `;
