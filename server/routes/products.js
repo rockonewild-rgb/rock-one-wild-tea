@@ -6,6 +6,8 @@ const { isTursoAvailable, queryTurso, executeTurso } = require('../db/turso');
 
 function normalizeProductImage(img) {
     if (!img) return 'images/Product.jpeg';
+    if (img.startsWith('images/products/')) return img;
+    if (img.includes('rock_one_')) return img;
     if (img.includes('silver_tips')) return 'images/Product.jpeg';
     if (img.includes('black_tea')) return 'images/luxury_tea_tin.jpg';
     if (img.includes('green_tea')) return 'images/luxury_tea_chest.jpg';

@@ -7435,6 +7435,8 @@ const UIComponents = {
         const basePrice = Number(item.price !== undefined ? item.price : (item.price_usd !== undefined ? item.price_usd : (item.quotedPrice || 28.00))) || 28.00;
         const baseLKR = Number(item.price_lkr || Math.round(basePrice * 305));
         const originalPrice = (basePrice * 1.176).toFixed(2);
+        const shipFee = Number(item.shipping_fee_usd !== undefined ? item.shipping_fee_usd : (item.shippingCharge !== undefined ? item.shippingCharge : (item.shippingFee !== undefined ? item.shippingFee : (item.id === 'prod-rock-one-black-tea' ? 19.0 : 0)))) || 0;
+        const netWt = item.weight || item.netWeight || (isProd ? '50g Pack' : '');
         
         let breadcrumbText = 'Shop &bull; Single-Estate Artisanal Harvest';
         if (isTour) breadcrumbText = 'Experiences &bull; Private Sanctuary Gongfu Tasting';
@@ -7493,11 +7495,21 @@ const UIComponents = {
         // 3. Variants setup
         let variants = [];
         if (isProd) {
-            variants = [
-                { id: 'v1', label: 'Tin - 50g/1.8 oz', multiplier: 1.0, stock: 16, default: true },
-                { id: 'v2', label: 'Reserve Pouch - 100g/3.5 oz', multiplier: 1.85, stock: 11 },
-                { id: 'v3', label: 'Estate Chest - 250g/8.8 oz', multiplier: 4.20, stock: 6 }
-            ];
+            if (Array.isArray(item.variants) && item.variants.length > 0) {
+                variants = item.variants;
+            } else if (item.id === 'prod-rock-one-black-tea') {
+                variants = [
+                    { id: 'v1', label: '1x 50g Pack ($17.00)', multiplier: 1.0, stock: 50, default: true },
+                    { id: 'v2', label: '2x 50g Packs (100g) ($32.00)', multiplier: 1.882, stock: 25 },
+                    { id: 'v3', label: '5x 50g Master Pack (250g) ($75.00)', multiplier: 4.412, stock: 12 }
+                ];
+            } else {
+                variants = [
+                    { id: 'v1', label: 'Tin - 50g/1.8 oz', multiplier: 1.0, stock: 16, default: true },
+                    { id: 'v2', label: 'Reserve Pouch - 100g/3.5 oz', multiplier: 1.85, stock: 11 },
+                    { id: 'v3', label: 'Estate Chest - 250g/8.8 oz', multiplier: 4.20, stock: 6 }
+                ];
+            }
         } else if (isTour) {
             variants = [
                 { id: 'v1', label: 'Standard Connoisseur (1.5h)', multiplier: 1.0, stock: 8, default: true },
@@ -7525,58 +7537,161 @@ const UIComponents = {
                 ? 'Numbered heirloom teak chests housing the pinnacle of our wild harvest'
                 : 'Patiently crafted for a smooth, mellow sweetness and lingering floral finish'));
 
-        const accordions = [
-            {
-                id: 'about',
-                title: isTour ? 'About This Experience' : (isBox ? 'About This Collector Chest' : 'About This Tea'),
+        const accordions = [];
+
+        // 1. Philosophy Accordion (When provided by client)
+        if (item.philosophy) {
+            accordions.push({
+                id: 'philosophy',
+                title: 'Our Philosophy',
                 open: true,
-                content: isTour
-                    ? '<p>Immerse yourself in our private tea sanctuary. Your estate host introduces the biodiverse terroir of our 1,320m mountain ridges, the art of hand plucking, and leads you through multi-step Gongfu infusions in authentic purple clay gaiwans.</p><ul style="padding-left:1.2rem; margin-top:0.5rem; line-height:1.7;"><li>Introduction to Uva Medium wild tea gardens</li><li>Observation of whole-leaf leaf opening under controlled heat</li><li>Tasting across 5 separate infusions with flavor notes journal</li></ul>'
-                    : (isBox
-                        ? '<p>Each collector chest is an individual work of art made from seasoned highland teakwood with hand-burnished solid brass accents. Inside are serialized glass vials preserved under inert nitrogen seal, a numbered estate certificate signed by our Master Tea Maker, and tasting accessories.</p>'
-                        : (item.about 
-                            ? '<p><strong>' + title + '</strong></p><p>' + item.about + '</p><p>Crafted exclusively from tender shoots plucked during the dry August-September quality season when cool mountain winds concentrate natural sugars, aromatic linalools, and floral antioxidants in every bud.</p>'
-                            : '<p><strong>' + title + '</strong></p><p>' + shortDesc + '</p><p>Crafted exclusively from tender shoots plucked during the dry August-September quality season when cool mountain winds concentrate natural sugars, aromatic linalools, and floral antioxidants in every bud.</p>'))
-            },
-            {
-                id: 'origin',
-                title: 'Origin & Terroir',
-                open: false,
-                content: item.origin 
-                    ? '<p>' + item.origin + '</p>'
-                    : '<p><strong>Estate Sanctuary:</strong> Rock One Wild Tea Sanctuary, Passara, Badulla District, Uva Highlands, Sri Lanka.</p><p><strong>Elevation:</strong> 1,240m &ndash; 1,320m above sea level (High Montane Cloud Forest).</p><p><strong>Terroir Dynamics:</strong> Pristine organic soil enriched by centuries of wild montane leaf litter, natural granite springs, and the famous dry-cold August katabatic winds that produce the distinctive Uva seasonal character.</p>'
-            },
-            {
-                id: 'caffeine',
-                title: isTour ? 'Duration & Group Size' : 'Caffeine Level',
-                open: false,
-                content: isTour
-                    ? '<p><strong>Duration:</strong> Approximately 1.5 to 2 hours of unhurried ceremonial steeping.</p><p><strong>Group Size:</strong> Intimate private group (maximum 8 guests per session) to ensure personalized master sommelier guidance.</p><p><strong>Sanctuary Schedule:</strong> Monday through Saturday (Closed Sundays for sanctuary biodiversity rest).</p>'
-                    : (item.caffeine 
-                        ? '<p>' + item.caffeine + '</p>'
-                        : '<p><strong>Caffeine Classification:</strong> Medium (approx. 38mg &ndash; 45mg per 250ml brewed cup).</p><p>Naturally balanced by exceptionally high concentrations of calming L-theanine, promoting alert tranquility and steady cognitive focus without jittery spikes or crashes.</p>')
-            },
-            {
-                id: 'preparation',
-                title: isTour ? 'Dress Code & Visitor Guidelines' : 'Preparation & Gongfu Steeping',
-                open: false,
-                content: isTour
-                    ? '<p><strong>Attire:</strong> Comfortable mountain footwear and light casual attire suitable for cool highland mornings (18&deg;C &ndash; 24&deg;C).</p><p><strong>Photography:</strong> Personal photography of our terraced gardens and ceremonial tables is warmly welcomed.</p><p><strong>Arrival:</strong> Please arrive 10 minutes prior to your reserved slot at the Welcome Pavilion.</p>'
-                    : (item.preparation 
-                        ? '<p>' + item.preparation + '</p>'
-                        : '<p><strong>Water Temperature:</strong> 90&deg;C &ndash; 95&deg;C (194&deg;F &ndash; 203&deg;F), soft mountain or filtered water recommended.</p><p><strong>Leaf-to-Water Ratio:</strong> 3.5g per 150ml (Gongfu gaiwan) or 2.5g per 250ml (Western teapot).</p><p><strong>Infusion Timing:</strong></p><ul style="padding-left:1.2rem; line-height:1.7;"><li>1st Infusion: 35 seconds (bright aroma & floral bouquet)</li><li>2nd Infusion: 50 seconds (silky body & caramel notes)</li><li>3rd Infusion: 80 seconds (deep mineral sweetness)</li><li>4th & 5th Infusions: 120 seconds (lingering honey finish)</li></ul>')
-            },
-            {
-                id: 'benefits',
-                title: isTour ? 'Inclusions & Take-Home Gifts' : (isBox ? 'Preservation & Storage' : 'Tea Benefits & Freshness Guarantee'),
-                open: false,
-                content: isTour
-                    ? "<p>Every guest receives a complimentary commemorative Estate Tasting Cup, a personalized Sommelier Certificate, and a sample tin of the day's featured harvest.</p>"
-                    : (item.benefits 
-                        ? '<p>' + item.benefits + '</p>'
-                        : '<p><strong>Antioxidant Richness:</strong> Abundant theaflavins, thearubigins, and polyphenols supporting cardiovascular wellness and cellular rejuvenation.</p><p><strong>Nitrogen Vacuum Seal:</strong> Packed fresh on the estate within 48 hours of sorting to lock in volatile essential oils and pristine garden freshness for up to 24 months.</p>')
-            }
-        ];
+                content: `
+                    <div style="background: rgba(212,175,55,0.06); border-left: 3px solid var(--color-gold); padding: 0.85rem 1rem; border-radius: 4px; margin-bottom: 0.8rem;">
+                        <p style="font-style: italic; color: var(--color-gold); font-size: 1.05rem; margin: 0; font-weight: 600;">
+                            &ldquo;Small Batches. Personal Care. Exceptional Ceylon Tea.&rdquo;
+                        </p>
+                    </div>
+                    <p style="line-height: 1.7; color: #cbd5e1; margin-bottom: 0.6rem;">
+                        We believe that exceptional tea begins with nature and is perfected through craftsmanship.
+                    </p>
+                    <p style="line-height: 1.7; color: #cbd5e1; margin-bottom: 0.6rem;">
+                        Every batch reflects our family’s dedication, respect for our natural surroundings and passion for sharing the distinctive character of Ceylon tea with the world.
+                    </p>
+                    <p style="font-weight: 600; color: #4ade80; margin: 0; font-size: 0.95rem;">
+                        &mdash; From Our Wild Forest Tea Garden to Your Cup.
+                    </p>
+                `
+            });
+        }
+
+        // 2. Artisan Specifications Accordion
+        if (item.id === 'prod-rock-one-black-tea' || item.cultivar) {
+            accordions.push({
+                id: 'specs',
+                title: 'Artisan Specifications & Terroir',
+                open: !item.philosophy,
+                content: `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem 1.25rem; font-size: 0.88rem; line-height: 1.5;">
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.35rem;">
+                            <span style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Tea Type</span>
+                            <strong style="color: #f1f5f9;">Handcrafted Ceylon Black Tea</strong>
+                        </div>
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.35rem;">
+                            <span style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Tea Clone / Cultivar</span>
+                            <strong style="color: #f1f5f9;">TRI 2025 (Selected Elite Clone)</strong>
+                        </div>
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.35rem;">
+                            <span style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Origin</span>
+                            <strong style="color: #f1f5f9;">Uva Medium Growing Region, Sri Lanka</strong>
+                        </div>
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.35rem;">
+                            <span style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Elevation</span>
+                            <strong style="color: #f1f5f9;">Approximately 3,000–5,000 feet</strong>
+                        </div>
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.35rem;">
+                            <span style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Tea Garden</span>
+                            <strong style="color: #f1f5f9;">Family-Owned Tea Garden</strong>
+                        </div>
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.35rem;">
+                            <span style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Growing Environment</span>
+                            <strong style="color: #f1f5f9;">Natural Forest-Surrounded Tea Garden</strong>
+                        </div>
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.35rem;">
+                            <span style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Processing Method</span>
+                            <strong style="color: #f1f5f9;">Traditional Hand-Rolled Black Tea Processing</strong>
+                        </div>
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.35rem;">
+                            <span style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Production Style</span>
+                            <strong style="color: #f1f5f9;">Artisan Small-Batch / Limited Quantity</strong>
+                        </div>
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.35rem;">
+                            <span style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Flavour Profile</span>
+                            <strong style="color: #f1f5f9;">Smooth, Naturally Sweet &amp; Delicate Floral</strong>
+                        </div>
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.35rem;">
+                            <span style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Aroma</span>
+                            <strong style="color: #f1f5f9;">Gentle Floral and Honey-Like Character</strong>
+                        </div>
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.35rem;">
+                            <span style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Regional Identity</span>
+                            <strong style="color: #f1f5f9;">Distinctive Uva Seasonal Tea-Growing Character</strong>
+                        </div>
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.35rem;">
+                            <span style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Recommended Serving</span>
+                            <strong style="color: #f1f5f9;">Morning and Afternoon</strong>
+                        </div>
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.35rem;">
+                            <span style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Net Weight</span>
+                            <strong style="color: #f1f5f9;">50g per Pack</strong>
+                        </div>
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.35rem;">
+                            <span style="color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: block;">Caffeine</span>
+                            <strong style="color: #f1f5f9;">Naturally Contains Caffeine</strong>
+                        </div>
+                    </div>
+                `
+            });
+        }
+
+        // 3. About This Tea Accordion
+        accordions.push({
+            id: 'about',
+            title: isTour ? 'About This Experience' : (isBox ? 'About This Collector Chest' : 'About This Tea'),
+            open: accordions.length === 0,
+            content: isTour
+                ? '<p>Immerse yourself in our private tea sanctuary. Your estate host introduces the biodiverse terroir of our 1,320m mountain ridges, the art of hand plucking, and leads you through multi-step Gongfu infusions in authentic purple clay gaiwans.</p><ul style="padding-left:1.2rem; margin-top:0.5rem; line-height:1.7;"><li>Introduction to Uva Medium wild tea gardens</li><li>Observation of whole-leaf leaf opening under controlled heat</li><li>Tasting across 5 separate infusions with flavor notes journal</li></ul>'
+                : (isBox
+                    ? '<p>Each collector chest is an individual work of art made from seasoned highland teakwood with hand-burnished solid brass accents. Inside are serialized glass vials preserved under inert nitrogen seal, a numbered estate certificate signed by our Master Tea Maker, and tasting accessories.</p>'
+                    : (item.about 
+                        ? '<p><strong>' + title + '</strong></p><p>' + item.about + '</p><p>Crafted exclusively from tender shoots plucked during the dry August-September quality season when cool mountain winds concentrate natural sugars, aromatic linalools, and floral antioxidants in every bud.</p>'
+                        : '<p><strong>' + title + '</strong></p><p>' + shortDesc + '</p><p>Crafted exclusively from tender shoots plucked during the dry August-September quality season when cool mountain winds concentrate natural sugars, aromatic linalools, and floral antioxidants in every bud.</p>'))
+        });
+
+        // 4. Origin & Terroir
+        accordions.push({
+            id: 'origin',
+            title: 'Origin & Terroir',
+            open: false,
+            content: item.origin 
+                ? '<p>' + item.origin + '</p>'
+                : '<p><strong>Estate Sanctuary:</strong> Rock One Wild Tea Sanctuary, Passara, Badulla District, Uva Highlands, Sri Lanka.</p><p><strong>Elevation:</strong> 1,240m &ndash; 1,320m above sea level (High Montane Cloud Forest).</p><p><strong>Terroir Dynamics:</strong> Pristine organic soil enriched by centuries of wild montane leaf litter, natural granite springs, and the famous dry-cold August katabatic winds that produce the distinctive Uva seasonal character.</p>'
+        });
+
+        // 5. Caffeine Level / Duration
+        accordions.push({
+            id: 'caffeine',
+            title: isTour ? 'Duration & Group Size' : 'Caffeine Level',
+            open: false,
+            content: isTour
+                ? '<p><strong>Duration:</strong> Approximately 1.5 to 2 hours of unhurried ceremonial steeping.</p><p><strong>Group Size:</strong> Intimate private group (maximum 8 guests per session) to ensure personalized master sommelier guidance.</p><p><strong>Sanctuary Schedule:</strong> Monday through Saturday (Closed Sundays for sanctuary biodiversity rest).</p>'
+                : (item.caffeine 
+                    ? '<p>' + item.caffeine + '</p>'
+                    : '<p><strong>Caffeine Classification:</strong> Medium (approx. 38mg &ndash; 45mg per 250ml brewed cup).</p><p>Naturally balanced by exceptionally high concentrations of calming L-theanine, promoting alert tranquility and steady cognitive focus without jittery spikes or crashes.</p>')
+        });
+
+        // 6. Preparation & Gongfu Steeping
+        accordions.push({
+            id: 'preparation',
+            title: isTour ? 'Dress Code & Visitor Guidelines' : 'Preparation & Gongfu Steeping',
+            open: false,
+            content: isTour
+                ? '<p><strong>Attire:</strong> Comfortable mountain footwear and light casual attire suitable for cool highland mornings (18&deg;C &ndash; 24&deg;C).</p><p><strong>Photography:</strong> Personal photography of our terraced gardens and ceremonial tables is warmly welcomed.</p><p><strong>Arrival:</strong> Please arrive 10 minutes prior to your reserved slot at the Welcome Pavilion.</p>'
+                : (item.preparation 
+                    ? '<p>' + item.preparation + '</p>'
+                    : '<p><strong>Water Temperature:</strong> 90&deg;C &ndash; 95&deg;C (194&deg;F &ndash; 203&deg;F), soft mountain or filtered water recommended.</p><p><strong>Leaf-to-Water Ratio:</strong> 3.5g per 150ml (Gongfu gaiwan) or 2.5g per 250ml (Western teapot).</p><p><strong>Infusion Timing:</strong></p><ul style="padding-left:1.2rem; line-height:1.7;"><li>1st Infusion: 35 seconds (bright aroma & floral bouquet)</li><li>2nd Infusion: 50 seconds (silky body & caramel notes)</li><li>3rd Infusion: 80 seconds (deep mineral sweetness)</li><li>4th & 5th Infusions: 120 seconds (lingering honey finish)</li></ul>')
+        });
+
+        // 7. Tea Benefits
+        accordions.push({
+            id: 'benefits',
+            title: isTour ? 'Inclusions & Take-Home Gifts' : (isBox ? 'Preservation & Storage' : 'Tea Benefits & Freshness Guarantee'),
+            open: false,
+            content: isTour
+                ? "<p>Every guest receives a complimentary commemorative Estate Tasting Cup, a personalized Sommelier Certificate, and a sample tin of the day's featured harvest.</p>"
+                : (item.benefits 
+                    ? '<p>' + item.benefits + '</p>'
+                    : '<p><strong>Antioxidant Richness:</strong> Abundant theaflavins, thearubigins, and polyphenols supporting cardiovascular wellness and cellular rejuvenation.</p><p><strong>Nitrogen Vacuum Seal:</strong> Packed fresh on the estate within 48 hours of sorting to lock in volatile essential oils and pristine garden freshness for up to 24 months.</p>')
+        });
 
         // 5. Construct full Seven Teahouse HTML markup
         container.innerHTML = `
@@ -7650,6 +7765,21 @@ const UIComponents = {
                             <span class="seventea-current-price" id="seventea-calc-price">$${basePrice.toFixed(2)}</span>
                             <span class="seventea-discount-badge">15% OFF</span>
                         </div>
+
+                        ${isProd ? `
+                        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; margin: 0.45rem 0 0.85rem 0; font-size: 0.82rem;">
+                            <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.25); padding: 0.28rem 0.65rem; border-radius: 4px; color: #cbd5e1;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                                <span>Shipping: <strong style="color: var(--color-gold);">${shipFee > 0 ? `$${shipFee.toFixed(2)} Flat Worldwide` : 'Complimentary'}</strong></span>
+                            </div>
+                            ${netWt ? `
+                            <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); padding: 0.28rem 0.65rem; border-radius: 4px; color: #cbd5e1;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                                <span>Weight: <strong style="color: #f1f5f9;">${netWt}</strong></span>
+                            </div>
+                            ` : ''}
+                        </div>
+                        ` : ''}
 
                         <!-- Buy Over Time Financing Note -->
                         <div class="seventea-financing-note">
@@ -7982,6 +8112,8 @@ const UIComponents = {
                         id: item.id || (isTour ? 'tour-gongfu' : (isBox ? 'chest-01' : 'prod-reserve')),
                         name: `${title} (${selectedVariant.label})`,
                         price: finalUnitPrice,
+                        shippingCharge: shipFee,
+                        shipping_fee_usd: shipFee,
                         image: heroImg ? heroImg.src : primaryImg,
                         type: type,
                         weight: selectedVariant.label,
@@ -8011,7 +8143,9 @@ const UIComponents = {
                     timeSlot: options.timeSlot || '09:30 AM',
                     qty: currentQty,
                     variant: selectedVariant.label,
-                    price: basePrice * selectedVariant.multiplier
+                    price: basePrice * selectedVariant.multiplier,
+                    shippingCharge: shipFee,
+                    shipping_fee_usd: shipFee
                 });
             }
         };

@@ -565,8 +565,33 @@ class TeaFactoryStore {
                     this.state.boxes = [];
                     needsSave = true;
                 }
-                if (!this.state.products || !Array.isArray(this.state.products)) {
-                    this.state.products = [];
+                if (!this.state.products || !Array.isArray(this.state.products) || this.state.products.length === 0) {
+                    this.state.products = this.getDefaultProducts();
+                    needsSave = true;
+                } else {
+                    const premierProd = this.getDefaultProducts()[0];
+                    const existingIdx = this.state.products.findIndex(p => p && p.id === 'prod-rock-one-black-tea');
+                    if (existingIdx >= 0) {
+                        this.state.products[existingIdx] = Object.assign({}, premierProd, this.state.products[existingIdx], {
+                            images: premierProd.images,
+                            gallery: premierProd.gallery,
+                            philosophy: premierProd.philosophy,
+                            about: premierProd.about,
+                            price: 17.0,
+                            price_usd: 17.0,
+                            shipping_fee_usd: 19.0,
+                            shippingCharge: 19.0,
+                            shippingFee: 19.0,
+                            weight: '50g Pack',
+                            netWeight: '50g per Pack'
+                        });
+                        if (existingIdx > 0) {
+                            const [pItem] = this.state.products.splice(existingIdx, 1);
+                            this.state.products.unshift(pItem);
+                        }
+                    } else {
+                        this.state.products.unshift(premierProd);
+                    }
                     needsSave = true;
                 }
                 if (!this.state.bookings || !Array.isArray(this.state.bookings)) {
@@ -873,7 +898,70 @@ class TeaFactoryStore {
     }
 
     getDefaultProducts() {
-        return [];
+        return [
+            {
+                id: 'prod-rock-one-black-tea',
+                name: 'Rock One Wild Tea – Premium Black Tea',
+                category: 'Black Tea',
+                type: 'Black Tea',
+                price: 17.0,
+                price_usd: 17.0,
+                shipping_fee_usd: 19.0,
+                shippingCharge: 19.0,
+                shippingFee: 19.0,
+                weight: '50g Pack',
+                netWeight: '50g per Pack',
+                stock: 'In Stock',
+                stock_quantity: 50,
+                image: 'images/products/rock_one_black_tea_7.jpg',
+                images: [
+                    'images/products/rock_one_black_tea_7.jpg',
+                    'images/products/rock_one_black_tea_4.jpg',
+                    'images/products/rock_one_black_tea_1.jpg',
+                    'images/products/rock_one_black_tea_2.jpg',
+                    'images/products/rock_one_black_tea_3.jpg',
+                    'images/products/rock_one_black_tea_5.jpg',
+                    'images/products/rock_one_black_tea_6.jpg'
+                ],
+                gallery: [
+                    'images/products/rock_one_black_tea_7.jpg',
+                    'images/products/rock_one_black_tea_4.jpg',
+                    'images/products/rock_one_black_tea_1.jpg',
+                    'images/products/rock_one_black_tea_2.jpg',
+                    'images/products/rock_one_black_tea_3.jpg',
+                    'images/products/rock_one_black_tea_5.jpg',
+                    'images/products/rock_one_black_tea_6.jpg'
+                ],
+                desc: 'Artisan small-batch Ceylon black tea from our family-owned wild forest tea garden in Sri Lanka\'s Uva Medium region. Handcrafted from clone TRI 2025 to create a smooth, naturally sweet cup with delicate floral notes and gentle honey-like character.',
+                description: 'Artisan small-batch Ceylon black tea from our family-owned wild forest tea garden in Sri Lanka\'s Uva Medium region. Handcrafted from clone TRI 2025 to create a smooth, naturally sweet cup with delicate floral notes and gentle honey-like character.',
+                leafGrade: 'TRI 2025 Hand-Rolled Whole Leaf',
+                elevation: 'Uva Region (3,000–5,000 ft)',
+                harvestSeason: 'Uva Seasonal Flush 2026',
+                steepTemp: '95°C - 100°C',
+                steepTime: '3 - 4 mins',
+                steepSeconds: 180,
+                flavorProfile: 'Smooth & Sweet, Delicate Floral, Honey-Like Character, Wild Forest Terroir',
+                tastingNotes: ['Smooth Sweetness', 'Delicate Floral', 'Honey-Like Character', 'Uva Seasonal Notes'],
+                flavor_notes: ['Smooth Sweetness', 'Delicate Floral', 'Honey-Like Character', 'Uva Seasonal Notes'],
+                sensoryRadar: { floral: 92, malty: 78, sweetness: 88, astringency: 32, body: 82, aroma: 94 },
+                rating: 5.0,
+                reviewsCount: 38,
+                cultivar: 'TRI 2025',
+                origin: 'Uva Medium Growing Region, Sri Lanka (3,000–5,000 ft)',
+                caffeine: 'Naturally Contains Caffeine',
+                serving: 'Morning and Afternoon',
+                production: 'Artisan Small-Batch Production',
+                teaGarden: 'Family-Owned Tea Garden',
+                processing: 'Traditional Hand-Rolled Black Tea Processing',
+                philosophy: 'Small Batches. Personal Care. Exceptional Ceylon Tea. We believe that exceptional tea begins with nature and is perfected through craftsmanship. Every batch reflects our family’s dedication, respect for our natural surroundings and passion for sharing the distinctive character of Ceylon tea with the world. From Our Wild Forest Tea Garden to Your Cup.',
+                about: 'Handcrafted Ceylon black tea from our family-owned tea garden surrounded by natural high-montane forest in Sri Lanka\'s Uva Medium region (3,000–5,000 ft elevation). Carefully produced in limited artisan quantities using traditional hand-rolled orthodox processing techniques and elite cultivar TRI 2025. Every batch yields a clear, amber-golden liquor celebrated for its silky smooth mouthfeel, subtle honey sweetness, and fresh floral aroma.',
+                variants: [
+                    { id: 'v1', label: '1x 50g Pack ($17.00)', multiplier: 1.0, stock: 50, default: true },
+                    { id: 'v2', label: '2x 50g Packs (100g) ($32.00)', multiplier: 1.882, stock: 25 },
+                    { id: 'v3', label: '5x 50g Master Pack (250g) ($75.00)', multiplier: 4.412, stock: 12 }
+                ]
+            }
+        ];
     }
 
     addProduct(productData) {
@@ -3008,33 +3096,41 @@ Rock One Wild Tea Sanctuary Concierge Team
             // 1. Sync Products
             if (prodRes.status === 'fulfilled' && Array.isArray(prodRes.value)) {
                 this.state.products = prodRes.value.map(p => {
-                    const priceNum = Number(p.price !== undefined ? p.price : (p.price_usd !== undefined ? p.price_usd : 0)) || 0;
-                    const shippingNum = Number(p.shipping_fee_usd !== undefined ? p.shipping_fee_usd : (p.shippingCharge !== undefined ? p.shippingCharge : 0)) || 0;
+                    const priceNum = Number(p.price !== undefined ? p.price : (p.price_usd !== undefined ? p.price_usd : 0)) || (p.id === 'prod-rock-one-black-tea' ? 17.0 : 0);
+                    const shippingNum = Number(p.shipping_fee_usd !== undefined ? p.shipping_fee_usd : (p.shippingCharge !== undefined ? p.shippingCharge : (p.shippingFee !== undefined ? p.shippingFee : 0))) || (p.id === 'prod-rock-one-black-tea' ? 19.0 : 0);
                     const bg = typeof p.brewing_guide === 'string' ? JSON.parse(p.brewing_guide) : (p.brewing_guide || {});
                     const fNotes = Array.isArray(p.tastingNotes) ? p.tastingNotes : (Array.isArray(p.flavor_notes) ? p.flavor_notes : (typeof p.flavor_notes === 'string' ? JSON.parse(p.flavor_notes) : (bg.tastingNotes || [])));
                     const fProfile = p.flavorProfile || bg.flavorProfile || (fNotes.length > 0 ? fNotes.join(', ') : 'Single-Estate Reserve');
                     const radar = p.sensoryRadar || bg.sensoryRadar || { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 };
                     const steepSec = p.steepSeconds || bg.steepSeconds || (parseInt(p.steepTime, 10) ? parseInt(p.steepTime, 10) * 60 : 180);
 
+                    const rawImgs = Array.isArray(p.images) && p.images.length > 0 
+                        ? p.images 
+                        : (Array.isArray(bg.images) && bg.images.length > 0 ? bg.images : [p.image || p.image_url || 'images/Product.jpeg']);
+
                     return {
                         id: p.id,
                         name: p.name || 'Single-Estate Ceylon Tea',
                         category: p.category || 'Imperial Reserve',
+                        type: p.type || p.category || 'Black Tea',
                         price: priceNum,
                         price_usd: priceNum,
                         shipping_fee_usd: shippingNum,
                         shippingCharge: shippingNum,
                         shippingFee: shippingNum,
-                        weight: p.weight || '100g Vintage Tin',
+                        weight: p.weight || bg.weight || '50g Pack',
                         stock: p.stock || (p.stock_quantity > 0 ? 'In Stock' : 'In Stock'),
+                        stock_quantity: p.stock_quantity !== undefined ? p.stock_quantity : 50,
                         image: p.image || p.image_url || 'images/Product.jpeg',
+                        images: rawImgs,
+                        gallery: rawImgs,
                         desc: p.desc || p.description || '',
                         description: p.desc || p.description || '',
-                        leafGrade: p.leafGrade || p.leaf_grade || 'Finest Broken Orange Pekoe',
+                        leafGrade: p.leafGrade || p.leaf_grade || p.grade || 'Finest Broken Orange Pekoe',
                         elevation: p.elevation || '1,200m Highlands',
-                        harvestSeason: p.harvestSeason || p.harvest_season || 'Single-Estate Seasonal',
-                        steepTemp: p.steepTemp || p.steep_temp || '95°C',
-                        steepTime: p.steepTime || p.steep_time || '3-4 mins',
+                        harvestSeason: p.harvestSeason || p.harvest_season || p.season || 'Single-Estate Seasonal',
+                        steepTemp: p.steepTemp || p.steep_temp || bg.temp || '95°C',
+                        steepTime: p.steepTime || p.steep_time || bg.time || '3-4 mins',
                         steepSeconds: steepSec,
                         flavorProfile: fProfile,
                         tastingNotes: fNotes.length > 0 ? fNotes : ['Single Estate', 'Artisanal Harvest'],
@@ -3046,10 +3142,27 @@ Rock One Wild Tea Sanctuary Concierge Team
                             { round: 3, seconds: steepSec + 90, label: "3rd Infusion (Sweet Mineral Finish)" }
                         ],
                         brewing_guide: bg,
-                        rating: Number(p.rating || bg.rating) || 4.9,
-                        reviewsCount: Number(p.reviewsCount || p.reviews_count || bg.reviewsCount) || 36,
+                        about: bg.about || p.about || '',
+                        philosophy: bg.philosophy || p.philosophy || '',
+                        origin: bg.origin || p.origin || '',
+                        cultivar: bg.cultivar || p.cultivar || '',
+                        caffeine: bg.caffeine || p.caffeine || '',
+                        serving: bg.serving || p.serving || '',
+                        production: bg.production || p.production || '',
+                        teaGarden: bg.teaGarden || p.teaGarden || '',
+                        processing: bg.processing || p.processing || '',
+                        variants: Array.isArray(p.variants) ? p.variants : (bg.variants || undefined),
+                        rating: Number(p.rating || bg.rating) || 5.0,
+                        reviewsCount: Number(p.reviewsCount || p.reviews_count || bg.reviewsCount) || 38,
                         symbol: p.symbol || ''
                     };
+                });
+
+                // Ensure Rock One Wild Tea – Premium Black Tea is the premier featured product
+                this.state.products.sort((a, b) => {
+                    if (a.id === 'prod-rock-one-black-tea') return -1;
+                    if (b.id === 'prod-rock-one-black-tea') return 1;
+                    return 0;
                 });
             }
 
