@@ -451,6 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderHomeAnnouncementsPreview();
                 window.UIComponents.renderHeritageShowcase('home-heritage-container');
                 initHeritageGallerySlider();
+                bindGalleryEvents();
                 window.UIComponents.renderTestimonials('home-testimonials-container');
                 bindReviewEvents();
                 if (window.UIComponents.renderHomeGalleryShowcase) {
@@ -12004,6 +12005,27 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.style.overflow = '';
         };
 
+        window.openLightbox = function(srcOrIdx, customCaption) {
+            if (!lightbox || !lightboxImg) return;
+            const gImages = (window.TeaFactoryStore && window.TeaFactoryStore.getGalleryImages) 
+                ? window.TeaFactoryStore.getGalleryImages() 
+                : [];
+            let targetIdx = 0;
+            if (typeof srcOrIdx === 'number') {
+                targetIdx = (srcOrIdx + gImages.length) % gImages.length;
+            } else if (typeof srcOrIdx === 'string') {
+                const found = gImages.findIndex(img => img.src === srcOrIdx || srcOrIdx.includes(img.src));
+                targetIdx = found !== -1 ? found : 0;
+            }
+            showImage(targetIdx);
+            if (customCaption && lightboxCaption) {
+                lightboxCaption.innerText = customCaption;
+            }
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+        window.closeLightbox = closeLightbox;
+
         if (lightboxClose) {
             lightboxClose.addEventListener('click', closeLightbox);
         }
@@ -12850,13 +12872,15 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             };
         });
 
-        // Click slide to open lightbox
+        // Click slide to open full screen lightbox view
         slides.forEach(slide => {
             slide.onclick = () => {
                 const src = slide.getAttribute('data-src');
                 const caption = slide.getAttribute('data-caption');
-                if (typeof openLightbox === 'function') {
-                    openLightbox(src, caption);
+                const idxStr = slide.getAttribute('data-index');
+                const idx = idxStr !== null ? parseInt(idxStr, 10) : src;
+                if (typeof window.openLightbox === 'function') {
+                    window.openLightbox(idx, caption);
                 }
             };
         });

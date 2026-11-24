@@ -5578,7 +5578,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     display: grid !important;
     grid-template-columns: 1.05fr 0.95fr !important;
     gap: 3.5rem !important;
-    align-items: center !important;
+    align-items: stretch !important;
     margin-bottom: 4.5rem !important;
     padding-bottom: 4rem !important;
     border-bottom: 1px solid #e8e4df !important;
@@ -5586,18 +5586,18 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     box-sizing: border-box !important;
 }
 
-/* Heritage Gallery SlideShow */
+/* Heritage Gallery SlideShow - Edge-to-Edge Full Screen Coverage */
 .heritage-visual-wrapper {
     position: relative !important;
     border-radius: 20px !important;
     overflow: hidden !important;
     border: 2px solid #b8860b !important;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08) !important;
-    background: #0d1a12 !important;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.12) !important;
+    background: #040e08 !important;
     width: 100% !important;
+    height: 100% !important;
+    min-height: 520px !important;
     box-sizing: border-box !important;
-    min-height: 480px !important;
-    height: 520px !important;
 }
 
 .heritage-slides-track {
@@ -5609,13 +5609,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .heritage-slide {
     position: absolute !important;
     inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background-size: contain !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-color: #0d1a12 !important;
+    background-color: #040e08 !important;
     opacity: 0 !important;
     visibility: hidden !important;
     transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s !important;
@@ -5630,26 +5629,28 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .heritage-slide-blur-bg {
-    position: absolute !important;
-    inset: -25px !important;
-    background-size: cover !important;
-    background-position: center !important;
-    filter: blur(28px) brightness(0.6) !important;
-    opacity: 0.55 !important;
-    z-index: 1 !important;
-    pointer-events: none !important;
+    display: none !important;
 }
 
 .heritage-slide-img {
-    position: relative !important;
+    position: absolute !important;
+    inset: 0 !important;
     z-index: 2 !important;
     width: 100% !important;
     height: 100% !important;
     max-width: 100% !important;
     max-height: 100% !important;
-    object-fit: contain !important;
+    object-fit: cover !important;
+    object-position: center center !important;
     display: block !important;
+    image-rendering: -webkit-optimize-contrast !important;
+    image-rendering: high-quality !important;
     pointer-events: none !important;
+    transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.heritage-visual-wrapper:hover .heritage-slide.active .heritage-slide-img {
+    transform: scale(1.035) !important;
 }
 
 .heritage-slide-badge {

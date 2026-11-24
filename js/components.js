@@ -4104,24 +4104,22 @@ const UIComponents = {
                         </span>
                     </div>
                 </div>
-                <div class="heritage-visual-wrapper" id="heritage-gallery-slider" title="Click any photo to view in high resolution">
+                <div class="heritage-visual-wrapper" id="heritage-gallery-slider" title="Click to view full screen in HD Lightbox">
                     <div class="heritage-slides-track" id="heritage-slides-track">
                         ${galleryImages.length === 0 ? `
-                            <div class="heritage-slide active" style="background-image: url('images/1 (1).jpeg');" data-src="images/1 (1).jpeg" data-caption="Rock One Wild Tea Estate Garden">
-                                <div class="heritage-slide-blur-bg" style="background-image: url('images/1 (1).jpeg');"></div>
+                            <div class="heritage-slide active" data-index="0" data-src="images/1 (1).jpeg" data-caption="Rock One Wild Tea Estate Garden">
                                 <img src="images/1 (1).jpeg" alt="Rock One Wild Tea Estate Garden" class="heritage-slide-img" loading="eager" decoding="async">
-                                <div class="heritage-slide-badge">
+                                <div class="heritage-slide-badge" title="Click to view full screen">
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-                                    <span>Estate &amp; Harvest</span>
+                                    <span>Estate &amp; Harvest &bull; Full Screen</span>
                                 </div>
                             </div>
                         ` : galleryImages.map((img, idx) => `
-                            <div class="heritage-slide ${idx === 0 ? 'active' : ''}" style="background-image: url('${img.src}');" data-src="${img.src}" data-caption="${(img.caption || '').replace(/"/g, '&quot;')}">
-                                <div class="heritage-slide-blur-bg" style="background-image: url('${img.src}');"></div>
+                            <div class="heritage-slide ${idx === 0 ? 'active' : ''}" data-index="${idx}" data-src="${img.src}" data-caption="${(img.caption || '').replace(/"/g, '&quot;')}">
                                 <img src="${img.src}" alt="${(img.caption || 'Rock One Wild Tea Estate Garden').replace(/"/g, '&quot;')}" class="heritage-slide-img" loading="${idx === 0 ? 'eager' : 'lazy'}" decoding="async">
-                                <div class="heritage-slide-badge">
+                                <div class="heritage-slide-badge" title="Click to view full screen">
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-                                    <span>${(img.tag || 'Estate Terroir')}</span>
+                                    <span>${(img.tag || 'Estate Terroir')} &bull; Full Screen</span>
                                 </div>
                                 <div class="heritage-slide-info-bar">
                                     <span class="heritage-slide-caption-text">${(img.caption || 'Rock One Wild Tea Artisanal Estate').replace(/"/g, '&quot;')}</span>
