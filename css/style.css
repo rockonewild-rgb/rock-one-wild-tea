@@ -10476,37 +10476,38 @@ mark.search-match-highlight {
     pointer-events: none !important;
 }
 
-/* Simple, Unobtrusive "Social Media" Trigger Button */
+/* Simple, Unobtrusive "Social Media" Trigger Button (Symbol Only) */
 .side-social-toggle-btn {
     pointer-events: auto !important;
     display: flex !important;
     align-items: center !important;
-    gap: 0.42rem !important;
-    background: rgba(6, 22, 13, 0.92) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(212, 175, 55, 0.45) !important;
+    justify-content: center !important;
+    width: 36px !important;
+    height: 38px !important;
+    background: rgba(6, 22, 13, 0.94) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    border: 1.5px solid rgba(212, 175, 55, 0.5) !important;
     border-left: none !important;
-    border-radius: 0 16px 16px 0 !important;
-    padding: 0.38rem 0.68rem 0.38rem 0.55rem !important;
-    height: 30px !important;
+    border-radius: 0 10px 10px 0 !important;
+    padding: 0 !important;
     box-sizing: border-box !important;
-    color: #ffffff !important;
+    color: #facc15 !important;
     cursor: pointer !important;
-    box-shadow: 2px 4px 16px rgba(0, 0, 0, 0.28) !important;
+    box-shadow: 2px 4px 14px rgba(0, 0, 0, 0.32) !important;
     transition: all 0.22s ease !important;
     outline: none !important;
     user-select: none !important;
-    opacity: 0.92 !important;
+    opacity: 0.94 !important;
 }
 
 .side-social-toggle-btn:hover {
     background: rgba(6, 22, 13, 1) !important;
     border-color: #facc15 !important;
-    color: #facc15 !important;
+    color: #ffffff !important;
     opacity: 1 !important;
     transform: translateX(3px) !important;
-    box-shadow: 4px 6px 20px rgba(0, 0, 0, 0.35) !important;
+    box-shadow: 4px 6px 18px rgba(212, 175, 55, 0.4) !important;
 }
 
 .side-social-dock.open .side-social-toggle-btn {
@@ -10522,30 +10523,16 @@ mark.search-match-highlight {
     justify-content: center !important;
     color: #facc15 !important;
     flex-shrink: 0 !important;
+    transition: transform 0.22s ease, color 0.22s ease !important;
 }
 
-.social-toggle-text {
-    font-family: var(--font-sans, inherit) !important;
-    font-size: 0.72rem !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.03em !important;
-    text-transform: capitalize !important;
-    white-space: nowrap !important;
-    line-height: 1 !important;
-    color: #f1f5f9 !important;
+.side-social-toggle-btn:hover .social-toggle-icon {
+    transform: scale(1.12) !important;
+    color: #ffffff !important;
 }
 
-.social-toggle-chevron {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    color: #facc15 !important;
-    transition: transform 0.25s ease !important;
-    flex-shrink: 0 !important;
-}
-
-.side-social-dock.open .social-toggle-chevron {
-    transform: rotate(180deg) !important;
+.side-social-dock.open .social-toggle-icon {
+    transform: scale(1.08) rotate(45deg) !important;
 }
 
 /* Slide-Out Simple Social Media List Panel */
@@ -10712,12 +10699,9 @@ mark.search-match-highlight {
         transform: translateY(-50%) !important;
     }
     .side-social-toggle-btn {
-        padding: 0.35rem 0.6rem 0.35rem 0.5rem !important;
-        height: 28px !important;
-        gap: 0.35rem !important;
-    }
-    .social-toggle-text {
-        font-size: 0.68rem !important;
+        width: 34px !important;
+        height: 36px !important;
+        padding: 0 !important;
     }
     .side-social-panel {
         width: 195px !important;
@@ -10731,6 +10715,10 @@ mark.search-match-highlight {
         top: clamp(140px, 28vh, 200px) !important;
         bottom: auto !important;
         transform: translateY(-50%) !important;
+    }
+    .side-social-toggle-btn {
+        width: 32px !important;
+        height: 34px !important;
     }
     .side-social-panel {
         width: min(200px, 85vw) !important;
