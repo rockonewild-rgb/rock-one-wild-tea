@@ -228,7 +228,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png?v=1.26.0">
 
     <!-- Main Style Sheet -->
-    <link rel="stylesheet" href="css/style.css?v=3.74.0">
+    <link rel="stylesheet" href="css/style.css?v=3.75.0">
     
     <!-- Instant Scroll Position Reset (Ensures refresh & load always start at Top Hero Slideshow) -->
     <script>
@@ -1849,12 +1849,12 @@
         </div>
     </div>
 
-    <!-- Left-Hand Floating Social Media Hub (Single "Social Media" Option on Left Side + Click-to-Expand Luxury Drawer) -->
-    <aside id="side-social-dock" class="side-social-dock" aria-label="Social Media Channels">
-        <!-- Master "Social Media" Trigger Option on Left Side -->
+    <!-- Left-Hand Simple Social Media Dock -->
+    <aside id="side-social-dock" class="side-social-dock" aria-label="Social Media">
+        <!-- Simple "Social Media" Trigger Button -->
         <button type="button" id="side-social-toggle-btn" class="side-social-toggle-btn" aria-expanded="false" aria-controls="side-social-panel" aria-label="Social Media" title="Social Media">
             <span class="social-toggle-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="18" cy="5" r="3"></circle>
                     <circle cx="6" cy="12" r="3"></circle>
                     <circle cx="18" cy="19" r="3"></circle>
@@ -1864,119 +1864,59 @@
             </span>
             <span class="social-toggle-text">Social Media</span>
             <span class="social-toggle-chevron">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
             </span>
         </button>
 
-        <!-- Slide-Out Luxury Social Media Sanctuary Drawer (Revealed From Left When Clicked) -->
+        <!-- Simple Social Media List Panel (Names Only, WhatsApp Removed) -->
         <div id="side-social-panel" class="side-social-panel" aria-hidden="true">
             <div class="social-panel-header">
-                <div class="social-panel-title-wrap">
-                    <span class="social-panel-badge">Estate Sanctuary</span>
-                    <h4 class="social-panel-title">Social Media</h4>
-                    <p class="social-panel-desc">Follow our wild montane harvests &amp; artisanal craft</p>
-                </div>
-                <button type="button" id="side-social-close-btn" class="social-panel-close-btn" aria-label="Close Social Media Panel">
-                    &times;
-                </button>
+                <span class="social-panel-title">Social Media</span>
+                <button type="button" id="side-social-close-btn" class="social-panel-close-btn" aria-label="Close Social Media Panel">&times;</button>
             </div>
 
             <div class="side-social-channels-list">
-                <!-- Instagram (Authentic Gradient Badge) -->
-                <a href="https://www.instagram.com/rockonewild?stkn=MTA3dW52OTYyZzV5NA==" target="_blank" rel="noopener noreferrer" class="social-channel-item channel-instagram" aria-label="Instagram (@rockonewild)">
+                <!-- Instagram -->
+                <a href="https://www.instagram.com/rockonewild?stkn=MTA3dW52OTYyZzV5NA==" target="_blank" rel="noopener noreferrer" class="social-channel-item" aria-label="Instagram">
                     <span class="channel-icon-badge bg-instagram">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                     </span>
-                    <div class="channel-info">
-                        <div class="channel-title-row">
-                            <strong class="channel-name">Instagram</strong>
-                            <span class="channel-pill-tag">@rockonewild</span>
-                        </div>
-                        <span class="channel-sub">Live estate stories &amp; leaf harvests</span>
-                    </div>
-                    <span class="channel-action-btn">Connect ↗</span>
+                    <span class="channel-name">Instagram</span>
                 </a>
 
-                <!-- YouTube (Official Ruby Red Badge) -->
-                <a href="https://www.youtube.com/@Rockonewildtea001" target="_blank" rel="noopener noreferrer" class="social-channel-item channel-youtube" aria-label="YouTube Channel (@Rockonewildtea001)">
+                <!-- YouTube -->
+                <a href="https://www.youtube.com/@Rockonewildtea001" target="_blank" rel="noopener noreferrer" class="social-channel-item" aria-label="YouTube">
                     <span class="channel-icon-badge bg-youtube">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                     </span>
-                    <div class="channel-info">
-                        <div class="channel-title-row">
-                            <strong class="channel-name">YouTube</strong>
-                            <span class="channel-pill-tag">4K Terroir Films</span>
-                        </div>
-                        <span class="channel-sub">Orthodox withering &amp; wood-fire curing</span>
-                    </div>
-                    <span class="channel-action-btn">Watch ↗</span>
+                    <span class="channel-name">YouTube</span>
                 </a>
 
-                <!-- Facebook (Official Meta Blue Badge) -->
-                <a href="https://www.facebook.com/share/1ZL1cdnkKn/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="social-channel-item channel-facebook" aria-label="Facebook (Official Page)">
+                <!-- Facebook -->
+                <a href="https://www.facebook.com/share/1ZL1cdnkKn/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="social-channel-item" aria-label="Facebook">
                     <span class="channel-icon-badge bg-facebook">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
+                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
                     </span>
-                    <div class="channel-info">
-                        <div class="channel-title-row">
-                            <strong class="channel-name">Facebook</strong>
-                            <span class="channel-pill-tag">Official Community</span>
-                        </div>
-                        <span class="channel-sub">Estate updates, allocations &amp; events</span>
-                    </div>
-                    <span class="channel-action-btn">Visit ↗</span>
+                    <span class="channel-name">Facebook</span>
                 </a>
 
-                <!-- TripAdvisor (Official Green Badge) -->
-                <a href="https://www.tripadvisor.com" target="_blank" rel="noopener noreferrer" class="social-channel-item channel-tripadvisor" aria-label="TripAdvisor (Sanctuary Reviews)">
+                <!-- TripAdvisor -->
+                <a href="https://www.tripadvisor.com" target="_blank" rel="noopener noreferrer" class="social-channel-item" aria-label="TripAdvisor">
                     <span class="channel-icon-badge bg-tripadvisor">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="7" cy="14" r="2.5"></circle><circle cx="17" cy="14" r="2.5"></circle><path d="M12 4a10 10 0 0 0-9.8 8h2.05a8 8 0 0 1 15.5 0h2.05A10 10 0 0 0 12 4z"></path></svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="7" cy="14" r="2.5"></circle><circle cx="17" cy="14" r="2.5"></circle><path d="M12 4a10 10 0 0 0-9.8 8h2.05a8 8 0 0 1 15.5 0h2.05A10 10 0 0 0 12 4z"></path></svg>
                     </span>
-                    <div class="channel-info">
-                        <div class="channel-title-row">
-                            <strong class="channel-name">TripAdvisor</strong>
-                            <span class="channel-pill-tag">5.0 ★ Top Rated</span>
-                        </div>
-                        <span class="channel-sub">Verified guest cupping &amp; tour reviews</span>
-                    </div>
-                    <span class="channel-action-btn">Reviews ↗</span>
+                    <span class="channel-name">TripAdvisor</span>
                 </a>
 
-                <!-- Google Maps (Official Green/Red GPS Badge) -->
-                <a href="https://maps.google.com?ftid=0x3ae4630013bcccbb:0x453d082c477ea3bf" target="_blank" rel="noopener noreferrer" class="social-channel-item channel-maps" aria-label="Google Maps (GPS Directions)">
+                <!-- Google Maps -->
+                <a href="https://maps.google.com?ftid=0x3ae4630013bcccbb:0x453d082c477ea3bf" target="_blank" rel="noopener noreferrer" class="social-channel-item" aria-label="Google Maps">
                     <span class="channel-icon-badge bg-maps">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                     </span>
-                    <div class="channel-info">
-                        <div class="channel-title-row">
-                            <strong class="channel-name">Google Maps</strong>
-                            <span class="channel-pill-tag">GPS Directions</span>
-                        </div>
-                        <span class="channel-sub">Passara &amp; Ettampitiya highland sanctuary</span>
-                    </div>
-                    <span class="channel-action-btn">Route ↗</span>
+                    <span class="channel-name">Google Maps</span>
                 </a>
-
-                <!-- WhatsApp (Official Emerald Concierge Badge) -->
-                <a href="https://wa.me/94770000000" target="_blank" rel="noopener noreferrer" class="social-channel-item channel-whatsapp" aria-label="WhatsApp (Direct Concierge)">
-                    <span class="channel-icon-badge bg-whatsapp">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.586 1.761.884 2.791.885h.005c3.179 0 5.766-2.586 5.767-5.766.001-1.54-.598-2.988-1.688-4.079-1.09-1.091-2.539-1.692-4.084-1.692zm7.199 1.693c1.47 1.47 2.28 3.424 2.28 5.501 0 4.286-3.488 7.774-7.774 7.775-1.371-.001-2.716-.36-3.903-1.041l-4.333 1.136 1.156-4.223c-.748-1.229-1.144-2.639-1.143-4.084 0-4.286 3.488-7.774 7.774-7.775 2.077 0 4.032.81 5.502 2.28z"/></svg>
-                    </span>
-                    <div class="channel-info">
-                        <div class="channel-title-row">
-                            <strong class="channel-name">WhatsApp</strong>
-                            <span class="channel-pill-tag">Live Concierge</span>
-                        </div>
-                        <span class="channel-sub">Direct estate private reserve assistance</span>
-                    </div>
-                    <span class="channel-action-btn">Chat ↗</span>
-                </a>
-            </div>
-
-            <div class="social-panel-footer">
-                <span class="estate-tagline-micro">🍃 Rock One Wild Tea &bull; Ceylon High-Montane Estate</span>
             </div>
         </div>
     </aside>
@@ -2283,11 +2223,11 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <!-- Script Loads (Execution dependency order: i18n -> store -> components -> paypal -> app) -->
-    <script defer charset="utf-8" src="js/i18n.js?v=3.74.0"></script>
-    <script defer charset="utf-8" src="js/store.js?v=3.74.0"></script>
-    <script defer charset="utf-8" src="js/components.js?v=3.74.0"></script>
-    <script defer charset="utf-8" src="js/paypal.js?v=3.74.0"></script>
-    <script defer charset="utf-8" src="js/app.js?v=3.74.0"></script>
-    <script defer charset="utf-8" src="js/contrast-guard.js?v=3.74.0"></script>
+    <script defer charset="utf-8" src="js/i18n.js?v=3.75.0"></script>
+    <script defer charset="utf-8" src="js/store.js?v=3.75.0"></script>
+    <script defer charset="utf-8" src="js/components.js?v=3.75.0"></script>
+    <script defer charset="utf-8" src="js/paypal.js?v=3.75.0"></script>
+    <script defer charset="utf-8" src="js/app.js?v=3.75.0"></script>
+    <script defer charset="utf-8" src="js/contrast-guard.js?v=3.75.0"></script>
 </body>
 </html>

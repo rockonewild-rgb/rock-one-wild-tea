@@ -10462,12 +10462,12 @@ mark.search-match-highlight {
     }
 }
 
-/* ─── Left-Hand Floating Social Media Hub (Single Trigger + Slide-Out Luxury Drawer) ─── */
+/* ─── Left-Hand Simple Social Media Dock ─── */
 .side-social-dock {
     position: fixed !important;
     left: 0 !important;
     right: auto !important;
-    top: clamp(140px, 30vh, 220px) !important;
+    top: clamp(140px, 28vh, 200px) !important;
     transform: translateY(-50%) !important;
     z-index: 1250 !important;
     display: flex !important;
@@ -10476,39 +10476,44 @@ mark.search-match-highlight {
     pointer-events: none !important;
 }
 
-/* Master "Social Media" Trigger Option on Left Side */
+/* Simple, Unobtrusive "Social Media" Trigger Button */
 .side-social-toggle-btn {
     pointer-events: auto !important;
     display: flex !important;
     align-items: center !important;
-    gap: 0.55rem !important;
-    background: rgba(6, 22, 13, 0.96) !important;
-    backdrop-filter: blur(18px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
-    border: 1.5px solid rgba(212, 175, 55, 0.55) !important;
+    gap: 0.42rem !important;
+    background: rgba(6, 22, 13, 0.92) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(212, 175, 55, 0.45) !important;
     border-left: none !important;
-    border-radius: 0 24px 24px 0 !important;
-    padding: 0.62rem 0.95rem 0.62rem 0.85rem !important;
+    border-radius: 0 16px 16px 0 !important;
+    padding: 0.38rem 0.68rem 0.38rem 0.55rem !important;
+    height: 30px !important;
+    box-sizing: border-box !important;
     color: #ffffff !important;
     cursor: pointer !important;
-    box-shadow: 4px 6px 25px rgba(0, 0, 0, 0.45), 0 0 15px rgba(212, 175, 55, 0.15) !important;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 2px 4px 16px rgba(0, 0, 0, 0.28) !important;
+    transition: all 0.22s ease !important;
     outline: none !important;
     user-select: none !important;
+    opacity: 0.92 !important;
 }
 
 .side-social-toggle-btn:hover {
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.28), rgba(6, 22, 13, 0.98)) !important;
+    background: rgba(6, 22, 13, 1) !important;
     border-color: #facc15 !important;
     color: #facc15 !important;
-    transform: translateX(4px) !important;
-    box-shadow: 6px 8px 30px rgba(212, 175, 55, 0.4) !important;
+    opacity: 1 !important;
+    transform: translateX(3px) !important;
+    box-shadow: 4px 6px 20px rgba(0, 0, 0, 0.35) !important;
 }
 
 .side-social-dock.open .side-social-toggle-btn {
     background: #06160d !important;
     border-color: #facc15 !important;
     color: #facc15 !important;
+    opacity: 1 !important;
 }
 
 .social-toggle-icon {
@@ -10516,23 +10521,18 @@ mark.search-match-highlight {
     align-items: center !important;
     justify-content: center !important;
     color: #facc15 !important;
-    animation: socialPulseIcon 2.6s infinite ease-in-out;
-    flex-shrink: 0;
-}
-
-@keyframes socialPulseIcon {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.14); }
+    flex-shrink: 0 !important;
 }
 
 .social-toggle-text {
-    font-family: var(--font-heading, inherit) !important;
-    font-size: 0.78rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.05em !important;
-    text-transform: uppercase !important;
+    font-family: var(--font-sans, inherit) !important;
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.03em !important;
+    text-transform: capitalize !important;
     white-space: nowrap !important;
     line-height: 1 !important;
+    color: #f1f5f9 !important;
 }
 
 .social-toggle-chevron {
@@ -10540,15 +10540,15 @@ mark.search-match-highlight {
     align-items: center !important;
     justify-content: center !important;
     color: #facc15 !important;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    flex-shrink: 0;
+    transition: transform 0.25s ease !important;
+    flex-shrink: 0 !important;
 }
 
 .side-social-dock.open .social-toggle-chevron {
     transform: rotate(180deg) !important;
 }
 
-/* Slide-Out Luxury Social Media Sanctuary Drawer (From Left) */
+/* Slide-Out Simple Social Media List Panel */
 .side-social-panel {
     pointer-events: auto !important;
     position: absolute !important;
@@ -10556,20 +10556,20 @@ mark.search-match-highlight {
     right: auto !important;
     top: 0 !important;
     transform: translateX(-115%) !important;
-    width: 355px !important;
-    background: rgba(4, 15, 9, 0.98) !important;
-    backdrop-filter: blur(24px) saturate(190%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
-    border: 1.5px solid rgba(212, 175, 55, 0.45) !important;
+    width: 205px !important;
+    background: rgba(6, 22, 13, 0.97) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border: 1.5px solid rgba(212, 175, 55, 0.4) !important;
     border-left: none !important;
-    border-radius: 0 20px 20px 0 !important;
-    box-shadow: 12px 14px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.15) !important;
-    padding: 1.25rem 1.15rem !important;
+    border-radius: 0 16px 16px 0 !important;
+    box-shadow: 8px 12px 35px rgba(0, 0, 0, 0.65) !important;
+    padding: 0.75rem 0.8rem !important;
     box-sizing: border-box !important;
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease !important;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease !important;
     opacity: 0 !important;
     pointer-events: none !important;
-    max-height: calc(100vh - 160px) !important;
+    max-height: calc(100vh - 120px) !important;
     overflow-y: auto !important;
 }
 
@@ -10581,109 +10581,85 @@ mark.search-match-highlight {
 
 .social-panel-header {
     display: flex !important;
-    align-items: flex-start !important;
+    align-items: center !important;
     justify-content: space-between !important;
-    margin-bottom: 0.95rem !important;
-    padding-bottom: 0.75rem !important;
+    margin-bottom: 0.55rem !important;
+    padding-bottom: 0.45rem !important;
     border-bottom: 1px solid rgba(212, 175, 55, 0.22) !important;
 }
 
-.social-panel-title-wrap {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 2px !important;
-}
-
-.social-panel-badge {
-    font-size: 0.64rem !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.16em !important;
-    color: #facc15 !important;
-    font-weight: 700 !important;
-}
-
 .social-panel-title {
-    margin: 1px 0 0 0 !important;
-    font-size: 1.25rem !important;
-    font-family: var(--font-serif) !important;
-    color: #ffffff !important;
-    letter-spacing: -0.01em !important;
-    line-height: 1.2 !important;
-}
-
-.social-panel-desc {
-    font-size: 0.74rem !important;
-    color: #94a3b8 !important;
-    margin: 2px 0 0 0 !important;
-    line-height: 1.35 !important;
+    font-size: 0.76rem !important;
+    font-weight: 700 !important;
+    color: #facc15 !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
 }
 
 .social-panel-close-btn {
     background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid rgba(212, 175, 55, 0.35) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
     color: #e2e8f0 !important;
     border-radius: 50% !important;
-    width: 30px !important;
-    height: 30px !important;
-    font-size: 1.35rem !important;
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 1.15rem !important;
     line-height: 1 !important;
     cursor: pointer !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    transition: all 0.2s ease !important;
+    transition: all 0.18s ease !important;
     outline: none !important;
     flex-shrink: 0 !important;
-    margin-left: 0.5rem !important;
 }
 
 .social-panel-close-btn:hover {
-    background: rgba(239, 68, 68, 0.25) !important;
+    background: rgba(239, 68, 68, 0.3) !important;
     border-color: #ef4444 !important;
     color: #ffffff !important;
-    transform: scale(1.1) !important;
 }
 
 .side-social-channels-list {
     display: flex !important;
     flex-direction: column !important;
-    gap: 0.55rem !important;
+    gap: 0.38rem !important;
 }
 
-/* Individual Social Media Channel Rows */
+/* Simple Social Media Channel Rows (Names Only) */
 .social-channel-item {
     display: flex !important;
     align-items: center !important;
-    gap: 0.85rem !important;
-    padding: 0.65rem 0.85rem !important;
-    background: rgba(255, 255, 255, 0.035) !important;
-    border: 1px solid rgba(212, 175, 55, 0.16) !important;
-    border-radius: 13px !important;
+    gap: 0.65rem !important;
+    padding: 0.42rem 0.6rem !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 9px !important;
     text-decoration: none !important;
-    color: #ffffff !important;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    color: #f1f5f9 !important;
+    transition: all 0.2s ease !important;
     box-sizing: border-box !important;
 }
 
 .social-channel-item:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: rgba(212, 175, 55, 0.16) !important;
     border-color: rgba(212, 175, 55, 0.55) !important;
-    transform: translateX(4px) !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45) !important;
+    transform: translateX(3px) !important;
+    color: #facc15 !important;
 }
 
 /* Authentic Brand Color Badges */
 .channel-icon-badge {
-    width: 40px !important;
-    height: 40px !important;
-    min-width: 40px !important;
-    border-radius: 11px !important;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    border-radius: 7px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     color: #ffffff !important;
     flex-shrink: 0 !important;
-    transition: transform 0.25s ease !important;
+    transition: transform 0.2s ease !important;
 }
 
 .social-channel-item:hover .channel-icon-badge {
@@ -10693,125 +10669,58 @@ mark.search-match-highlight {
 /* Official Social Media Platform Colors */
 .bg-instagram {
     background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%) !important;
-    box-shadow: 0 4px 14px rgba(220, 39, 67, 0.45) !important;
+    box-shadow: 0 2px 8px rgba(220, 39, 67, 0.35) !important;
 }
 
 .bg-facebook {
     background: #1877F2 !important;
-    box-shadow: 0 4px 14px rgba(24, 119, 242, 0.45) !important;
+    box-shadow: 0 2px 8px rgba(24, 119, 242, 0.35) !important;
 }
 
 .bg-youtube {
     background: #FF0000 !important;
-    box-shadow: 0 4px 14px rgba(255, 0, 0, 0.45) !important;
+    box-shadow: 0 2px 8px rgba(255, 0, 0, 0.35) !important;
 }
 
 .bg-tripadvisor {
     background: #00AA6C !important;
-    box-shadow: 0 4px 14px rgba(0, 170, 108, 0.45) !important;
+    box-shadow: 0 2px 8px rgba(0, 170, 108, 0.35) !important;
 }
 
 .bg-maps {
     background: linear-gradient(135deg, #34A853 0%, #0F9D58 100%) !important;
-    box-shadow: 0 4px 14px rgba(52, 168, 83, 0.45) !important;
-}
-
-.bg-whatsapp {
-    background: #25D366 !important;
-    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.45) !important;
-}
-
-.channel-info {
-    display: flex !important;
-    flex-direction: column !important;
-    line-height: 1.25 !important;
-    flex: 1 !important;
-    min-width: 0 !important;
-}
-
-.channel-title-row {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.45rem !important;
-    flex-wrap: wrap !important;
+    box-shadow: 0 2px 8px rgba(52, 168, 83, 0.35) !important;
 }
 
 .channel-name {
-    font-size: 0.88rem !important;
-    font-weight: 700 !important;
-    color: #ffffff !important;
-    letter-spacing: 0.2px !important;
-}
-
-.channel-pill-tag {
-    font-size: 0.62rem !important;
-    background: rgba(212, 175, 55, 0.15) !important;
-    border: 1px solid rgba(212, 175, 55, 0.35) !important;
-    color: #fde047 !important;
-    padding: 1px 6px !important;
-    border-radius: 8px !important;
+    font-size: 0.82rem !important;
     font-weight: 600 !important;
-    line-height: 1.2 !important;
+    color: #f1f5f9 !important;
+    letter-spacing: 0.02em !important;
+    transition: color 0.18s ease !important;
 }
 
-.channel-sub {
-    font-size: 0.72rem !important;
-    color: #cbd5e1 !important;
-    margin-top: 2px !important;
-    line-height: 1.3 !important;
-    white-space: normal !important;
-}
-
-.channel-action-btn {
-    font-size: 0.7rem !important;
-    font-weight: 700 !important;
+.social-channel-item:hover .channel-name {
     color: #facc15 !important;
-    background: rgba(212, 175, 55, 0.12) !important;
-    border: 1px solid rgba(212, 175, 55, 0.3) !important;
-    padding: 0.25rem 0.55rem !important;
-    border-radius: 12px !important;
-    margin-left: auto !important;
-    flex-shrink: 0 !important;
-    transition: all 0.2s ease !important;
-    white-space: nowrap !important;
-}
-
-.social-channel-item:hover .channel-action-btn {
-    background: #facc15 !important;
-    color: #06160d !important;
-    transform: scale(1.05) !important;
-}
-
-.social-panel-footer {
-    margin-top: 0.85rem !important;
-    padding-top: 0.65rem !important;
-    border-top: 1px solid rgba(212, 175, 55, 0.15) !important;
-    text-align: center !important;
-}
-
-.estate-tagline-micro {
-    font-size: 0.66rem !important;
-    color: #94a3b8 !important;
-    letter-spacing: 0.05em !important;
 }
 
 @media (max-width: 900px) {
     .side-social-dock {
         left: 0 !important;
         right: auto !important;
-        top: clamp(140px, 30vh, 220px) !important;
+        top: clamp(140px, 28vh, 200px) !important;
         transform: translateY(-50%) !important;
     }
     .side-social-toggle-btn {
-        padding: 0.52rem 0.8rem 0.52rem 0.75rem !important;
-        font-size: 0.72rem !important;
+        padding: 0.35rem 0.6rem 0.35rem 0.5rem !important;
+        height: 28px !important;
         gap: 0.35rem !important;
     }
     .social-toggle-text {
-        font-size: 0.72rem !important;
+        font-size: 0.68rem !important;
     }
     .side-social-panel {
-        width: 300px !important;
+        width: 195px !important;
     }
 }
 
@@ -10819,12 +10728,12 @@ mark.search-match-highlight {
     .side-social-dock {
         left: 0 !important;
         right: auto !important;
-        top: clamp(140px, 30vh, 220px) !important;
+        top: clamp(140px, 28vh, 200px) !important;
         bottom: auto !important;
         transform: translateY(-50%) !important;
     }
     .side-social-panel {
-        width: min(315px, 92vw) !important;
+        width: min(200px, 85vw) !important;
     }
 }
 
@@ -11274,7 +11183,7 @@ mark.search-match-highlight {
     .side-social-dock {
         left: 0 !important;
         right: auto !important;
-        top: clamp(140px, 30vh, 220px) !important;
+        top: clamp(140px, 28vh, 200px) !important;
         bottom: auto !important;
         transform: translateY(-50%) !important;
         z-index: 1250 !important;
@@ -11734,7 +11643,7 @@ input, select, textarea, button {
     .side-social-dock {
         left: 0 !important;
         right: auto !important;
-        top: clamp(140px, 30vh, 220px) !important;
+        top: clamp(140px, 28vh, 200px) !important;
         bottom: auto !important;
         transform: translateY(-50%) !important;
         z-index: 1250 !important;
