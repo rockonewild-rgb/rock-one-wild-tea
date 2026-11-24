@@ -566,6 +566,8 @@ const UIComponents = {
             const tastingNotesText = p.flavorProfile || (p.tastingNotes && p.tastingNotes.length > 0 ? p.tastingNotes.join(' • ') : 'Single-Estate Ceylon Harvest');
             const displayNotes = this.highlightText(tastingNotesText, searchFilter);
             const displayWeight = p.weight || '100g Vintage Tin';
+            const ratingVal = Number(p.rating || (p.brewing_guide && p.brewing_guide.rating)) || 4.9;
+            const reviewCount = Number(p.reviewsCount || (p.brewing_guide && p.brewing_guide.reviewsCount)) || 42;
 
             return `
                 <div class="product-luxury-card status-available" data-id="${p.id}">
@@ -579,7 +581,7 @@ const UIComponents = {
                         <div class="product-quick-inspect-overlay">
                             <span class="product-inspect-hint">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="12 6 12 12 16 14"/></svg>
-                                <span>${_t('btn_tasting_radar_short', 'Sensory Radar')}</span>
+                                <span>${_t('btn_tasting_radar_short', 'Sensory Radar &amp; Steep Timer')}</span>
                             </span>
                         </div>
                     </div>
@@ -591,6 +593,15 @@ const UIComponents = {
                         </div>
 
                         <h3 class="product-card-title" title="${p.name}">${displayName}</h3>
+
+                        <!-- Customer Rating -->
+                        <div class="product-rating-row" title="${ratingVal.toFixed(1)} / 5.0 (${reviewCount} ${_t('reviews_label', 'patron reviews')})">
+                            <div class="product-stars-group" aria-label="${ratingVal.toFixed(1)} stars">
+                                <span class="star-icon">★</span><span class="star-icon">★</span><span class="star-icon">★</span><span class="star-icon">★</span><span class="star-icon">★</span>
+                            </div>
+                            <span class="product-rating-score">${ratingVal.toFixed(1)}</span>
+                            <span class="product-rating-count">(${reviewCount})</span>
+                        </div>
 
                         <div class="product-title-pricing-row">
                             <div class="product-price-block">
@@ -623,12 +634,16 @@ const UIComponents = {
                             </div>
                         </div>
 
-                        <!-- Card Action Buttons (Sensory Radar & Add to Bag) -->
+                        <!-- Card Action Buttons (Sensory Radar, Quick Order & Add to Bag) -->
                         <div class="product-card-actions-stack">
+                            <button type="button" class="btn btn-outline btn-view-connoisseur" data-id="${p.id}" aria-label="View Sensory Radar &amp; Steep Timer" title="View Sensory Radar &amp; Steep Timer">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="12 6 12 12 16 14"/></svg>
+                                <span>${_t('btn_tasting_radar_short', 'Sensory Radar &amp; Steep Timer')}</span>
+                            </button>
                             <div class="product-cta-button-group">
-                                <button type="button" class="btn btn-outline btn-view-connoisseur" data-id="${p.id}" aria-label="View Sensory Radar &amp; Steep Timer" title="View Sensory Radar &amp; Steep Timer">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="12 6 12 12 16 14"/></svg>
-                                    <span>${_t('btn_tasting_radar_short', 'Sensory Radar')}</span>
+                                <button type="button" class="btn btn-outline btn-book-prod" data-id="${p.id}" aria-label="Quick Order" title="Instant Direct Order / Reserve">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                    <span>${_t('btn_quick_order', 'Quick Order')}</span>
                                 </button>
                                 <button type="button" class="btn btn-primary btn-add-to-cart" data-id="${p.id}" data-type="product" aria-label="Add to Bag" title="Add to Bag">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>

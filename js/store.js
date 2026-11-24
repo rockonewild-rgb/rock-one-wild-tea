@@ -3046,6 +3046,8 @@ Rock One Wild Tea Sanctuary Concierge Team
                             { round: 3, seconds: steepSec + 90, label: "3rd Infusion (Sweet Mineral Finish)" }
                         ],
                         brewing_guide: bg,
+                        rating: Number(p.rating || bg.rating) || 4.9,
+                        reviewsCount: Number(p.reviewsCount || p.reviews_count || bg.reviewsCount) || 36,
                         symbol: p.symbol || ''
                     };
                 });
