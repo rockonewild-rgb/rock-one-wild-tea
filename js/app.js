@@ -13657,6 +13657,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 prefsPopup.setAttribute('aria-hidden', 'true');
             }
 
+            launcher.classList.add('active');
             windowEl.classList.add('active');
             windowEl.setAttribute('aria-hidden', 'false');
             
@@ -13672,6 +13673,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         }
 
         function closeChatbot() {
+            launcher.classList.remove('active');
             windowEl.classList.remove('active');
             windowEl.setAttribute('aria-hidden', 'true');
         }
@@ -13705,18 +13707,15 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             }
         });
 
-        // Render initial greeting and interactive FAQ menu
+        // Render initial conversational welcome message
         function renderWelcomeMessage() {
             const cfg = getConfig();
-            let welcomeGreeting = cfg.greeting || "Greetings! Welcome to **Rock One Wild Tea Estate**.";
-            if (window.TeaFactoryStore) {
-                const activeTheme = window.TeaFactoryStore.getActiveTheme();
-                if (activeTheme && activeTheme.id !== 'classic' && activeTheme.sommelierGreeting) {
-                    welcomeGreeting = activeTheme.sommelierGreeting;
-                }
+            const currentLang = getActiveLang();
+            let welcomeGreeting = "Hello! I'm your Rock One Wild Tea Sanctuary assistant. I can help you check tour availability, explore our artisanal tea collection, or look up your orders and bookings. How can I help you today?";
+            if (currentLang !== 'en' && cfg.greeting) {
+                welcomeGreeting = cfg.greeting;
             }
             addBotMessage(welcomeGreeting);
-            renderFaqMenu(cfg.menuTitle || "Select an Inquiry Topic:");
         }
 
         // Render Interactive In-Chat FAQ Menu Card
@@ -13935,34 +13934,176 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             });
         });
 
-        // Multilingual Intelligent Keyword Matcher & Fallback
+        // Multilingual Conversational Intelligence & Freeform Response Engine
         function generateSmartResponse(query) {
             const cfg = getConfig();
             const topics = getTopics();
-            const lower = query.toLowerCase();
+            const currentLang = getActiveLang();
+            const lower = query.toLowerCase().trim();
 
-            // Check Lookbook / Wholesale Technical Dossier
-            if (/lookbook|brochure|pdf|dossier|wholesale|b2b|export|නාමාවලිය|පොත|விவரக்குறிப்பு|カタログ|白皮书|画册|كتالوج/.test(lower)) {
-                addBotMessage(cfg.lookbookResponse || "You can view and download our complete **2026 Estate Lookbook & Wholesale Technical Dossier (PDF)** right now.", [
-                    { label: cfg.btnOpenLookbook || "Open Estate Lookbook (PDF)", onclick: "if(window.appOpenLookbook){window.appOpenLookbook()}" },
-                    { label: cfg.btnTradeDesk || "WhatsApp Trade Desk", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%2C%20I%20would%20like%20to%20receive%20the%202026%20B2B%20Wholesale%20Lookbook%20and%20Price%20List." }
+            // 1. Natural Language Greetings
+            if (/^(hi|hello|hey|greetings|good\s*(morning|afternoon|evening|day)|howdy|sup|hi\s*there|hello\s*there)$/i.test(lower) || /^(hi|hello|hey)\b/i.test(lower)) {
+                addBotMessage("Hello! How can I assist you today? Feel free to ask about our single-estate wild tea collection, estate factory tours, brewing recommendations, or international orders.");
+                return;
+            }
+
+            // 2. Specific Tea Varieties (Handled prior to general tea lists)
+            // Golden Ceylon Wild Flush
+            if (/golden(\s*ceylon)?(\s*wild)?\s*flush|gold\s*tip|golden\s*tea|honey\s*tea/i.test(lower)) {
+                addBotMessage("Our **Golden Ceylon Wild Flush** ($220 / 100g) is our crowning reserve. Hand-plucked by master pluckers at dawn, only the topmost tender tips are selected. It yields a luminous liquor with distinct notes of wild mountain honey, golden orchid, and dried apricot.\n\n• **Elevation**: 4,800 ft (Ettampitiya Monolith)\n• **Steeping**: 90°C – 95°C for 3–4 minutes\n• **Format**: 100g airtight collector caddy", [
+                    { label: "🛍️ View in Shop", tab: "catalog" },
+                    { label: "⚡ Order via WhatsApp", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20order%20the%20Golden%20Ceylon%20Wild%20Flush." }
                 ]);
                 return;
             }
 
-            // Match topic by index using international regex matrix
-            const topicIdx = window.TeaFactoryI18n ? window.TeaFactoryI18n.matchChatbotTopicIndex(query) : -1;
-            if (topicIdx >= 0 && topics[topicIdx]) {
-                addBotResponseWithFollowUps(topics[topicIdx]);
+            // Silver Needle Reserve
+            if (/silver\s*needle|white\s*tea|silver\s*tip|white\s*bud/i.test(lower)) {
+                addBotMessage("Our **Silver Needle Reserve** ($145 / 100g) is harvested exclusively from velvety, unopened virgin buds dried under high-altitude morning sun. Extremely rich in polyphenols and delicate in flavour, it offers ethereal aromas of sweet mountain mist and wild jasmine blossoms.\n\n• **Elevation**: 4,800 ft High Slopes\n• **Steeping**: 75°C – 80°C for 2–3 minutes\n• **Format**: 100g airtight collector caddy", [
+                    { label: "🛍️ View in Shop", tab: "catalog" },
+                    { label: "⚡ Order via WhatsApp", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20order%20the%20Silver%20Needle%20Reserve." }
+                ]);
                 return;
             }
 
-            // Default intelligent fallback in user's active language
-            addBotMessage(cfg.fallback || "Thank you for your inquiry! Our master tea sommelier is available to assist you.", [
-                { label: cfg.btnWhatsappDesk || "Chat on WhatsApp Desk", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20a%20question%3A%20" + encodeURIComponent(query) },
-                { label: cfg.btnExploreCatalog || "Explore Catalog", tab: "catalog" }
+            // Wild Highland Emerald (Green)
+            if (/highland\s*emerald|emerald|green\s*tea/i.test(lower)) {
+                addBotMessage("Our **Wild Highland Emerald** ($95 / 100g) is an artisanal pan-fired whole-leaf green tea. Gently fired in micro-batch woks to halt oxidation, it preserves crisp alpine vegetal sweetness with roasted chestnut undertones.\n\n• **Elevation**: 4,800 ft High Slopes\n• **Steeping**: 75°C – 80°C for 2 minutes\n• **Format**: 100g airtight collector caddy", [
+                    { label: "🛍️ View in Shop", tab: "catalog" },
+                    { label: "⚡ Order via WhatsApp", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20order%20the%20Wild%20Highland%20Emerald." }
+                ]);
+                return;
+            }
+
+            // Artisanal BOP1 Black Tea
+            if (/bop|bop1|black\s*tea|pekoe|orthodox\s*black|orange\s*pekoe/i.test(lower)) {
+                addBotMessage("Our **Artisanal Broken Orange Pekoe (BOP1)** ($85 / 100g) is a full-bodied traditional orthodox black tea. Gently rolled on heritage brass tables and naturally oxidized in cool Uva mountain air, it yields a deep amber liquor with warm notes of wild honey, rich malt, and Ceylon mountain spice.\n\n• **Elevation**: 4,800 ft High Slopes\n• **Steeping**: 90°C – 95°C for 3–4 minutes\n• **Format**: 100g airtight collector caddy", [
+                    { label: "🛍️ View in Shop", tab: "catalog" },
+                    { label: "⚡ Order via WhatsApp", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20order%20the%20Artisanal%20BOP1%20Black%20Tea." }
+                ]);
+                return;
+            }
+
+            // 3. General Tea Products / Collection / "i need to know tea product"
+            if (/product|what\s*(tea|teas)|tea\s*(list|variet|item|collect|reserve|type)|show\s*(me\s*)?(tea|product)|need\s*to\s*know\s*tea|tell\s*me\s*about\s*(tea|product)|available\s*tea|catalogue|catalog|our\s*tea|loose\s*leaf|^tea$|^teas$/i.test(lower)) {
+                addBotMessage("We offer 100% handcrafted artisanal Ceylon tea harvested from our single estate in Ettampitiya:\n\n• **Golden Ceylon Wild Flush** ($220 / 100g) — Rare sun-warmed tender tips with notes of wild forest honey and sweet apricot.\n• **Silver Needle Reserve** ($145 / 100g) — Virgin white bud pluck, offering delicate jasmine aromas and sweet mountain mist.\n• **Wild Highland Emerald** ($95 / 100g) — Artisan pan-fired whole-leaf green tea with sweet alpine vegetal freshness.\n• **Artisanal Broken Orange Pekoe (BOP1)** ($85 / 100g) — Whole-leaf orthodox black tea with deep amber liquor, rich malt, and wild spice.\n\nAll teas are single-estate, hand-plucked, and 100% chemical-free.", [
+                    { label: "🛍️ Shop Now", tab: "catalog" },
+                    { label: "⚡ Quick Order on WhatsApp", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20order%20artisanal%20tea." }
+                ]);
+                return;
+            }
+
+            // 4. Factory Tours, Visits, Tastings & Availability
+            if (/tour|visit|factory\s*tour|tasting|cupping|slot|timing|hours|experience|plucking|walk|sanctuary|masterclass|availability|booking|book\s*tour/i.test(lower)) {
+                addBotMessage("We welcome guests for immersive private estate experiences at our mountain sanctuary in Ettampitiya:\n\n• **Sunrise Artisan Plucking Tour** ($50 / guest) — 7:00 AM – 10:30 AM. Pluck two leaves and a bud across misty slopes and visit the withering lofts.\n• **Full Factory & Orthodox Craft Masterclass** ($80 / guest) — 10:00 AM – 2:00 PM. Hands-on rolling, oxidation, and wood-fired drying with Master Bandara.\n• **Signature High-Mountain Tasting Flight** ($25 / guest) — 3:00 PM – 5:00 PM. Guided sensory cupping of 6 rare reserve flushes overlooking the valley.\n\nAll tours include complimentary fresh artisanal infusions and estate refreshments.", [
+                    { label: "🍵 Book Estate Tour", tab: "tours" },
+                    { label: "📱 Reserve via WhatsApp", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20check%20availability%20and%20book%20an%20estate%20tour." }
+                ]);
+                return;
+            }
+
+            // 5. Prices & Rates
+            if (/price|cost|how\s*much|rate|rates|pricing|dollar|usd|\$|euro|lkr/i.test(lower)) {
+                addBotMessage("Here are our current single-estate prices:\n\n• **Artisanal BOP1 Black**: **$85** / 100g\n• **Highland Emerald Green**: **$95** / 100g\n• **Silver Needle White**: **$145** / 100g\n• **Golden Ceylon Wild Flush**: **$220** / 100g\n• **Estate Tours & Tastings**: **$25 – $80** per guest\n• **Teakwood Collector Chests**: Custom quotations available\n\nComplimentary worldwide express shipping (DHL/FedEx) is provided on all tea orders of $150 or more.", [
+                    { label: "🛍️ Shop Now", tab: "catalog" },
+                    { label: "⚡ Quick Order on WhatsApp", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20inquire%20about%20prices%20and%20orders." }
+                ]);
+                return;
+            }
+
+            // 6. Location, Address & Directions
+            if (/where|location|address|map|direction|ettampitiya|bandarawela|ella|how\s*to\s*(reach|get|find|go)|drive|road|route/i.test(lower)) {
+                addBotMessage("**Rock One Wild Tea Estate & Family Factory** is located at:\n📍 **Gannilawaththa, Wellawela, Ettampitiya 90140, Badulla District, Sri Lanka**\n\nPerched at 4,800 ft elevation in the Uva mountain range, we are approximately 35 minutes scenic drive from Bandarawela and Ella. Estate visits and tastings are open daily by reservation.", [
+                    { label: "🚗 Get Directions on WhatsApp", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20please%20send%20directions%20to%20the%20estate." }
+                ]);
+                return;
+            }
+
+            // 7. Shipping, Delivery & International Transit
+            if (/ship|deliver|international|courier|dhl|fedex|airtight|freight|how\s*long|arrival|transit|uk|usa|united\s*states|canada|australia|germany|france|europe|uae|dubai|japan/i.test(lower)) {
+                addBotMessage("We deliver fresh single-estate harvests directly to connoisseurs across 50+ countries worldwide:\n\n• **Express Couriers**: Dispatched via **DHL Express & FedEx International Priority** (3–6 business days).\n• **Freshness Sealed**: Packed in nitrogen-flushed, airtight UV-barrier metal caddies sealed at the estate.\n• **Complimentary Shipping**: Free international express shipping on orders of $150 or more.\n• **Live Tracking**: Tracking number provided via SMS, WhatsApp & email upon dispatch.", [
+                    { label: "🛍️ Shop Now", tab: "catalog" },
+                    { label: "📦 Inquire on WhatsApp", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20a%20question%20about%20international%20shipping." }
+                ]);
+                return;
+            }
+
+            // 8. Brewing & Steeping Ritual
+            if (/brew|steep|how\s*to\s*(make|prepare|brew)|temp|temperature|water|ratio|infus/i.test(lower)) {
+                addBotMessage("Master Sommelier Steeping Ritual:\n\n• **Water**: Fresh mountain spring water or soft filtered water.\n• **White & Green Teas** (Silver Needle, Emerald Green): 75°C – 80°C (167°F – 176°F), steep for 2 to 3 minutes.\n• **Black & Golden Flush**: 90°C – 95°C (194°F – 203°F), steep for 3 to 4 minutes.\n• **Ratio**: 2.5g whole leaf per 200ml (7 oz) water.\n• **Re-steeping**: Our whole wild leaves can be infused up to 3 times, revealing different aroma layers each steep.", [
+                    { label: "⏳ Live Brewing Timer", tab: "brewing" }
+                ]);
+                return;
+            }
+
+            // 9. How to Order, Cart, Quick Order & Payment
+            if (/how\s*to\s*order|how\s*to\s*buy|buy|order|purchase|cart|bag|pay|payment|card|credit|bank|transfer|paypal|checkout/i.test(lower)) {
+                addBotMessage("You can easily place an order in two convenient ways:\n\n1. **Online via Shop Now**: Browse our collection, click **Quick Order** or **Add to Bag**, and complete checkout securely with PayPal, Credit/Debit Card, or Bank Wire.\n2. **Direct WhatsApp Concierge**: Message our estate desk at **+94 77 320 9950** for customized invoices, corporate gifting, or special harvest reserves.", [
+                    { label: "🛍️ Go to Shop Now", tab: "catalog" },
+                    { label: "⚡ WhatsApp Order Desk", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20place%20an%20order." }
+                ]);
+                return;
+            }
+
+            // 10. Heritage, Founder & Story
+            if (/who|story|bandara|history|about|founder|family|heritage|origin|wild\s*tea|pesticide|organic/i.test(lower)) {
+                addBotMessage("**Rock One Wild Tea Sanctuary** is a small-batch family tea garden founded by **Master Bandara**. Our wild tea trees grow naturally around a towering granite monolith in Ettampitiya at 4,800 ft. We harvest without synthetic agrochemicals and craft every leaf using ancestral orthodox methods to preserve the authentic terroir of Ceylon.", [
+                    { label: "📖 View Estate Story", tab: "home" }
+                ]);
+                return;
+            }
+
+            // 11. Lookbook / Technical Dossier (PDF)
+            if (/lookbook|brochure|pdf|dossier|wholesale|b2b|export|bulk/i.test(lower)) {
+                addBotMessage("You can view and download our complete **2026 Estate Lookbook & Wholesale Technical Dossier (PDF)** right now, featuring terroir profiles, harvest grade matrices, bespoke gift chest customization, and international freight certifications.", [
+                    { label: "Open Estate Lookbook (PDF)", onclick: "if(window.appOpenLookbook){window.appOpenLookbook()}" },
+                    { label: "WhatsApp Trade Desk", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Estate%2C%20I%20would%20like%20to%20receive%20the%202026%20B2B%20Wholesale%20Lookbook%20and%20Price%20List." }
+                ]);
+                return;
+            }
+
+            // 12. Gift Boxes / Teakwood Chests
+            if (/gift|box|chest|wooden|wood|teak|present|hamper/i.test(lower)) {
+                addBotMessage("Our limited-edition **Collector Teakwood Gift Chests (Series 01–10)** are individually hand-carved by local artisans from aged Ceylon teakwood and sealed with molten wax. Each chest houses 100g of rare Golden Tips or Silver Needle wild tea.", [
+                    { label: "🎁 View Gift Catalog", tab: "gifts" },
+                    { label: "📱 Inquire on WhatsApp", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20inquire%20about%20teakwood%20gift%20chests." }
+                ]);
+                return;
+            }
+
+            // 13. Contact, Phone & WhatsApp
+            if (/contact|phone|call|whatsapp|email|support|help|number|manager|talk|speak|concierge/i.test(lower)) {
+                addBotMessage("Our estate concierge is ready to assist you directly:\n\n• **Phone & WhatsApp**: [+94 77 320 9950](https://wa.me/94773209950)\n• **Location**: Gannilawaththa, Wellawela, Ettampitiya, Sri Lanka\n• **Operating Hours**: 8:00 AM – 6:30 PM (IST) Daily\n\nTap below to chat instantly with our concierge on WhatsApp!", [
+                    { label: "📱 Chat on WhatsApp", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20need%20assistance." },
+                    { label: "🛍️ Browse Shop", tab: "catalog" }
+                ]);
+                return;
+            }
+
+            // 14. Reviews & Ratings
+            if (/review|rating|feedback|star|opinion|experience|testimoni/i.test(lower)) {
+                addBotMessage("Our single-estate harvests maintain an average **5.0 / 5.0 rating (★★★★★)** from tea connoisseurs and visitors worldwide. Guests consistently commend the natural floral complexity of our wild leaves and the warm hospitality of our estate masterclass.", [
+                    { label: "🛍️ Shop Now", tab: "catalog" },
+                    { label: "🍵 Estate Tours", tab: "tours" }
+                ]);
+                return;
+            }
+
+            // 15. Multilingual Matcher for Non-English
+            if (currentLang !== 'en') {
+                const topicIdx = window.TeaFactoryI18n ? window.TeaFactoryI18n.matchChatbotTopicIndex(query) : -1;
+                if (topicIdx >= 0 && topics[topicIdx]) {
+                    addBotResponseWithFollowUps(topics[topicIdx]);
+                    return;
+                }
+            }
+
+            // 16. Helpful Conversational Fallback
+            addBotMessage("Thank you for your question! I'm here to assist you with everything regarding **Rock One Wild Tea Sanctuary**.\n\nYou can ask me anything about:\n• Our 4 single-estate **tea varieties & pricing**\n• **Factory tour packages** & tasting flights\n• **International express delivery** (DHL / FedEx)\n• **Brewing guides** & steeping temperatures\n• **Estate location** & driving directions\n• **Placing an order** or custom gift chests\n\nHow may I help you today?", [
+                { label: "🛍️ Shop Now", tab: "catalog" },
+                { label: "🍵 Estate Tours", tab: "tours" },
+                { label: "📱 WhatsApp Concierge", href: "https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20an%20inquiry%3A%20" + encodeURIComponent(query) }
             ]);
-            renderFaqMenu(cfg.menuTitle || "Or select an inquiry topic:");
         }
 
         // Expose global method to synchronize language live

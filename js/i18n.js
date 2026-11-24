@@ -98,10 +98,10 @@
             bespoke_preview_crest: "ROCK ONE WILD TEA • SANCTUARY",
 
             // AI Sommelier Chatbot
-            chatbot_title: "AI Tea Sommelier & Concierge",
-            chatbot_subtitle: "Ask about rare harvests, private chests, steeping rituals & estate tours",
-            chatbot_input_placeholder: "Ask anything about teas, tours, orders...",
-            chatbot_welcome: "Greetings! Welcome to **Rock One Wild Tea Estate**. I am your **AI Tea Sommelier & Concierge**.\n\nPlease select any inquiry topic below for instant answers, or type your own question:",
+            chatbot_title: "Rock One Assistant",
+            chatbot_subtitle: "Rock One Wild Tea Sanctuary",
+            chatbot_input_placeholder: "Ask about availability or your booking...",
+            chatbot_welcome: "Hello! I'm your Rock One Wild Tea Sanctuary assistant. I can help you check tour availability, explore our artisanal tea collection, or look up your orders and bookings. How can I help you today?",
 
             // Footer
             footer_about_title: "Rock One Wild Tea (Pvt) Limited",
@@ -1386,10 +1386,10 @@
     const CHATBOT_I18N = {
         en: {
             config: {
-                title: "AI Tea Sommelier & Concierge",
-                subtitle: "Estate FAQ & Collector Assistant",
-                placeholder: "Ask anything about teas, tours, orders...",
-                greeting: "Greetings! Welcome to **Rock One Wild Tea Estate**. I am your **AI Tea Sommelier & Concierge**.\n\nPlease select any inquiry topic below for instant answers, or type your own question:",
+                title: "Rock One Assistant",
+                subtitle: "Rock One Wild Tea Sanctuary",
+                placeholder: "Ask about availability or your booking...",
+                greeting: "Hello! I'm your Rock One Wild Tea Sanctuary assistant. I can help you check tour availability, explore our artisanal tea collection, or look up your orders and bookings. How can I help you today?",
                 menuTitle: "Select an Inquiry Topic:",
                 allTopicsTitle: "All Inquiry Topics",
                 relatedTitle: "Related Inquiries:",
