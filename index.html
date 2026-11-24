@@ -228,7 +228,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png?v=1.26.0">
 
     <!-- Main Style Sheet -->
-    <link rel="stylesheet" href="css/style.css?v=3.79.0">
+    <link rel="stylesheet" href="css/style.css?v=3.80.0">
     
     <!-- Instant Scroll Position Reset (Ensures refresh & load always start at Top Hero Slideshow) -->
     <script>
@@ -495,9 +495,9 @@
                             </button>
                         </li>
                         <li>
-                            <button class="nav-link nav-btn" data-tab="catalog" id="nav-catalog">
+                            <button class="nav-link nav-btn nav-btn-shop" data-tab="catalog" id="nav-catalog" title="Explore Ceylon Artisanal Rare Teas">
                                 <svg class="nav-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
-                                <span class="nav-text" data-i18n="nav_products">Shop</span>
+                                <span class="nav-text" data-i18n="nav_products">Shop Now</span>
                             </button>
                         </li>
                         <!-- [FUTURE MODULE: Gift Catalog Main Menu Button - Uncomment to restore]
@@ -539,6 +539,17 @@
                 <!-- Dedicated Header Utility & User Actions (Separated from Main Menu) -->
                 <div class="header-utility-group">
                     <div class="header-nav-divider" aria-hidden="true"></div>
+
+                    <!-- Shopping Cart / Reserve Bag Pill (Standard E-Commerce Header Placement) -->
+                    <button type="button" class="nav-link nav-btn nav-btn-cart" id="nav-cart-btn" title="Shopping Cart / Reserve Bag" aria-label="Shopping Cart">
+                        <svg class="nav-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1.5"></circle>
+                            <circle cx="20" cy="21" r="1.5"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                        <span class="nav-text" data-i18n="nav_cart">Cart</span>
+                        <span class="nav-cart-badge" id="nav-cart-badge" style="display: none;">0</span>
+                    </button>
 
                     <!-- My Order Pill -->
                     <button class="nav-link nav-btn nav-btn-order" data-tab="order" id="nav-order" title="My Orders &amp; Track">
@@ -641,9 +652,23 @@
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
                         </span>
                         <div class="m-text-group">
-                            <span class="m-title" data-i18n="nav_products">Shop</span>
+                            <span class="m-title" data-i18n="nav_products">Shop Now</span>
                             <span class="m-desc">Single-estate artisanal tins</span>
                         </div>
+                    </button>
+                    <button type="button" class="nav-link mobile-nav-item mobile-cart-item" id="mobile-cart-btn" data-action="open-cart">
+                        <span class="m-icon-box">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="9" cy="21" r="1.5"></circle>
+                                <circle cx="20" cy="21" r="1.5"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                            </svg>
+                        </span>
+                        <div class="m-text-group">
+                            <span class="m-title" data-i18n="nav_cart">Shopping Cart</span>
+                            <span class="m-desc">View reserve bag &amp; checkout</span>
+                        </div>
+                        <span class="m-bulletin-badge" id="mobile-cart-badge" style="display: none;">0</span>
                     </button>
                     <button class="nav-link mobile-nav-item" data-tab="tours">
                         <span class="m-icon-box">
@@ -2236,11 +2261,11 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <!-- Script Loads (Execution dependency order: i18n -> store -> components -> paypal -> app) -->
-    <script defer charset="utf-8" src="js/i18n.js?v=3.79.0"></script>
-    <script defer charset="utf-8" src="js/store.js?v=3.79.0"></script>
-    <script defer charset="utf-8" src="js/components.js?v=3.79.0"></script>
-    <script defer charset="utf-8" src="js/paypal.js?v=3.79.0"></script>
-    <script defer charset="utf-8" src="js/app.js?v=3.79.0"></script>
-    <script defer charset="utf-8" src="js/contrast-guard.js?v=3.79.0"></script>
+    <script defer charset="utf-8" src="js/i18n.js?v=3.80.0"></script>
+    <script defer charset="utf-8" src="js/store.js?v=3.80.0"></script>
+    <script defer charset="utf-8" src="js/components.js?v=3.80.0"></script>
+    <script defer charset="utf-8" src="js/paypal.js?v=3.80.0"></script>
+    <script defer charset="utf-8" src="js/app.js?v=3.80.0"></script>
+    <script defer charset="utf-8" src="js/contrast-guard.js?v=3.80.0"></script>
 </body>
 </html>
