@@ -562,12 +562,18 @@ const UIComponents = {
             const displayName = this.highlightText(p.name, searchFilter);
             const displayDesc = this.highlightText(p.desc || p.description || '', searchFilter);
             const displayGrade = this.highlightText(p.leafGrade || p.grade || _t('leaf_grade_default', 'Single-Estate Reserve'), searchFilter);
-            const shipVal = Number(p.shippingCharge !== undefined ? p.shippingCharge : (p.shippingFee || p.shipping_fee_usd || 0)) || 0;
+            const shipVal = Number(p.shippingCharge !== undefined ? p.shippingCharge : (p.shippingFee || p.shipping_fee_usd || (p.id === 'prod-rock-one-black-tea' ? 19.0 : 0))) || 0;
             const tastingNotesText = p.flavorProfile || (p.tastingNotes && p.tastingNotes.length > 0 ? p.tastingNotes.join(' • ') : 'Single-Estate Ceylon Harvest');
             const displayNotes = this.highlightText(tastingNotesText, searchFilter);
-            const displayWeight = p.weight || '100g Vintage Tin';
-            const ratingVal = Number(p.rating || (p.brewing_guide && p.brewing_guide.rating)) || 4.9;
-            const reviewCount = Number(p.reviewsCount || (p.brewing_guide && p.brewing_guide.reviewsCount)) || 42;
+            const displayWeight = p.weight || '50g Pack';
+            const ratingVal = Number(p.rating || (p.brewing_guide && p.brewing_guide.rating)) || 5.0;
+            const reviewCount = Number(p.reviewsCount || (p.brewing_guide && p.brewing_guide.reviewsCount)) || 2;
+            const basePrice = Number(p.price !== undefined ? p.price : 17.00);
+            const origPriceVal = Number(p.originalPrice || p.origPrice || (basePrice * 1.176));
+            const discountPct = Math.round((1 - basePrice / origPriceVal) * 100) || 15;
+            const formattedOrig = window.TeaFactoryStore.formatCurrency(origPriceVal);
+            const formattedPrice = window.TeaFactoryStore.formatCurrency(basePrice);
+            const formattedShip = shipVal > 0 ? (shipVal === 19 ? '$19.00 Flat Worldwide' : `+ ${window.TeaFactoryStore.formatCurrency(shipVal)} Flat Worldwide`) : 'Complimentary Worldwide';
 
             return `
                 <div class="product-luxury-card status-available" data-id="${p.id}">
@@ -590,6 +596,10 @@ const UIComponents = {
                             <span class="product-category-crumb">${p.category || 'Pure Ceylon'}</span>
                             <span class="product-eyebrow-sep">&bull;</span>
                             <span class="leaf-grade-badge">${displayGrade}</span>
+                            ${p.elevation ? `
+                                <span class="product-eyebrow-sep">&bull;</span>
+                                <span style="display:inline-flex; align-items:center; gap:0.25rem; font-size:0.72rem; color:#855b0a; font-weight:600;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>${p.elevation}</span>
+                            ` : ''}
                         </div>
 
                         <h3 class="product-card-title" title="${p.name}">${displayName}</h3>
@@ -603,12 +613,25 @@ const UIComponents = {
                             <span class="product-rating-count">(${reviewCount})</span>
                         </div>
 
-                        <div class="product-title-pricing-row">
-                            <div class="product-price-block">
-                                <span class="product-price-val">${window.TeaFactoryStore.formatCurrency(p.price)}</span>
-                                <span class="product-shipping-note">${shipVal > 0 ? `+ ${window.TeaFactoryStore.formatCurrency(shipVal)} shipping` : _t('shipping_free', 'Complimentary Worldwide Shipping')}</span>
+                        <!-- Strikethrough Price, Sale Price, Discount Badge & Chips (Parity with Product Detail) -->
+                        <div class="product-title-pricing-row" style="display: flex; flex-direction: column; align-items: stretch; gap: 0.35rem; width: 100%;">
+                            <div class="product-price-block" style="width: 100%;">
+                                <div class="product-card-pricing-wrap">
+                                    <span class="product-card-orig-price">${formattedOrig}</span>
+                                    <span class="product-card-current-price">${formattedPrice}</span>
+                                    <span class="product-card-discount-badge">${discountPct}% OFF</span>
+                                </div>
+                                <div class="product-card-chips-row">
+                                    <span class="product-card-chip product-chip-shipping">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#854d0e" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                                        <span>Shipping: <strong>${formattedShip}</strong></span>
+                                    </span>
+                                    <span class="product-card-chip product-chip-weight">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                                        <span>Weight: <strong>${displayWeight}</strong></span>
+                                    </span>
+                                </div>
                             </div>
-                            ${p.elevation ? `<div class="product-elevation-tag" title="Elevation"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg> ${p.elevation}</div>` : ''}
                         </div>
 
                         <div class="product-flavor-profile-row" title="Signature Tasting Chords">

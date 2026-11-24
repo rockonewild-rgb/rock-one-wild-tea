@@ -5246,6 +5246,86 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     white-space: nowrap;
 }
 
+/* Product Card Pricing & Discount Badge (Parity with Product Detail) */
+.product-card-pricing-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.35rem;
+}
+
+.product-card-orig-price {
+    font-size: 1.25rem;
+    color: #9ca3af !important;
+    text-decoration: line-through;
+    font-family: var(--font-serif);
+    font-weight: 500;
+}
+
+.product-card-current-price {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #111827 !important;
+    font-family: var(--font-serif);
+    line-height: 1;
+}
+
+.product-card-discount-badge {
+    background: #f4dfc8 !important;
+    color: #855b05 !important;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.22rem 0.65rem;
+    border-radius: 9999px;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.product-card-chips-row {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: nowrap;
+    margin-top: 0.15rem;
+    width: 100%;
+}
+
+.product-card-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.67rem;
+    padding: 0.16rem 0.36rem;
+    border-radius: 4px;
+    line-height: 1.25;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.product-chip-shipping {
+    background: #fdfbf7 !important;
+    border: 1px solid #ebd9b8 !important;
+    color: #4b5563 !important;
+}
+
+.product-chip-shipping strong {
+    color: #855b05 !important;
+    font-weight: 700;
+}
+
+.product-chip-weight {
+    background: #f0fdf4 !important;
+    border: 1px solid #bbf7d0 !important;
+    color: #166534 !important;
+}
+
+.product-chip-weight strong {
+    color: #15803d !important;
+    font-weight: 700;
+}
+
 .product-elevation-tag {
     background: rgba(184, 134, 11, 0.08);
     border: 1px solid rgba(184, 134, 11, 0.25);
