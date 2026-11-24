@@ -13268,7 +13268,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 const descClass = isHeritage ? 'hero-description hero-desc-left' : 'hero-description';
                 const bookBtnText = isHeritage ? 'Book Experience &rarr;' : 'Book Tea Experience &rarr;';
                 const rawImg = slideObj.image || 'images/hero_slide_1.jpg';
-                const imgSrc = rawImg.startsWith('data:') ? rawImg : (rawImg.includes('?v=') ? rawImg : `${rawImg}?v=3.69.0`);
+                const imgSrc = rawImg.startsWith('data:') ? rawImg : (rawImg.includes('?v=') ? rawImg : `${rawImg}?v=3.70.0`);
 
                 return `
                     <div class="hero-slide${isActive ? ' active' : ''}${heritageClass}" style="background-image: url('${imgSrc}');">

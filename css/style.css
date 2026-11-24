@@ -1114,17 +1114,19 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
 
 /* Ensure all section container divs are 100% full-width so page-hero-banner bleeds edge-to-edge */
 .view-section,
+.view-section > div,
 #about-page-container,
 #catalog-full-container,
 #gifts-container,
+#reserve-container,
 #tours-timeline-container,
 #tours-location-container,
 #gallery-container,
 #announcements-full-container,
-#order-container,
-#reserve-container {
+#order-container {
     width: 100% !important;
     max-width: 100% !important;
+    min-width: 100% !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
     margin-left: 0 !important;
@@ -1132,24 +1134,12 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     box-sizing: border-box !important;
 }
 
-/* Constrain all page content below full-width hero banners (strictly excluding home hero slideshow & all its children) */
-.view-section:not(#home-section) > div:not(.hero-section):not(#hero-slider-container) > :not(.page-hero-banner),
-.view-section > :not(.page-hero-banner):not(.hero-section):not(#hero-slider-container),
-#home-section > :not(.hero-section):not(#hero-slider-container),
-.page-intro-header {
-    max-width: 1440px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    padding-left: clamp(20px, 4.5vw, 68px) !important;
-    padding-right: clamp(20px, 4.5vw, 68px) !important;
-    box-sizing: border-box !important;
-}
-
-/* Master Full-Bleed 100% Edge-to-Edge Canvas for Hero Slideshow (Zero Gaps / Zero Margins / Zero Side Lines) */
+/* Master Full-Bleed 100% Edge-to-Edge Canvas for ALL Hero Banners (Home & Subpages - Zero Side Gaps / Zero Centering Boxes) */
 .hero-section,
 #hero-slider-container,
 .hero-slides-wrapper,
-.hero-slide {
+.hero-slide,
+.page-hero-banner {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 100% !important;
@@ -1159,6 +1149,18 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     margin-right: 0 !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Constrain ONLY page content below full-width hero banners (strictly excluding hero banners and top-level section containers) */
+.view-section:not(#home-section) > div:not(.hero-section):not(#hero-slider-container) > :not(.page-hero-banner),
+#home-section > :not(.hero-section):not(#hero-slider-container),
+.page-intro-header {
+    max-width: 1440px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: clamp(20px, 4.5vw, 68px) !important;
+    padding-right: clamp(20px, 4.5vw, 68px) !important;
     box-sizing: border-box !important;
 }
 
