@@ -6682,12 +6682,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Quick Order button in Shop menu directly opens the fullscreen Checkout screen
+        // Quick Order button in Shop menu opens Seven Teahouse detailed purchasing modal (identical to clicking product image)
         document.querySelectorAll('.btn-book-prod').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const productId = btn.getAttribute('data-id');
-                openDrawer('product', productId);
+                if (productId && window.openProductDetail) {
+                    window.openProductDetail(productId, 'product');
+                } else if (productId) {
+                    openDrawer('product', productId);
+                }
             });
         });
 

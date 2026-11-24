@@ -5930,7 +5930,9 @@ const UIComponents = {
         // Bind quick buy button in modal
         modal.querySelector('.btn-book-prod')?.addEventListener('click', () => {
             closeModal();
-            if (window.appOpenProductDrawer) {
+            if (window.openProductDetail) {
+                window.openProductDetail(product.id, 'product');
+            } else if (window.appOpenProductDrawer) {
                 window.appOpenProductDrawer(product.id);
             }
         });
