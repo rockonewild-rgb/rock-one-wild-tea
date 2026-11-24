@@ -1175,29 +1175,24 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     pointer-events: none;
     transform: scale(1.14);
     opacity: 0.15;
-    filter: blur(4px) brightness(1.05);
     animation: pageHeroBgZoomOut 8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    will-change: transform, opacity, filter;
+    will-change: transform, opacity;
 }
 
 @keyframes pageHeroBgZoomOut {
     0% {
         transform: scale(1.14);
         opacity: 0.15;
-        filter: blur(4px) brightness(1.06);
     }
     20% {
         opacity: 0.85;
-        filter: blur(0.5px) brightness(1.02);
     }
     40% {
         opacity: 1;
-        filter: blur(0px) brightness(1);
     }
     100% {
         transform: scale(1.0);
         opacity: 1;
-        filter: blur(0px) brightness(1);
     }
 }
 
