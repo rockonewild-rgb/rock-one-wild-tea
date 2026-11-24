@@ -13106,7 +13106,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             progressFill.style.width = '0%';
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    progressFill.style.transition = 'width 5.5s linear';
+                    progressFill.style.transition = 'width 8.0s linear';
                     progressFill.style.width = '100%';
                 });
             });
@@ -13144,7 +13144,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         function startAutoPlay() {
             stopAutoPlay();
             triggerProgressBar();
-            heroSliderTimer = setInterval(nextSlide, 5500);
+            heroSliderTimer = setInterval(nextSlide, 8000);
         }
 
         function stopAutoPlay() {
