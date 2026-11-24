@@ -479,9 +479,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 bindAnnouncementsPageEvents();
                 break;
             case 'gifts':
+                // [FUTURE MODULE: Gift Catalog temporarily hidden per client request - safely redirects to Shop]
+                switchTab('catalog');
+                break;
+                /* Uncomment to restore Gifts module:
                 window.UIComponents.renderSeriesSelector('gifts-container');
                 bindCatalogEvents('gifts-container');
                 break;
+                */
             case 'reserve':
                 window.UIComponents.renderPrivateReservePage('reserve-container');
                 bindPrivateReserveForm();
