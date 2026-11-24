@@ -5418,6 +5418,377 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     text-align: center;
 }
 
+/* ==========================================================================
+   Modern Artisanal Products Desk & Studio UI/UX
+   ========================================================================== */
+
+.products-desk-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.products-desk-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    background: #ffffff;
+    border: 1px solid #e8e4df;
+    border-radius: 14px;
+    padding: 1.5rem 1.75rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.products-desk-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #855b05;
+    background: #fdf6e7;
+    border: 1px solid #e8d7a8;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+    margin-bottom: 0.5rem;
+}
+
+.products-desk-title {
+    margin: 0 0 0.35rem 0;
+    font-family: var(--font-serif, 'Playfair Display', serif);
+    font-size: 1.5rem;
+    color: #111827;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.products-desk-subtitle {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #64748b;
+    max-width: 680px;
+    line-height: 1.5;
+}
+
+.products-stats-bar {
+    display: flex;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.products-stats-bar .stat-pill {
+    background: #fbfaf7;
+    border: 1px solid #e8e4df;
+    border-radius: 10px;
+    padding: 0.65rem 1.15rem;
+    min-width: 110px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+}
+
+.products-stats-bar .stat-num {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #855b05;
+    line-height: 1.1;
+}
+
+.products-stats-bar .stat-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+/* Desk View Switcher Navigation */
+.products-view-switcher {
+    display: flex;
+    gap: 0.5rem;
+    background: #f1f0ec;
+    padding: 0.35rem;
+    border-radius: 10px;
+    width: fit-content;
+    border: 1px solid #e5e0d5;
+}
+
+.products-view-btn {
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.55rem 1.25rem;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.products-view-btn:hover {
+    color: #111827;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.products-view-btn.active {
+    background: #ffffff;
+    color: #855b05;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    font-weight: 700;
+}
+
+/* Product Catalog Card */
+.product-catalog-card,
+.product-composer-card {
+    background: #ffffff;
+    border: 1px solid #e8e4df;
+    border-radius: 14px;
+    padding: 1.75rem;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.04);
+}
+
+/* Catalog Search & Filters */
+.catalog-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid #eee9e0;
+}
+
+.catalog-search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 260px;
+    max-width: 440px;
+}
+
+.catalog-search-input {
+    width: 100%;
+    padding: 0.65rem 1rem 0.65rem 2.4rem;
+    font-size: 0.85rem;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    background: #fbfaf7;
+    color: #111827;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.catalog-search-input:focus {
+    border-color: #b8860b;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.15);
+}
+
+.catalog-search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+.catalog-filter-group {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.catalog-filter-chip {
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #4b5563;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.4rem 0.85rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.catalog-filter-chip:hover {
+    border-color: #b8860b;
+    color: #855b05;
+}
+
+.catalog-filter-chip.active {
+    background: #fdf6e7;
+    border-color: #b8860b;
+    color: #855b05;
+    font-weight: 700;
+}
+
+/* Modern Admin Product Table */
+.modern-product-table {
+    width: 100%;
+    table-layout: auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    text-align: left;
+    background: #ffffff !important;
+}
+
+.modern-product-table thead th {
+    background: #f8f6f0 !important;
+    color: #7a5a06 !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.85rem 0.95rem !important;
+    border-bottom: 2px solid #e5e0d5 !important;
+    white-space: nowrap;
+}
+
+.modern-product-table tbody tr {
+    background: #ffffff !important;
+    transition: background 0.15s ease;
+}
+
+.modern-product-table tbody tr:nth-child(even) {
+    background: #faf9f6 !important;
+}
+
+.modern-product-table tbody tr:hover td {
+    background: #f5f2e8 !important;
+}
+
+.modern-product-table td {
+    padding: 0.85rem 0.95rem;
+    border-bottom: 1px solid #f0ece1;
+    vertical-align: middle;
+    color: #1f2937 !important;
+    background: inherit;
+}
+
+.modern-product-table .box-badge {
+    white-space: nowrap !important;
+    display: inline-block;
+}
+
+/* Composer Section Cards */
+.composer-section-card {
+    background: #fbfaf7;
+    border: 1px solid #e8e4df;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.composer-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee9e0;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.composer-section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #855b05;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.composer-section-badge {
+    font-size: 0.7rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+}
+
+/* Composer Edit Active Notice */
+.composer-edit-banner {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    background: #fefce8;
+    border: 1.5px solid #facc15;
+    border-radius: 10px;
+    padding: 0.85rem 1.25rem;
+    margin-bottom: 1.25rem;
+    color: #854d0e;
+}
+
+.composer-edit-banner.active {
+    display: flex;
+}
+
+/* Composer Form Inputs */
+.composer-section-card .form-label {
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #374151;
+    margin-bottom: 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.composer-section-card .form-input,
+.composer-section-card select.form-input,
+.composer-section-card textarea.form-input {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.88rem;
+    color: #111827;
+    background: #ffffff;
+    border: 1.5px solid #d1d5db;
+    border-radius: 7px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.composer-section-card .form-input:focus {
+    border-color: #b8860b;
+    box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.15);
+}
+
+.composer-section-card .field-hint {
+    font-size: 0.72rem;
+    color: #64748b;
+    margin-top: 0.3rem;
+    line-height: 1.4;
+}
+
+.composer-radar-box {
+    background: #ffffff;
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.composer-radar-box:hover {
+    border-color: #d1d5db;
+}
+
 .slip-pdf-icon {
     font-size: 2.5rem;
 }

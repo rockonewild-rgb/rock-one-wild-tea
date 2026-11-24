@@ -2958,9 +2958,9 @@ Rock One Wild Tea Sanctuary Concierge Team
         const productBookings = this.state.bookings.filter(b => b.type === 'product');
         const tourBookings = this.state.bookings.filter(b => b.type === 'tour');
         
-        const boxSales = boxBookings.reduce((sum, b) => sum + b.price, 0);
-        const productSales = productBookings.reduce((sum, b) => sum + b.price, 0);
-        const totalDeposits = tourBookings.reduce((sum, b) => sum + b.depositPaid, 0);
+        const boxSales = boxBookings.reduce((sum, b) => sum + (Number(b.price) || 0), 0);
+        const productSales = productBookings.reduce((sum, b) => sum + (Number(b.price) || 0), 0);
+        const totalDeposits = tourBookings.reduce((sum, b) => sum + (Number(b.depositPaid) || 0), 0);
 
         return {
             totalBookingsCount: this.state.bookings.length,
@@ -2969,9 +2969,9 @@ Rock One Wild Tea Sanctuary Concierge Team
             productBookingsCount: productBookings.length,
             tourBookingsCount: tourBookings.length,
             inquiriesCount: (this.state.inquiries || []).length,
-            availableBoxesCount: this.state.boxes.filter(b => b.status === "Available").length,
-            revenue: boxSales + productSales,
-            tourRevenue: totalDeposits
+            availableBoxesCount: (this.state.boxes || []).filter(b => b.status === "Available").length,
+            revenue: (boxSales || 0) + (productSales || 0),
+            tourRevenue: totalDeposits || 0
         };
     }
 

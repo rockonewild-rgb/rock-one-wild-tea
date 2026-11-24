@@ -10104,6 +10104,104 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // ==========================================
+        // Product Desk View Switcher & Live Filter
+        // ==========================================
+        const tabViewCatalog = document.getElementById('tab-view-catalog');
+        const tabViewComposer = document.getElementById('tab-view-composer');
+        const sectionCatalog = document.getElementById('products-catalog-section');
+        const sectionComposer = document.getElementById('products-composer-section');
+        const btnQuickAddProd = document.getElementById('btn-quick-add-prod');
+        const btnBackToCatalog = document.getElementById('btn-back-to-catalog');
+        const quickComposerWrap = document.getElementById('quick-composer-launch-wrap');
+        const composerEditBanner = document.getElementById('composer-edit-banner');
+        const composerEditBadgeText = document.getElementById('composer-edit-badge-text');
+        const btnCancelEditBanner = document.getElementById('btn-cancel-edit-banner');
+
+        const switchProductDeskView = (mode) => {
+            if (mode === 'composer') {
+                if (sectionCatalog) sectionCatalog.style.display = 'none';
+                if (sectionComposer) sectionComposer.style.display = 'block';
+                if (tabViewComposer) tabViewComposer.classList.add('active');
+                if (tabViewCatalog) tabViewCatalog.classList.remove('active');
+                if (quickComposerWrap) quickComposerWrap.style.display = 'none';
+            } else {
+                if (sectionCatalog) sectionCatalog.style.display = 'block';
+                if (sectionComposer) sectionComposer.style.display = 'none';
+                if (tabViewCatalog) tabViewCatalog.classList.add('active');
+                if (tabViewComposer) tabViewComposer.classList.remove('active');
+                if (quickComposerWrap) quickComposerWrap.style.display = 'block';
+            }
+        };
+
+        if (tabViewCatalog) tabViewCatalog.addEventListener('click', () => switchProductDeskView('catalog'));
+        if (tabViewComposer) tabViewComposer.addEventListener('click', () => switchProductDeskView('composer'));
+        if (btnBackToCatalog) btnBackToCatalog.addEventListener('click', () => switchProductDeskView('catalog'));
+        if (btnQuickAddProd) {
+            btnQuickAddProd.addEventListener('click', () => {
+                const editIdInput = document.getElementById('prod-edit-id');
+                if (editIdInput && editIdInput.value) {
+                    const cancelBtn = document.getElementById('btn-cancel-edit-prod');
+                    cancelBtn?.click();
+                }
+                switchProductDeskView('composer');
+                sectionComposer?.scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+        if (btnCancelEditBanner) {
+            btnCancelEditBanner.addEventListener('click', () => {
+                const cancelBtn = document.getElementById('btn-cancel-edit-prod');
+                cancelBtn?.click();
+            });
+        }
+
+        // Live Table Search & Category Filter
+        const prodCatalogSearch = document.getElementById('prod-catalog-search');
+        const prodCategoryChips = document.querySelectorAll('#prod-category-filter-chips .catalog-filter-chip');
+        const prodTableRows = document.querySelectorAll('.prod-table-row');
+        const prodNoResults = document.getElementById('catalog-no-results');
+
+        let activeCategoryFilter = 'all';
+
+        const filterProductCatalog = () => {
+            const query = (prodCatalogSearch?.value || '').toLowerCase().trim();
+            let visibleCount = 0;
+
+            prodTableRows.forEach(row => {
+                const name = (row.getAttribute('data-name') || '').toLowerCase();
+                const cat = (row.getAttribute('data-category') || '').toLowerCase();
+                const grade = (row.getAttribute('data-grade') || '').toLowerCase();
+                const flavor = (row.getAttribute('data-flavor') || '').toLowerCase();
+
+                const matchesQuery = !query || name.includes(query) || cat.includes(query) || grade.includes(query) || flavor.includes(query);
+                const matchesCategory = activeCategoryFilter === 'all' || cat.includes(activeCategoryFilter.toLowerCase());
+
+                if (matchesQuery && matchesCategory) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (prodNoResults) {
+                prodNoResults.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
+        };
+
+        if (prodCatalogSearch) {
+            prodCatalogSearch.addEventListener('input', filterProductCatalog);
+        }
+
+        prodCategoryChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                prodCategoryChips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                activeCategoryFilter = chip.getAttribute('data-filter') || 'all';
+                filterProductCatalog();
+            });
+        });
+
         // Bind Product Image File Uploader & Multi-Photo Gallery
         const prodImageInput = document.getElementById('prod-image-file');
         const prodImageZone = document.getElementById('prod-image-zone');
@@ -10557,7 +10655,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedProdImageBase64 = image || (selectedProdImages[0] ? selectedProdImages[0].src : '');
                 renderProdPhotosGallery();
 
-                document.getElementById('admin-add-product-form')?.scrollIntoView({ behavior: 'smooth' });
+                // Switch to composer view & show edit notification banner
+                switchProductDeskView('composer');
+                if (composerEditBanner) {
+                    composerEditBanner.classList.add('active');
+                    if (composerEditBadgeText) {
+                        composerEditBadgeText.innerText = `Editing: ${name} (ID: ${id})`;
+                    }
+                }
+                sectionComposer?.scrollIntoView({ behavior: 'smooth' });
             });
         });
 
@@ -10598,9 +10704,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (descEl) descEl.innerText = 'Add a new standard tea product to the customer storefront.';
                 const saveBtn = document.getElementById('btn-save-prod');
                 if (saveBtn) saveBtn.innerText = 'Publish Product';
-                cancelEditProdBtn.style.display = 'none';
                 if (prodImageZone) prodImageZone.classList.remove('has-file');
-                if (prodImagePreview) prodImagePreview.style.display = 'none';
+                const pImgPrev = document.getElementById('prod-image-preview');
+                if (pImgPrev) pImgPrev.style.display = 'none';
 
                 // Reset radar sliders & badges
                 const defaultRadar = { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 };
@@ -10610,6 +10716,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (slider) slider.value = defaultRadar[k];
                     if (badge) badge.innerText = `${defaultRadar[k]}%`;
                 });
+
+                // Dismiss edit mode alert banner and switch back to active catalog
+                if (composerEditBanner) composerEditBanner.classList.remove('active');
+                switchProductDeskView('catalog');
             });
         }
 

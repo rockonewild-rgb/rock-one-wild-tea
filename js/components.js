@@ -1269,7 +1269,7 @@ const UIComponents = {
             <div class="admin-stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
                 <div class="admin-stat-card">
                     <span class="stat-label">Total Revenue</span>
-                    <span class="stat-value">$${(stats.revenue + stats.tourRevenue).toFixed(2)}</span>
+                    <span class="stat-value">$${((Number(stats.revenue) || 0) + (Number(stats.tourRevenue) || 0)).toFixed(2)}</span>
                     <span class="stat-desc">All orders + Tour Deposits</span>
                 </div>
                 <div class="admin-stat-card">
@@ -2623,23 +2623,96 @@ const UIComponents = {
             `;
         } else if (activeSubTab === 'products') {
             const products = window.TeaFactoryStore.getProducts();
+            const inStockCount = products.filter(p => (p.stock || '').toLowerCase() === 'in stock').length;
+            const lowStockCount = products.filter(p => ['low stock', 'rare reserve'].includes((p.stock || '').toLowerCase())).length;
+            const blackCount = products.filter(p => (p.category || '').toLowerCase().includes('black')).length;
+            const greenCount = products.filter(p => (p.category || '').toLowerCase().includes('green')).length;
+            const whiteCount = products.filter(p => (p.category || '').toLowerCase().includes('white')).length;
+
             html += `
-                <div class="admin-columns">
-                    <div class="panel-card" style="margin-bottom: 0;">
-                        <h3 class="panel-title">Active Products List</h3>
-                        <p class="panel-desc">Manage standard tea products displayed in the Product Catalog.</p>
+                <div class="products-desk-wrapper">
+                    <!-- Desk Header with Stats & Actions -->
+                    <div class="products-desk-header">
+                        <div>
+                            <div class="products-desk-badge">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                                <span>STOREFRONT PRODUCT DESK</span>
+                            </div>
+                            <h2 class="products-desk-title">Artisanal Tea Inventory &amp; Catalog Studio</h2>
+                            <p class="products-desk-subtitle">
+                                Manage your single-estate offerings, dual-currency pricing, inventory levels, high-resolution photography showcase, and sommelier tasting dossiers.
+                            </p>
+                        </div>
                         
-                        <div class="table-responsive">
-                            <table class="admin-table">
+                        <!-- Live Inventory Stats -->
+                        <div class="products-stats-bar">
+                            <div class="stat-pill">
+                                <span class="stat-num">${products.length}</span>
+                                <span class="stat-label">Total Teas</span>
+                            </div>
+                            <div class="stat-pill">
+                                <span class="stat-num" style="color: #16a34a;">${inStockCount}</span>
+                                <span class="stat-label">In Stock</span>
+                            </div>
+                            <div class="stat-pill">
+                                <span class="stat-num" style="color: #d97706;">${lowStockCount}</span>
+                                <span class="stat-label">Low / Reserve</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View Switcher Tabs -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div class="products-view-switcher">
+                            <button type="button" id="tab-view-catalog" class="products-view-btn active">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                                <span>Active Catalog (${products.length})</span>
+                            </button>
+                            <button type="button" id="tab-view-composer" class="products-view-btn">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <span>Introduce New Product</span>
+                            </button>
+                        </div>
+
+                        <div id="quick-composer-launch-wrap">
+                            <button type="button" id="btn-quick-add-prod" class="btn btn-primary" style="font-size: 0.8rem; padding: 0.55rem 1.15rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.45rem; box-shadow: 0 4px 15px rgba(212,175,55,0.25);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <span>Introduce Tea</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- VIEW 1: ACTIVE PRODUCTS CATALOG -->
+                    <div id="products-catalog-section" class="product-catalog-card">
+                        <!-- Toolbar: Search & Category Filter Chips -->
+                        <div class="catalog-toolbar">
+                            <div class="catalog-search-wrap">
+                                <span class="catalog-search-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                </span>
+                                <input type="text" id="prod-catalog-search" class="catalog-search-input" placeholder="Search products by name, grade, category, notes...">
+                            </div>
+
+                            <div class="catalog-filter-group" id="prod-category-filter-chips">
+                                <button type="button" class="catalog-filter-chip active" data-filter="all">All (${products.length})</button>
+                                <button type="button" class="catalog-filter-chip" data-filter="Black Tea">Black Tea (${blackCount})</button>
+                                <button type="button" class="catalog-filter-chip" data-filter="Green Tea">Green Tea (${greenCount})</button>
+                                <button type="button" class="catalog-filter-chip" data-filter="White Tea">White Tea (${whiteCount})</button>
+                            </div>
+                        </div>
+
+                        <!-- Products Table -->
+                        <div class="table-responsive" style="border: 1px solid #e8e4df; border-radius: 10px; overflow-x: auto; background: #ffffff;">
+                            <table class="modern-product-table" id="admin-products-table" style="width: 100%; min-width: 820px;">
                                 <thead>
                                     <tr>
-                                        <th>Image</th>
-                                        <th>Name & Grade</th>
-                                        <th>Category & Sub-Category</th>
-                                        <th>Weight</th>
-                                        <th>Price</th>
-                                        <th>Stock</th>
-                                        <th>Action</th>
+                                        <th style="width: 65px; text-align: center;">Photo</th>
+                                        <th style="min-width: 180px;">Product &amp; Harvest Details</th>
+                                        <th style="min-width: 140px;">Category &amp; Brewing</th>
+                                        <th style="min-width: 100px;">Packaging</th>
+                                        <th style="min-width: 125px;">Pricing &amp; Shipping</th>
+                                        <th style="min-width: 95px;">Stock</th>
+                                        <th style="min-width: 120px; text-align: right;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -2668,46 +2741,47 @@ const UIComponents = {
                                         const prodImagesCount = prodImagesArr.length;
 
                                         return `
-                                        <tr>
+                                        <tr class="prod-table-row" data-name="${(prod.name || '').toLowerCase()}" data-category="${categoryStr}" data-grade="${leafGradeStr.toLowerCase()}" data-flavor="${flavorProfileStr.toLowerCase()}">
                                             <td>
-                                                <div style="position: relative; width: 44px; height: 44px; display: inline-block;">
-                                                    <img src="${prodImg}" alt="${prod.name}" style="width: 44px; height: 44px; object-fit: contain; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); background: rgba(0,0,0,0.4); display: block;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
-                                                    ${prodImagesCount > 1 ? `
-                                                        <span style="position: absolute; bottom: -3px; right: -3px; background: rgba(4,14,8,0.92); border: 1px solid var(--color-gold); color: var(--color-gold); font-size: 0.58rem; font-weight: 700; padding: 0.05rem 0.25rem; border-radius: 3px; line-height: 1; box-shadow: 0 2px 4px rgba(0,0,0,0.6);" title="${prodImagesCount} photos attached">
-                                                            +${prodImagesCount - 1}
-                                                        </span>
-                                                    ` : ''}
+                                                <div style="position: relative; width: 50px; height: 50px; display: inline-block;">
+                                                    <img src="${prodImg}" alt="${prod.name}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 8px; border: 1.5px solid rgba(212,175,55,0.4); background: #ffffff; display: block; box-shadow: 0 2px 6px rgba(0,0,0,0.06);" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
+                                                    <span style="position: absolute; bottom: -4px; right: -4px; background: ${prodImagesCount > 1 ? '#855b05' : '#4b5563'}; border: 1.5px solid #ffffff; color: #ffffff; font-size: 0.58rem; font-weight: 700; padding: 0.1rem 0.35rem; border-radius: 8px; line-height: 1; display: inline-flex; align-items: center; gap: 0.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2);" title="${prodImagesCount} photo(s) in gallery">
+                                                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                                        <span>${prodImagesCount}</span>
+                                                    </span>
                                                 </div>
                                             </td>
                                             <td>
-                                                <strong>${prod.name}</strong><br>
-                                                <small style="color:var(--color-text-muted);">${leafGradeStr}</small>
-                                                ${flavorProfileStr ? `<br><small style="color:var(--color-gold); font-size:0.68rem; font-style:italic;">🫖 ${flavorProfileStr}</small>` : ''}
-                                                <div style="display:flex; flex-wrap:wrap; gap:0.25rem; margin-top:0.35rem;">
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold); display:inline-flex; align-items:center; gap:0.25rem;" title="Floral">${SVG_ICONS.sensoryFloral} ${radar.floral ?? 80}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold); display:inline-flex; align-items:center; gap:0.25rem;" title="Malty">${SVG_ICONS.sensoryMalty} ${radar.malty ?? 75}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold); display:inline-flex; align-items:center; gap:0.25rem;" title="Sweetness">${SVG_ICONS.sensorySweetness} ${radar.sweetness ?? 80}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold); display:inline-flex; align-items:center; gap:0.25rem;" title="Astringency">${SVG_ICONS.sensoryAstringency} ${radar.astringency ?? 40}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold); display:inline-flex; align-items:center; gap:0.25rem;" title="Body">${SVG_ICONS.sensoryBody} ${radar.body ?? 80}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold); display:inline-flex; align-items:center; gap:0.25rem;" title="Aroma">${SVG_ICONS.sensoryAroma} ${radar.aroma ?? 90}%</span>
+                                                <div style="font-weight: 700; font-size: 0.92rem; color: #111827;">${prod.name}</div>
+                                                <div style="display: inline-flex; align-items: center; gap: 0.35rem; margin-top: 2px;">
+                                                    <span style="font-size: 0.7rem; font-weight: 600; color: #855b05; background: #fdf6e7; border: 1px solid #e8d7a8; padding: 0.1rem 0.45rem; border-radius: 4px;">${leafGradeStr}</span>
+                                                    ${elevationStr ? `<span style="font-size: 0.68rem; color: #64748b;">• ${elevationStr}</span>` : ''}
+                                                </div>
+                                                ${flavorProfileStr ? `<div style="color: #6b7280; font-size: 0.74rem; font-style: italic; margin-top: 3px;">🫖 ${flavorProfileStr}</div>` : ''}
+                                            </td>
+                                            <td>
+                                                <span style="font-weight: 600; font-size: 0.82rem; color: #111827;">${categoryStr}</span><br>
+                                                <span style="font-size: 0.7rem; color: #4b5563; background: #f3f4f6; padding: 0.15rem 0.45rem; border-radius: 4px; display: inline-block; margin-top: 3px;">${subcategoryStr}</span>
+                                                <div style="font-size: 0.68rem; color: #64748b; margin-top: 3px;">
+                                                    ${prod.steepTemp || '85°C'} • ${prod.steepTime || '3-4 mins'}
                                                 </div>
                                             </td>
                                             <td>
-                                                <strong>${categoryStr}</strong><br>
-                                                <span style="font-size:0.68rem; color:var(--color-gold); background:rgba(212,175,55,0.1); padding:0.1rem 0.35rem; border-radius:3px; display:inline-block; margin-top:2px;">${subcategoryStr}</span>
-                                            </td>
-                                            <td>${weightStr}</td>
-                                            <td style="color:var(--color-gold); font-weight: 600;">
-                                                <div>$${priceVal.toFixed(2)} <span style="font-size:0.72rem; color:#cbd5e1; font-weight:400;">(Rs ${(prod.price_lkr || Math.round(priceVal * 305)).toLocaleString()})</span></div>
-                                                ${shippingVal > 0 ? `<div style="font-size:0.65rem; color:#86efac; font-weight:500;">+$${shippingVal.toFixed(2)} ship <span style="color:#cbd5e1; font-weight:400;">(Rs ${(prod.shippingCharge_lkr !== undefined ? prod.shippingCharge_lkr : Math.round(shippingVal * 305)).toLocaleString()})</span></div>` : `<div style="font-size:0.65rem; color:rgba(255,255,255,0.4); font-weight:400;">Free ship</div>`}
+                                                <span style="font-size: 0.82rem; font-weight: 600; color: #374151;">${weightStr}</span>
+                                                ${prod.symbol ? `<br><small style="font-size: 0.68rem; color: #855b05;">Symbol: ${prod.symbol}</small>` : ''}
                                             </td>
                                             <td>
-                                                <span class="box-badge ${stockStr === 'In Stock' ? 'status-available' : 'status-pending'}" style="font-size: 0.65rem;">
+                                                <div style="font-weight: 700; font-size: 0.92rem; color: #111827;">$${priceVal.toFixed(2)}</div>
+                                                <div style="font-size: 0.72rem; color: #64748b;">Rs ${(prod.price_lkr || Math.round(priceVal * 305)).toLocaleString()}</div>
+                                                ${shippingVal > 0 ? `<div style="font-size: 0.68rem; color: #15803d; font-weight: 600; margin-top: 2px;">+$${shippingVal.toFixed(2)} ship</div>` : `<div style="font-size: 0.68rem; color: #64748b;">Free delivery</div>`}
+                                            </td>
+                                            <td>
+                                                <span class="box-badge ${stockStr === 'In Stock' ? 'status-available' : (stockStr === 'Rare Reserve' ? 'status-reserve' : 'status-pending')}" style="font-size: 0.68rem; padding: 0.2rem 0.55rem; border-radius: 6px; white-space: nowrap; display: inline-block;">
                                                     ${stockStr}
                                                 </span>
                                             </td>
-                                            <td style="white-space: nowrap;">
-                                                <div style="display: flex; gap: 0.4rem; align-items: center;">
+                                            <td style="text-align: right; white-space: nowrap;">
+                                                <div style="display: inline-flex; gap: 0.45rem; align-items: center;">
                                                     <button class="btn-edit-prod" 
                                                             data-id="${prod.id}" 
                                                             data-name="${prod.name}" 
@@ -2742,16 +2816,13 @@ const UIComponents = {
                                                             data-caffeine="${(prod.caffeine || '').replace(/"/g, '&quot;')}" 
                                                             data-preparation="${(prod.preparation || '').replace(/"/g, '&quot;')}" 
                                                             data-benefits="${(prod.benefits || '').replace(/"/g, '&quot;')}" 
-                                                            style="background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); color: var(--color-gold); padding: 0.35rem 0.65rem; font-size: 0.7rem; border-radius: 3px; cursor: pointer; transition: var(--transition-smooth); display: inline-flex; align-items: center; gap: 0.25rem;" 
-                                                            title="Edit Product">
-                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                            style="background: #fdf6e7; border: 1.5px solid #d4af37; color: #855b05; padding: 0.4rem 0.75rem; font-size: 0.75rem; font-weight: 700; border-radius: 5px; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.35rem;" 
+                                                            title="Edit Product Details">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                                         Edit
                                                     </button>
-                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                                        Edit
-                                                    </button>
-                                                    <button class="btn-delete-prod" data-id="${prod.id}" data-name="${prod.name}" style="background: transparent; border: 1px solid rgba(255,94,94,0.3); color: #ff5e5e; padding: 0.35rem 0.65rem; font-size: 0.7rem; border-radius: 3px; cursor: pointer; transition: var(--transition-smooth); display: inline-flex; align-items: center; gap: 0.25rem;" title="Delete product">
-                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                    <button class="btn-delete-prod" data-id="${prod.id}" data-name="${prod.name}" style="background: transparent; border: 1.5px solid #fca5a5; color: #dc2626; padding: 0.4rem 0.75rem; font-size: 0.75rem; font-weight: 600; border-radius: 5px; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.35rem;" title="Delete product">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                                         Delete
                                                     </button>
                                                 </div>
@@ -2761,385 +2832,389 @@ const UIComponents = {
                                     }).join('')}
                                 </tbody>
                             </table>
+                            <div id="catalog-no-results" style="display: none; padding: 2.5rem; text-align: center; color: #64748b; font-size: 0.9rem;">
+                                No tea products found matching your search. Try adjusting keywords or category filters.
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="panel-card admin-form-card" style="margin-bottom: 0;">
-                        <div class="admin-card-header" style="border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 1rem; margin-bottom: 1.5rem;">
-                            <div style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold); margin-bottom: 0.35rem;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-                                <span>STOREFRONT CATALOG</span>
+
+                    <!-- VIEW 2: PRODUCT STUDIO COMPOSER -->
+                    <div id="products-composer-section" class="product-composer-card" style="display: none;">
+                        <!-- Composer Header -->
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1.5px solid #eee9e0; padding-bottom: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                            <div>
+                                <div style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #855b05; margin-bottom: 0.35rem;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                    <span>PRODUCT COMPOSER STUDIO</span>
+                                </div>
+                                <h3 class="panel-title" id="prod-form-title" style="margin-bottom: 0.25rem; font-size: 1.45rem; color: #111827; font-family: var(--font-serif);">Introduce New Product</h3>
+                                <p class="panel-desc" id="prod-form-desc" style="margin-bottom: 0; font-size: 0.82rem; color: #64748b;">Add a new standard tea harvest with pricing, gallery, tasting radar, and connoisseur dossiers.</p>
                             </div>
-                            <h3 class="panel-title" id="prod-form-title" style="margin-bottom: 0.25rem; font-size: 1.35rem;">Introduce New Product</h3>
-                            <p class="panel-desc" id="prod-form-desc" style="margin-bottom: 0; font-size: 0.8rem; color: var(--color-text-muted);">Add a new standard tea product to the customer storefront.</p>
+                            <button type="button" id="btn-back-to-catalog" class="btn btn-outline" style="font-size: 0.78rem; padding: 0.5rem 1rem; border-color: #d1d5db; color: #4b5563; display: inline-flex; align-items: center; gap: 0.4rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                <span>Back to Catalog</span>
+                            </button>
                         </div>
-                        
-                        <form id="admin-add-product-form" class="admin-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
+
+                        <!-- Edit Mode Alert Banner -->
+                        <div id="composer-edit-banner" class="composer-edit-banner">
+                            <div style="display: flex; align-items: center; gap: 0.65rem;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                <span style="font-weight: 600; font-size: 0.85rem;" id="composer-edit-badge-text">Editing Product Specifications</span>
+                            </div>
+                            <button type="button" id="btn-cancel-edit-banner" style="background: transparent; border: 1px solid #ca8a04; color: #854d0e; font-size: 0.72rem; padding: 0.25rem 0.65rem; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                                Discard &amp; Reset
+                            </button>
+                        </div>
+
+                        <form id="admin-add-product-form" class="admin-form" style="display: flex; flex-direction: column; gap: 1.5rem;">
                             <input type="hidden" id="prod-edit-id" value="">
-                            <div class="form-row" style="display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 1rem; align-items: start;">
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-name" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Product Name *</label>
-                                    <input class="form-input" type="text" id="prod-name" required placeholder="e.g. Royal Earl Grey">
-                                </div>
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-category" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Category *</label>
-                                    <select class="form-input" id="prod-category" required>
-                                        <option value="Black Tea" selected>Black Tea</option>
-                                        <option value="White Tea">White Tea</option>
-                                        <option value="Green Tea">Green Tea</option>
-                                    </select>
-                                </div>
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-subcategory" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Sub-Category *</label>
-                                    <select class="form-input" id="prod-subcategory" required>
-                                        <option value="Hot Tea (Gongfu style)" selected>Hot Tea (Gongfu style)</option>
-                                        <option value="Ice Tea">Ice Tea</option>
-                                        <option value="Cool Tea">Cool Tea</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="form-row" style="display: grid; grid-template-columns: 140px 1.2fr 1.2fr 1fr; gap: 0.75rem; align-items: start;">
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-currency" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Currency *</label>
-                                    <select class="form-input" id="prod-currency" style="font-weight: 700; color: var(--color-gold);">
-                                        <option value="USD" selected>USD ($)</option>
-                                        <option value="LKR">LKR (Rs)</option>
-                                    </select>
-                                </div>
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" id="prod-amount-label" for="prod-amount-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Product Price *</label>
-                                    <input class="form-input" type="number" step="0.01" id="prod-amount-input" required placeholder="45.00" style="font-weight: 600;">
-                                    <div id="prod-counterpart-price" style="font-size: 0.7rem; color: #86efac; font-weight: 600; min-height: 1rem;">
-                                        ≈ Rs 13,725 LKR
-                                    </div>
-                                </div>
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" id="prod-shipping-label" for="prod-shipping-amount-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Shipping Charge</label>
-                                    <input class="form-input" type="number" step="0.01" min="0" id="prod-shipping-amount-input" placeholder="0.00" style="font-weight: 600;">
-                                    <div id="prod-counterpart-shipping" style="font-size: 0.7rem; color: #86efac; font-weight: 600; min-height: 1rem;">
-                                        ≈ Rs 0 LKR
-                                    </div>
-                                </div>
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-weight" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Weight *</label>
-                                    <input class="form-input" type="text" id="prod-weight" required placeholder="100g">
-                                </div>
-                            </div>
-                            <!-- Hidden dual currency inputs for store persistence -->
                             <input type="hidden" id="prod-price" value="45.00">
                             <input type="hidden" id="prod-price-lkr" value="13725">
                             <input type="hidden" id="prod-shipping" value="0.00">
                             <input type="hidden" id="prod-shipping-lkr" value="0">
 
-                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start;">
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-symbol" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Icon / Symbol</label>
-                                    <select class="form-input" id="prod-symbol">
-                                        <option value="">Standard Monogram</option>
-                                        <option value="Black Tea">Black Tea Reserve</option>
-                                        <option value="Green Tea">Green Tea Reserve</option>
-                                        <option value="White Tea">White Tea Reserve</option>
-                                        <option value="Oolong Tea">Oolong Tea Reserve</option>
-                                    </select>
+                            <!-- SECTION 1: Product Identity & Classifications -->
+                            <div class="composer-section-card">
+                                <div class="composer-section-header">
+                                    <h4 class="composer-section-title">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                        <span>01. Product Identity &amp; Classification</span>
+                                    </h4>
+                                    <span class="composer-section-badge">Core Details</span>
                                 </div>
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-stock" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Stock Status *</label>
-                                    <select class="form-input" id="prod-stock" required>
-                                        <option value="In Stock">In Stock</option>
-                                        <option value="Low Stock">Low Stock</option>
-                                        <option value="Rare Reserve">Rare Reserve</option>
-                                    </select>
+
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.15rem; margin-bottom: 1.15rem;">
+                                    <div class="form-group">
+                                        <label class="form-label" for="prod-name">Product Name *</label>
+                                        <input class="form-input" type="text" id="prod-name" required placeholder="e.g. Royal Earl Grey Reserve">
+                                        <span class="field-hint">Primary name displayed on product cards and checkout receipts.</span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="prod-grade">Leaf Grade</label>
+                                        <input class="form-input" type="text" id="prod-grade" placeholder="e.g. Finest Tippy Flowery Orange Pekoe (FTGFOP1)">
+                                        <span class="field-hint">Official orthodox tea leaf grading standard.</span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="prod-symbol">Icon / Packaging Monogram</label>
+                                        <select class="form-input" id="prod-symbol">
+                                            <option value="">Standard Monogram</option>
+                                            <option value="Black Tea">Black Tea Reserve</option>
+                                            <option value="Green Tea">Green Tea Reserve</option>
+                                            <option value="White Tea">White Tea Reserve</option>
+                                            <option value="Oolong Tea">Oolong Tea Reserve</option>
+                                        </select>
+                                        <span class="field-hint">Displayed on seal stamps and collector tin lids.</span>
+                                    </div>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.15rem; margin-bottom: 1.15rem;">
+                                    <div class="form-group">
+                                        <label class="form-label" for="prod-category">Category *</label>
+                                        <select class="form-input" id="prod-category" required>
+                                            <option value="Black Tea" selected>Black Tea</option>
+                                            <option value="White Tea">White Tea</option>
+                                            <option value="Green Tea">Green Tea</option>
+                                            <option value="Oolong Tea">Oolong Tea</option>
+                                            <option value="Herbal Infusion">Herbal Infusion</option>
+                                            <option value="Specialty Tea">Specialty Tea</option>
+                                            <option value="Artisanal Reserve">Artisanal Reserve</option>
+                                            <option value="Private Reserve">Private Reserve</option>
+                                            <option value="artisan">Artisan Collection</option>
+                                            <option value="private_reserve">Private Reserve (Legacy)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="prod-subcategory">Sub-Category *</label>
+                                        <select class="form-input" id="prod-subcategory" required>
+                                            <option value="Hot Tea (Gongfu style)" selected>Hot Tea (Gongfu style)</option>
+                                            <option value="Ice Tea">Ice Tea</option>
+                                            <option value="Cool Tea">Cool Tea</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="prod-desc">Short Description *</label>
+                                    <textarea class="form-input" id="prod-desc" required rows="3" placeholder="Describe the character, harvest altitude, processing style, and tea drinking experience..." style="resize: vertical; line-height: 1.5;"></textarea>
                                 </div>
                             </div>
 
-                            <!-- Multi-Photo Gallery & Cover Showcase Section -->
-                            <div class="admin-sensory-panel admin-photo-gallery-panel" style="background: rgba(4, 14, 8, 0.75); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 12px; padding: 1.25rem 1.15rem; display: flex; flex-direction: column; gap: 0.95rem; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
-                                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 0.6rem;">
-                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                                            <polyline points="21 15 16 10 5 21"/>
-                                        </svg>
-                                        <span style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold);">Product Photography &amp; Gallery Showcase</span>
+                            <!-- SECTION 2: Pricing, Packaging & Stock -->
+                            <div class="composer-section-card">
+                                <div class="composer-section-header">
+                                    <h4 class="composer-section-title">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                        <span>02. Dual-Currency Pricing, Packaging &amp; Stock</span>
+                                    </h4>
+                                    <span class="composer-section-badge">Financial &amp; Inventory</span>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.15rem; margin-bottom: 1.15rem;">
+                                    <div class="form-group">
+                                        <label class="form-label" for="prod-currency">Input Currency</label>
+                                        <select class="form-input" id="prod-currency" style="font-weight: 700; color: #855b05;">
+                                            <option value="USD" selected>USD ($)</option>
+                                            <option value="LKR">LKR (Rs)</option>
+                                        </select>
                                     </div>
-                                    <span id="prod-photos-count-badge" style="font-size: 0.68rem; padding: 0.2rem 0.6rem; border-radius: 12px; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.35); color: var(--color-gold); font-weight: 600;">
+                                    <div class="form-group">
+                                        <label class="form-label" id="prod-amount-label" for="prod-amount-input">Product Price *</label>
+                                        <input class="form-input" type="number" step="0.01" id="prod-amount-input" required placeholder="45.00" style="font-weight: 700;">
+                                        <div id="prod-counterpart-price" style="font-size: 0.72rem; color: #16a34a; font-weight: 700; margin-top: 0.25rem;">
+                                            ≈ Rs 13,725 LKR
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" id="prod-shipping-label" for="prod-shipping-amount-input">Shipping Charge</label>
+                                        <input class="form-input" type="number" step="0.01" min="0" id="prod-shipping-amount-input" placeholder="0.00" style="font-weight: 700;">
+                                        <div id="prod-counterpart-shipping" style="font-size: 0.72rem; color: #16a34a; font-weight: 700; margin-top: 0.25rem;">
+                                            Free / Complimentary
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="prod-weight">Net Weight / Packaging *</label>
+                                        <input class="form-input" type="text" id="prod-weight" required placeholder="100g Vintage Tin">
+                                    </div>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.15rem;">
+                                    <div class="form-group">
+                                        <label class="form-label" for="prod-stock">Stock Availability *</label>
+                                        <select class="form-input" id="prod-stock" required>
+                                            <option value="In Stock">In Stock (Available for Storefront Orders)</option>
+                                            <option value="Low Stock">Low Stock (Limited Reserve)</option>
+                                            <option value="Rare Reserve">Rare Reserve (Special Harvest)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="prod-elevation">Terroir Elevation</label>
+                                        <input class="form-input" type="text" id="prod-elevation" placeholder="e.g. 1,240m Montane Ridge">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECTION 3: Photography Showcase & Multiple Gallery Images -->
+                            <div class="composer-section-card">
+                                <div class="composer-section-header">
+                                    <h4 class="composer-section-title">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                        <span>03. Product Photography &amp; Multi-Angle Gallery</span>
+                                    </h4>
+                                    <span id="prod-photos-count-badge" style="font-size: 0.72rem; padding: 0.2rem 0.65rem; border-radius: 12px; background: #fdf6e7; border: 1px solid #e8d7a8; color: #855b05; font-weight: 700;">
                                         0 Photos Attached
                                     </span>
                                 </div>
-                                <p style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.45;">
-                                    Upload multiple photos or pick estate photography. The designated <strong style="color:var(--color-gold);">★ Main Cover</strong> photo serves as the storefront card and catalog image, while all photos form the interactive 360&deg; gallery inside the product detail modal.
+                                <p style="font-size: 0.78rem; color: #64748b; margin: 0 0 1rem 0; line-height: 1.45;">
+                                    Attach multiple photos. The designated <strong style="color:#855b05;">★ Main Cover</strong> photo serves as the storefront card and catalog image, while all photos form the interactive 360&deg; gallery inside customer product detail modals.
                                 </p>
 
                                 <!-- Drag & Drop / File Upload Zone -->
-                                <div class="file-upload-zone" id="prod-image-zone" style="padding: 1.25rem 1rem; border-radius: 10px; cursor: pointer; text-align: center; border: 1.5px dashed rgba(212,175,55,0.4); background: rgba(0,0,0,0.25); transition: var(--transition-smooth);">
-                                    <div class="file-upload-icon" style="margin-bottom: 0.35rem; color: var(--color-gold);">
-                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                            <polyline points="17 8 12 3 7 8"></polyline>
-                                            <line x1="12" y1="3" x2="12" y2="15"></line>
-                                        </svg>
+                                <div class="file-upload-zone" id="prod-image-zone" style="padding: 1.5rem 1rem; border-radius: 10px; cursor: pointer; text-align: center; border: 2px dashed #d4af37; background: #fbfaf7; transition: all 0.2s ease;">
+                                    <div class="file-upload-icon" style="margin-bottom: 0.35rem; color: #855b05;">
+                                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                                     </div>
-                                    <div class="file-upload-text" style="font-size: 0.82rem; font-weight: 500;">
-                                        Drag &amp; drop multiple photos here, or <span class="file-upload-link" style="color: var(--color-gold); text-decoration: underline;">browse device</span>
+                                    <div class="file-upload-text" style="font-size: 0.88rem; font-weight: 600; color: #1f2937;">
+                                        Drag &amp; drop multiple photos here, or <span class="file-upload-link" style="color: #855b05; text-decoration: underline;">browse device</span>
                                     </div>
-                                    <div class="file-upload-hint" style="font-size: 0.7rem; margin-top: 0.3rem; color: var(--color-text-muted);">
+                                    <div class="file-upload-hint" style="font-size: 0.72rem; margin-top: 0.35rem; color: #64748b;">
                                         Supports JPG, PNG, WebP &bull; Select multiple files at once (Up to 5MB each)
                                     </div>
                                     <input type="file" id="prod-image-file" accept="image/*" multiple style="display:none;">
                                 </div>
 
                                 <!-- Add by URL / Relative Path -->
-                                <div style="display: flex; gap: 0.5rem; align-items: center; background: rgba(0,0,0,0.3); padding: 0.5rem 0.65rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2" style="flex-shrink:0;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                                    <input type="text" id="prod-image-url-input" class="form-input" placeholder="Or paste image URL / relative path (e.g. images/Product.jpeg)" style="padding: 0.4rem 0.65rem; font-size: 0.78rem; flex: 1;">
-                                    <button type="button" id="btn-add-prod-image-url" style="background: rgba(212,175,55,0.18); border: 1px solid rgba(212,175,55,0.45); color: var(--color-gold); font-size: 0.72rem; padding: 0.42rem 0.85rem; border-radius: 4px; cursor: pointer; white-space: nowrap; font-weight: 600; display: inline-flex; align-items: center; gap: 0.3rem;">
+                                <div style="display: flex; gap: 0.5rem; align-items: center; background: #ffffff; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid #d1d5db; margin-top: 0.85rem;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#855b05" stroke-width="2" style="flex-shrink:0;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                                    <input type="text" id="prod-image-url-input" class="form-input" placeholder="Or paste image URL / relative path (e.g. images/Product.jpeg)" style="padding: 0.45rem 0.65rem; font-size: 0.82rem; flex: 1; border: 1px solid #d1d5db; background:#fbfaf7;">
+                                    <button type="button" id="btn-add-prod-image-url" style="background: #fdf6e7; border: 1.5px solid #d4af37; color: #855b05; font-size: 0.75rem; padding: 0.45rem 0.95rem; border-radius: 5px; cursor: pointer; white-space: nowrap; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
                                         + Add Photo
                                     </button>
                                 </div>
 
-                                <!-- Quick Presets -->
-                                <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-                                    <div style="font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); display: flex; align-items: center; gap: 0.35rem;">
-                                        <span>Quick Estate Photography Presets:</span>
+                                <!-- Quick Estate Presets -->
+                                <div style="margin-top: 0.85rem;">
+                                    <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #855b05; margin-bottom: 0.4rem;">
+                                        Quick Estate Photography Presets:
                                     </div>
                                     <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;" id="prod-preset-images-bar">
-                                        <button type="button" class="btn-preset-prod-img" data-src="images/Product.jpeg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
-                                            Vintage Tin
-                                        </button>
-                                        <button type="button" class="btn-preset-prod-img" data-src="images/luxury_tea_tin.jpg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
-                                            Luxury Tin
-                                        </button>
-                                        <button type="button" class="btn-preset-prod-img" data-src="images/luxury_tea_chest.jpg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
-                                            Teak Chest
-                                        </button>
-                                        <button type="button" class="btn-preset-prod-img" data-src="images/Tea in cup.jpeg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
-                                            Sommelier Cup
-                                        </button>
-                                        <button type="button" class="btn-preset-prod-img" data-src="images/Tea estate.jpeg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
-                                            Wild Estate
-                                        </button>
-                                        <button type="button" class="btn-preset-prod-img" data-src="images/Factory inside.jpeg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
-                                            Orthodox Roller
-                                        </button>
-                                        <button type="button" class="btn-preset-prod-img" data-src="images/Ceylon tea.jpg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
-                                            Handcrafted Leaves
-                                        </button>
-                                        <button type="button" class="btn-preset-prod-img" data-src="images/Gift Box.jpeg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
-                                            Gift Box
-                                        </button>
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/Product.jpeg" style="background: #ffffff; border: 1px solid #d1d5db; color: #374151; font-size: 0.72rem; padding: 0.3rem 0.65rem; border-radius: 5px; cursor: pointer; font-weight: 600;">Vintage Tin</button>
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/luxury_tea_tin.jpg" style="background: #ffffff; border: 1px solid #d1d5db; color: #374151; font-size: 0.72rem; padding: 0.3rem 0.65rem; border-radius: 5px; cursor: pointer; font-weight: 600;">Luxury Tin</button>
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/luxury_tea_chest.jpg" style="background: #ffffff; border: 1px solid #d1d5db; color: #374151; font-size: 0.72rem; padding: 0.3rem 0.65rem; border-radius: 5px; cursor: pointer; font-weight: 600;">Teak Chest</button>
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/Tea in cup.jpeg" style="background: #ffffff; border: 1px solid #d1d5db; color: #374151; font-size: 0.72rem; padding: 0.3rem 0.65rem; border-radius: 5px; cursor: pointer; font-weight: 600;">Sommelier Cup</button>
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/Tea estate.jpeg" style="background: #ffffff; border: 1px solid #d1d5db; color: #374151; font-size: 0.72rem; padding: 0.3rem 0.65rem; border-radius: 5px; cursor: pointer; font-weight: 600;">Wild Estate</button>
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/Factory inside.jpeg" style="background: #ffffff; border: 1px solid #d1d5db; color: #374151; font-size: 0.72rem; padding: 0.3rem 0.65rem; border-radius: 5px; cursor: pointer; font-weight: 600;">Orthodox Roller</button>
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/Ceylon tea.jpg" style="background: #ffffff; border: 1px solid #d1d5db; color: #374151; font-size: 0.72rem; padding: 0.3rem 0.65rem; border-radius: 5px; cursor: pointer; font-weight: 600;">Handcrafted Leaves</button>
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/Gift Box.jpeg" style="background: #ffffff; border: 1px solid #d1d5db; color: #374151; font-size: 0.72rem; padding: 0.3rem 0.65rem; border-radius: 5px; cursor: pointer; font-weight: 600;">Gift Box</button>
                                     </div>
                                 </div>
 
-                                <!-- Dynamic Interactive Photo Gallery Grid -->
-                                <div id="prod-photos-grid-wrapper" style="display: none; flex-direction: column; gap: 0.65rem;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(212,175,55,0.15); padding-top: 0.65rem;">
-                                        <span style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
+                                <!-- Dynamic Attached Photos Grid -->
+                                <div id="prod-photos-grid-wrapper" style="display: none; flex-direction: column; gap: 0.75rem; margin-top: 1.15rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee9e0; padding-top: 0.75rem;">
+                                        <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #855b05;">
                                             Attached Photos (<span id="prod-photos-count-num">0</span>)
                                         </span>
-                                        <button type="button" id="btn-clear-all-prod-photos" style="background: transparent; border: 1px solid rgba(255,94,94,0.3); color: #ff8585; font-size: 0.68rem; padding: 0.2rem 0.55rem; border-radius: 3px; cursor: pointer; transition: var(--transition-smooth);">
+                                        <button type="button" id="btn-clear-all-prod-photos" style="background: transparent; border: 1px solid #fca5a5; color: #dc2626; font-size: 0.72rem; padding: 0.25rem 0.65rem; border-radius: 4px; cursor: pointer; font-weight: 600;">
                                             Clear All Photos
                                         </button>
                                     </div>
-                                    <div id="prod-photos-thumbnails-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.65rem;">
+                                    <div id="prod-photos-thumbnails-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 0.85rem;">
                                         <!-- Rendered dynamically -->
                                     </div>
                                 </div>
 
-                                <!-- Fallback hidden preview for legacy selectors -->
                                 <div id="prod-image-preview" style="display:none;"></div>
                             </div>
 
-                            <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                <label class="form-label" for="prod-desc" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Short Description *</label>
-                                <textarea class="form-input" id="prod-desc" required rows="3" placeholder="Describe the character, harvest details, and brewing experience..." style="resize: vertical; line-height: 1.5;"></textarea>
-                            </div>
-
-                            <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                <label class="form-label" for="prod-grade" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Leaf Grade</label>
-                                <input class="form-input" type="text" id="prod-grade" placeholder="e.g. Finest Tippy Flowery Orange Pekoe">
-                            </div>
-
-                            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start;">
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-temp" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Steep Temp</label>
-                                    <input class="form-input" type="text" id="prod-temp" placeholder="e.g. 95°C (203°F)">
+                            <!-- SECTION 4: Tasting Notes & 6-Point Sensory Radar -->
+                            <div class="composer-section-card">
+                                <div class="composer-section-header">
+                                    <h4 class="composer-section-title">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="12 6 12 12 16 14"></polygon></svg>
+                                        <span>04. Sommelier Tasting Profile &amp; Sensory Radar Chart</span>
+                                    </h4>
+                                    <span class="composer-section-badge">Connoisseur Dossier</span>
                                 </div>
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-time" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Steep Time</label>
-                                    <input class="form-input" type="text" id="prod-time" placeholder="e.g. 3-4 Minutes (or 180s)">
-                                </div>
-                            </div>
 
-                            <!-- Sensory Flavour Profile & Tasting Radar Master Section -->
-                            <div class="admin-sensory-panel" style="background: rgba(4, 14, 8, 0.75); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 12px; padding: 1.35rem 1.25rem; display: flex; flex-direction: column; gap: 1.15rem; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
-                                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 0.65rem;">
-                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="12 6 12 12 16 14"/></svg>
-                                        <span style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold);">Sensory Flavour Profile &amp; Tasting Radar</span>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.15rem; margin-bottom: 1.15rem;">
+                                    <div class="form-group">
+                                        <label class="form-label" for="prod-flavor-profile">Sensory Flavour Profile *</label>
+                                        <input class="form-input" type="text" id="prod-flavor-profile" required placeholder="e.g. Fresh Jasmine, White Peach, Sweet Montane Dew" style="font-weight: 600;">
+                                        <span class="field-hint">Primary bouquet chord displayed on product cards and sommelier guide.</span>
                                     </div>
-                                    <span style="font-size: 0.68rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px;">Connoisseur Dossier</span>
-                                </div>
-
-                                <!-- Flavour Profile Headline / Bouquet -->
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-flavor-profile" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
-                                        Sensory Flavour Profile *
-                                    </label>
-                                    <input class="form-input" type="text" id="prod-flavor-profile" required placeholder="e.g. Fresh Jasmine, White Peach, Sweet Montane Dew" style="font-weight: 500;">
-                                    <small style="font-size: 0.7rem; color: var(--color-text-muted);">Main bouquet chord displayed on customer storefront cards and sommelier guide.</small>
-                                </div>
-
-                                <!-- Tasting Notes / Chords (Tags) -->
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-tasting-notes" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
-                                        Sommelier Tasting Chords (Comma Separated) *
-                                    </label>
-                                    <input class="form-input" type="text" id="prod-tasting-notes" required placeholder="e.g. Wild Orchid, Golden Honey, Warm Cocoa, Montane Mineral">
-                                    <small style="font-size: 0.7rem; color: var(--color-text-muted);">Rendered as tasting chord tags on product cards and in the Sensory Dossier modal.</small>
-                                </div>
-
-                                <!-- Terroir Elevation -->
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-elevation" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Terroir Elevation</label>
-                                    <input class="form-input" type="text" id="prod-elevation" placeholder="e.g. 1,240m Montane Ridge">
-                                    <small style="font-size: 0.7rem; color: var(--color-text-muted);">Estate harvest altitude displayed in customer Connoisseur Dossier.</small>
-                                </div>
-
-                                <!-- 6-Point Sensory Radar Calibration Sliders -->
-                                <div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
-                                        <label class="form-label" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); margin-bottom: 0;">
-                                            6-Point Sensory Radar Calibration (0% - 100%)
-                                        </label>
-                                        <small style="font-size: 0.68rem; color: var(--color-text-muted);">Calibrates polygon radar chart</small>
+                                    <div class="form-group">
+                                        <label class="form-label" for="prod-tasting-notes">Sommelier Tasting Chords (Comma-Separated) *</label>
+                                        <input class="form-input" type="text" id="prod-tasting-notes" required placeholder="e.g. Wild Orchid, Golden Honey, Warm Cocoa, Montane Mineral">
+                                        <span class="field-hint">Rendered as tasting tags on catalog and detail screens.</span>
                                     </div>
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;" class="admin-radar-sliders-grid">
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.15rem; margin-bottom: 1.25rem;">
+                                    <div class="form-group">
+                                        <label class="form-label" for="prod-temp">Steeping Water Temp</label>
+                                        <input class="form-input" type="text" id="prod-temp" placeholder="e.g. 95°C (203°F)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="prod-time">Steeping Time</label>
+                                        <input class="form-input" type="text" id="prod-time" placeholder="e.g. 3-4 Minutes (or 180s)">
+                                    </div>
+                                </div>
+
+                                <!-- 6-Point Sensory Radar Sliders -->
+                                <div style="border-top: 1px solid #eee9e0; padding-top: 1rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+                                        <label class="form-label" style="margin-bottom: 0;">6-Point Sensory Radar Calibration (0% - 100%)</label>
+                                        <span style="font-size: 0.72rem; color: #64748b;">Calibrates the 360° polygon radar chart</span>
+                                    </div>
+
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem;">
                                         <!-- Floral -->
-                                        <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
-                                            <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
+                                        <div class="composer-radar-box">
+                                            <div style="display: flex; justify-content: space-between; font-size: 0.76rem; font-weight: 600; color: #374151; margin-bottom: 0.35rem;">
                                                 <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryFloral} Floral Intensity</span>
-                                                <strong id="badge-radar-floral" style="color: var(--color-gold); font-family: monospace;">80%</strong>
+                                                <strong id="badge-radar-floral" style="color: #855b05; font-family: monospace;">80%</strong>
                                             </div>
-                                            <input type="range" id="prod-radar-floral" min="0" max="100" value="80" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
+                                            <input type="range" id="prod-radar-floral" min="0" max="100" value="80" step="1" style="width: 100%; accent-color: #b8860b; cursor: pointer;">
                                         </div>
                                         <!-- Malty -->
-                                        <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
-                                            <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
+                                        <div class="composer-radar-box">
+                                            <div style="display: flex; justify-content: space-between; font-size: 0.76rem; font-weight: 600; color: #374151; margin-bottom: 0.35rem;">
                                                 <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryMalty} Malty / Roast</span>
-                                                <strong id="badge-radar-malty" style="color: var(--color-gold); font-family: monospace;">75%</strong>
+                                                <strong id="badge-radar-malty" style="color: #855b05; font-family: monospace;">75%</strong>
                                             </div>
-                                            <input type="range" id="prod-radar-malty" min="0" max="100" value="75" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
+                                            <input type="range" id="prod-radar-malty" min="0" max="100" value="75" step="1" style="width: 100%; accent-color: #b8860b; cursor: pointer;">
                                         </div>
                                         <!-- Sweetness -->
-                                        <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
-                                            <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
+                                        <div class="composer-radar-box">
+                                            <div style="display: flex; justify-content: space-between; font-size: 0.76rem; font-weight: 600; color: #374151; margin-bottom: 0.35rem;">
                                                 <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensorySweetness} Natural Sweetness</span>
-                                                <strong id="badge-radar-sweetness" style="color: var(--color-gold); font-family: monospace;">80%</strong>
+                                                <strong id="badge-radar-sweetness" style="color: #855b05; font-family: monospace;">80%</strong>
                                             </div>
-                                            <input type="range" id="prod-radar-sweetness" min="0" max="100" value="80" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
+                                            <input type="range" id="prod-radar-sweetness" min="0" max="100" value="80" step="1" style="width: 100%; accent-color: #b8860b; cursor: pointer;">
                                         </div>
                                         <!-- Astringency -->
-                                        <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
-                                            <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
+                                        <div class="composer-radar-box">
+                                            <div style="display: flex; justify-content: space-between; font-size: 0.76rem; font-weight: 600; color: #374151; margin-bottom: 0.35rem;">
                                                 <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryAstringency} Astringency</span>
-                                                <strong id="badge-radar-astringency" style="color: var(--color-gold); font-family: monospace;">40%</strong>
+                                                <strong id="badge-radar-astringency" style="color: #855b05; font-family: monospace;">40%</strong>
                                             </div>
-                                            <input type="range" id="prod-radar-astringency" min="0" max="100" value="40" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
+                                            <input type="range" id="prod-radar-astringency" min="0" max="100" value="40" step="1" style="width: 100%; accent-color: #b8860b; cursor: pointer;">
                                         </div>
                                         <!-- Body -->
-                                        <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
-                                            <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
+                                        <div class="composer-radar-box">
+                                            <div style="display: flex; justify-content: space-between; font-size: 0.76rem; font-weight: 600; color: #374151; margin-bottom: 0.35rem;">
                                                 <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryBody} Body &amp; Structure</span>
-                                                <strong id="badge-radar-body" style="color: var(--color-gold); font-family: monospace;">80%</strong>
+                                                <strong id="badge-radar-body" style="color: #855b05; font-family: monospace;">80%</strong>
                                             </div>
-                                            <input type="range" id="prod-radar-body" min="0" max="100" value="80" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
+                                            <input type="range" id="prod-radar-body" min="0" max="100" value="80" step="1" style="width: 100%; accent-color: #b8860b; cursor: pointer;">
                                         </div>
                                         <!-- Aroma -->
-                                        <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
-                                            <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
+                                        <div class="composer-radar-box">
+                                            <div style="display: flex; justify-content: space-between; font-size: 0.76rem; font-weight: 600; color: #374151; margin-bottom: 0.35rem;">
                                                 <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryAroma} Aroma Intensity</span>
-                                                <strong id="badge-radar-aroma" style="color: var(--color-gold); font-family: monospace;">90%</strong>
+                                                <strong id="badge-radar-aroma" style="color: #855b05; font-family: monospace;">90%</strong>
                                             </div>
-                                            <input type="range" id="prod-radar-aroma" min="0" max="100" value="90" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
+                                            <input type="range" id="prod-radar-aroma" min="0" max="100" value="90" step="1" style="width: 100%; accent-color: #b8860b; cursor: pointer;">
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Product Desk: Connoisseur Description & Seven Teahouse Accordions -->
-                            <div class="admin-sensory-panel admin-dossier-panel" style="background: rgba(4, 14, 8, 0.75); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 12px; padding: 1.35rem 1.25rem; display: flex; flex-direction: column; gap: 1.15rem; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
-                                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 0.65rem;">
-                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                                        <span style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold);">Product Desk &bull; Checkout &amp; Storefront Dossier Accordions</span>
-                                    </div>
-                                    <span style="font-size: 0.68rem; color: #86efac; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Seven Teahouse Style</span>
+                            <!-- SECTION 5: Connoisseur Dossier & Seven Teahouse Accordions -->
+                            <div class="composer-section-card">
+                                <div class="composer-section-header">
+                                    <h4 class="composer-section-title">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                                        <span>05. Connoisseur Dossier &amp; Storytelling Accordions</span>
+                                    </h4>
+                                    <span class="composer-section-badge">Seven Teahouse Style</span>
                                 </div>
-                                <p style="font-size: 0.75rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
-                                    Configure the poetic banner headline and 5 collapsible accordions displayed on checkout and product detail screens.
+                                <p style="font-size: 0.78rem; color: #64748b; margin: 0 0 1rem 0; line-height: 1.45;">
+                                    Configure the poetic banner headline and the 5 collapsible story accordions displayed on customer product detail screens.
                                 </p>
 
-                                <!-- Poetic Headline Banner -->
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-headline" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
-                                        Poetic Headline Banner
-                                    </label>
+                                <div class="form-group" style="margin-bottom: 1.15rem;">
+                                    <label class="form-label" for="prod-headline">Poetic Headline Banner</label>
                                     <input class="form-input" type="text" id="prod-headline" placeholder="e.g. Tender spring buds, roasted chestnut aroma, and fresh natural sweetness" style="font-weight: 500;">
-                                    <small style="font-size: 0.7rem; color: var(--color-text-muted);">Centered serif headline displayed above the accordions.</small>
+                                    <span class="field-hint">Centered serif headline displayed above the accordions.</span>
                                 </div>
 
-                                <!-- 1. About This Tea -->
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-about" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
-                                        1. About This Tea (Full Story &amp; Craftsmanship)
-                                    </label>
+                                <div class="form-group" style="margin-bottom: 1.15rem;">
+                                    <label class="form-label" for="prod-about">1. About This Tea (Full Story &amp; Craftsmanship)</label>
                                     <textarea class="form-input" id="prod-about" rows="3" placeholder="Detailed story of the plucking season, handcrafted pan-firing, and taste character..." style="resize: vertical; line-height: 1.5;"></textarea>
                                 </div>
 
-                                <!-- 2. Origin & Terroir -->
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-origin" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
-                                        2. Origin &amp; Terroir Details
-                                    </label>
+                                <div class="form-group" style="margin-bottom: 1.15rem;">
+                                    <label class="form-label" for="prod-origin">2. Origin &amp; Terroir Details</label>
                                     <textarea class="form-input" id="prod-origin" rows="2" placeholder="e.g. Passara Sanctuary, Badulla District, Uva Highlands, 1,320m Montane Ridge..." style="resize: vertical; line-height: 1.5;"></textarea>
                                 </div>
 
-                                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start;">
-                                    <!-- 3. Caffeine Level -->
-                                    <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                        <label class="form-label" for="prod-caffeine" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
-                                            3. Caffeine Level
-                                        </label>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.15rem; margin-bottom: 1.15rem;">
+                                    <div class="form-group">
+                                        <label class="form-label" for="prod-caffeine">3. Caffeine Level</label>
                                         <input class="form-input" type="text" id="prod-caffeine" placeholder="e.g. Medium (approx. 38mg - 45mg per 250ml cup), high L-theanine">
                                     </div>
-
-                                    <!-- 4. Preparation & Steeping -->
-                                    <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                        <label class="form-label" for="prod-preparation" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
-                                            4. Preparation &amp; Steeping Guide
-                                        </label>
+                                    <div class="form-group">
+                                        <label class="form-label" for="prod-preparation">4. Preparation &amp; Steeping Guide</label>
                                         <input class="form-input" type="text" id="prod-preparation" placeholder="e.g. 90°C - 95°C water, 3.5g per 150ml, 35s - 50s - 80s infusions">
                                     </div>
                                 </div>
 
-                                <!-- 5. Tea Benefits -->
-                                <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                    <label class="form-label" for="prod-benefits" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
-                                        5. Tea Benefits &amp; Purity Guarantee
-                                    </label>
-                                    <textarea class="form-input" id="prod-benefits" rows="2" placeholder="e.g. High in polyphenols & L-theanine, promotes focus, sustained antioxidant balance..." style="resize: vertical; line-height: 1.5;"></textarea>
+                                <div class="form-group">
+                                    <label class="form-label" for="prod-benefits">5. Tea Benefits &amp; Purity Guarantee</label>
+                                    <textarea class="form-input" id="prod-benefits" rows="2" placeholder="e.g. High in polyphenols &amp; L-theanine, promotes focus, sustained antioxidant balance..." style="resize: vertical; line-height: 1.5;"></textarea>
                                 </div>
                             </div>
-                            
-                            <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 0.5rem;">
-                                <button type="submit" id="btn-save-prod" class="btn btn-primary" style="flex: 1; padding: 0.85rem 1.5rem; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 0.45rem;">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                                    <span>Publish Product</span>
+
+                            <!-- Form Actions Footer -->
+                            <div style="display: flex; gap: 1rem; align-items: center; justify-content: flex-end; padding-top: 1rem; border-top: 1.5px solid #eee9e0; flex-wrap: wrap;">
+                                <button type="button" id="btn-cancel-edit-prod" class="btn btn-outline" style="border-color: #d1d5db; color: #4b5563; padding: 0.75rem 1.5rem; font-size: 0.85rem; font-weight: 600;">
+                                    Cancel &amp; Return
                                 </button>
-                                <button type="button" id="btn-cancel-edit-prod" class="btn btn-outline" style="display: none; border-color: rgba(255,255,255,0.25); color: var(--color-text-muted); padding: 0.85rem 1.25rem; font-size: 0.85rem;">
-                                    Cancel
+                                <button type="submit" id="btn-save-prod" class="btn btn-primary" style="padding: 0.75rem 2rem; font-size: 0.88rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(212,175,55,0.25);">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                                    <span>Publish Product</span>
                                 </button>
                             </div>
                         </form>
