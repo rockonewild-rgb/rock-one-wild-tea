@@ -6638,13 +6638,43 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .developer-credit {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+}
+
+.developer-credit-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: inherit;
+    text-decoration: none !important;
+    transition: all 0.22s ease;
+    opacity: 0.88;
+}
+
+.developer-credit-link:hover {
+    opacity: 1;
+    color: #7a5a06 !important;
+}
+
+.developer-credit-text {
+    color: inherit;
+    font-size: 0.76rem;
+    font-weight: 500;
+    transition: color 0.22s ease;
 }
 
 .footer-dev-logo {
-    height: 18px;
+    height: 24px;
+    width: auto;
+    max-width: 95px;
     object-fit: contain;
-    filter: brightness(0.95);
+    vertical-align: middle;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
+}
+
+.developer-credit-link:hover .footer-dev-logo {
+    transform: translateY(-1.5px) scale(1.08);
+    filter: drop-shadow(0 4px 8px rgba(0, 170, 130, 0.22)) brightness(1.05);
 }
 
 /* Interactive Brewing Guide Styles */
