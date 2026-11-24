@@ -15033,7 +15033,7 @@ img, video, canvas, iframe {
     overflow-y: scroll !important;
     -webkit-overflow-scrolling: touch !important;
     overscroll-behavior-y: contain !important;
-    z-index: 2200 !important;
+    z-index: 2800 !important;
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -18676,7 +18676,7 @@ div[style*="rgba(6, 24, 14"] p {
     overflow-y: scroll !important;
     -webkit-overflow-scrolling: touch !important;
     overscroll-behavior-y: contain !important;
-    z-index: 2200 !important;
+    z-index: 2800 !important;
     padding: 0 !important;
     margin: 0 !important;
     background: #f8f6f2 !important;
@@ -18685,6 +18685,11 @@ div[style*="rgba(6, 24, 14"] p {
     pointer-events: all !important;
     scrollbar-width: thin !important;
     scrollbar-color: #b8860b #f1ede6 !important;
+}
+
+#cart-drawer-overlay,
+.cart-drawer-overlay {
+    z-index: 2800 !important;
 }
 
 /* Prominent gold scrollbar for the checkout overlay */

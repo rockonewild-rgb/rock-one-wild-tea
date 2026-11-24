@@ -5323,7 +5323,10 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.classList.remove('active', 'open');
             modal.setAttribute('aria-hidden', 'true');
         }
-        document.body.style.overflow = '';
+        const cartOverlay = document.getElementById('cart-drawer-overlay');
+        if (!cartOverlay || (!cartOverlay.classList.contains('active') && !cartOverlay.classList.contains('open'))) {
+            document.body.style.overflow = '';
+        }
     };
 
     window.openProductDetail = function(id, type = 'product', options = {}) {
@@ -5376,6 +5379,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && prodDetailModal && prodDetailModal.classList.contains('active')) {
+            const cartOverlay = document.getElementById('cart-drawer-overlay');
+            if (cartOverlay && (cartOverlay.classList.contains('active') || cartOverlay.classList.contains('open'))) {
+                return; // Let cart overlay handle escape first
+            }
             window.closeProductDetail();
         }
     });
@@ -14219,11 +14226,22 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             cartOverlay.classList.remove('active');
             cartOverlay.classList.remove('open');
             cartOverlay.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
+            const prodDetailModal = document.getElementById('product-detail-modal');
+            if (!prodDetailModal || (!prodDetailModal.classList.contains('active') && !prodDetailModal.classList.contains('open'))) {
+                document.body.style.overflow = '';
+            } else {
+                document.body.style.overflow = 'hidden';
+            }
         }
 
         window.appOpenCart = openCart;
+        window.openCart = openCart;
         window.appCloseCart = closeCart;
+        window.closeCart = closeCart;
+        window.toggleCartDrawer = function(openState) {
+            if (openState !== false) openCart();
+            else closeCart();
+        };
 
         // Global delegated trigger for opening Reserve Bag
         document.addEventListener('click', (e) => {

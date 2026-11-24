@@ -8157,9 +8157,12 @@ const UIComponents = {
         if (addCartBtn) {
             addCartBtn.addEventListener('click', () => {
                 const finalUnitPrice = basePrice * selectedVariant.multiplier;
+                const variantSuffix = selectedVariant.label ? selectedVariant.label.replace(/\s+/g, '_') : 'std';
+                const cartItemId = `${item.id || (isTour ? 'tour-gongfu' : (isBox ? 'chest-01' : 'prod-reserve'))}_${variantSuffix}`;
+
                 if (window.TeaFactoryStore && window.TeaFactoryStore.addToCart) {
                     window.TeaFactoryStore.addToCart({
-                        id: item.id || (isTour ? 'tour-gongfu' : (isBox ? 'chest-01' : 'prod-reserve')),
+                        id: cartItemId,
                         name: `${title} (${selectedVariant.label})`,
                         price: finalUnitPrice,
                         shippingCharge: shipFee,
@@ -8167,16 +8170,25 @@ const UIComponents = {
                         image: heroImg ? heroImg.src : primaryImg,
                         type: type,
                         weight: selectedVariant.label,
-                        category: isTour ? 'Experience' : (isBox ? 'Collector Chest' : 'Single-Estate Tea'),
-                        qty: currentQty
-                    });
+                        category: isTour ? 'Experience' : (isBox ? 'Collector Chest' : 'Single-Estate Tea')
+                    }, currentQty);
                 }
+
+                // Immediately refresh cart counter badges on navigation and floating dock
+                if (window.appUpdateCartBadges) {
+                    window.appUpdateCartBadges();
+                }
+
                 if (window.showToast) {
                     window.showToast('Added to Reserve Bag', `${currentQty} &times; ${title} (${selectedVariant.label}) added.`, 'success');
                 }
-                // Open cart drawer
-                if (window.toggleCartDrawer) {
-                    window.closeProductDetail();
+
+                // Open Reserve Bag / Cart Drawer immediately so the customer sees the cart
+                if (typeof window.appOpenCart === 'function') {
+                    window.appOpenCart();
+                } else if (typeof window.openCart === 'function') {
+                    window.openCart();
+                } else if (typeof window.toggleCartDrawer === 'function') {
                     window.toggleCartDrawer(true);
                 }
             });
