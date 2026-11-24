@@ -235,7 +235,8 @@ const UIComponents = {
     } = {}) {
         const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
         return `
-            <div class="page-hero-banner" style="background-image: url('${image}');">
+            <div class="page-hero-banner">
+                <div class="page-hero-bg" style="background-image: url('${image}');"></div>
                 <div class="page-hero-overlay"></div>
                 <div class="page-hero-content">
                     <div class="page-hero-text">

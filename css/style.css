@@ -1157,9 +1157,6 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     padding: 0 !important;
     border-radius: 0 !important;
     border: none !important;
-    background-size: cover !important;
-    background-position: center center !important;
-    background-repeat: no-repeat !important;
     overflow: hidden !important;
     display: flex !important;
     align-items: center !important;
@@ -1167,12 +1164,60 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     background-color: #030e07 !important;
 }
 
-/* Dark nature Ceylon gradient overlay (darker on left for crystal-clear readability) */
+/* Background image layer with slow zoom-out entrance and crystal-clear visibility */
+.page-hero-bg {
+    position: absolute;
+    inset: -14px;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    z-index: 0;
+    pointer-events: none;
+    transform: scale(1.15);
+    opacity: 0.15;
+    filter: blur(4px) brightness(1.05);
+    animation: pageHeroBgZoomOut 2.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    will-change: transform, opacity, filter;
+}
+
+@keyframes pageHeroBgZoomOut {
+    0% {
+        transform: scale(1.15);
+        opacity: 0.15;
+        filter: blur(4px) brightness(1.06);
+    }
+    30% {
+        opacity: 0.85;
+        filter: blur(0.5px) brightness(1.02);
+    }
+    100% {
+        transform: scale(1.0);
+        opacity: 1;
+        filter: blur(0px) brightness(1);
+    }
+}
+
+/* Fallback if background-image is directly on .page-hero-banner */
+.page-hero-banner:not(:has(.page-hero-bg)) {
+    background-size: cover !important;
+    background-position: center center !important;
+    animation: pageHeroBgZoomOut 2.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Luminous atmospheric Ceylon gradient overlay — guarantees proper image visibility with left-side text contrast */
 .page-hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, rgba(3, 14, 8, 0.90) 0%, rgba(3, 14, 8, 0.74) 42%, rgba(2, 10, 5, 0.38) 75%, rgba(2, 10, 5, 0.16) 100%),
-                linear-gradient(180deg, rgba(2, 10, 5, 0.35) 0%, transparent 60%, rgba(2, 8, 4, 0.6) 100%);
+    background: linear-gradient(90deg, 
+        rgba(3, 14, 8, 0.58) 0%, 
+        rgba(3, 14, 8, 0.36) 40%, 
+        rgba(2, 10, 5, 0.12) 72%, 
+        transparent 100%),
+        linear-gradient(180deg, 
+        rgba(2, 10, 5, 0.16) 0%, 
+        transparent 35%, 
+        transparent 75%, 
+        rgba(2, 8, 4, 0.25) 100%);
     z-index: 1;
     pointer-events: none;
 }
@@ -1192,17 +1237,19 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
 .page-hero-text {
     max-width: 720px;
     text-align: left;
-    animation: heroFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    z-index: 4;
 }
 
+/* Staggered description entrance: appears first while background image slowly zooms out */
 .page-hero-pill-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
     padding: 0.28rem 0.85rem;
     border-radius: 9999px;
-    background: rgba(16, 185, 129, 0.18);
-    border: 1px solid rgba(74, 222, 128, 0.38);
+    background: rgba(16, 185, 129, 0.22);
+    border: 1px solid rgba(74, 222, 128, 0.45);
     color: #86efac;
     font-size: 0.76rem;
     font-weight: 600;
@@ -1210,6 +1257,8 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     margin-bottom: 0.75rem;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    animation: heroBadgeReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.05s forwards;
 }
 
 .page-hero-pretitle {
@@ -1221,7 +1270,9 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     line-height: 1.15;
     letter-spacing: -0.025em;
     margin-bottom: 0.2rem;
-    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9), 0 4px 22px rgba(0, 0, 0, 0.85);
+    opacity: 0;
+    animation: heroTextReveal 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.12s forwards;
 }
 
 .page-hero-title {
@@ -1232,19 +1283,45 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     line-height: 1.1;
     margin: 0 0 0.75rem 0;
     letter-spacing: -0.025em;
-    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95), 0 6px 28px rgba(0, 0, 0, 0.88);
+    opacity: 0;
+    animation: heroTextReveal 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.18s forwards;
 }
 
 .page-hero-tagline {
     font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
     font-size: clamp(0.92rem, 1.35vw, 1.15rem);
     font-style: italic;
-    color: rgba(255, 255, 255, 0.92);
+    color: rgba(255, 255, 255, 0.95);
     font-weight: 400;
     letter-spacing: 0.2px;
     margin: 0;
     line-height: 1.5;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.95), 0 3px 18px rgba(0, 0, 0, 0.88);
+    opacity: 0;
+    animation: heroTextReveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards;
+}
+
+@keyframes heroBadgeReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(12px) scale(0.96);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes heroTextReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Page Intro Block directly below the banner (Reference: 'Our Story' pill & bold title) */
@@ -1370,8 +1447,8 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     background-repeat: no-repeat;
     opacity: 0;
     visibility: hidden;
-    transform: scale(1);
-    transition: opacity 1.1s ease-in-out, transform 8s cubic-bezier(0.16, 1, 0.3, 1), visibility 1.1s;
+    transform: scale(1.10);
+    transition: opacity 1.1s ease-in-out, transform 7s cubic-bezier(0.16, 1, 0.3, 1), visibility 1.1s;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1379,13 +1456,13 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     padding: clamp(0.75rem, 2vh, 1.5rem) 1rem clamp(5rem, 11vh, 7.5rem) 1rem !important;
     text-align: center;
     box-sizing: border-box;
-    filter: brightness(1.03) contrast(1.04);
+    filter: brightness(1.04) contrast(1.04);
 }
 
 .hero-slide.active {
     opacity: 1;
     visibility: visible;
-    transform: scale(1.015);
+    transform: scale(1.0);
     z-index: 2;
 }
 
