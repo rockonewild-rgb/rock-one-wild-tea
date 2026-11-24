@@ -1162,6 +1162,11 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     box-sizing: border-box !important;
 }
 
+/* Temporarily hide Numbered Box Booking Selection (1 to 10) on Home Page */
+#home-catalog-preview-block {
+    display: none !important;
+}
+
 /* =========================================================================
    CINEMATIC PAGE HERO BANNER (REFERENCE: ELLA ORGANIC TEA GARDEN HERITAGE STYLE)
    ========================================================================= */

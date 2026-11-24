@@ -446,8 +446,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderTabContent(tabId) {
         switch (tabId) {
             case 'home':
+                /* Numbered Box Booking Selection (1 to 10) temporarily hidden on home page per user request
                 window.UIComponents.renderSeriesSelector('catalog-widget-container');
                 bindCatalogEvents('catalog-widget-container');
+                */
                 renderHomeAnnouncementsPreview();
                 window.UIComponents.renderHeritageShowcase('home-heritage-container');
                 initHeritageGallerySlider();
