@@ -559,114 +559,80 @@ const UIComponents = {
 
         let prodHtml = `<div class="products-grid">`;
         prodHtml += filteredProducts.map(p => {
-            const tastingChips = (p.tastingNotes && p.tastingNotes.length > 0)
-                ? p.tastingNotes.map(n => `<span class="tasting-chip">${this.highlightText(n, searchFilter)}</span>`).join('')
-                : `<span class="tasting-chip">${_t('terroir_pure_ceylon', 'Pure Ceylon')}</span><span class="tasting-chip">${_t('terroir_single_estate', 'Single Estate')}</span>`;
-
-            const radar = p.sensoryRadar || { floral: 75, malty: 70, sweetness: 75, astringency: 40, body: 75, aroma: 85 };
             const displayName = this.highlightText(p.name, searchFilter);
-            const displayDesc = this.highlightText(p.desc, searchFilter);
-            const displayGrade = this.highlightText(p.leafGrade || _t('leaf_grade_default', 'Single-Estate Reserve'), searchFilter);
+            const displayDesc = this.highlightText(p.desc || p.description || '', searchFilter);
+            const displayGrade = this.highlightText(p.leafGrade || p.grade || _t('leaf_grade_default', 'Single-Estate Reserve'), searchFilter);
+            const shipVal = Number(p.shippingCharge !== undefined ? p.shippingCharge : (p.shippingFee || p.shipping_fee_usd || 0)) || 0;
+            const tastingNotesText = p.flavorProfile || (p.tastingNotes && p.tastingNotes.length > 0 ? p.tastingNotes.join(' • ') : 'Single-Estate Ceylon Harvest');
+            const displayNotes = this.highlightText(tastingNotesText, searchFilter);
+            const displayWeight = p.weight || '100g Vintage Tin';
 
             return `
-                <div class="product-luxury-card status-available">
-                    <div class="product-card-visual-box">
+                <div class="product-luxury-card status-available" data-id="${p.id}">
+                    <div class="product-card-visual-box" title="${_t('view_product_detail', 'Click to view details &amp; sensory dossier')}">
                         <img src="${p.image || 'images/Product.jpeg'}" class="product-card-image" alt="${p.name}" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
                         <div class="product-card-overlay"></div>
                         <div class="product-card-badge-cluster">
                             <span class="product-stock-tag ${p.stock === 'Low Stock' ? 'tag-warning' : 'tag-available'}">${p.stock || _t('stock_available', 'In Stock')}</span>
-                            ${p.elevation ? `<span class="product-elevation-tag"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg> ${p.elevation}</span>` : ''}
                         </div>
-                        ${p.weight ? `<div class="product-weight-chip">${p.weight}</div>` : ''}
+                        <div class="product-weight-chip">${displayWeight}</div>
+                        <div class="product-quick-inspect-overlay">
+                            <span class="product-inspect-hint">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="12 6 12 12 16 14"/></svg>
+                                <span>${_t('btn_tasting_radar_short', 'Sensory Radar')}</span>
+                            </span>
+                        </div>
                     </div>
                     <div class="product-card-content">
-                        <div class="product-leaf-grade-banner">
+                        <div class="product-card-eyebrow">
+                            <span class="product-category-crumb">${p.category || 'Pure Ceylon'}</span>
+                            <span class="product-eyebrow-sep">&bull;</span>
                             <span class="leaf-grade-badge">${displayGrade}</span>
-                            <span class="product-category-crumb">${p.category || 'Pure Ceylon'}${p.subcategory ? ` &bull; ${p.subcategory}` : ''}</span>
-                        </div>
-                        <div class="product-title-pricing-row">
-                            <h3 class="product-card-title">${displayName}</h3>
-                            <div class="product-price-block">
-                                <span class="product-price-val">${window.TeaFactoryStore.formatCurrency(p.price)}</span>
-                                ${(() => {
-                                    const shipVal = Number(p.shippingCharge !== undefined ? p.shippingCharge : (p.shippingFee || 0)) || 0;
-                                    if (shipVal > 0) {
-                                        return `<span class="product-shipping-note" style="display:block; font-size:0.68rem; color:#86efac; font-weight:500; margin-top:2px;">+ ${window.TeaFactoryStore.formatCurrency(shipVal)} shipping</span>`;
-                                    }
-                                    return `<span class="product-shipping-note" style="display:block; font-size:0.68rem; color:rgba(255,255,255,0.45); font-weight:400; margin-top:2px;">Complimentary shipping</span>`;
-                                })()}
-                            </div>
-                        </div>
-                        <p class="product-card-description">${displayDesc}</p>
-                        ${p.flavorProfile ? `
-                        <div class="product-flavor-profile-row" style="margin-bottom: 0.65rem; font-size: 0.76rem; color: var(--color-gold); font-weight: 500; display: flex; align-items: center; gap: 0.35rem; line-height: 1.35;">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polygon points="12 6 12 12 16 14"/></svg>
-                            <span>${this.highlightText(p.flavorProfile, searchFilter)}</span>
-                        </div>` : ''}
-                        
-                        <!-- Tasting Notes Chords -->
-                        <div class="product-tasting-chips-row">
-                            ${tastingChips}
                         </div>
 
-                        <!-- Steeping Quick Indicators -->
+                        <h3 class="product-card-title" title="${p.name}">${displayName}</h3>
+
+                        <div class="product-title-pricing-row">
+                            <div class="product-price-block">
+                                <span class="product-price-val">${window.TeaFactoryStore.formatCurrency(p.price)}</span>
+                                <span class="product-shipping-note">${shipVal > 0 ? `+ ${window.TeaFactoryStore.formatCurrency(shipVal)} shipping` : _t('shipping_free', 'Complimentary Worldwide Shipping')}</span>
+                            </div>
+                            ${p.elevation ? `<div class="product-elevation-tag" title="Elevation"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg> ${p.elevation}</div>` : ''}
+                        </div>
+
+                        <div class="product-flavor-profile-row" title="Signature Tasting Chords">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="flavor-leaf-svg" style="flex-shrink:0; color:#b8860b;"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+                            <span class="product-notes-text">${displayNotes}</span>
+                        </div>
+
+                        <p class="product-card-description">${displayDesc}</p>
+
+                        <!-- Quick Brewing Indicators Strip -->
                         <div class="product-brewing-specs-row">
                             <div class="spec-cell" title="${_t('stat_water_temp', 'Water Temperature')}">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
                                 <span>${p.steepTemp || '90°C'}</span>
                             </div>
                             <div class="spec-cell" title="${_t('stat_steep_duration', 'Steeping Duration')}">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                 <span>${p.steepTime || '3 Min'}</span>
                             </div>
-                            <div class="spec-cell" title="${_t('stat_aroma', 'Aroma Score')}">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                <span>${_t('stat_aroma', 'Aroma')} ${radar.aroma || 85}%</span>
+                            <div class="spec-cell" title="${_t('stat_format', 'Format')}">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                                <span>${displayWeight}</span>
                             </div>
                         </div>
 
-                        <!-- 6-Point Calibrated Sensory Spectrum Ribbon (Vector Icons - Immune to Mojibake) -->
-                        <div class="product-sensory-ribbon" style="display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.35rem 0.4rem; background: rgba(4,14,8,0.78); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.45rem 0.55rem; margin-bottom: 0.85rem; font-size: 0.68rem; color: #dcece1; box-sizing: border-box; width: 100%; overflow: hidden;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; min-width:0;" title="${_t('radar_floral', 'Floral')}">
-                                <span style="display:inline-flex; align-items:center; gap:0.25rem; min-width:0; overflow:hidden; white-space:nowrap;">${SVG_ICONS.sensoryFloral} <span style="overflow:hidden; text-overflow:ellipsis;">${_t('radar_floral', 'Floral')}</span></span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.2rem; flex-shrink:0;">${radar.floral ?? 80}%</strong>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center; min-width:0;" title="${_t('radar_malty', 'Malty')}">
-                                <span style="display:inline-flex; align-items:center; gap:0.25rem; min-width:0; overflow:hidden; white-space:nowrap;">${SVG_ICONS.sensoryMalty} <span style="overflow:hidden; text-overflow:ellipsis;">${_t('radar_malty', 'Malty')}</span></span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.2rem; flex-shrink:0;">${radar.malty ?? 75}%</strong>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center; min-width:0;" title="${_t('radar_sweetness', 'Natural Sweetness')}">
-                                <span style="display:inline-flex; align-items:center; gap:0.25rem; min-width:0; overflow:hidden; white-space:nowrap;">${SVG_ICONS.sensorySweetness} <span style="overflow:hidden; text-overflow:ellipsis;">${_t('radar_sweet_short', 'Sweet')}</span></span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.2rem; flex-shrink:0;">${radar.sweetness ?? 80}%</strong>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center; min-width:0;" title="${_t('radar_astringency', 'Astringency & Briskness')}">
-                                <span style="display:inline-flex; align-items:center; gap:0.25rem; min-width:0; overflow:hidden; white-space:nowrap;">${SVG_ICONS.sensoryAstringency} <span style="overflow:hidden; text-overflow:ellipsis;">${_t('radar_brisk_short', 'Brisk')}</span></span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.2rem; flex-shrink:0;">${radar.astringency ?? 40}%</strong>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center; min-width:0;" title="${_t('radar_body', 'Body')}">
-                                <span style="display:inline-flex; align-items:center; gap:0.25rem; min-width:0; overflow:hidden; white-space:nowrap;">${SVG_ICONS.sensoryBody} <span style="overflow:hidden; text-overflow:ellipsis;">${_t('radar_body', 'Body')}</span></span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.2rem; flex-shrink:0;">${radar.body ?? 80}%</strong>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center; min-width:0;" title="${_t('radar_aroma', 'Aroma')}">
-                                <span style="display:inline-flex; align-items:center; gap:0.25rem; min-width:0; overflow:hidden; white-space:nowrap;">${SVG_ICONS.sensoryAroma} <span style="overflow:hidden; text-overflow:ellipsis;">${_t('radar_aroma', 'Aroma')}</span></span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.2rem; flex-shrink:0;">${radar.aroma ?? 90}%</strong>
-                            </div>
-                        </div>
-
-                        <!-- Card Action Buttons -->
+                        <!-- Card Action Buttons (Sensory Radar & Add to Bag) -->
                         <div class="product-card-actions-stack">
-                            <button type="button" class="btn btn-outline btn-view-connoisseur" data-id="${p.id}" aria-label="View Sensory Radar & Steep Timer">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="12 6 12 12 16 14"/></svg>
-                                <span>${_t('btn_tasting_radar', 'Sensory Radar & Steep Timer')}</span>
-                            </button>
                             <div class="product-cta-button-group">
-                                <button type="button" class="btn btn-primary btn-add-to-cart" data-id="${p.id}" data-type="product" aria-label="Add to Bag">
+                                <button type="button" class="btn btn-outline btn-view-connoisseur" data-id="${p.id}" aria-label="View Sensory Radar &amp; Steep Timer" title="View Sensory Radar &amp; Steep Timer">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="12 6 12 12 16 14"/></svg>
+                                    <span>${_t('btn_tasting_radar_short', 'Sensory Radar')}</span>
+                                </button>
+                                <button type="button" class="btn btn-primary btn-add-to-cart" data-id="${p.id}" data-type="product" aria-label="Add to Bag" title="Add to Bag">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                                     <span>${_t('btn_add_to_bag', 'Add to Bag')}</span>
-                                </button>
-                                <button type="button" class="btn btn-outline btn-book-prod" data-id="${p.id}" aria-label="Reserve Product">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                    <span>${_t('btn_quick_order', 'Reserve')}</span>
                                 </button>
                             </div>
                         </div>
