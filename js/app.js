@@ -13258,25 +13258,32 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         if (slidesWrapper && storeHeroSlides.length > 0) {
             slidesWrapper.innerHTML = storeHeroSlides.map((slideObj, idx) => {
                 const isActive = idx === currentHeroIndex || (idx === 0 && currentHeroIndex >= storeHeroSlides.length);
-                const subtitle = slideObj.subtitle || 'Authentic Ceylon Tea Experience';
-                const title = slideObj.title || 'Organic Homemade<br><span>Tea Experience</span>';
+                const isHeritage = slideObj.isHeritage || idx === 0 || slideObj.id === 'slide_01';
+                const heritageClass = isHeritage ? ' hero-slide-heritage' : '';
+                const subtitle = slideObj.subtitle || (isHeritage ? 'Authentic • Organic • Traditional' : 'Authentic Ceylon Tea Experience');
+                const title = slideObj.title || (isHeritage ? '<span class="hero-title-top">Rock One\'s Organic</span><span class="hero-title-bottom">Tea Heritage</span>' : 'Organic Homemade<br><span>Tea Experience</span>');
+                const titleClass = isHeritage ? 'hero-title hero-title-heritage' : 'hero-title';
+                const taglineHtml = slideObj.tagline ? `<div class="hero-tagline-italic">${slideObj.tagline}</div>` : (isHeritage ? `<div class="hero-tagline-italic">Where Nature Meets Tradition</div>` : '');
                 const description = slideObj.description || "Discover the ancient art of organic tea-making in the heart of Ceylon's mountains. From garden to cup, experience the authentic journey of premium Sri Lankan tea.";
+                const descClass = isHeritage ? 'hero-description hero-desc-left' : 'hero-description';
+                const bookBtnText = isHeritage ? 'Book Experience &rarr;' : 'Book Tea Experience &rarr;';
                 const rawImg = slideObj.image || 'images/hero_slide_1.jpg';
-                const imgSrc = rawImg.startsWith('data:') ? rawImg : (rawImg.includes('?v=') ? rawImg : `${rawImg}?v=3.63.0`);
+                const imgSrc = rawImg.startsWith('data:') ? rawImg : (rawImg.includes('?v=') ? rawImg : `${rawImg}?v=3.69.0`);
 
                 return `
-                    <div class="hero-slide${isActive ? ' active' : ''}" style="background-image: url('${imgSrc}');">
+                    <div class="hero-slide${isActive ? ' active' : ''}${heritageClass}" style="background-image: url('${imgSrc}');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
                             <span class="hero-pill-badge">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
                                 <span>${subtitle}</span>
                             </span>
-                            <h1 class="hero-title">${title}</h1>
-                            <p class="hero-description">${description}</p>
+                            <h1 class="${titleClass}">${title}</h1>
+                            ${taglineHtml}
+                            <p class="${descClass}">${description}</p>
                             <div class="hero-cta">
                                 <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('booking') : (document.getElementById('nav-booking') && document.getElementById('nav-booking').click());">
-                                    Book Tea Experience &rarr;
+                                    ${bookBtnText}
                                 </button>
                                 <button type="button" class="btn btn-hero-outline" onclick="window.appSwitchTab ? window.appSwitchTab('catalog') : (document.getElementById('nav-catalog') && document.getElementById('nav-catalog').click());">
                                     Explore Tea Shop

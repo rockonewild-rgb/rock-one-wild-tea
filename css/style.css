@@ -1673,6 +1673,110 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     font-weight: 500;
 }
 
+/* ─── Hero Slide 1: Ella Organic Tea Heritage Banner Style ─── */
+.hero-slide.hero-slide-heritage .hero-slide-overlay {
+    background: linear-gradient(to right, rgba(4, 20, 10, 0.90) 0%, rgba(4, 20, 10, 0.74) 38%, rgba(4, 20, 10, 0.35) 68%, rgba(4, 20, 10, 0.10) 88%, transparent 100%) !important;
+}
+
+.hero-slide-heritage .hero-title-heritage {
+    font-size: clamp(2.1rem, 4.4vw, 3.8rem) !important;
+    font-weight: 800 !important;
+    line-height: 1.08 !important;
+    letter-spacing: -0.025em !important;
+    margin: 0 0 0.35rem 0 !important;
+}
+
+.hero-slide-heritage .hero-title-heritage .hero-title-top,
+.hero-slide-heritage .hero-title > span:first-child {
+    display: block !important;
+    color: #f59e0b !important;
+    background: linear-gradient(135deg, #fef08a 0%, #f59e0b 55%, #d97706 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    filter: drop-shadow(0 2px 14px rgba(245, 158, 11, 0.35));
+}
+
+.hero-slide-heritage .hero-title-heritage .hero-title-bottom,
+.hero-slide-heritage .hero-title > span:last-child {
+    display: block !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.85);
+}
+
+.hero-slide-heritage .hero-tagline-italic {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(1.05rem, 1.4vw, 1.35rem);
+    color: #e5e7eb;
+    margin-bottom: clamp(0.45rem, 1.2vh, 0.8rem);
+    letter-spacing: 0.4px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+}
+
+.hero-slide-heritage .hero-desc-left {
+    max-width: 580px !important;
+    color: rgba(255, 255, 255, 0.94) !important;
+    font-size: clamp(0.84rem, 1.05vw, 0.98rem) !important;
+    line-height: 1.55 !important;
+    margin-bottom: clamp(0.75rem, 1.5vh, 1.15rem) !important;
+}
+
+@media (min-width: 860px) {
+    .hero-slide-heritage .hero-slide-content {
+        align-items: flex-start !important;
+        text-align: left !important;
+        max-width: 680px !important;
+        margin-left: clamp(2.5rem, 6.5vw, 7rem) !important;
+        margin-right: auto !important;
+        padding-left: 0 !important;
+    }
+    .hero-slide-heritage .hero-title-heritage {
+        text-align: left !important;
+    }
+    .hero-slide-heritage .hero-tagline-italic {
+        text-align: left !important;
+    }
+    .hero-slide-heritage .hero-desc-left {
+        text-align: left !important;
+        margin-left: 0 !important;
+        margin-right: auto !important;
+    }
+    .hero-slide-heritage .hero-cta {
+        justify-content: flex-start !important;
+        margin-left: 0 !important;
+    }
+    .hero-slide-heritage .hero-rating-badge {
+        justify-content: flex-start !important;
+        margin-left: 0 !important;
+    }
+}
+
+@media (max-width: 859px) {
+    .hero-slide-heritage .hero-slide-content {
+        align-items: center !important;
+        text-align: center !important;
+    }
+    .hero-slide-heritage .hero-title-heritage {
+        text-align: center !important;
+    }
+    .hero-slide-heritage .hero-tagline-italic {
+        text-align: center !important;
+    }
+    .hero-slide-heritage .hero-desc-left {
+        text-align: center !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+    .hero-slide-heritage .hero-cta {
+        justify-content: center !important;
+    }
+    .hero-slide-heritage .hero-rating-badge {
+        justify-content: center !important;
+    }
+}
+
 /* Bottom Floating Stat Cards (Reference: Ella Organic Tea Garden Style) */
 .hero-floating-stats-wrap {
     position: absolute;

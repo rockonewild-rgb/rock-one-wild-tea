@@ -626,30 +626,30 @@ const UIComponents = {
                         </div>
 
                         <!-- 6-Point Calibrated Sensory Spectrum Ribbon (Vector Icons - Immune to Mojibake) -->
-                        <div class="product-sensory-ribbon" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem 0.5rem; background: rgba(4,14,8,0.72); border: 1px solid rgba(212,175,55,0.22); border-radius: 8px; padding: 0.45rem 0.65rem; margin-bottom: 0.85rem; font-size: 0.7rem; color: #dcece1;">
-                            <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_floral', 'Floral')}">
-                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryFloral} ${_t('radar_floral', 'Floral')}</span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.25rem;">${radar.floral ?? 80}%</strong>
+                        <div class="product-sensory-ribbon" style="display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.35rem 0.4rem; background: rgba(4,14,8,0.78); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.45rem 0.55rem; margin-bottom: 0.85rem; font-size: 0.68rem; color: #dcece1; box-sizing: border-box; width: 100%; overflow: hidden;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; min-width:0;" title="${_t('radar_floral', 'Floral')}">
+                                <span style="display:inline-flex; align-items:center; gap:0.25rem; min-width:0; overflow:hidden; white-space:nowrap;">${SVG_ICONS.sensoryFloral} <span style="overflow:hidden; text-overflow:ellipsis;">${_t('radar_floral', 'Floral')}</span></span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.2rem; flex-shrink:0;">${radar.floral ?? 80}%</strong>
                             </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_malty', 'Malty')}">
-                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryMalty} ${_t('radar_malty', 'Malty')}</span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.25rem;">${radar.malty ?? 75}%</strong>
+                            <div style="display:flex; justify-content:space-between; align-items:center; min-width:0;" title="${_t('radar_malty', 'Malty')}">
+                                <span style="display:inline-flex; align-items:center; gap:0.25rem; min-width:0; overflow:hidden; white-space:nowrap;">${SVG_ICONS.sensoryMalty} <span style="overflow:hidden; text-overflow:ellipsis;">${_t('radar_malty', 'Malty')}</span></span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.2rem; flex-shrink:0;">${radar.malty ?? 75}%</strong>
                             </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_sweetness', 'Sweetness')}">
-                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensorySweetness} ${_t('radar_sweetness', 'Sweet')}</span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.25rem;">${radar.sweetness ?? 80}%</strong>
+                            <div style="display:flex; justify-content:space-between; align-items:center; min-width:0;" title="${_t('radar_sweetness', 'Natural Sweetness')}">
+                                <span style="display:inline-flex; align-items:center; gap:0.25rem; min-width:0; overflow:hidden; white-space:nowrap;">${SVG_ICONS.sensorySweetness} <span style="overflow:hidden; text-overflow:ellipsis;">${_t('radar_sweet_short', 'Sweet')}</span></span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.2rem; flex-shrink:0;">${radar.sweetness ?? 80}%</strong>
                             </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_astringency', 'Astringency')}">
-                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryAstringency} ${_t('radar_astringency', 'Astringent')}</span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.25rem;">${radar.astringency ?? 40}%</strong>
+                            <div style="display:flex; justify-content:space-between; align-items:center; min-width:0;" title="${_t('radar_astringency', 'Astringency & Briskness')}">
+                                <span style="display:inline-flex; align-items:center; gap:0.25rem; min-width:0; overflow:hidden; white-space:nowrap;">${SVG_ICONS.sensoryAstringency} <span style="overflow:hidden; text-overflow:ellipsis;">${_t('radar_brisk_short', 'Brisk')}</span></span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.2rem; flex-shrink:0;">${radar.astringency ?? 40}%</strong>
                             </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_body', 'Body')}">
-                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryBody} ${_t('radar_body', 'Body')}</span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.25rem;">${radar.body ?? 80}%</strong>
+                            <div style="display:flex; justify-content:space-between; align-items:center; min-width:0;" title="${_t('radar_body', 'Body')}">
+                                <span style="display:inline-flex; align-items:center; gap:0.25rem; min-width:0; overflow:hidden; white-space:nowrap;">${SVG_ICONS.sensoryBody} <span style="overflow:hidden; text-overflow:ellipsis;">${_t('radar_body', 'Body')}</span></span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.2rem; flex-shrink:0;">${radar.body ?? 80}%</strong>
                             </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_aroma', 'Aroma')}">
-                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryAroma} ${_t('radar_aroma', 'Aroma')}</span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.25rem;">${radar.aroma ?? 90}%</strong>
+                            <div style="display:flex; justify-content:space-between; align-items:center; min-width:0;" title="${_t('radar_aroma', 'Aroma')}">
+                                <span style="display:inline-flex; align-items:center; gap:0.25rem; min-width:0; overflow:hidden; white-space:nowrap;">${SVG_ICONS.sensoryAroma} <span style="overflow:hidden; text-overflow:ellipsis;">${_t('radar_aroma', 'Aroma')}</span></span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.2rem; flex-shrink:0;">${radar.aroma ?? 90}%</strong>
                             </div>
                         </div>
 

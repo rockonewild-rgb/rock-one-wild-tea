@@ -385,15 +385,17 @@ const DEFAULT_GALLERY_IMAGES = [
 const DEFAULT_HERO_SLIDES = [
     {
         id: "slide_01",
-        image: "images/hero_slide_1.jpg?v=3.63.0",
-        subtitle: "Rock One Wild Tea (Pvt) Limited • Uva Medium Region",
-        title: "From Our Wild Forest Garden <span>to Your Cup.</span>",
-        description: "Rock One Wild Tea is a family-owned tea business born from our own tea garden in Sri Lanka’s Uva Medium region, nestled in a forested environment at the foot of a large rock formation. Hand made with Care, Crafted from Ceylon — from selecting the tea leaves to small-batch processing in our family factory.",
-        enabled: true
+        image: "images/hero_slide_1.jpg?v=3.69.0",
+        subtitle: "Authentic • Organic • Traditional",
+        title: "<span class=\"hero-title-top\">Rock One's Organic</span><span class=\"hero-title-bottom\">Tea Heritage</span>",
+        tagline: "Where Nature Meets Tradition",
+        description: "Discover the ancient art of organic tea-making in the heart of Ceylon's mountains. From our wild forest garden to your cup, experience the authentic journey of premium artisanal tea.",
+        enabled: true,
+        isHeritage: true
     },
     {
         id: "slide_02",
-        image: "images/hero_slide_2.jpg?v=3.63.0",
+        image: "images/hero_slide_2.jpg?v=3.69.0",
         subtitle: "Forested Mountain Terroir • 1,240m Elevation",
         title: "Wild Arbor Garden. <span>Mountain Foothill Heritage.</span>",
         description: "Grown naturally amidst virgin mountain forest and ancient flora at the foot of our iconic rock formation in Ettampitiya, free from chemical fertilizers and synthetic pesticides.",
@@ -401,7 +403,7 @@ const DEFAULT_HERO_SLIDES = [
     },
     {
         id: "slide_03",
-        image: "images/hero_slide_3.jpg?v=3.63.0",
+        image: "images/hero_slide_3.jpg?v=3.69.0",
         subtitle: "Generational Artisans • Selective Two Leaves & A Bud",
         title: "Dawn Hand-Plucking. <span>Artisanal Purity.</span>",
         description: "Every tender shoot is hand-harvested at first light by skilled generational pluckers to preserve precious silver tips, essential oils, and volatile aromatics.",
@@ -409,7 +411,7 @@ const DEFAULT_HERO_SLIDES = [
     },
     {
         id: "slide_04",
-        image: "images/hero_slide_4.jpg?v=3.63.0",
+        image: "images/hero_slide_4.jpg?v=3.69.0",
         subtitle: "Time-Honored Orthodox Methods • Fragrant Cedar Air-Withering",
         title: "Orthodox Rolling. <span>Traditional Family Craft.</span>",
         description: "Leaves undergo natural mountain air-withering on cedar troughs and gentle brass rolling to unlock rich polyphenols and the signature brisk character of Uva Medium teas.",
@@ -417,7 +419,7 @@ const DEFAULT_HERO_SLIDES = [
     },
     {
         id: "slide_05",
-        image: "images/hero_slide_5.jpg?v=3.63.0",
+        image: "images/hero_slide_5.jpg?v=3.69.0",
         subtitle: "Small-Batch Processing • Precision Temperature Control",
         title: "Historic Wood-Firing. <span>Flavor Perfection.</span>",
         description: "Calibrated wood-fired curing locks in volatile aromas and amber liquor notes, crafting an unforgettable Ceylon tea tasting experience.",
@@ -425,7 +427,7 @@ const DEFAULT_HERO_SLIDES = [
     },
     {
         id: "slide_06",
-        image: "images/hero_slide_6.jpg?v=3.63.0",
+        image: "images/hero_slide_6.jpg?v=3.69.0",
         subtitle: "Solid Light-Wood Teak Chests • Individually Numbered (1 to 10)",
         title: "Numbered Collector Chests. <span>Limited Allocations.</span>",
         description: "Each seasonal equinox release yields strictly 10 individually numbered collector chests, hand-sealed with private estate gold bullion wax and registered with certified provenance deeds.",
@@ -433,7 +435,7 @@ const DEFAULT_HERO_SLIDES = [
     },
     {
         id: "slide_07",
-        image: "images/hero_slide_7.jpg?v=3.63.0",
+        image: "images/hero_slide_7.jpg?v=3.69.0",
         subtitle: "Private Tours (Mon–Sat) • Max 10 Visitors Per Session",
         title: "Visit Our Family Factory. <span>Artisanal Tea Tasting.</span>",
         description: "Discover the story of Rock One Wild Tea with guided walkthroughs, tea leaf selection, orthodox processing, and sommelier cupping (9:30 AM, 11:00 AM, 1:30 PM, 3:30 PM).",
@@ -441,7 +443,7 @@ const DEFAULT_HERO_SLIDES = [
     },
     {
         id: "slide_08",
-        image: "images/hero_slide_8.jpg?v=3.63.0",
+        image: "images/hero_slide_8.jpg?v=3.69.0",
         subtitle: "Artisanal Packaging • Handcrafted from Sri Lankan Teak",
         title: "Artisanal Packaging. <span>The Perfect Gift.</span>",
         description: "Presentation boxes handcrafted by local carpenters from solid Sri Lankan teak, containing our finest whole-leaf Ceylon black and green tea selections.",
@@ -1195,49 +1197,49 @@ class TeaFactoryStore {
     // ── Hero Slideshow Desk Store Methods ──
     _getHeroImageMap() {
         return {
-            'images/1 (1).jpeg': 'images/hero_slide_1.jpg?v=3.63.0',
-            'images/1 (2).jpeg': 'images/hero_slide_2.jpg?v=3.63.0',
-            'images/1 (3).jpeg': 'images/hero_slide_2.jpg?v=3.63.0',
-            'images/1 (4).jpeg': 'images/hero_slide_4.jpg?v=3.63.0',
-            'images/1 (5).jpeg': 'images/hero_slide_3.jpg?v=3.63.0',
-            'images/1 (7).jpeg': 'images/hero_slide_4.jpg?v=3.63.0',
-            'images/1 (8).jpeg': 'images/hero_slide_2.jpg?v=3.63.0',
-            'images/1 (9).jpeg': 'images/hero_slide_4.jpg?v=3.63.0',
-            'images/1 (10).jpeg': 'images/hero_slide_4.jpg?v=3.63.0',
-            'images/1 (12).jpeg': 'images/hero_slide_5.jpg?v=3.63.0',
-            'images/1 (13).jpeg': 'images/hero_slide_5.jpg?v=3.63.0',
-            'images/1 (14).jpeg': 'images/hero_slide_7.jpg?v=3.63.0',
-            'images/1 (15).jpeg': 'images/hero_slide_6.jpg?v=3.63.0',
-            'images/1 (16).jpeg': 'images/hero_slide_6.jpg?v=3.63.0',
-            'images/1 (17).jpeg': 'images/hero_slide_7.jpg?v=3.63.0',
-            'images/1 (18).jpeg': 'images/hero_slide_7.jpg?v=3.63.0',
-            'images/1 (19).jpeg': 'images/hero_slide_6.jpg?v=3.63.0',
-            'images/1 (20).jpeg': 'images/hero_slide_3.jpg?v=3.63.0',
-            'images/1 (21).jpeg': 'images/hero_slide_1.jpg?v=3.63.0',
-            'images/1 (22).jpeg': 'images/hero_slide_3.jpg?v=3.63.0',
-            'images/1 (23).jpeg': 'images/hero_slide_3.jpg?v=3.63.0',
-            'images/1 (24).jpeg': 'images/hero_slide_2.jpg?v=3.63.0',
-            'images/1 (25).jpeg': 'images/hero_slide_2.jpg?v=3.63.0',
-            'images/1 (26).jpeg': 'images/hero_slide_6.jpg?v=3.63.0',
-            'images/1 (27).jpeg': 'images/hero_slide_7.jpg?v=3.63.0',
-            'images/1 (28).jpeg': 'images/hero_slide_7.jpg?v=3.63.0',
-            'images/1 (29).jpeg': 'images/hero_slide_7.jpg?v=3.63.0',
-            'images/Gift box 2.jpeg': 'images/hero_slide_8.jpg?v=3.63.0',
-            'images/Gift Box.jpeg': 'images/hero_slide_8.jpg?v=3.63.0'
+            'images/1 (1).jpeg': 'images/hero_slide_1.jpg?v=3.69.0',
+            'images/1 (2).jpeg': 'images/hero_slide_2.jpg?v=3.69.0',
+            'images/1 (3).jpeg': 'images/hero_slide_2.jpg?v=3.69.0',
+            'images/1 (4).jpeg': 'images/hero_slide_4.jpg?v=3.69.0',
+            'images/1 (5).jpeg': 'images/hero_slide_3.jpg?v=3.69.0',
+            'images/1 (7).jpeg': 'images/hero_slide_4.jpg?v=3.69.0',
+            'images/1 (8).jpeg': 'images/hero_slide_2.jpg?v=3.69.0',
+            'images/1 (9).jpeg': 'images/hero_slide_4.jpg?v=3.69.0',
+            'images/1 (10).jpeg': 'images/hero_slide_4.jpg?v=3.69.0',
+            'images/1 (12).jpeg': 'images/hero_slide_5.jpg?v=3.69.0',
+            'images/1 (13).jpeg': 'images/hero_slide_5.jpg?v=3.69.0',
+            'images/1 (14).jpeg': 'images/hero_slide_7.jpg?v=3.69.0',
+            'images/1 (15).jpeg': 'images/hero_slide_6.jpg?v=3.69.0',
+            'images/1 (16).jpeg': 'images/hero_slide_6.jpg?v=3.69.0',
+            'images/1 (17).jpeg': 'images/hero_slide_7.jpg?v=3.69.0',
+            'images/1 (18).jpeg': 'images/hero_slide_7.jpg?v=3.69.0',
+            'images/1 (19).jpeg': 'images/hero_slide_6.jpg?v=3.69.0',
+            'images/1 (20).jpeg': 'images/hero_slide_3.jpg?v=3.69.0',
+            'images/1 (21).jpeg': 'images/hero_slide_1.jpg?v=3.69.0',
+            'images/1 (22).jpeg': 'images/hero_slide_3.jpg?v=3.69.0',
+            'images/1 (23).jpeg': 'images/hero_slide_3.jpg?v=3.69.0',
+            'images/1 (24).jpeg': 'images/hero_slide_2.jpg?v=3.69.0',
+            'images/1 (25).jpeg': 'images/hero_slide_2.jpg?v=3.69.0',
+            'images/1 (26).jpeg': 'images/hero_slide_6.jpg?v=3.69.0',
+            'images/1 (27).jpeg': 'images/hero_slide_7.jpg?v=3.69.0',
+            'images/1 (28).jpeg': 'images/hero_slide_7.jpg?v=3.69.0',
+            'images/1 (29).jpeg': 'images/hero_slide_7.jpg?v=3.69.0',
+            'images/Gift box 2.jpeg': 'images/hero_slide_8.jpg?v=3.69.0',
+            'images/Gift Box.jpeg': 'images/hero_slide_8.jpg?v=3.69.0'
         };
     }
 
     _resolveHeroSlideImage(imgStr) {
-        if (!imgStr) return 'images/hero_slide_1.jpg?v=3.63.0';
+        if (!imgStr) return 'images/hero_slide_1.jpg?v=3.69.0';
         const trimmed = imgStr.trim();
         const base = trimmed.split('?')[0];
         const map = this._getHeroImageMap();
         if (map[base]) return map[base];
         if (map[trimmed]) return map[trimmed];
         if (trimmed.startsWith('data:')) return trimmed;
-        // If it's a hero slide image without current cache buster, ensure v=3.63.0
+        // If it's a hero slide image without current cache buster, ensure v=3.69.0
         if (base.startsWith('images/hero_slide_')) {
-            return `${base}?v=3.63.0`;
+            return `${base}?v=3.69.0`;
         }
         return trimmed;
     }
@@ -1250,7 +1252,15 @@ class TeaFactoryStore {
             // Auto-migrate any old portrait images or unversioned slides to sharp 1080p slides
             let updated = false;
             this.state.heroSlides.forEach(s => {
-                if (s && s.image) {
+                if (s && s.id === 'slide_01') {
+                    s.image = "images/hero_slide_1.jpg?v=3.69.0";
+                    s.subtitle = "Authentic • Organic • Traditional";
+                    s.title = "<span class=\"hero-title-top\">Rock One's Organic</span><span class=\"hero-title-bottom\">Tea Heritage</span>";
+                    s.tagline = "Where Nature Meets Tradition";
+                    s.description = "Discover the ancient art of organic tea-making in the heart of Ceylon's mountains. From our wild forest garden to your cup, experience the authentic journey of premium artisanal tea.";
+                    s.isHeritage = true;
+                    updated = true;
+                } else if (s && s.image) {
                     const resolved = this._resolveHeroSlideImage(s.image);
                     if (resolved !== s.image) {
                         s.image = resolved;
