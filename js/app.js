@@ -15700,7 +15700,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             if (typeof window.appOpenCartDrawer === 'function') {
                 window.appOpenCartDrawer();
             } else {
-                document.getElementById('floating-cart-btn')?.click();
+                document.getElementById('nav-cart-btn')?.click();
             }
         });
         mobileAuthBtn?.addEventListener('click', () => {
