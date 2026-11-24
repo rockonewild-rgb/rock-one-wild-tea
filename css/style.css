@@ -605,11 +605,11 @@ body {
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
-/* ─── Premium Navigation Bar Styling ─────────────────────────────────────── */
+/* ─── Premium Navigation Bar Styling (Ella Reference Style: Clean, Elegant Typography) ─── */
 .desktop-nav {
     display: flex;
     align-items: center;
-    margin-left: clamp(1rem, 2.2vw, 2.4rem);
+    margin-left: clamp(1.2rem, 2.5vw, 2.8rem);
     min-width: 0;
     flex-shrink: 0;
 }
@@ -618,17 +618,90 @@ body {
     display: flex;
     align-items: center;
     list-style: none;
-    gap: clamp(0.18rem, 0.3vw, 0.32rem);
+    gap: clamp(0.85rem, 1.4vw, 1.75rem);
     padding: 0;
     margin: 0;
     flex-wrap: nowrap;
+}
+
+/* Desktop Main Menu Items: Clean, High-End Typography (No Heavy Pill Outlines) */
+.desktop-nav .nav-link {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    color: #e2e8f0 !important;
+    font-family: var(--font-sans);
+    font-size: clamp(0.84rem, 0.92vw, 0.94rem);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    padding: 0.5rem 0.25rem !important;
+    height: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    text-transform: capitalize;
+    transition: color 0.22s ease;
+    white-space: nowrap;
+    position: relative;
+    outline: none;
+    flex-shrink: 0;
+}
+
+/* Hide cluttering icons on desktop main navigation bar (clean luxury aesthetic like Ella Organic) */
+.desktop-nav .nav-link .nav-svg {
+    display: none !important;
+}
+
+/* Elegant Underline Indicator on Hover & Active */
+.desktop-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #facc15, #d4af37);
+    box-shadow: 0 0 8px rgba(250, 204, 21, 0.6);
+    transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.desktop-nav .nav-link:hover {
+    color: #facc15 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.desktop-nav .nav-link:hover::after {
+    width: 100%;
+}
+
+.desktop-nav .nav-link.active {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.desktop-nav .nav-link.active::after {
+    width: 100%;
 }
 
 /* ─── Dedicated Header Utility Group (Cleanly Separated from Main Menu) ─── */
 .header-utility-group {
     display: flex;
     align-items: center;
-    gap: clamp(0.25rem, 0.4vw, 0.45rem);
+    gap: clamp(0.35rem, 0.6vw, 0.65rem);
     margin-left: auto;
     flex-shrink: 0;
     flex-wrap: nowrap;
@@ -636,9 +709,9 @@ body {
 
 .header-nav-divider {
     width: 1px;
-    height: 22px;
+    height: 24px;
     background: linear-gradient(180deg, transparent, rgba(212, 175, 55, 0.45), transparent);
-    margin: 0 clamp(0.2rem, 0.35vw, 0.45rem);
+    margin: 0 clamp(0.25rem, 0.4vw, 0.55rem);
     flex-shrink: 0;
 }
 
@@ -661,7 +734,6 @@ body {
     align-items: center;
     justify-content: center;
     gap: 0.38rem;
-    text-transform: uppercase;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     white-space: nowrap;
     position: relative;
@@ -10390,278 +10462,369 @@ mark.search-match-highlight {
     }
 }
 
-/* ─── Left-Hand Floating Live Social & Tour Hub (Hover-Expanding Pills) ─── */
+/* ─── Left-Hand Floating Social Media Hub (Single Trigger + Slide-Out Luxury Drawer) ─── */
 .side-social-dock {
-    position: fixed;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1200;
-    display: flex;
-    flex-direction: column;
-    pointer-events: none;
+    position: fixed !important;
+    left: 0 !important;
+    right: auto !important;
+    top: clamp(140px, 30vh, 220px) !important;
+    transform: translateY(-50%) !important;
+    z-index: 1250 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    pointer-events: none !important;
 }
 
-.side-social-list {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-    padding: 6px 0;
-    pointer-events: auto;
-}
-
-.side-social-pill {
-    position: relative;
-    display: flex;
-    align-items: center;
-    height: 44px;
-    width: 44px;
-    background: #ffffff !important;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid #e8e4df !important;
+/* Master "Social Media" Trigger Option on Left Side */
+.side-social-toggle-btn {
+    pointer-events: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.55rem !important;
+    background: rgba(6, 22, 13, 0.96) !important;
+    backdrop-filter: blur(18px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+    border: 1.5px solid rgba(212, 175, 55, 0.55) !important;
     border-left: none !important;
-    border-radius: 0 24px 24px 0;
-    text-decoration: none;
-    cursor: pointer;
-    overflow: hidden;
-    white-space: nowrap;
-    box-shadow: 2px 4px 15px rgba(0, 0, 0, 0.08) !important;
-    transition: width 0.38s cubic-bezier(0.25, 1, 0.5, 1),
-                background 0.3s ease,
-                border-color 0.3s ease,
-                box-shadow 0.3s ease,
-                transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-    user-select: none;
-    -webkit-user-select: none;
+    border-radius: 0 24px 24px 0 !important;
+    padding: 0.62rem 0.95rem 0.62rem 0.85rem !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    box-shadow: 4px 6px 25px rgba(0, 0, 0, 0.45), 0 0 15px rgba(212, 175, 55, 0.15) !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    outline: none !important;
+    user-select: none !important;
 }
 
-.pill-icon {
-    width: 44px;
-    min-width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #7a5a06 !important;
-    transition: transform 0.3s ease, color 0.3s ease;
+.side-social-toggle-btn:hover {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.28), rgba(6, 22, 13, 0.98)) !important;
+    border-color: #facc15 !important;
+    color: #facc15 !important;
+    transform: translateX(4px) !important;
+    box-shadow: 6px 8px 30px rgba(212, 175, 55, 0.4) !important;
+}
+
+.side-social-dock.open .side-social-toggle-btn {
+    background: #06160d !important;
+    border-color: #facc15 !important;
+    color: #facc15 !important;
+}
+
+.social-toggle-icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #facc15 !important;
+    animation: socialPulseIcon 2.6s infinite ease-in-out;
     flex-shrink: 0;
 }
 
-.pill-label {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 0 16px 0 2px;
-    opacity: 0;
-    transform: translateX(-12px);
-    transition: opacity 0.26s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
-    pointer-events: none;
+@keyframes socialPulseIcon {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.14); }
 }
 
-.pill-name {
-    font-family: var(--font-sans);
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: #111827 !important;
-    letter-spacing: 0.5px;
-    line-height: 1.15;
+.social-toggle-text {
+    font-family: var(--font-heading, inherit) !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+    line-height: 1 !important;
 }
 
-.pill-sub {
-    font-size: 0.65rem;
-    color: #4b5563 !important;
-    font-weight: 500;
-    margin-top: 2px;
-    line-height: 1;
-    letter-spacing: 0.3px;
+.social-toggle-chevron {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #facc15 !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    flex-shrink: 0;
 }
 
-/* ─── Expand On Mouse Hover / Focus / Mobile Tap ─── */
-.side-social-pill:hover,
-.side-social-pill:focus-visible,
-.side-social-pill.touch-active {
-    width: 215px;
-    box-shadow: 6px 6px 22px rgba(0, 0, 0, 0.7);
-    transform: translateX(2px);
-    outline: none;
+.side-social-dock.open .social-toggle-chevron {
+    transform: rotate(180deg) !important;
 }
 
-.side-social-pill:hover .pill-label,
-.side-social-pill:focus-visible .pill-label,
-.side-social-pill.touch-active .pill-label {
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: auto;
+/* Slide-Out Luxury Social Media Sanctuary Drawer (From Left) */
+.side-social-panel {
+    pointer-events: auto !important;
+    position: absolute !important;
+    left: 0 !important;
+    right: auto !important;
+    top: 0 !important;
+    transform: translateX(-115%) !important;
+    width: 355px !important;
+    background: rgba(4, 15, 9, 0.98) !important;
+    backdrop-filter: blur(24px) saturate(190%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+    border: 1.5px solid rgba(212, 175, 55, 0.45) !important;
+    border-left: none !important;
+    border-radius: 0 20px 20px 0 !important;
+    box-shadow: 12px 14px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.15) !important;
+    padding: 1.25rem 1.15rem !important;
+    box-sizing: border-box !important;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    max-height: calc(100vh - 160px) !important;
+    overflow-y: auto !important;
 }
 
-.side-social-pill:hover .pill-icon,
-.side-social-pill:focus-visible .pill-icon,
-.side-social-pill.touch-active .pill-icon {
-    transform: scale(1.14);
+.side-social-dock.open .side-social-panel {
+    transform: translateX(0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
 }
 
-/* ─── Brand Identity Color Accents on Hover ─── */
-.pill-whatsapp:hover,
-.pill-whatsapp:focus-visible,
-.pill-whatsapp.touch-active {
-    background: linear-gradient(90deg, #128C7E 0%, #25D366 100%);
-    border-color: #25D366;
-    box-shadow: 6px 4px 22px rgba(37, 211, 102, 0.55);
-}
-.pill-whatsapp:hover .pill-icon,
-.pill-whatsapp:focus-visible .pill-icon,
-.pill-whatsapp.touch-active .pill-icon {
-    color: #ffffff;
+.social-panel-header {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    margin-bottom: 0.95rem !important;
+    padding-bottom: 0.75rem !important;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.22) !important;
 }
 
-.pill-instagram:hover,
-.pill-instagram:focus-visible,
-.pill-instagram.touch-active {
-    background: linear-gradient(90deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
-    border-color: #fd1d1d;
-    box-shadow: 6px 4px 22px rgba(253, 29, 29, 0.55);
-}
-.pill-instagram:hover .pill-icon,
-.pill-instagram:focus-visible .pill-icon,
-.pill-instagram.touch-active .pill-icon {
-    color: #ffffff;
+.social-panel-title-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
 }
 
-.pill-facebook:hover,
-.pill-facebook:focus-visible,
-.pill-facebook.touch-active {
-    background: linear-gradient(90deg, #1877F2 0%, #0d65d9 100%);
-    border-color: #1877F2;
-    box-shadow: 6px 4px 22px rgba(24, 119, 242, 0.55);
-}
-.pill-facebook:hover .pill-icon,
-.pill-facebook:focus-visible .pill-icon,
-.pill-facebook.touch-active .pill-icon {
-    color: #ffffff;
+.social-panel-badge {
+    font-size: 0.64rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.16em !important;
+    color: #facc15 !important;
+    font-weight: 700 !important;
 }
 
-.pill-tripadvisor:hover,
-.pill-tripadvisor:focus-visible,
-.pill-tripadvisor.touch-active {
-    background: linear-gradient(90deg, #008756 0%, #00AA6C 100%);
-    border-color: #00AA6C;
-    box-shadow: 6px 4px 22px rgba(0, 170, 108, 0.55);
-}
-.pill-tripadvisor:hover .pill-icon,
-.pill-tripadvisor:focus-visible .pill-icon,
-.pill-tripadvisor.touch-active .pill-icon {
-    color: #ffffff;
+.social-panel-title {
+    margin: 1px 0 0 0 !important;
+    font-size: 1.25rem !important;
+    font-family: var(--font-serif) !important;
+    color: #ffffff !important;
+    letter-spacing: -0.01em !important;
+    line-height: 1.2 !important;
 }
 
-.pill-about:hover,
-.pill-about:focus-visible,
-.pill-about.touch-active {
-    background: linear-gradient(90deg, #064e3b 0%, #059669 100%);
-    border-color: #86efac;
-    box-shadow: 6px 4px 22px rgba(6, 78, 59, 0.75), 0 0 15px rgba(134, 239, 172, 0.4);
-}
-.pill-about:hover .pill-icon,
-.pill-about:focus-visible .pill-icon,
-.pill-about.touch-active .pill-icon {
-    color: #ffd875;
-}
-.pill-about:hover .pill-name,
-.pill-about:focus-visible .pill-name,
-.pill-about.touch-active .pill-name {
-    color: #ffffff;
-}
-.pill-about:hover .pill-sub,
-.pill-about:focus-visible .pill-sub,
-.pill-about.touch-active .pill-sub {
-    color: #86efac;
+.social-panel-desc {
+    font-size: 0.74rem !important;
+    color: #94a3b8 !important;
+    margin: 2px 0 0 0 !important;
+    line-height: 1.35 !important;
 }
 
-.pill-tour:hover,
-.pill-tour:focus-visible,
-.pill-tour.touch-active {
-    background: linear-gradient(90deg, #997a15 0%, #d4af37 100%);
-    border-color: #d4af37;
-    box-shadow: 6px 4px 22px rgba(212, 175, 55, 0.65);
-}
-.pill-tour:hover .pill-icon,
-.pill-tour:focus-visible .pill-icon,
-.pill-tour.touch-active .pill-icon {
-    color: #000000;
-}
-.pill-tour:hover .pill-name,
-.pill-tour:focus-visible .pill-name,
-.pill-tour.touch-active .pill-name {
-    color: #000000;
-}
-.pill-tour:hover .pill-sub,
-.pill-tour:focus-visible .pill-sub,
-.pill-tour.touch-active .pill-sub {
-    color: rgba(0, 0, 0, 0.85);
+.social-panel-close-btn {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(212, 175, 55, 0.35) !important;
+    color: #e2e8f0 !important;
+    border-radius: 50% !important;
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 1.35rem !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+    outline: none !important;
+    flex-shrink: 0 !important;
+    margin-left: 0.5rem !important;
 }
 
-.pill-maps:hover,
-.pill-maps:focus-visible,
-.pill-maps.touch-active {
-    background: linear-gradient(90deg, #1a73e8 0%, #4285F4 100%);
-    border-color: #4285F4;
-    box-shadow: 6px 4px 22px rgba(66, 133, 244, 0.55);
-}
-.pill-maps:hover .pill-icon,
-.pill-maps:focus-visible .pill-icon,
-.pill-maps.touch-active .pill-icon {
-    color: #ffffff;
+.social-panel-close-btn:hover {
+    background: rgba(239, 68, 68, 0.25) !important;
+    border-color: #ef4444 !important;
+    color: #ffffff !important;
+    transform: scale(1.1) !important;
 }
 
-.pill-youtube:hover,
-.pill-youtube:focus-visible,
-.pill-youtube.touch-active {
-    background: linear-gradient(90deg, #cc0000 0%, #FF0000 100%);
-    border-color: #FF0000;
-    box-shadow: 6px 4px 22px rgba(255, 0, 0, 0.55);
-}
-.pill-youtube:hover .pill-icon,
-.pill-youtube:focus-visible .pill-icon,
-.pill-youtube.touch-active .pill-icon {
-    color: #ffffff;
+.side-social-channels-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.55rem !important;
 }
 
-.pill-phone:hover,
-.pill-phone:focus-visible,
-.pill-phone.touch-active {
-    background: linear-gradient(90deg, #0d3a22 0%, #1a7d48 100%);
-    border-color: #34d399;
-    box-shadow: 6px 4px 22px rgba(52, 211, 153, 0.55);
+/* Individual Social Media Channel Rows */
+.social-channel-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.85rem !important;
+    padding: 0.65rem 0.85rem !important;
+    background: rgba(255, 255, 255, 0.035) !important;
+    border: 1px solid rgba(212, 175, 55, 0.16) !important;
+    border-radius: 13px !important;
+    text-decoration: none !important;
+    color: #ffffff !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-sizing: border-box !important;
 }
-.pill-phone:hover .pill-icon,
-.pill-phone:focus-visible .pill-icon,
-.pill-phone.touch-active .pill-icon {
-    color: #34d399;
+
+.social-channel-item:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(212, 175, 55, 0.55) !important;
+    transform: translateX(4px) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Authentic Brand Color Badges */
+.channel-icon-badge {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    border-radius: 11px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #ffffff !important;
+    flex-shrink: 0 !important;
+    transition: transform 0.25s ease !important;
+}
+
+.social-channel-item:hover .channel-icon-badge {
+    transform: scale(1.08) !important;
+}
+
+/* Official Social Media Platform Colors */
+.bg-instagram {
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%) !important;
+    box-shadow: 0 4px 14px rgba(220, 39, 67, 0.45) !important;
+}
+
+.bg-facebook {
+    background: #1877F2 !important;
+    box-shadow: 0 4px 14px rgba(24, 119, 242, 0.45) !important;
+}
+
+.bg-youtube {
+    background: #FF0000 !important;
+    box-shadow: 0 4px 14px rgba(255, 0, 0, 0.45) !important;
+}
+
+.bg-tripadvisor {
+    background: #00AA6C !important;
+    box-shadow: 0 4px 14px rgba(0, 170, 108, 0.45) !important;
+}
+
+.bg-maps {
+    background: linear-gradient(135deg, #34A853 0%, #0F9D58 100%) !important;
+    box-shadow: 0 4px 14px rgba(52, 168, 83, 0.45) !important;
+}
+
+.bg-whatsapp {
+    background: #25D366 !important;
+    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.45) !important;
+}
+
+.channel-info {
+    display: flex !important;
+    flex-direction: column !important;
+    line-height: 1.25 !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+.channel-title-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    flex-wrap: wrap !important;
+}
+
+.channel-name {
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    letter-spacing: 0.2px !important;
+}
+
+.channel-pill-tag {
+    font-size: 0.62rem !important;
+    background: rgba(212, 175, 55, 0.15) !important;
+    border: 1px solid rgba(212, 175, 55, 0.35) !important;
+    color: #fde047 !important;
+    padding: 1px 6px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+}
+
+.channel-sub {
+    font-size: 0.72rem !important;
+    color: #cbd5e1 !important;
+    margin-top: 2px !important;
+    line-height: 1.3 !important;
+    white-space: normal !important;
+}
+
+.channel-action-btn {
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    color: #facc15 !important;
+    background: rgba(212, 175, 55, 0.12) !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    padding: 0.25rem 0.55rem !important;
+    border-radius: 12px !important;
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+}
+
+.social-channel-item:hover .channel-action-btn {
+    background: #facc15 !important;
+    color: #06160d !important;
+    transform: scale(1.05) !important;
+}
+
+.social-panel-footer {
+    margin-top: 0.85rem !important;
+    padding-top: 0.65rem !important;
+    border-top: 1px solid rgba(212, 175, 55, 0.15) !important;
+    text-align: center !important;
+}
+
+.estate-tagline-micro {
+    font-size: 0.66rem !important;
+    color: #94a3b8 !important;
+    letter-spacing: 0.05em !important;
+}
+
+@media (max-width: 900px) {
+    .side-social-dock {
+        left: 0 !important;
+        right: auto !important;
+        top: clamp(140px, 30vh, 220px) !important;
+        transform: translateY(-50%) !important;
+    }
+    .side-social-toggle-btn {
+        padding: 0.52rem 0.8rem 0.52rem 0.75rem !important;
+        font-size: 0.72rem !important;
+        gap: 0.35rem !important;
+    }
+    .social-toggle-text {
+        font-size: 0.72rem !important;
+    }
+    .side-social-panel {
+        width: 300px !important;
+    }
 }
 
 @media (max-width: 600px) {
     .side-social-dock {
-        top: auto;
-        bottom: 75px;
-        transform: none;
+        left: 0 !important;
+        right: auto !important;
+        top: clamp(140px, 30vh, 220px) !important;
+        bottom: auto !important;
+        transform: translateY(-50%) !important;
     }
-    .side-social-pill {
-        height: 38px;
-        width: 38px;
-    }
-    .pill-icon {
-        width: 38px;
-        min-width: 38px;
-        height: 38px;
-    }
-    .pill-icon svg {
-        width: 17px;
-        height: 17px;
-    }
-    .side-social-pill:hover,
-    .side-social-pill:focus-visible,
-    .side-social-pill.touch-active {
-        width: 190px;
+    .side-social-panel {
+        width: min(315px, 92vw) !important;
     }
 }
 
@@ -11107,31 +11270,14 @@ mark.search-match-highlight {
         z-index: 999 !important;
     }
 
-    /* 2. Left-Hand Side Social Dock Mobile Optimization (Tucked to Screen Edge) */
+    /* 2. Left-Hand Side Social Hub Mobile Optimization */
     .side-social-dock {
-        left: 4px !important;
-        bottom: 0.75rem !important;
-        top: auto !important;
-        transform: none !important;
-        gap: 0.35rem !important;
-        z-index: 998 !important;
-    }
-    .side-social-pill {
-        width: 34px !important;
-        height: 34px !important;
-        border-radius: 8px !important;
-    }
-    .side-social-pill.touch-active {
-        width: 155px !important;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.85) !important;
-    }
-    .pill-icon {
-        width: 34px !important;
-        height: 34px !important;
-    }
-    .pill-icon svg {
-        width: 16px !important;
-        height: 16px !important;
+        left: 0 !important;
+        right: auto !important;
+        top: clamp(140px, 30vh, 220px) !important;
+        bottom: auto !important;
+        transform: translateY(-50%) !important;
+        z-index: 1250 !important;
     }
 
     /* 3. Home Screen Cards Mobile Refinements */
@@ -11584,57 +11730,14 @@ input, select, textarea, button {
         animation: drawerSlideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
     }
 
-    /* Left-Side Social Dock on Mobile (Compact, Sleek & Touch Expandable) */
+    /* Left-Side Social Dock on Mobile */
     .side-social-dock {
-        display: flex !important;
-        position: fixed !important;
         left: 0 !important;
-        bottom: 1rem !important;
-        top: auto !important;
-        transform: none !important;
-        z-index: 1040 !important;
-        flex-direction: column !important;
-        pointer-events: none !important;
-    }
-    .side-social-list {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 5px !important;
-        padding: 0 !important;
-        pointer-events: auto !important;
-    }
-    .side-social-pill {
-        width: 36px !important;
-        height: 36px !important;
-        border-radius: 0 18px 18px 0 !important;
-        background: #ffffff !important;
-        border: 1px solid #e8e4df !important;
-        border-left: none !important;
-        box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.08) !important;
-        display: flex !important;
-        align-items: center !important;
-        overflow: hidden !important;
-        transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    }
-    .side-social-pill .pill-icon {
-        width: 36px !important;
-        height: 36px !important;
-        min-width: 36px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        color: #96700a !important;
-    }
-    .side-social-pill .pill-icon svg {
-        width: 17px !important;
-        height: 17px !important;
-        display: block !important;
-    }
-    .side-social-pill.touch-active {
-        width: 160px !important;
-        background: rgba(8, 24, 14, 0.98) !important;
-        border-color: var(--color-gold) !important;
-        box-shadow: 4px 6px 20px rgba(0, 0, 0, 0.8), 0 0 12px rgba(212, 175, 55, 0.3) !important;
+        right: auto !important;
+        top: clamp(140px, 30vh, 220px) !important;
+        bottom: auto !important;
+        transform: translateY(-50%) !important;
+        z-index: 1250 !important;
     }
 
     /* Hero Section Mobile Optimization (Full-Bleed Edge-to-Edge) */
@@ -12365,20 +12468,8 @@ input, select, textarea, button {
         padding: 1.1rem 0.75rem !important;
     }
     .side-social-dock {
-        left: 3px !important;
-        gap: 0.3rem !important;
-    }
-    .side-social-pill {
-        width: 32px !important;
-        height: 32px !important;
-    }
-    .side-social-pill .pill-icon {
-        width: 32px !important;
-        height: 32px !important;
-    }
-    .side-social-pill .pill-icon svg {
-        width: 14px !important;
-        height: 14px !important;
+        left: 0 !important;
+        right: auto !important;
     }
     .floating-whatsapp-btn,
     .floating-global-prefs-btn,
@@ -12448,19 +12539,8 @@ input, select, textarea, button {
     }
 
     .side-social-dock {
-        left: 2px !important;
-    }
-    .side-social-pill {
-        width: 28px !important;
-        height: 28px !important;
-    }
-    .side-social-pill .pill-icon {
-        width: 28px !important;
-        height: 28px !important;
-    }
-    .side-social-pill .pill-icon svg {
-        width: 13px !important;
-        height: 13px !important;
+        left: 0 !important;
+        right: auto !important;
     }
 
     .floating-whatsapp-btn,
@@ -14742,18 +14822,8 @@ img, video, canvas, iframe {
 
     /* Floating Actions & Social Dock Stack */
     .side-social-dock {
-        bottom: 0.75rem !important;
         left: 0 !important;
-    }
-
-    .side-social-pill {
-        width: 32px !important;
-        height: 32px !important;
-    }
-
-    .side-social-pill .pill-icon {
-        width: 32px !important;
-        height: 32px !important;
+        right: auto !important;
     }
 
     .floating-whatsapp-btn {
@@ -17508,23 +17578,7 @@ div[style*="rgba(6, 24, 14"] p {
 }
 
 .side-social-pill {
-    background: #ffffff !important;
-    border: 1px solid #e8e4df !important;
-    border-left: none !important;
-    box-shadow: 2px 4px 15px rgba(0, 0, 0, 0.08) !important;
-}
 
-.side-social-pill .pill-icon {
-    color: #7a5a06 !important;
-}
-
-.side-social-pill .pill-name {
-    color: #111827 !important;
-}
-
-.side-social-pill .pill-sub {
-    color: #4b5563 !important;
-}
 
 
 

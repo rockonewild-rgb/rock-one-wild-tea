@@ -15909,76 +15909,68 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         });
     })();
 
-    // 11. Left-Hand Floating Live Social & Tour Hub (Mobile Touch Expand / Navigate / Double-Tap Collapse)
+    // 11. Right-Hand Floating Social Media Hub (Single Trigger + Slide-Out Drawer with Authentic Brand Colors)
     (function initSideSocialDock() {
         const dock = document.getElementById('side-social-dock');
         if (!dock) return;
 
-        const pills = dock.querySelectorAll('.side-social-pill');
-        const lastTapTimes = new Map();
-        let autoCollapseTimer = null;
+        const toggleBtn = document.getElementById('side-social-toggle-btn');
+        const closeBtn = document.getElementById('side-social-close-btn');
+        const panel = document.getElementById('side-social-panel');
 
-        function collapseAllPills() {
-            pills.forEach(p => p.classList.remove('touch-active'));
-            if (autoCollapseTimer) {
-                clearTimeout(autoCollapseTimer);
-                autoCollapseTimer = null;
+        function togglePanel(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            const isOpen = dock.classList.toggle('open');
+            if (toggleBtn) {
+                toggleBtn.setAttribute('aria-expanded', String(isOpen));
+            }
+            if (panel) {
+                panel.setAttribute('aria-hidden', String(!isOpen));
             }
         }
 
-        pills.forEach(pill => {
-            pill.addEventListener('click', function(e) {
-                // Only intercept on mobile / touch screen sizes
-                const isMobileOrTouch = window.innerWidth <= 900 || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-                if (!isMobileOrTouch) return; // Allow normal desktop hover/click behavior
+        function closePanel() {
+            if (dock.classList.contains('open')) {
+                dock.classList.remove('open');
+                if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+                if (panel) panel.setAttribute('aria-hidden', 'true');
+            }
+        }
 
-                const now = Date.now();
-                const lastTap = lastTapTimes.get(pill) || 0;
-                const timeDiff = now - lastTap;
-                lastTapTimes.set(pill, now);
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', togglePanel);
+        }
 
-                const isAlreadyExpanded = pill.classList.contains('touch-active');
-
-                // Case A: Double-Tap on an expanded pill (2 taps within 380ms) -> Collapse immediately
-                if (isAlreadyExpanded && timeDiff < 380 && timeDiff > 40) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    pill.classList.remove('touch-active');
-                    if (autoCollapseTimer) clearTimeout(autoCollapseTimer);
-                    return;
-                }
-
-                // Case B: First Tap on a collapsed pill -> Expand and show name, DO NOT navigate yet
-                if (!isAlreadyExpanded) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    collapseAllPills();
-                    pill.classList.add('touch-active');
-
-                    // Auto-collapse after 4.5 seconds if inactive
-                    autoCollapseTimer = setTimeout(() => {
-                        pill.classList.remove('touch-active');
-                    }, 4500);
-                    return;
-                }
-
-                // Case C: Second Tap on an already expanded pill -> Allow normal navigation / action!
-                if (autoCollapseTimer) clearTimeout(autoCollapseTimer);
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                closePanel();
             });
-        });
+        }
 
-        // Tap outside anywhere collapses expanded pills
+        // Tap or click outside collapses the social panel
         document.addEventListener('click', function(e) {
             if (!e.target.closest('#side-social-dock')) {
-                collapseAllPills();
+                closePanel();
             }
         });
 
         document.addEventListener('touchstart', function(e) {
             if (!e.target.closest('#side-social-dock')) {
-                collapseAllPills();
+                closePanel();
             }
         }, { passive: true });
+
+        // Escape key closes the social panel
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePanel();
+            }
+        });
     })();
 
     // ─── Initialize Active Seasonal Theme on Startup ───
