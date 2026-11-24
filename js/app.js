@@ -12986,7 +12986,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 const subtitle = slideObj.subtitle || 'Authentic Ceylon Tea Experience';
                 const title = slideObj.title || 'Organic Homemade<br><span>Tea Experience</span>';
                 const description = slideObj.description || "Discover the ancient art of organic tea-making in the heart of Ceylon's mountains. From garden to cup, experience the authentic journey of premium Sri Lankan tea.";
-                const imgSrc = slideObj.image || 'images/1 (1).jpeg';
+                const imgSrc = slideObj.image || 'images/hero_slide_1.jpg';
 
                 return `
                     <div class="hero-slide${isActive ? ' active' : ''}" style="background-image: url('${imgSrc}');">

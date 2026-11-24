@@ -385,7 +385,7 @@ const DEFAULT_GALLERY_IMAGES = [
 const DEFAULT_HERO_SLIDES = [
     {
         id: "slide_01",
-        image: "images/1 (1).jpeg",
+        image: "images/hero_slide_1.jpg",
         subtitle: "Rock One Wild Tea (Pvt) Limited • Uva Medium Region",
         title: "From Our Wild Forest Garden <span>to Your Cup.</span>",
         description: "Rock One Wild Tea is a family-owned tea business born from our own tea garden in Sri Lanka’s Uva Medium region, nestled in a forested environment at the foot of a large rock formation. Hand made with Care, Crafted from Ceylon — from selecting the tea leaves to small-batch processing in our family factory.",
@@ -393,7 +393,7 @@ const DEFAULT_HERO_SLIDES = [
     },
     {
         id: "slide_02",
-        image: "images/1 (2).jpeg",
+        image: "images/hero_slide_2.jpg",
         subtitle: "Forested Mountain Terroir • 1,240m Elevation",
         title: "Wild Arbor Garden. <span>Mountain Foothill Heritage.</span>",
         description: "Grown naturally amidst virgin mountain forest and ancient flora at the foot of our iconic rock formation in Ettampitiya, free from chemical fertilizers and synthetic pesticides.",
@@ -401,7 +401,7 @@ const DEFAULT_HERO_SLIDES = [
     },
     {
         id: "slide_03",
-        image: "images/1 (5).jpeg",
+        image: "images/hero_slide_3.jpg",
         subtitle: "Generational Artisans • Selective Two Leaves & A Bud",
         title: "Dawn Hand-Plucking. <span>Artisanal Purity.</span>",
         description: "Every tender shoot is hand-harvested at first light by skilled generational pluckers to preserve precious silver tips, essential oils, and volatile aromatics.",
@@ -409,7 +409,7 @@ const DEFAULT_HERO_SLIDES = [
     },
     {
         id: "slide_04",
-        image: "images/1 (10).jpeg",
+        image: "images/hero_slide_4.jpg",
         subtitle: "Time-Honored Orthodox Methods • Fragrant Cedar Air-Withering",
         title: "Orthodox Rolling. <span>Traditional Family Craft.</span>",
         description: "Leaves undergo natural mountain air-withering on cedar troughs and gentle brass rolling to unlock rich polyphenols and the signature brisk character of Uva Medium teas.",
@@ -417,7 +417,7 @@ const DEFAULT_HERO_SLIDES = [
     },
     {
         id: "slide_05",
-        image: "images/1 (12).jpeg",
+        image: "images/hero_slide_5.jpg",
         subtitle: "Small-Batch Processing • Precision Temperature Control",
         title: "Historic Wood-Firing. <span>Flavor Perfection.</span>",
         description: "Calibrated wood-fired curing locks in volatile aromas and amber liquor notes, crafting an unforgettable Ceylon tea tasting experience.",
@@ -425,23 +425,23 @@ const DEFAULT_HERO_SLIDES = [
     },
     {
         id: "slide_06",
-        image: "images/1 (14).jpeg",
-        subtitle: "Private Tours (Mon–Sat) • Max 10 Visitors Per Session",
-        title: "Visit Our Family Factory. <span>Artisanal Tea Tasting.</span>",
-        description: "Discover the story of Rock One Wild Tea with guided walkthroughs, tea leaf selection, orthodox processing, and sommelier cupping (9:30 AM, 11:00 AM, 1:30 PM, 3:30 PM).",
-        enabled: true
-    },
-    {
-        id: "slide_07",
-        image: "images/1 (16).jpeg",
+        image: "images/hero_slide_6.jpg",
         subtitle: "Solid Light-Wood Teak Chests • Individually Numbered (1 to 10)",
         title: "Numbered Collector Chests. <span>Limited Allocations.</span>",
         description: "Each seasonal equinox release yields strictly 10 individually numbered collector chests, hand-sealed with private estate gold bullion wax and registered with certified provenance deeds.",
         enabled: true
     },
     {
+        id: "slide_07",
+        image: "images/hero_slide_7.jpg",
+        subtitle: "Private Tours (Mon–Sat) • Max 10 Visitors Per Session",
+        title: "Visit Our Family Factory. <span>Artisanal Tea Tasting.</span>",
+        description: "Discover the story of Rock One Wild Tea with guided walkthroughs, tea leaf selection, orthodox processing, and sommelier cupping (9:30 AM, 11:00 AM, 1:30 PM, 3:30 PM).",
+        enabled: true
+    },
+    {
         id: "slide_08",
-        image: "images/Gift box 2.jpeg",
+        image: "images/hero_slide_8.jpg",
         subtitle: "Artisanal Packaging • Handcrafted from Sri Lankan Teak",
         title: "Artisanal Packaging. <span>The Perfect Gift.</span>",
         description: "Presentation boxes handcrafted by local carpenters from solid Sri Lankan teak, containing our finest whole-leaf Ceylon black and green tea selections.",
@@ -1190,12 +1190,34 @@ class TeaFactoryStore {
 
     // ── Hero Slideshow Desk Store Methods ──
     getHeroSlides() {
+        const imgMap = {
+            'images/1 (1).jpeg': 'images/hero_slide_1.jpg',
+            'images/1 (2).jpeg': 'images/hero_slide_2.jpg',
+            'images/1 (5).jpeg': 'images/hero_slide_3.jpg',
+            'images/1 (10).jpeg': 'images/hero_slide_4.jpg',
+            'images/1 (12).jpeg': 'images/hero_slide_5.jpg',
+            'images/1 (16).jpeg': 'images/hero_slide_6.jpg',
+            'images/1 (14).jpeg': 'images/hero_slide_7.jpg',
+            'images/Gift box 2.jpeg': 'images/hero_slide_8.jpg',
+            'images/Gift Box.jpeg': 'images/hero_slide_8.jpg'
+        };
+
         if (!this.state.heroSlides || !Array.isArray(this.state.heroSlides) || this.state.heroSlides.length === 0) {
             this.state.heroSlides = [...DEFAULT_HERO_SLIDES];
             this.saveState();
         } else {
-            // Filter out any slides with deleted assets
+            // Auto-migrate any old portrait images to widescreen 16:9 slides
+            let updated = false;
+            this.state.heroSlides.forEach(s => {
+                if (s && s.image && imgMap[s.image]) {
+                    s.image = imgMap[s.image];
+                    updated = true;
+                }
+            });
             this.state.heroSlides = this.state.heroSlides.filter(s => s && s.image && !s.image.includes('tea_garden_hand_plucking'));
+            if (updated) {
+                this.saveState();
+            }
         }
         return this.state.heroSlides;
     }
@@ -1204,7 +1226,7 @@ class TeaFactoryStore {
         if (!this.state.heroSlides) this.state.heroSlides = [...DEFAULT_HERO_SLIDES];
         const newSlide = {
             id: `slide_${Date.now()}`,
-            image: slideData.image || "images/1 (1).jpeg",
+            image: slideData.image || "images/hero_slide_1.jpg",
             subtitle: slideData.subtitle || "Rock One Wild Tea (Pvt) Limited",
             title: slideData.title || "From Our Wild Forest Garden <span>to Your Cup.</span>",
             description: slideData.description || "Hand made with Care, Crafted from Ceylon — small-batch processing in our family factory.",
