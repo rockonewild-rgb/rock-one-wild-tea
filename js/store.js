@@ -882,6 +882,8 @@ class TeaFactoryStore {
             price: parseFloat(productData.price) || 0.00,
             weight: productData.weight || "100g",
             image: productData.image || "images/Product.jpeg",
+            images: Array.isArray(productData.images) && productData.images.length > 0 ? productData.images : [productData.image || "images/Product.jpeg"],
+            gallery: Array.isArray(productData.images) && productData.images.length > 0 ? productData.images : [productData.image || "images/Product.jpeg"],
             desc: productData.desc || "",
             stock: productData.stock || "In Stock",
             symbol: productData.symbol || "",
@@ -927,6 +929,8 @@ class TeaFactoryStore {
             price: updatedData.price !== undefined ? parseFloat(updatedData.price) : current.price,
             weight: updatedData.weight !== undefined ? updatedData.weight : current.weight,
             image: updatedData.image !== undefined ? updatedData.image : current.image,
+            images: updatedData.images !== undefined ? updatedData.images : (current.images || [current.image || "images/Product.jpeg"]),
+            gallery: updatedData.images !== undefined ? updatedData.images : (current.gallery || current.images || [current.image || "images/Product.jpeg"]),
             desc: updatedData.desc !== undefined ? updatedData.desc : current.desc,
             stock: updatedData.stock !== undefined ? updatedData.stock : current.stock,
             symbol: updatedData.symbol !== undefined ? updatedData.symbol : current.symbol,
@@ -2126,6 +2130,8 @@ class TeaFactoryStore {
             stock: productData.stock !== undefined ? productData.stock : 'In Stock',
             stock_quantity: typeof productData.stock === 'number' ? productData.stock : 10,
             image: productData.image || 'images/Product.jpeg',
+            images: Array.isArray(productData.images) && productData.images.length > 0 ? productData.images : [productData.image || 'images/Product.jpeg'],
+            gallery: Array.isArray(productData.images) && productData.images.length > 0 ? productData.images : [productData.image || 'images/Product.jpeg'],
             desc: productData.desc || productData.description || '',
             description: productData.desc || productData.description || '',
             leafGrade: productData.leafGrade || productData.grade || 'Premium Grade',
@@ -2181,9 +2187,13 @@ class TeaFactoryStore {
         const steepSeconds = updatedData.steepSeconds !== undefined ? parseInt(updatedData.steepSeconds, 10) : (current.steepSeconds || 180);
         const elevation = updatedData.elevation !== undefined ? updatedData.elevation : (current.elevation || '1,200m Highlands');
 
+        const updatedImages = updatedData.images !== undefined ? updatedData.images : (current.images || [current.image || 'images/Product.jpeg']);
         const updated = {
             ...current,
             ...updatedData,
+            image: updatedData.image !== undefined ? updatedData.image : current.image,
+            images: updatedImages,
+            gallery: updatedImages,
             price: priceVal,
             price_usd: priceVal,
             elevation: elevation,

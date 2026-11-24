@@ -296,6 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
     let selectedAnnImageBase64 = '';
     let selectedProdImageBase64 = '';
+    let selectedProdImages = []; // Array of { src: string, name: string, isCover: boolean }
     let selectedBoxImageBase64 = '';
     let selectedGalleryImageBase64 = '';
     let selectedOrderSlipBase64 = '';
@@ -10103,15 +10104,17 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Bind Product Image File Uploader
+        // Bind Product Image File Uploader & Multi-Photo Gallery
         const prodImageInput = document.getElementById('prod-image-file');
         const prodImageZone = document.getElementById('prod-image-zone');
-        const prodImagePreview = document.getElementById('prod-image-preview');
 
-        if (prodImageInput && prodImageZone && prodImagePreview) {
-            selectedProdImageBase64 = '';
-
-            prodImageZone.addEventListener('click', () => prodImageInput.click());
+        if (prodImageInput && prodImageZone) {
+            prodImageZone.addEventListener('click', (e) => {
+                // Prevent double trigger if clicking link
+                if (e.target.tagName !== 'INPUT') {
+                    prodImageInput.click();
+                }
+            });
 
             prodImageZone.addEventListener('dragover', (e) => {
                e.preventDefault();
@@ -10121,17 +10124,75 @@ document.addEventListener('DOMContentLoaded', () => {
             prodImageZone.addEventListener('drop', (e) => {
                e.preventDefault();
                prodImageZone.classList.remove('drag-over');
-               if (e.dataTransfer.files.length > 0) {
-                   handleProdFileSelected(e.dataTransfer.files[0], prodImageZone, prodImagePreview);
+               if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                   handleProdFilesSelected(e.dataTransfer.files);
                }
             });
 
             prodImageInput.addEventListener('change', () => {
-               if (prodImageInput.files.length > 0) {
-                   handleProdFileSelected(prodImageInput.files[0], prodImageZone, prodImagePreview);
+               if (prodImageInput.files && prodImageInput.files.length > 0) {
+                   handleProdFilesSelected(prodImageInput.files);
+                   prodImageInput.value = '';
                }
             });
         }
+
+        // Bind Add Photo by URL or relative path
+        const btnAddProdImageUrl = document.getElementById('btn-add-prod-image-url');
+        const prodImageUrlInput = document.getElementById('prod-image-url-input');
+        if (btnAddProdImageUrl && prodImageUrlInput) {
+            const addUrlPhoto = () => {
+                const url = prodImageUrlInput.value.trim();
+                if (url) {
+                    selectedProdImages.push({
+                        src: url,
+                        name: url.split('/').pop() || 'Photo',
+                        isCover: selectedProdImages.length === 0
+                    });
+                    prodImageUrlInput.value = '';
+                    renderProdPhotosGallery();
+                }
+            };
+            btnAddProdImageUrl.addEventListener('click', addUrlPhoto);
+            prodImageUrlInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addUrlPhoto();
+                }
+            });
+        }
+
+        // Bind Quick Estate Photography Preset buttons
+        document.querySelectorAll('.btn-preset-prod-img').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const src = btn.getAttribute('data-src');
+                if (src) {
+                    if (!selectedProdImages.some(img => img.src === src)) {
+                        selectedProdImages.push({
+                            src: src,
+                            name: src.split('/').pop() || 'Preset',
+                            isCover: selectedProdImages.length === 0
+                        });
+                        renderProdPhotosGallery();
+                    } else {
+                        showToast('Photo Already Added', 'This photo is already in your attached gallery.', 'info');
+                    }
+                }
+            });
+        });
+
+        // Bind Clear All Photos button
+        const btnClearAllPhotos = document.getElementById('btn-clear-all-prod-photos');
+        if (btnClearAllPhotos) {
+            btnClearAllPhotos.addEventListener('click', () => {
+                selectedProdImages = [];
+                selectedProdImageBase64 = '';
+                renderProdPhotosGallery();
+            });
+        }
+
+        // Render current gallery state
+        renderProdPhotosGallery();
 
         // Bind real-time range slider percentage displays for sensory radar
         ['floral', 'malty', 'sweetness', 'astringency', 'body', 'aroma'].forEach(metric => {
@@ -10293,17 +10354,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     benefits
                 };
 
+                // Resolve cover image and full images gallery
+                const coverObj = selectedProdImages.find(img => img.isCover) || selectedProdImages[0];
+                const primaryImage = coverObj ? coverObj.src : (selectedProdImageBase64 || 'images/Product.jpeg');
+                const imagesList = selectedProdImages.length > 0 ? selectedProdImages.map(img => img.src) : [primaryImage];
+
+                productPayload.image = primaryImage;
+                productPayload.images = imagesList;
+                productPayload.gallery = imagesList;
+
                 if (editId) {
-                    if (image) productPayload.image = image;
                     window.TeaFactoryStore.updateProduct(editId, productPayload);
-                    showToast("Product Updated", `"${name}" specifications and sensory profile have been updated.`, "success");
+                    showToast("Product Updated", `"${name}" specifications, ${imagesList.length} photo(s), and sensory profile have been updated.`, "success");
                 } else {
-                    productPayload.image = image || 'images/Product.jpeg';
                     window.TeaFactoryStore.addProduct(productPayload);
-                    showToast("Product Introduced", `"${name}" has been published with sensory profile & radar to the catalog.`, "success");
+                    showToast("Product Introduced", `"${name}" has been published with ${imagesList.length} photo(s) and sensory radar to the catalog.`, "success");
                 }
                 
                 selectedProdImageBase64 = '';
+                selectedProdImages = [];
+                renderProdPhotosGallery();
+
                 addProductForm.reset();
                 const editIdInput = document.getElementById('prod-edit-id');
                 if (editIdInput) editIdInput.value = '';
@@ -10317,12 +10388,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (pAmt) pAmt.value = '';
                 const pShipAmt = document.getElementById('prod-shipping-amount-input');
                 if (pShipAmt) pShipAmt.value = '';
-                if (document.getElementById('prod-headline')) document.getElementById('prod-headline').value = '';
-                if (document.getElementById('prod-about')) document.getElementById('prod-about').value = '';
-                if (document.getElementById('prod-origin')) document.getElementById('prod-origin').value = '';
-                if (document.getElementById('prod-caffeine')) document.getElementById('prod-caffeine').value = '';
-                if (document.getElementById('prod-preparation')) document.getElementById('prod-preparation').value = '';
-                if (document.getElementById('prod-benefits')) document.getElementById('prod-benefits').value = '';
                 if (document.getElementById('prod-headline')) document.getElementById('prod-headline').value = '';
                 if (document.getElementById('prod-about')) document.getElementById('prod-about').value = '';
                 if (document.getElementById('prod-origin')) document.getElementById('prod-origin').value = '';
@@ -10463,19 +10528,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 setRadarVal('aroma', radarAroma);
 
                 if (titleEl) titleEl.innerText = `Edit Product: ${name}`;
-                if (descEl) descEl.innerText = `Update storefront details, tasting notes, sensory radar, and image for ${name}.`;
+                if (descEl) descEl.innerText = `Update storefront details, tasting notes, sensory radar, and gallery photos for ${name}.`;
                 if (saveBtn) saveBtn.innerText = 'Update Product';
                 if (cancelBtn) cancelBtn.style.display = 'inline-block';
 
-                if (image && prodImagePreview) {
-                    selectedProdImageBase64 = image.startsWith('data:') ? image : '';
-                    prodImagePreview.style.display = 'block';
-                    prodImagePreview.innerHTML = `
-                        <div class="slip-preview-inner">
-                            <img src="${image}" alt="Product Preview" style="max-width:100%;max-height:140px;object-fit:contain;border-radius:8px;border:1px solid rgba(212,175,55,0.3);background:rgba(0,0,0,0.4);" onerror="window.handleImageError && window.handleImageError(this, 'product')">
-                            <div class="slip-filename">Current Product Image</div>
-                        </div>`;
+                // Populate multi-photo showcase gallery
+                const rawImages = btn.getAttribute('data-images');
+                let parsedImages = [];
+                try {
+                    if (rawImages) {
+                        parsedImages = JSON.parse(decodeURIComponent(rawImages));
+                    }
+                } catch (e) {
+                    console.warn('Failed to parse data-images', e);
                 }
+                if (!Array.isArray(parsedImages) || parsedImages.length === 0) {
+                    if (image) parsedImages = [image];
+                }
+
+                selectedProdImages = parsedImages.filter(Boolean).map((src, idx) => ({
+                    src: src,
+                    name: src.startsWith('data:') ? `Uploaded Photo ${idx + 1}` : (src.split('/').pop() || `Photo ${idx + 1}`),
+                    isCover: (src === image) || (idx === 0)
+                }));
+                if (!selectedProdImages.some(img => img.isCover) && selectedProdImages.length > 0) {
+                    selectedProdImages[0].isCover = true;
+                }
+                selectedProdImageBase64 = image || (selectedProdImages[0] ? selectedProdImages[0].src : '');
+                renderProdPhotosGallery();
 
                 document.getElementById('admin-add-product-form')?.scrollIntoView({ behavior: 'smooth' });
             });
@@ -10486,6 +10566,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cancelEditProdBtn) {
             cancelEditProdBtn.addEventListener('click', () => {
                 selectedProdImageBase64 = '';
+                selectedProdImages = [];
+                renderProdPhotosGallery();
                 const addProductForm = document.getElementById('admin-add-product-form');
                 if (addProductForm) addProductForm.reset();
                 const editIdInput = document.getElementById('prod-edit-id');
@@ -11765,24 +11847,165 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsDataURL(file);
     }
 
-    // 7e-2. Product Image uploader helper
-    function handleProdFileSelected(file, zone, preview) {
-        if (file.size > 5 * 1024 * 1024) {
-            showToast('File Too Large', 'Please upload a file under 5MB.', 'error');
+    // 7e-2. Product Multi-Photo Gallery helper & renderer
+    function renderProdPhotosGallery() {
+        const gridWrapper = document.getElementById('prod-photos-grid-wrapper');
+        const gridContainer = document.getElementById('prod-photos-thumbnails-grid');
+        const countBadge = document.getElementById('prod-photos-count-badge');
+        const countNum = document.getElementById('prod-photos-count-num');
+        const prodImageZone = document.getElementById('prod-image-zone');
+
+        const total = selectedProdImages.length;
+        if (countBadge) {
+            countBadge.innerText = total === 1 ? '1 Photo Attached' : `${total} Photos Attached`;
+            countBadge.style.color = total > 0 ? 'var(--color-gold)' : 'var(--color-text-muted)';
+        }
+        if (countNum) countNum.innerText = total;
+
+        if (total === 0) {
+            if (gridWrapper) gridWrapper.style.display = 'none';
+            if (gridContainer) gridContainer.innerHTML = '';
+            if (prodImageZone) prodImageZone.classList.remove('has-file');
+            selectedProdImageBase64 = '';
             return;
         }
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            selectedProdImageBase64 = e.target.result;
-            preview.style.display = 'block';
-            preview.innerHTML = `
-                <div class="slip-preview-inner">
-                    <img src="${selectedProdImageBase64}" alt="Product Image Preview" style="max-width:100%;max-height:140px;object-fit:contain;border-radius:8px;border:1px solid rgba(212,175,55,0.3);background:rgba(0,0,0,0.4);" onerror="window.handleImageError && window.handleImageError(this, 'product')">
-                    <div class="slip-filename">&#x2714; ${file.name}</div>
-                </div>`;
-            zone.classList.add('has-file');
-        };
-        reader.readAsDataURL(file);
+
+        if (prodImageZone) prodImageZone.classList.add('has-file');
+        if (gridWrapper) gridWrapper.style.display = 'flex';
+
+        // Ensure exactly one photo is marked as cover
+        if (!selectedProdImages.some(img => img.isCover)) {
+            selectedProdImages[0].isCover = true;
+        }
+
+        // Set primary cover in selectedProdImageBase64 for backwards compatibility
+        const coverObj = selectedProdImages.find(img => img.isCover) || selectedProdImages[0];
+        if (coverObj) {
+            selectedProdImageBase64 = coverObj.src;
+        }
+
+        if (gridContainer) {
+            gridContainer.innerHTML = selectedProdImages.map((img, idx) => {
+                const isCover = Boolean(img.isCover);
+                return `
+                <div class="prod-photo-thumb-card ${isCover ? 'is-cover' : ''}" style="position: relative; background: rgba(0,0,0,0.5); border: ${isCover ? '1.5px solid var(--color-gold)' : '1px solid rgba(255,255,255,0.12)'}; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; box-shadow: ${isCover ? '0 0 10px rgba(212,175,55,0.25)' : 'none'};">
+                    <div style="position: relative; width: 100%; height: 95px; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                        <img src="${img.src}" alt="${img.name || 'Photo'}" style="width: 100%; height: 100%; object-fit: contain; display: block;" onerror="window.handleImageError && window.handleImageError(this, 'product')">
+                        <span style="position: absolute; top: 4px; left: 4px; font-size: 0.6rem; padding: 0.1rem 0.35rem; border-radius: 3px; font-weight: 700; ${isCover ? 'background: var(--color-gold); color: #000;' : 'background: rgba(0,0,0,0.7); color: #cbd5e1;'}">
+                            ${isCover ? '★ Cover' : `#${idx + 1}`}
+                        </span>
+                        <button type="button" class="btn-remove-prod-photo" data-index="${idx}" style="position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; border-radius: 50%; background: rgba(239,68,68,0.85); color: #fff; border: none; font-size: 0.75rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Remove Photo">
+                            &times;
+                        </button>
+                    </div>
+                    <div style="padding: 0.4rem; display: flex; flex-direction: column; gap: 0.25rem; background: rgba(0,0,0,0.4);">
+                        <div style="font-size: 0.65rem; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${img.name || 'Photo'}">
+                            ${img.name || 'Photo'}
+                        </div>
+                        <div style="display: flex; gap: 0.25rem; align-items: center; justify-content: space-between;">
+                            ${!isCover ? `
+                                <button type="button" class="btn-set-prod-cover" data-index="${idx}" style="background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.4); color: var(--color-gold); font-size: 0.62rem; padding: 0.15rem 0.35rem; border-radius: 3px; cursor: pointer; flex: 1; font-weight: 600;">
+                                    Make Cover
+                                </button>
+                            ` : `
+                                <span style="font-size: 0.62rem; color: var(--color-gold); font-weight: 700; padding: 0.15rem 0; flex: 1; text-align: center;">
+                                    Main Cover
+                                </span>
+                            `}
+                            <div style="display: flex; gap: 2px;">
+                                <button type="button" class="btn-move-prod-photo-left" data-index="${idx}" ${idx === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : 'style="cursor:pointer;"'} style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.6rem; padding: 0.1rem 0.25rem; border-radius: 2px;" title="Move Left">
+                                    &larr;
+                                </button>
+                                <button type="button" class="btn-move-prod-photo-right" data-index="${idx}" ${idx === total - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : 'style="cursor:pointer;"'} style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.6rem; padding: 0.1rem 0.25rem; border-radius: 2px;" title="Move Right">
+                                    &rarr;
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            // Bind thumbnail controls
+            gridContainer.querySelectorAll('.btn-remove-prod-photo').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const i = parseInt(btn.getAttribute('data-index'), 10);
+                    if (!isNaN(i) && i >= 0 && i < selectedProdImages.length) {
+                        const wasCover = selectedProdImages[i].isCover;
+                        selectedProdImages.splice(i, 1);
+                        if (wasCover && selectedProdImages.length > 0) {
+                            selectedProdImages[0].isCover = true;
+                        }
+                        renderProdPhotosGallery();
+                    }
+                });
+            });
+
+            gridContainer.querySelectorAll('.btn-set-prod-cover').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const i = parseInt(btn.getAttribute('data-index'), 10);
+                    if (!isNaN(i) && i >= 0 && i < selectedProdImages.length) {
+                        selectedProdImages.forEach((img, idx) => {
+                            img.isCover = (idx === i);
+                        });
+                        renderProdPhotosGallery();
+                    }
+                });
+            });
+
+            gridContainer.querySelectorAll('.btn-move-prod-photo-left').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const i = parseInt(btn.getAttribute('data-index'), 10);
+                    if (!isNaN(i) && i > 0) {
+                        const tmp = selectedProdImages[i - 1];
+                        selectedProdImages[i - 1] = selectedProdImages[i];
+                        selectedProdImages[i] = tmp;
+                        renderProdPhotosGallery();
+                    }
+                });
+            });
+
+            gridContainer.querySelectorAll('.btn-move-prod-photo-right').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const i = parseInt(btn.getAttribute('data-index'), 10);
+                    if (!isNaN(i) && i < selectedProdImages.length - 1) {
+                        const tmp = selectedProdImages[i + 1];
+                        selectedProdImages[i + 1] = selectedProdImages[i];
+                        selectedProdImages[i] = tmp;
+                        renderProdPhotosGallery();
+                    }
+                });
+            });
+        }
+    }
+
+    function handleProdFilesSelected(fileList) {
+        if (!fileList || fileList.length === 0) return;
+        const files = Array.from(fileList);
+        files.forEach(file => {
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('File Too Large', `"${file.name}" exceeds 5MB limit and was skipped.`, 'warning');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                selectedProdImages.push({
+                    src: e.target.result,
+                    name: file.name,
+                    isCover: selectedProdImages.length === 0
+                });
+                renderProdPhotosGallery();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function handleProdFileSelected(file, zone, preview) {
+        handleProdFilesSelected([file]);
     }
 
     // 7e-3. Gift Box Image uploader helper

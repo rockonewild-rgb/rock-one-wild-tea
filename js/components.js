@@ -2664,10 +2664,20 @@ const UIComponents = {
                                         else if (prodImg.includes('green_tea')) prodImg = 'images/luxury_tea_chest.jpg';
                                         else if (prodImg.includes('tea_box')) prodImg = 'images/Gift Box.jpeg';
 
+                                        const prodImagesArr = Array.isArray(prod.images) && prod.images.length > 0 ? prod.images : [prodImg];
+                                        const prodImagesCount = prodImagesArr.length;
+
                                         return `
                                         <tr>
                                             <td>
-                                                <img src="${prodImg}" alt="${prod.name}" style="width: 44px; height: 44px; object-fit: contain; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); background: rgba(0,0,0,0.4); display: block;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
+                                                <div style="position: relative; width: 44px; height: 44px; display: inline-block;">
+                                                    <img src="${prodImg}" alt="${prod.name}" style="width: 44px; height: 44px; object-fit: contain; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); background: rgba(0,0,0,0.4); display: block;" onerror="window.handleImageError && window.handleImageError(this, 'product')" loading="lazy" decoding="async">
+                                                    ${prodImagesCount > 1 ? `
+                                                        <span style="position: absolute; bottom: -3px; right: -3px; background: rgba(4,14,8,0.92); border: 1px solid var(--color-gold); color: var(--color-gold); font-size: 0.58rem; font-weight: 700; padding: 0.05rem 0.25rem; border-radius: 3px; line-height: 1; box-shadow: 0 2px 4px rgba(0,0,0,0.6);" title="${prodImagesCount} photos attached">
+                                                            +${prodImagesCount - 1}
+                                                        </span>
+                                                    ` : ''}
+                                                </div>
                                             </td>
                                             <td>
                                                 <strong>${prod.name}</strong><br>
@@ -2715,6 +2725,7 @@ const UIComponents = {
                                                             data-temp="${prod.steepTemp || prod.steep_temp || ''}" 
                                                             data-time="${prod.steepTime || prod.steep_time || ''}" 
                                                             data-image="${prod.image || prod.image_url || 'images/Product.jpeg'}" 
+                                                            data-images="${encodeURIComponent(JSON.stringify(prodImagesArr))}" 
                                                             data-flavor-profile="${flavorProfileStr.replace(/"/g, '&quot;')}" 
                                                             data-tasting-notes="${tastingNotesStr.replace(/"/g, '&quot;')}" 
                                                             data-radar-floral="${radar.floral ?? 80}" 
@@ -2733,6 +2744,9 @@ const UIComponents = {
                                                             data-benefits="${(prod.benefits || '').replace(/"/g, '&quot;')}" 
                                                             style="background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.4); color: var(--color-gold); padding: 0.35rem 0.65rem; font-size: 0.7rem; border-radius: 3px; cursor: pointer; transition: var(--transition-smooth); display: inline-flex; align-items: center; gap: 0.25rem;" 
                                                             title="Edit Product">
+                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                        Edit
+                                                    </button>
                                                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                                         Edit
                                                     </button>
@@ -2839,20 +2853,102 @@ const UIComponents = {
                                 </div>
                             </div>
 
-                            <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
-                                <label class="form-label" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Attach Product Image</label>
-                                <div class="file-upload-zone" id="prod-image-zone" style="padding: 1.25rem 1rem; border-radius: 10px;">
+                            <!-- Multi-Photo Gallery & Cover Showcase Section -->
+                            <div class="admin-sensory-panel admin-photo-gallery-panel" style="background: rgba(4, 14, 8, 0.75); border: 1.5px solid rgba(212, 175, 55, 0.35); border-radius: 12px; padding: 1.25rem 1.15rem; display: flex; flex-direction: column; gap: 0.95rem; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
+                                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 0.6rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                                            <polyline points="21 15 16 10 5 21"/>
+                                        </svg>
+                                        <span style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold);">Product Photography &amp; Gallery Showcase</span>
+                                    </div>
+                                    <span id="prod-photos-count-badge" style="font-size: 0.68rem; padding: 0.2rem 0.6rem; border-radius: 12px; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.35); color: var(--color-gold); font-weight: 600;">
+                                        0 Photos Attached
+                                    </span>
+                                </div>
+                                <p style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.45;">
+                                    Upload multiple photos or pick estate photography. The designated <strong style="color:var(--color-gold);">★ Main Cover</strong> photo serves as the storefront card and catalog image, while all photos form the interactive 360&deg; gallery inside the product detail modal.
+                                </p>
+
+                                <!-- Drag & Drop / File Upload Zone -->
+                                <div class="file-upload-zone" id="prod-image-zone" style="padding: 1.25rem 1rem; border-radius: 10px; cursor: pointer; text-align: center; border: 1.5px dashed rgba(212,175,55,0.4); background: rgba(0,0,0,0.25); transition: var(--transition-smooth);">
                                     <div class="file-upload-icon" style="margin-bottom: 0.35rem; color: var(--color-gold);">
                                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                                            <circle cx="12" cy="13" r="4"></circle>
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
                                         </svg>
                                     </div>
-                                    <div class="file-upload-text" style="font-size: 0.8rem;">Drag &amp; drop or <span class="file-upload-link">browse image</span></div>
-                                    <div class="file-upload-hint" style="font-size: 0.7rem; margin-top: 0.25rem; color: var(--color-text-muted);">JPG or PNG &mdash; Max 5MB (Defaults to standard luxury tin)</div>
-                                    <input type="file" id="prod-image-file" accept="image/*" style="display:none;">
+                                    <div class="file-upload-text" style="font-size: 0.82rem; font-weight: 500;">
+                                        Drag &amp; drop multiple photos here, or <span class="file-upload-link" style="color: var(--color-gold); text-decoration: underline;">browse device</span>
+                                    </div>
+                                    <div class="file-upload-hint" style="font-size: 0.7rem; margin-top: 0.3rem; color: var(--color-text-muted);">
+                                        Supports JPG, PNG, WebP &bull; Select multiple files at once (Up to 5MB each)
+                                    </div>
+                                    <input type="file" id="prod-image-file" accept="image/*" multiple style="display:none;">
                                 </div>
-                                <div id="prod-image-preview" class="slip-preview" style="display:none; margin-top: 0.5rem;"></div>
+
+                                <!-- Add by URL / Relative Path -->
+                                <div style="display: flex; gap: 0.5rem; align-items: center; background: rgba(0,0,0,0.3); padding: 0.5rem 0.65rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="2" style="flex-shrink:0;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                                    <input type="text" id="prod-image-url-input" class="form-input" placeholder="Or paste image URL / relative path (e.g. images/Product.jpeg)" style="padding: 0.4rem 0.65rem; font-size: 0.78rem; flex: 1;">
+                                    <button type="button" id="btn-add-prod-image-url" style="background: rgba(212,175,55,0.18); border: 1px solid rgba(212,175,55,0.45); color: var(--color-gold); font-size: 0.72rem; padding: 0.42rem 0.85rem; border-radius: 4px; cursor: pointer; white-space: nowrap; font-weight: 600; display: inline-flex; align-items: center; gap: 0.3rem;">
+                                        + Add Photo
+                                    </button>
+                                </div>
+
+                                <!-- Quick Presets -->
+                                <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                    <div style="font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); display: flex; align-items: center; gap: 0.35rem;">
+                                        <span>Quick Estate Photography Presets:</span>
+                                    </div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;" id="prod-preset-images-bar">
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/Product.jpeg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
+                                            Vintage Tin
+                                        </button>
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/luxury_tea_tin.jpg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
+                                            Luxury Tin
+                                        </button>
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/luxury_tea_chest.jpg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
+                                            Teak Chest
+                                        </button>
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/Tea in cup.jpeg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
+                                            Sommelier Cup
+                                        </button>
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/Tea estate.jpeg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
+                                            Wild Estate
+                                        </button>
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/Factory inside.jpeg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
+                                            Orthodox Roller
+                                        </button>
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/Ceylon tea.jpg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
+                                            Handcrafted Leaves
+                                        </button>
+                                        <button type="button" class="btn-preset-prod-img" data-src="images/Gift Box.jpeg" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(212,175,55,0.25); color: #e2e8f0; font-size: 0.68rem; padding: 0.25rem 0.55rem; border-radius: 4px; cursor: pointer;">
+                                            Gift Box
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Dynamic Interactive Photo Gallery Grid -->
+                                <div id="prod-photos-grid-wrapper" style="display: none; flex-direction: column; gap: 0.65rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(212,175,55,0.15); padding-top: 0.65rem;">
+                                        <span style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
+                                            Attached Photos (<span id="prod-photos-count-num">0</span>)
+                                        </span>
+                                        <button type="button" id="btn-clear-all-prod-photos" style="background: transparent; border: 1px solid rgba(255,94,94,0.3); color: #ff8585; font-size: 0.68rem; padding: 0.2rem 0.55rem; border-radius: 3px; cursor: pointer; transition: var(--transition-smooth);">
+                                            Clear All Photos
+                                        </button>
+                                    </div>
+                                    <div id="prod-photos-thumbnails-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.65rem;">
+                                        <!-- Rendered dynamically -->
+                                    </div>
+                                </div>
+
+                                <!-- Fallback hidden preview for legacy selectors -->
+                                <div id="prod-image-preview" style="display:none;"></div>
                             </div>
 
                             <div class="form-group" style="display: flex; flex-direction: column; gap: 0.45rem;">
@@ -2964,11 +3060,6 @@ const UIComponents = {
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
                                                 <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryAroma} Aroma Intensity</span>
-                                                <strong id="badge-radar-aroma" style="color: var(--color-gold); font-family: monospace;">90%</strong>
-                                            </div>
-                                            <input type="range" id="prod-radar-aroma" min="0" max="100" value="90" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
-                                        </div>
-                                                <span>✨ Aroma Intensity</span>
                                                 <strong id="badge-radar-aroma" style="color: var(--color-gold); font-family: monospace;">90%</strong>
                                             </div>
                                             <input type="range" id="prod-radar-aroma" min="0" max="100" value="90" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
@@ -7297,7 +7388,15 @@ const UIComponents = {
         // 2. Resolve image gallery (6 to 8 luxury images)
         let primaryImg = item.image || item.image_url || (isTour ? 'images/Factory inside.jpeg' : (isBox ? 'images/Gift Box.jpeg' : 'images/Tea in cup.jpeg'));
         let galleryImages = [];
-        if (Array.isArray(item.gallery) && item.gallery.length > 0) {
+        if (Array.isArray(item.images) && item.images.length > 0) {
+            galleryImages = [...item.images];
+            if (isProd) {
+                const extraBackups = ['images/Tea in cup.jpeg', 'images/Tea estate.jpeg', 'images/Factory inside.jpeg', 'images/Ceylon tea.jpg'];
+                extraBackups.forEach(b => {
+                    if (!galleryImages.includes(b) && galleryImages.length < 5) galleryImages.push(b);
+                });
+            }
+        } else if (Array.isArray(item.gallery) && item.gallery.length > 0) {
             galleryImages = [...item.gallery];
         } else if (isTour) {
             galleryImages = [

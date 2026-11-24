@@ -25,6 +25,8 @@ function formatProductRow(r) {
     const stockStatus = bg.stock_status || (typeof r.stock === 'number' ? (r.stock <= 5 ? 'Low Stock' : 'In Stock') : (r.stock || 'In Stock'));
     const stockQty = typeof r.stock === 'number' ? r.stock : (stockStatus === 'Low Stock' ? 5 : 15);
     const steepSec = bg.steepSeconds || (parseInt(bg.time, 10) ? parseInt(bg.time, 10) * 60 : 180);
+    const normImg = normalizeProductImage(r.image);
+    const imgList = Array.isArray(r.images) && r.images.length > 0 ? r.images : (Array.isArray(bg.images) && bg.images.length > 0 ? bg.images : [normImg]);
 
     return {
         ...r,
@@ -41,7 +43,9 @@ function formatProductRow(r) {
         steepTime: bg.time || bg.steepTime || '3-4 Minutes',
         stock: stockStatus,
         stock_quantity: stockQty,
-        image: normalizeProductImage(r.image),
+        image: normImg,
+        images: imgList,
+        gallery: imgList,
         flavor_notes: fNotes,
         flavorProfile: fProfile,
         tastingNotes: tNotes,
@@ -214,7 +218,8 @@ router.post('/', async (req, res) => {
             steepSeconds: finalSteepSeconds,
             shippingCharge: finalShipping,
             shippingFee: finalShipping,
-            subcategory: finalSubcategory
+            subcategory: finalSubcategory,
+            images: Array.isArray(req.body.images) && req.body.images.length > 0 ? req.body.images : [image]
         };
 
         const record = {
@@ -338,7 +343,8 @@ router.put('/:id', async (req, res) => {
                 ...(steepTime ? { time: steepTime } : {}),
                 ...(typeof stock === 'string' ? { stock_status: stock } : {}),
                 ...(subcategory ? { subcategory } : {}),
-                ...(updates.shipping_fee_usd !== undefined ? { shippingCharge: updates.shipping_fee_usd, shipping_fee: updates.shipping_fee_usd } : {})
+                ...(updates.shipping_fee_usd !== undefined ? { shippingCharge: updates.shipping_fee_usd, shipping_fee: updates.shipping_fee_usd } : {}),
+                ...(Array.isArray(req.body.images) ? { images: req.body.images } : {})
             };
         }
         if (is_reserve !== undefined) updates.is_reserve = Boolean(is_reserve);
