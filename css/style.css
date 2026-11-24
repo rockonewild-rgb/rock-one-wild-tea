@@ -501,24 +501,33 @@ a:hover {
     color: var(--color-gold-hover);
 }
 
-/* App Header styling - Premium White Luxury Glass Ribbon */
+/* App Header styling - Matching Ceylon Forest Green Luxury Glass Ribbon */
 .app-header {
-    background: rgba(255, 255, 255, 0.94) !important;
+    background: rgba(6, 22, 13, 0.96) !important;
     backdrop-filter: blur(20px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-    border-bottom: 1px solid #e8e4df !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    transition: var(--transition-smooth);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.28) !important;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.45) !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: 64px !important;
+    z-index: 1200 !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body {
+    padding-top: 64px !important;
 }
 
 .header-container {
     width: 100%;
     max-width: 1600px;
+    height: 100%;
     margin: 0 auto;
-    padding: clamp(0.35rem, 0.8vh, 0.55rem) clamp(0.75rem, 1.8vw, 1.5rem);
+    padding: 0 clamp(0.75rem, 1.8vw, 1.5rem);
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -552,14 +561,14 @@ a:hover {
 
 .brand-logo:hover {
     transform: scale(1.05);
-    filter: drop-shadow(0 2px 8px rgba(184, 134, 11, 0.45));
+    filter: drop-shadow(0 2px 10px rgba(212, 175, 55, 0.65));
 }
 
 .brand-logo img {
     height: clamp(34px, 4vw, 44px);
     width: auto;
     object-fit: contain;
-    filter: drop-shadow(0 1px 2px rgba(184, 134, 11, 0.25)) drop-shadow(0 2px 5px rgba(0, 0, 0, 0.08));
+    filter: drop-shadow(0 1px 3px rgba(212, 175, 55, 0.4)) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
 
 .brand-title-lockup {
@@ -574,25 +583,26 @@ a:hover {
     font-size: clamp(0.95rem, 1.25vw, 1.22rem);
     font-weight: 800;
     letter-spacing: -0.015em;
-    color: #111827 !important;
+    color: #ffffff !important;
     background: none !important;
     -webkit-background-clip: unset !important;
-    -webkit-text-fill-color: #111827 !important;
+    -webkit-text-fill-color: #ffffff !important;
     line-height: 1.15;
     white-space: nowrap;
-    text-shadow: none !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
 }
 
 .brand-tagline {
     font-family: var(--font-sans);
     font-size: clamp(0.52rem, 0.62vw, 0.64rem);
-    letter-spacing: 0.08em;
-    color: #15803d !important;
+    letter-spacing: 0.12em;
+    color: #facc15 !important;
     text-transform: uppercase;
     font-weight: 700;
     opacity: 1 !important;
     margin-top: 2px;
     white-space: nowrap;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 /* ─── Premium Navigation Bar Styling ─────────────────────────────────────── */
@@ -627,30 +637,30 @@ a:hover {
 .header-nav-divider {
     width: 1px;
     height: 22px;
-    background: linear-gradient(180deg, transparent, rgba(212, 175, 55, 0.5), transparent);
-    margin: 0 clamp(0.12rem, 0.25vw, 0.3rem);
+    background: linear-gradient(180deg, transparent, rgba(212, 175, 55, 0.45), transparent);
+    margin: 0 clamp(0.2rem, 0.35vw, 0.45rem);
     flex-shrink: 0;
 }
 
 .nav-btn {
-    background: #ffffff;
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid #e2ddd5;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
     border-radius: 20px;
-    color: #374151;
-    font-size: clamp(0.72rem, 0.78vw, 0.8rem);
+    color: #e2e8f0 !important;
+    font-size: clamp(0.76rem, 0.8vw, 0.84rem);
     font-weight: 600;
-    letter-spacing: clamp(0.2px, 0.05vw, 0.4px);
+    letter-spacing: 0.05em;
     cursor: pointer;
-    padding: clamp(0.32rem, 0.45vw, 0.42rem) clamp(0.45rem, 0.6vw, 0.68rem);
-    height: clamp(32px, 3.8vh, 36px);
+    padding: 0.42rem clamp(0.55rem, 0.75vw, 0.85rem);
+    height: 36px;
     box-sizing: border-box;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(0.25rem, 0.35vw, 0.4rem);
+    gap: 0.38rem;
     text-transform: uppercase;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     white-space: nowrap;
@@ -667,7 +677,7 @@ a:hover {
 }
 
 .nav-svg {
-    color: #6b7280;
+    color: #94a3b8;
     transition: all 0.22s ease;
     display: inline-block;
     vertical-align: middle;
@@ -678,30 +688,30 @@ a:hover {
 }
 
 .nav-btn:hover {
-    background: #fdfbf7;
-    border-color: var(--color-gold);
-    color: #855b05;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 14px rgba(184, 134, 11, 0.15);
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(212, 175, 55, 0.35) !important;
+    color: #facc15 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
 }
 
 .nav-btn:hover .nav-svg {
-    color: var(--color-gold);
+    color: #facc15;
     transform: scale(1.1);
 }
 
 .nav-btn.active {
-    background: #fffdf9;
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border-color: var(--color-gold);
-    color: #855b05;
+    background: rgba(212, 175, 55, 0.18) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(212, 175, 55, 0.65) !important;
+    color: #fef08a !important;
     font-weight: 700;
-    box-shadow: 0 2px 10px rgba(184, 134, 11, 0.15);
+    box-shadow: 0 2px 12px rgba(212, 175, 55, 0.25) !important;
 }
 
 .nav-btn.active .nav-svg {
-    color: var(--color-gold);
+    color: #fef08a;
     transform: scale(1.12);
 }
 
@@ -742,37 +752,36 @@ a:hover {
 
 /* My Order Special Highlight Pill */
 .nav-btn-order {
-    background: rgba(212, 175, 55, 0.16);
-    border: 1.5px solid rgba(212, 175, 55, 0.65);
-    color: var(--color-gold);
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(212, 175, 55, 0.08)) !important;
+    border: 1.5px solid rgba(212, 175, 55, 0.65) !important;
+    color: #fde047 !important;
     font-weight: 700;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
+    border-radius: 20px !important;
 }
 
 .nav-btn-order:hover, .nav-btn-order.active {
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.42), rgba(212, 175, 55, 0.18));
-    border-color: var(--color-gold);
-    color: #ffffff;
-    box-shadow: 0 6px 24px rgba(212, 175, 55, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.35);
-    transform: translateY(-2px);
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.35), rgba(212, 175, 55, 0.16)) !important;
+    border-color: #fde047 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 16px rgba(212, 175, 55, 0.45) !important;
+    transform: translateY(-1px);
 }
 
 .nav-btn-order .nav-svg {
-    color: var(--color-gold);
+    color: #fde047 !important;
 }
 
 .nav-btn-order:hover .nav-svg, .nav-btn-order.active .nav-svg {
-    color: #ffffff;
+    color: #ffffff !important;
 }
 
 /* Admin Panel Special Pill */
 .nav-btn-admin {
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(6, 24, 14, 0.8));
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid rgba(212, 175, 55, 0.45);
-    color: var(--color-gold-light);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    color: #e2e8f0 !important;
+    border-radius: 20px !important;
     padding: clamp(0.32rem, 0.45vw, 0.42rem) clamp(0.5rem, 0.65vw, 0.72rem);
     gap: 0.35rem;
     font-weight: 700;
@@ -782,14 +791,15 @@ a:hover {
 }
 
 .nav-btn-admin:hover, .nav-btn-admin.active {
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.28), rgba(18, 52, 30, 0.9));
-    border-color: var(--color-gold);
-    color: #ffffff;
-    box-shadow: 0 0 16px rgba(212, 175, 55, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    background: rgba(212, 175, 55, 0.22) !important;
+    border-color: rgba(212, 175, 55, 0.65) !important;
+    color: #facc15 !important;
+    box-shadow: 0 0 14px rgba(212, 175, 55, 0.35) !important;
+    transform: translateY(-1px);
 }
 
 .nav-btn-admin .nav-svg {
-    color: var(--color-gold);
+    color: #facc15 !important;
     flex-shrink: 0;
 }
 
@@ -11444,23 +11454,30 @@ input, select, textarea, button {
         overflow-x: hidden !important;
     }
 
-    /* Header & Mobile Hamburger Menu Bar (Always Visible on Mobile - Luxury White Ribbon) */
+    /* Header & Mobile Hamburger Menu Bar (Always Visible on Mobile - Ceylon Forest Green Ribbon) */
     .app-header {
-        position: sticky !important;
+        position: fixed !important;
         top: 0 !important;
-        z-index: 1000 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 1200 !important;
         width: 100% !important;
-        background: rgba(255, 255, 255, 0.96) !important;
+        height: 56px !important;
+        background: rgba(6, 22, 13, 0.96) !important;
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
-        border-bottom: 1px solid #e8e4df !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.28) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45) !important;
+    }
+    body {
+        padding-top: 56px !important;
     }
     .header-container {
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
-        padding: 0.5rem 0.85rem !important;
+        padding: 0 0.85rem !important;
+        height: 100% !important;
         width: 100% !important;
         box-sizing: border-box !important;
         gap: 0.5rem !important;
@@ -11495,6 +11512,10 @@ input, select, textarea, button {
         overflow: hidden !important;
         text-overflow: ellipsis !important;
         display: block !important;
+        color: #ffffff !important;
+        background: none !important;
+        -webkit-text-fill-color: #ffffff !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
     }
     .brand-tagline {
         font-size: clamp(0.4rem, 1.9vw, 0.48rem) !important;
@@ -11503,6 +11524,8 @@ input, select, textarea, button {
         overflow: hidden !important;
         text-overflow: ellipsis !important;
         display: block !important;
+        color: #facc15 !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
     }
     .desktop-nav {
         display: none !important;
@@ -11513,22 +11536,22 @@ input, select, textarea, button {
         justify-content: space-between !important;
         align-items: center !important;
         flex-shrink: 0 !important;
-        width: 42px !important;
-        height: 42px !important;
-        min-width: 42px !important;
-        padding: 10px 8px !important;
-        background: #ffffff !important;
-        border: 1.5px solid #d1d5db !important;
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        padding: 9px 8px !important;
+        background: rgba(212, 175, 55, 0.12) !important;
+        border: 1.5px solid rgba(212, 175, 55, 0.45) !important;
         border-radius: 8px !important;
         cursor: pointer !important;
         z-index: 100 !important;
         margin-left: auto !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25) !important;
     }
     .hamburger-bar {
         width: 100% !important;
         height: 2.5px !important;
-        background-color: #111827 !important;
+        background-color: #facc15 !important;
         border-radius: 2px !important;
         display: block !important;
     }
@@ -15445,23 +15468,20 @@ h1, h2, h3, h4, h5, h6 {
     color: #4b5563;
 }
 
-/* Header brand lockup: dark-to-gold gradient text on the white ribbon */
+/* Header brand lockup: pure white & gold text on Ceylon forest green header */
 .brand-name {
-    background: linear-gradient(to right, #111827 35%, #8a6508 100%) !important;
-    -webkit-background-clip: text !important;
-    background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    text-shadow: none !important;
+    color: #ffffff !important;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
 }
 
 .brand-tagline {
-    color: #7a5a06 !important;
+    color: #facc15 !important;
     opacity: 1 !important;
-}
-
-#nav-order .nav-text,
-#nav-order {
-    color: #7a5a06 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Hero slide text stays crisp white with shadow over photography */
@@ -16234,20 +16254,20 @@ label {
 
 /* Header Brand Lockup */
 .brand-name {
-    color: #111827 !important;
+    color: #ffffff !important;
     background: none !important;
     -webkit-background-clip: unset !important;
     background-clip: unset !important;
-    -webkit-text-fill-color: #111827 !important;
-    text-shadow: none !important;
+    -webkit-text-fill-color: #ffffff !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
     font-weight: 800 !important;
 }
 
 .brand-tagline {
-    color: #855d08 !important;
+    color: #facc15 !important;
     font-weight: 700 !important;
     opacity: 1 !important;
-    text-shadow: none !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Estate Admin Panel: Stats, Tabs, Desks & Actions */
@@ -17063,23 +17083,23 @@ div[style*="rgba(6, 24, 14"] p {
 
 /* 20.1 Header Brand & Logo */
 .brand-name {
-    color: #111827 !important;
+    color: #ffffff !important;
     background: none !important;
     -webkit-background-clip: unset !important;
-    -webkit-text-fill-color: #111827 !important;
-    text-shadow: none !important;
+    -webkit-text-fill-color: #ffffff !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
     font-weight: 800 !important;
 }
 
 .brand-tagline {
-    color: #7a5a06 !important;
+    color: #facc15 !important;
     font-weight: 700 !important;
     opacity: 1 !important;
-    text-shadow: none !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
 }
 
 .brand-logo img {
-    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.06)) !important;
+    filter: drop-shadow(0 1px 3px rgba(212, 175, 55, 0.4)) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3)) !important;
 }
 
 /* 20.2 Product Catalog Controls Toolbar & Products */
