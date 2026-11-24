@@ -502,6 +502,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.UIComponents.renderLocationMapSection('tours-location-container');
                 bindTourEvents();
                 break;
+            case 'science':
+                // Science & Biochemical Validation view
+                break;
             case 'gallery':
                 window.UIComponents.renderGallery('gallery-container');
                 bindGalleryEvents();
@@ -13944,6 +13947,15 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             // 1. Natural Language Greetings
             if (/^(hi|hello|hey|greetings|good\s*(morning|afternoon|evening|day)|howdy|sup|hi\s*there|hello\s*there)$/i.test(lower) || /^(hi|hello|hey)\b/i.test(lower)) {
                 addBotMessage("Hello! How can I assist you today? Feel free to ask about our single-estate wild tea collection, estate factory tours, brewing recommendations, or international orders.");
+                return;
+            }
+
+            // 1.5 Science & Biochemical Lab Certification (NSF & TRI Research)
+            if (/science|lab|laboratory|chemist|biochem|polyphenol|catechin|egcg|nsf|tri\b|wt26|test\s*(result|report)|health\s*benefit|antioxidant|proven/i.test(lower)) {
+                addBotMessage("Rock One Wild Tea (Cultivar **WT26**, Wellawela) has been scientifically validated in research published in the **Journal of the National Science Foundation (JNSF)** by the **Tea Research Institute of Sri Lanka (TRI)**:\n\n• **Total Polyphenols**: **216.79 mg/g** (higher than national average) — intense cellular antioxidant protection.\n• **Total Catechins**: **194.02 mg/g** — rich in bio-active EGCG and health-promoting flavanols.\n• **Fast Fermentation**: **37 minutes** — rapid enzymatic oxidation into golden theaflavins (TF).\n• **Elite Classification**: Categorized in **Cluster II** alongside Sri Lanka's greatest cultivars (DT1, PK2, N2).\n\nYou can explore our dedicated **Science & Lab screen** or download the complete 11-page research publication.", [
+                    { label: "🔬 View Science & Lab Screen", tab: "science" },
+                    { label: "📄 Download NSF Research PDF", href: "files/NSF_Biochem_tea.pdf" }
+                ]);
                 return;
             }
 

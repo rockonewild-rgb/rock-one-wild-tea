@@ -1297,7 +1297,8 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
 #tours-location-container,
 #gallery-container,
 #announcements-full-container,
-#order-container {
+#order-container,
+#science-page-container {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 100% !important;
@@ -19106,6 +19107,653 @@ div[style*="rgba(6, 24, 14"] p {
     border-color: #111827;
     color: #ffffff;
 }
+
+/* ==========================================================================
+   SCIENCE & BIOCHEMICAL VALIDATION SCREEN (NSF & TRI REPORT)
+   ========================================================================== */
+.science-content-wrap {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 1.5rem 6rem;
+    box-sizing: border-box;
+}
+
+.science-overview-card {
+    background: linear-gradient(135deg, rgba(11, 37, 24, 0.95) 0%, rgba(19, 78, 47, 0.85) 60%, rgba(24, 68, 44, 0.9) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    border-radius: 20px;
+    padding: 2.25rem 2.5rem;
+    color: #ffffff;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.2);
+    margin-bottom: 3.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.science-overview-card::after {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.science-overview-intro {
+    margin-bottom: 2rem;
+}
+
+.science-overview-title {
+    font-family: var(--font-serif);
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0.5rem 0 0.85rem;
+    line-height: 1.25;
+}
+
+.science-overview-desc {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: #d4ecd9;
+    max-width: 960px;
+    margin: 0;
+}
+
+.science-hero {
+    background: linear-gradient(135deg, rgba(11, 37, 24, 0.92) 0%, rgba(19, 78, 47, 0.82) 60%, rgba(24, 68, 44, 0.88) 100%), url('../images/hero_banner_science.jpg');
+    background-size: cover;
+    background-position: center center;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: 20px;
+    padding: 3.5rem 2.5rem;
+    color: #ffffff;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.science-hero::after {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.science-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(212, 175, 55, 0.18);
+    border: 1px solid var(--color-gold);
+    color: var(--color-gold);
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+}
+
+.science-title {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+}
+
+.science-subtitle {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: #d4ecd9;
+    max-width: 900px;
+    margin-bottom: 2.25rem;
+}
+
+.science-subtitle strong {
+    color: #ffffff;
+}
+
+.science-highlights-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.science-stat-pill {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 14px;
+    padding: 1.1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    backdrop-filter: blur(8px);
+}
+
+.science-stat-pill .stat-num {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--color-gold);
+    line-height: 1.1;
+}
+
+.science-stat-pill .stat-unit {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #a3e6be;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin: 2px 0 4px;
+}
+
+.science-stat-pill .stat-lbl {
+    font-size: 0.82rem;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+/* 5 Pillars Section */
+.science-pillars-section {
+    margin-top: 4.5rem;
+}
+
+.science-section-header {
+    text-align: center;
+    max-width: 780px;
+    margin: 0 auto 2.5rem;
+}
+
+.science-section-tag {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: var(--color-gold-dark, #b8860b);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.4rem;
+}
+
+.science-section-heading {
+    font-family: var(--font-serif);
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.6rem;
+}
+
+.science-section-sub {
+    font-size: 0.95rem;
+    color: #4b5563;
+    line-height: 1.55;
+}
+
+.science-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.science-card {
+    background: #ffffff;
+    border: 1px solid #e8e4df;
+    border-radius: 16px;
+    padding: 1.85rem;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.science-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(19, 78, 47, 0.12);
+    border-color: #134e2f;
+}
+
+.sc-card-badge {
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #134e2f;
+    background: #eaf7ee;
+    padding: 0.25rem 0.65rem;
+    border-radius: 12px;
+    display: inline-block;
+    margin-bottom: 1rem;
+    align-self: flex-start;
+}
+
+.sc-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(19, 78, 47, 0.08);
+    color: #134e2f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.sc-card-title {
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.sc-metric-box {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px dashed #e8e4df;
+}
+
+.sc-metric-val {
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: #134e2f;
+    line-height: 1;
+}
+
+.sc-metric-unit {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+}
+
+.sc-metric-pm {
+    font-size: 0.76rem;
+    color: #9ca3af;
+    margin-left: auto;
+    font-family: monospace;
+}
+
+.sc-benchmark-bar {
+    background: #f3f4f6;
+    border-radius: 10px;
+    height: 6px;
+    position: relative;
+    margin-bottom: 1.25rem;
+}
+
+.sc-bar-fill {
+    background: linear-gradient(90deg, #134e2f, #d4af37);
+    height: 100%;
+    border-radius: 10px;
+}
+
+.sc-bar-label {
+    display: block;
+    font-size: 0.72rem;
+    color: #0e3d24;
+    font-weight: 600;
+    margin-top: 0.35rem;
+}
+
+.sc-card-desc {
+    font-size: 0.88rem;
+    color: #4b5563;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+    flex: 1;
+}
+
+.sc-card-meta {
+    font-size: 0.72rem;
+    color: #6b7280;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Comparative Data Table */
+.science-table-section {
+    margin-top: 5rem;
+}
+
+.science-table-wrapper {
+    overflow-x: auto;
+    background: #ffffff;
+    border: 1px solid #e8e4df;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.science-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.88rem;
+    min-width: 780px;
+}
+
+.science-data-table thead {
+    background: #0e2b1d;
+    color: #ffffff;
+}
+
+.science-data-table th {
+    padding: 1.1rem 1rem;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    border-bottom: 2px solid var(--color-gold);
+}
+
+.science-data-table td {
+    padding: 1.1rem 1rem;
+    border-bottom: 1px solid #f0eee9;
+    color: #374151;
+    vertical-align: middle;
+}
+
+.science-data-table tr.highlight-row {
+    background: rgba(234, 247, 238, 0.75);
+}
+
+.science-data-table tr.highlight-row td {
+    border-top: 2px solid #134e2f;
+    border-bottom: 2px solid #134e2f;
+    color: #0e3d24;
+}
+
+.cultivar-pill-gold {
+    display: inline-block;
+    background: var(--color-gold);
+    color: #040a06;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    margin-left: 0.4rem;
+}
+
+.cluster-badge {
+    display: inline-block;
+    padding: 0.25rem 0.65rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.cluster-badge.cluster-2 {
+    background: #134e2f;
+    color: #ffffff;
+}
+
+.cluster-badge.cluster-1 {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.cluster-badge.cluster-4 {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.science-data-table tr.summary-row {
+    background: #f9fafb;
+    font-style: italic;
+    color: #6b7280;
+}
+
+/* Academic Citation Box */
+.science-citation-box {
+    margin-top: 4.5rem;
+    background: #faf8f5;
+    border: 1.5px solid #d4af37;
+    border-radius: 18px;
+    padding: 2.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    flex-wrap: wrap;
+}
+
+.citation-left {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    max-width: 780px;
+}
+
+.citation-stamp {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid var(--color-gold);
+    color: #96700a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.citation-source-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #96700a;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 0.35rem;
+    display: block;
+}
+
+.citation-article-title {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+    line-height: 1.35;
+}
+
+.citation-authors {
+    font-size: 0.85rem;
+    color: #374151;
+    margin-bottom: 0.35rem;
+}
+
+.citation-meta {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+}
+
+.citation-institutes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    font-size: 0.75rem;
+    color: #4b5563;
+    font-weight: 500;
+}
+
+.citation-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex-shrink: 0;
+    min-width: 240px;
+}
+
+.btn-download-pdf {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #134e2f;
+    color: #ffffff !important;
+    padding: 0.85rem 1.4rem;
+    border-radius: 30px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none !important;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(19, 78, 47, 0.35);
+    text-align: center;
+}
+
+.btn-download-pdf:hover {
+    background: #0d3821;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(19, 78, 47, 0.5);
+}
+
+.btn-view-doi {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    background: #ffffff;
+    border: 1.5px solid #d1d5db;
+    color: #374151 !important;
+    padding: 0.7rem 1.2rem;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.btn-view-doi:hover {
+    border-color: #134e2f;
+    color: #134e2f !important;
+}
+
+/* Call to Action Banner */
+.science-cta-banner {
+    margin-top: 4.5rem;
+    background: linear-gradient(135deg, #0e2b1d 0%, #134e2f 100%);
+    border-radius: 20px;
+    padding: 3.5rem 2rem;
+    text-align: center;
+    color: #ffffff;
+    box-shadow: 0 16px 45px rgba(19, 78, 47, 0.25);
+}
+
+.cta-tag {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--color-gold);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.cta-title {
+    font-family: var(--font-serif);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.85rem;
+}
+
+.cta-desc {
+    font-size: 1rem;
+    color: #d4ecd9;
+    max-width: 680px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-cta-gold {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #d4af37, #b8860b);
+    color: #040a06;
+    font-weight: 700;
+    padding: 0.85rem 1.75rem;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+}
+
+.btn-cta-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(212, 175, 55, 0.6);
+    background: #f3e5ab;
+}
+
+.btn-cta-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #25D366;
+    color: #ffffff !important;
+    font-weight: 700;
+    padding: 0.85rem 1.75rem;
+    border-radius: 30px;
+    text-decoration: none !important;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.35);
+}
+
+.btn-cta-whatsapp:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(37, 211, 102, 0.5);
+}
+
+@media (max-width: 768px) {
+    .science-title {
+        font-size: 1.85rem;
+    }
+    .science-hero {
+        padding: 2.25rem 1.25rem;
+    }
+    .science-citation-box {
+        flex-direction: column;
+        padding: 1.5rem;
+        align-items: stretch;
+    }
+    .citation-actions {
+        width: 100%;
+    }
+    .science-cards-grid {
+        grid-template-columns: 1fr;
+    }
+    .cta-title {
+        font-size: 1.75rem;
+    }
+}
+
 
 
 
