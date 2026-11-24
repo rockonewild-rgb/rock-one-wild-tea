@@ -308,11 +308,37 @@ async function executeTurso(sql, args = []) {
     }
 }
 
+/**
+ * Probe live Turso database connection and return health status
+ */
+async function pingTurso() {
+    if (!turso || !isTursoAvailable) {
+        return { success: false, connected: false, error: 'TURSO_DATABASE_URL or TURSO_AUTH_TOKEN not configured' };
+    }
+    try {
+        const ping = await turso.execute('SELECT 1 AS connected, CURRENT_TIMESTAMP AS server_time');
+        return {
+            success: true,
+            connected: true,
+            url: (process.env.TURSO_DATABASE_URL || '').trim(),
+            serverTime: ping.rows[0]?.server_time || null
+        };
+    } catch (err) {
+        return {
+            success: false,
+            connected: false,
+            url: (process.env.TURSO_DATABASE_URL || '').trim(),
+            error: err.message
+        };
+    }
+}
+
 module.exports = {
     turso,
     isTursoAvailable: () => isTursoAvailable,
     initTursoSchema,
     syncLocalToTurso,
     queryTurso,
-    executeTurso
+    executeTurso,
+    pingTurso
 };

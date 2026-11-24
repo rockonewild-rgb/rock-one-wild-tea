@@ -8,7 +8,7 @@ require('dotenv').config();
 // Initialize database, Supabase & Turso clients
 require('./db/database');
 const { pingSupabase, getSupabaseHealth } = require('./db/supabase');
-const { isTursoAvailable, initTursoSchema, syncLocalToTurso } = require('./db/turso');
+const { isTursoAvailable, initTursoSchema, syncLocalToTurso, pingTurso } = require('./db/turso');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -56,7 +56,7 @@ app.use(express.static(path.join(__dirname, '..'), {
     }
 }));
 
-// API Healthcheck with Supabase keep-alive ping support
+// API Healthcheck with Supabase & Turso keep-alive ping support
 app.get('/api/health', async (req, res) => {
     let pingResult = null;
     const shouldPing = req.query.ping === 'true' || req.query.keepalive === 'true' || req.query.ping === '1';
@@ -66,6 +66,7 @@ app.get('/api/health', async (req, res) => {
     }
     
     const health = typeof getSupabaseHealth === 'function' ? getSupabaseHealth() : { isHealthy: true };
+    const tursoStatus = typeof pingTurso === 'function' ? await pingTurso() : { connected: false };
 
     res.json({
         status: 'online',
@@ -74,7 +75,8 @@ app.get('/api/health', async (req, res) => {
         timestamp: new Date().toISOString(),
         database: {
             sqlite: 'connected',
-            turso: isTursoAvailable() ? 'connected' : 'not-configured (using local SQLite)',
+            turso: tursoStatus.connected ? 'connected' : (tursoStatus.error ? `offline (${tursoStatus.error})` : 'not-configured'),
+            tursoHealth: tursoStatus,
             supabase: health.isHealthy ? 'connected' : 'circuit-breaker-fallback',
             supabaseHealth: health,
             ping: pingResult
