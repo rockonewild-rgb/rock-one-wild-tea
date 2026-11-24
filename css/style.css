@@ -1132,16 +1132,33 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     box-sizing: border-box !important;
 }
 
-/* Constrain all page content below full-width hero banners */
-.view-section > div > :not(.page-hero-banner),
-.view-section > :not(.page-hero-banner):not(.hero-section),
-#home-section > :not(.hero-section),
+/* Constrain all page content below full-width hero banners (strictly excluding home hero slideshow & all its children) */
+.view-section:not(#home-section) > div:not(.hero-section):not(#hero-slider-container) > :not(.page-hero-banner),
+.view-section > :not(.page-hero-banner):not(.hero-section):not(#hero-slider-container),
+#home-section > :not(.hero-section):not(#hero-slider-container),
 .page-intro-header {
     max-width: 1440px !important;
     margin-left: auto !important;
     margin-right: auto !important;
     padding-left: clamp(20px, 4.5vw, 68px) !important;
     padding-right: clamp(20px, 4.5vw, 68px) !important;
+    box-sizing: border-box !important;
+}
+
+/* Master Full-Bleed 100% Edge-to-Edge Canvas for Hero Slideshow (Zero Gaps / Zero Margins / Zero Side Lines) */
+.hero-section,
+#hero-slider-container,
+.hero-slides-wrapper,
+.hero-slide {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
     box-sizing: border-box !important;
 }
 
@@ -1430,20 +1447,32 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
 }
 
 .hero-slides-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+    position: relative !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    height: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
 }
 
 .hero-slide {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    height: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
     opacity: 0;
     visibility: hidden;
     transform: scale(1.04);
@@ -1454,7 +1483,7 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     justify-content: center;
     padding: clamp(0.75rem, 2vh, 1.5rem) 1rem clamp(5rem, 11vh, 7.5rem) 1rem !important;
     text-align: center;
-    box-sizing: border-box;
+    box-sizing: border-box !important;
     filter: brightness(1.03) contrast(1.03);
     image-rendering: -webkit-optimize-contrast;
     image-rendering: high-quality;
@@ -1737,6 +1766,8 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     top: 50% !important;
     transform: translateY(-50%) !important;
     width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
     height: 44px !important;
     border-radius: 50% !important;
     background: rgba(255, 255, 255, 0.18) !important;
@@ -1752,6 +1783,9 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     font-size: 1.4rem !important;
     transition: all 0.3s ease !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
 }
 .hero-side-nav:hover {
     background: rgba(255, 255, 255, 0.35) !important;
@@ -1760,29 +1794,38 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     transform: translateY(-50%) scale(1.08) !important;
 }
 .hero-side-prev {
-    left: 1.25rem !important;
+    left: clamp(3.2rem, 4.5vw, 4.25rem) !important;
 }
 .hero-side-next {
-    right: 1.25rem !important;
+    right: clamp(1rem, 2.5vw, 2.5rem) !important;
 }
 
-/* Slide Autoplay Progress Line */
+/* Slide Autoplay Progress Line (100% Bleed, starts at x=0 edge-to-edge) */
 .hero-progress-line {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: rgba(255, 255, 255, 0.1);
-    z-index: 10;
-    overflow: hidden;
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    height: 3px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    z-index: 10 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
 }
 
 .hero-progress-fill {
-    height: 100%;
+    height: 100% !important;
     width: 0%;
-    background: linear-gradient(90deg, #16a34a, #facc15);
-    box-shadow: 0 0 10px rgba(250, 204, 21, 0.8);
+    margin: 0 !important;
+    padding: 0 !important;
+    background: linear-gradient(90deg, #16a34a, #facc15) !important;
+    box-shadow: 0 0 10px rgba(250, 204, 21, 0.8) !important;
+    box-sizing: border-box !important;
 }
 
 .hero-section::before {
@@ -10756,10 +10799,11 @@ mark.search-match-highlight {
    UNIVERSAL AUTO-RESOLUTION & DISPLAY SCALING ENGINE (MULTI-MONITOR / LAPTOPS)
    ══════════════════════════════════════════════════════════════════════════════ */
 
-/* 1. Ultra-Wide & 4K Displays */
+/* 1. Ultra-Wide & 4K Displays (Preserve Full Canvas Bleed for Hero Sections) */
 @media (min-width: 2560px) {
     .main-content {
-        max-width: 1600px;
+        max-width: 100% !important;
+        width: 100% !important;
     }
 }
 
