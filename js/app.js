@@ -451,8 +451,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderHomeAnnouncementsPreview();
                 window.UIComponents.renderHeritageShowcase('home-heritage-container');
                 initHeritageGallerySlider();
-                window.UIComponents.renderCinemaShowcase('home-cinema-container');
-                bindCinemaEvents();
                 window.UIComponents.renderTestimonials('home-testimonials-container');
                 bindReviewEvents();
                 if (window.UIComponents.renderHomeGalleryShowcase) {
@@ -466,7 +464,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'about':
                 window.UIComponents.renderAboutUsPage('about-page-container');
-                bindCinemaEvents();
                 break;
             case 'announcements':
                 if (window.TeaFactoryStore && typeof window.TeaFactoryStore.markAnnouncementsAsRead === 'function') {
@@ -5278,97 +5275,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     window.initCheckoutReviewsInteractions = initCheckoutReviewsInteractions;
 
-    // ── Cinema of the Estate Interactive Video Player Logic ──
+    // ── Cinema of the Estate Interactive Video Player Logic (Safely disabled per user request) ──
     function bindCinemaEvents() {
-        const iframe = document.getElementById('estate-cinema-iframe');
-        const ytWrapper = document.getElementById('cinema-yt-wrapper');
-        const html5Wrapper = document.getElementById('cinema-html5-wrapper');
-        const video = document.getElementById('estate-cinema-video');
-        const btnModeYt = document.getElementById('btn-cinema-mode-yt');
-        const btnModeHtml5 = document.getElementById('btn-cinema-mode-html5');
-        const chapterCards = document.querySelectorAll('.cinema-chapter-card');
-        const facade = document.getElementById('cinema-poster-facade');
-
-        function activateCinemaPlayer(ytStart = 0) {
-            if (facade) {
-                facade.style.opacity = '0';
-                setTimeout(() => { facade.style.display = 'none'; }, 350);
-            }
-            if (ytWrapper && ytWrapper.style.display !== 'none' && iframe) {
-                const baseSrc = iframe.getAttribute('data-src') || 'https://www.youtube-nocookie.com/embed/kYJqK9oP64U?enablejsapi=1&rel=0&modestbranding=1&color=white&playsinline=1';
-                iframe.src = `${baseSrc}&start=${ytStart}&autoplay=1`;
-            }
-            if (html5Wrapper && html5Wrapper.style.display !== 'none' && video) {
-                video.currentTime = ytStart;
-                video.play().catch(e => console.log('Video play error:', e));
-            }
-        }
-
-        if (facade) {
-            facade.onclick = () => activateCinemaPlayer(0);
-        }
-
-        // Engine Switching
-        if (btnModeYt && btnModeHtml5) {
-            btnModeYt.onclick = () => {
-                btnModeYt.classList.add('active');
-                btnModeYt.style.borderColor = 'rgba(212,175,55,0.6)';
-                btnModeYt.style.color = '#ffd875';
-                btnModeHtml5.classList.remove('active');
-                btnModeHtml5.style.borderColor = 'rgba(255,255,255,0.18)';
-                btnModeHtml5.style.color = 'var(--color-text-muted)';
-                if (ytWrapper) ytWrapper.style.display = 'block';
-                if (html5Wrapper) {
-                    html5Wrapper.style.display = 'none';
-                    if (video) video.pause();
-                }
-            };
-
-            btnModeHtml5.onclick = () => {
-                btnModeHtml5.classList.add('active');
-                btnModeHtml5.style.borderColor = 'rgba(212,175,55,0.6)';
-                btnModeHtml5.style.color = '#ffd875';
-                btnModeYt.classList.remove('active');
-                btnModeYt.style.borderColor = 'rgba(255,255,255,0.18)';
-                btnModeYt.style.color = 'var(--color-text-muted)';
-                if (html5Wrapper) html5Wrapper.style.display = 'block';
-                if (ytWrapper) ytWrapper.style.display = 'none';
-                if (facade) {
-                    facade.style.opacity = '0';
-                    setTimeout(() => { facade.style.display = 'none'; }, 350);
-                }
-                if (video) {
-                    video.play().catch(e => console.log('HTML5 play blocked', e));
-                }
-            };
-        }
-
-        // Chapter Card Clicks
-        chapterCards.forEach(card => {
-            card.onclick = () => {
-                chapterCards.forEach(c => c.classList.remove('active'));
-                card.classList.add('active');
-
-                const ytStart = parseInt(card.dataset.ytStart || '0', 10);
-                const html5Time = parseFloat(card.dataset.time || '0');
-
-                if (facade && facade.style.display !== 'none') {
-                    activateCinemaPlayer(ytStart);
-                    return;
-                }
-
-                // If YouTube is active
-                if (ytWrapper && ytWrapper.style.display !== 'none' && iframe) {
-                    iframe.src = `https://www.youtube-nocookie.com/embed/kYJqK9oP64U?enablejsapi=1&rel=0&modestbranding=1&color=white&playsinline=1&start=${ytStart}&autoplay=1`;
-                }
-
-                // If HTML5 is active
-                if (html5Wrapper && html5Wrapper.style.display !== 'none' && video) {
-                    video.currentTime = html5Time;
-                    video.play().catch(e => console.log('Video play error:', e));
-                }
-            };
-        });
+        return;
     }
 
     function closeDrawer() {
@@ -14681,7 +14590,6 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
 
             if (bodyContainer) {
                 window.UIComponents.renderAboutUsPage('about-modal-body-container');
-                bindCinemaEvents();
             }
 
             modal.classList.add('active');
@@ -14694,10 +14602,6 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             modal.classList.remove('active');
             modal.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
-
-            // Pause video if playing
-            const video = document.getElementById('estate-cinema-video');
-            if (video) video.pause();
         }
 
         window.appOpenAboutModal = openAboutModal;
