@@ -1446,7 +1446,7 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     background-repeat: no-repeat;
     opacity: 0;
     visibility: hidden;
-    transform: scale(1.10);
+    transform: scale(1.04);
     transition: opacity 1.4s ease-in-out, transform 10s cubic-bezier(0.16, 1, 0.3, 1), visibility 1.4s;
     display: flex;
     flex-direction: column;
@@ -1455,7 +1455,9 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     padding: clamp(0.75rem, 2vh, 1.5rem) 1rem clamp(5rem, 11vh, 7.5rem) 1rem !important;
     text-align: center;
     box-sizing: border-box;
-    filter: brightness(1.04) contrast(1.04);
+    filter: brightness(1.03) contrast(1.03);
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: high-quality;
 }
 
 .hero-slide.active {

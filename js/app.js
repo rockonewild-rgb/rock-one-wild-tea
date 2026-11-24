@@ -12902,7 +12902,8 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 const subtitle = slideObj.subtitle || 'Authentic Ceylon Tea Experience';
                 const title = slideObj.title || 'Organic Homemade<br><span>Tea Experience</span>';
                 const description = slideObj.description || "Discover the ancient art of organic tea-making in the heart of Ceylon's mountains. From garden to cup, experience the authentic journey of premium Sri Lankan tea.";
-                const imgSrc = slideObj.image || 'images/hero_slide_1.jpg';
+                const rawImg = slideObj.image || 'images/hero_slide_1.jpg';
+                const imgSrc = rawImg.startsWith('data:') ? rawImg : (rawImg.includes('?v=') ? rawImg : `${rawImg}?v=3.63.0`);
 
                 return `
                     <div class="hero-slide${isActive ? ' active' : ''}" style="background-image: url('${imgSrc}');">
@@ -12936,8 +12937,10 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             slidesWrapper.innerHTML = galleryImages.map((imgObj, idx) => {
                 const meta = getHeroSlideMetadata(imgObj, idx);
                 const isActive = idx === currentHeroIndex || (idx === 0 && currentHeroIndex >= galleryImages.length);
+                const rawGalleryImg = imgObj.src || 'images/hero_slide_1.jpg';
+                const galleryImgSrc = rawGalleryImg.startsWith('data:') ? rawGalleryImg : (rawGalleryImg.includes('?v=') ? rawGalleryImg : `${rawGalleryImg}?v=3.63.0`);
                 return `
-                    <div class="hero-slide${isActive ? ' active' : ''}" style="background-image: url('${imgObj.src}');">
+                    <div class="hero-slide${isActive ? ' active' : ''}" style="background-image: url('${galleryImgSrc}');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
                             <span class="hero-pill-badge">

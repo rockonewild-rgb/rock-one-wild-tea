@@ -11,7 +11,14 @@ const SVG_ICONS = {
     clock: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
     check: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
     arrowRight: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`,
-    trash: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`
+    trash: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`,
+    // 6-Point Calibrated Sensory Spectrum Vector Icons (Encoding-immune & crisp at all resolutions)
+    sensoryFloral: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;display:inline-block;"><circle cx="12" cy="12" r="3"/><path d="M12 2a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4zm0 12a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4zm-6-2a4 4 0 0 0-4-4 4 4 0 0 0 4-4 4 4 0 0 0 4 4 4 4 0 0 0-4 4zm12 0a4 4 0 0 0-4-4 4 4 0 0 0 4-4 4 4 0 0 0 4 4 4 4 0 0 0-4 4z"/></svg>`,
+    sensoryMalty: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;display:inline-block;"><path d="M7 20l10-10M16 4l-4 4M20 8l-4 4M12 8l-4 4M16 12l-4 4M11 5l-2 2M15 9l-2 2M19 13l-2 2M3 21l3-3"/></svg>`,
+    sensorySweetness: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;display:inline-block;"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`,
+    sensoryAstringency: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;display:inline-block;"><path d="M11 20A7 7 0 0 1 4 13c0-4.42 4.58-9 7-9 2.42 0 7 4.58 7 9a7 7 0 0 1-7 7z"/><path d="M11 20V10"/></svg>`,
+    sensoryBody: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;display:inline-block;"><path d="M12 3v18M6 8l6-2 6 2M6 8a3 3 0 0 0 6 0M18 8a3 3 0 0 0 6 0M3 21h18"/></svg>`,
+    sensoryAroma: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;display:inline-block;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
 };
 
 // Global Theme Vector SVG Helper
@@ -618,31 +625,31 @@ const UIComponents = {
                             </div>
                         </div>
 
-                        <!-- 6-Point Calibrated Sensory Spectrum Ribbon -->
-                        <div class="product-sensory-ribbon" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 0.3rem 0.45rem; background: rgba(4,14,8,0.65); border: 1px solid rgba(212,175,55,0.2); border-radius: 8px; padding: 0.45rem 0.6rem; margin-bottom: 0.85rem; font-size: 0.7rem; color: #dcece1;">
+                        <!-- 6-Point Calibrated Sensory Spectrum Ribbon (Vector Icons - Immune to Mojibake) -->
+                        <div class="product-sensory-ribbon" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem 0.5rem; background: rgba(4,14,8,0.72); border: 1px solid rgba(212,175,55,0.22); border-radius: 8px; padding: 0.45rem 0.65rem; margin-bottom: 0.85rem; font-size: 0.7rem; color: #dcece1;">
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_floral', 'Floral')}">
-                                <span>🌸 ${_t('radar_floral', 'Floral')}</span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.floral ?? 80}%</strong>
+                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryFloral} ${_t('radar_floral', 'Floral')}</span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.25rem;">${radar.floral ?? 80}%</strong>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_malty', 'Malty')}">
-                                <span>🌾 ${_t('radar_malty', 'Malty')}</span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.malty ?? 75}%</strong>
+                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryMalty} ${_t('radar_malty', 'Malty')}</span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.25rem;">${radar.malty ?? 75}%</strong>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_sweetness', 'Sweetness')}">
-                                <span>🍯 ${_t('radar_sweetness', 'Sweet')}</span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.sweetness ?? 80}%</strong>
+                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensorySweetness} ${_t('radar_sweetness', 'Sweet')}</span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.25rem;">${radar.sweetness ?? 80}%</strong>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_astringency', 'Astringency')}">
-                                <span>🍃 ${_t('radar_astringency', 'Astringent')}</span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.astringency ?? 40}%</strong>
+                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryAstringency} ${_t('radar_astringency', 'Astringent')}</span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.25rem;">${radar.astringency ?? 40}%</strong>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_body', 'Body')}">
-                                <span>⚖️ ${_t('radar_body', 'Body')}</span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.body ?? 80}%</strong>
+                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryBody} ${_t('radar_body', 'Body')}</span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.25rem;">${radar.body ?? 80}%</strong>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;" title="${_t('radar_aroma', 'Aroma')}">
-                                <span>✨ ${_t('radar_aroma', 'Aroma')}</span>
-                                <strong style="color:var(--color-gold); font-size:0.68rem;">${radar.aroma ?? 90}%</strong>
+                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryAroma} ${_t('radar_aroma', 'Aroma')}</span>
+                                <strong style="color:var(--color-gold); font-size:0.68rem; margin-left:0.25rem;">${radar.aroma ?? 90}%</strong>
                             </div>
                         </div>
 
@@ -2667,12 +2674,12 @@ const UIComponents = {
                                                 <small style="color:var(--color-text-muted);">${leafGradeStr}</small>
                                                 ${flavorProfileStr ? `<br><small style="color:var(--color-gold); font-size:0.68rem; font-style:italic;">🫖 ${flavorProfileStr}</small>` : ''}
                                                 <div style="display:flex; flex-wrap:wrap; gap:0.25rem; margin-top:0.35rem;">
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Floral">🌸 ${radar.floral ?? 80}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Malty">🌾 ${radar.malty ?? 75}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Sweetness">🍯 ${radar.sweetness ?? 80}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Astringency">🍃 ${radar.astringency ?? 40}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Body">⚖️ ${radar.body ?? 80}%</span>
-                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold);" title="Aroma">✨ ${radar.aroma ?? 90}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold); display:inline-flex; align-items:center; gap:0.25rem;" title="Floral">${SVG_ICONS.sensoryFloral} ${radar.floral ?? 80}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold); display:inline-flex; align-items:center; gap:0.25rem;" title="Malty">${SVG_ICONS.sensoryMalty} ${radar.malty ?? 75}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold); display:inline-flex; align-items:center; gap:0.25rem;" title="Sweetness">${SVG_ICONS.sensorySweetness} ${radar.sweetness ?? 80}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold); display:inline-flex; align-items:center; gap:0.25rem;" title="Astringency">${SVG_ICONS.sensoryAstringency} ${radar.astringency ?? 40}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold); display:inline-flex; align-items:center; gap:0.25rem;" title="Body">${SVG_ICONS.sensoryBody} ${radar.body ?? 80}%</span>
+                                                    <span style="font-size:0.62rem; padding:0.1rem 0.35rem; border-radius:4px; background:rgba(212,175,55,0.08); color:var(--color-gold); display:inline-flex; align-items:center; gap:0.25rem;" title="Aroma">${SVG_ICONS.sensoryAroma} ${radar.aroma ?? 90}%</span>
                                                 </div>
                                             </td>
                                             <td>
@@ -2916,7 +2923,7 @@ const UIComponents = {
                                         <!-- Floral -->
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
-                                                <span>🌸 Floral Intensity</span>
+                                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryFloral} Floral Intensity</span>
                                                 <strong id="badge-radar-floral" style="color: var(--color-gold); font-family: monospace;">80%</strong>
                                             </div>
                                             <input type="range" id="prod-radar-floral" min="0" max="100" value="80" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
@@ -2924,7 +2931,7 @@ const UIComponents = {
                                         <!-- Malty -->
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
-                                                <span>🌾 Malty / Roast</span>
+                                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryMalty} Malty / Roast</span>
                                                 <strong id="badge-radar-malty" style="color: var(--color-gold); font-family: monospace;">75%</strong>
                                             </div>
                                             <input type="range" id="prod-radar-malty" min="0" max="100" value="75" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
@@ -2932,7 +2939,7 @@ const UIComponents = {
                                         <!-- Sweetness -->
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
-                                                <span>🍯 Natural Sweetness</span>
+                                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensorySweetness} Natural Sweetness</span>
                                                 <strong id="badge-radar-sweetness" style="color: var(--color-gold); font-family: monospace;">80%</strong>
                                             </div>
                                             <input type="range" id="prod-radar-sweetness" min="0" max="100" value="80" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
@@ -2940,7 +2947,7 @@ const UIComponents = {
                                         <!-- Astringency -->
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
-                                                <span>🍃 Astringency</span>
+                                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryAstringency} Astringency</span>
                                                 <strong id="badge-radar-astringency" style="color: var(--color-gold); font-family: monospace;">40%</strong>
                                             </div>
                                             <input type="range" id="prod-radar-astringency" min="0" max="100" value="40" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
@@ -2948,7 +2955,7 @@ const UIComponents = {
                                         <!-- Body -->
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
-                                                <span>⚖️ Body &amp; Structure</span>
+                                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryBody} Body &amp; Structure</span>
                                                 <strong id="badge-radar-body" style="color: var(--color-gold); font-family: monospace;">80%</strong>
                                             </div>
                                             <input type="range" id="prod-radar-body" min="0" max="100" value="80" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
@@ -2956,6 +2963,11 @@ const UIComponents = {
                                         <!-- Aroma -->
                                         <div style="background: rgba(0,0,0,0.38); padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
                                             <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #dcece1; margin-bottom: 0.35rem;">
+                                                <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryAroma} Aroma Intensity</span>
+                                                <strong id="badge-radar-aroma" style="color: var(--color-gold); font-family: monospace;">90%</strong>
+                                            </div>
+                                            <input type="range" id="prod-radar-aroma" min="0" max="100" value="90" step="1" class="admin-range-slider" style="width: 100%; accent-color: var(--color-gold); cursor: pointer;">
+                                        </div>
                                                 <span>✨ Aroma Intensity</span>
                                                 <strong id="badge-radar-aroma" style="color: var(--color-gold); font-family: monospace;">90%</strong>
                                             </div>
@@ -5592,7 +5604,7 @@ const UIComponents = {
                             <!-- Floral -->
                             <div class="spectrum-bar-item">
                                 <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
-                                    <span>🌸 ${_t('radar_floral', 'Floral Intensity')}</span>
+                                    <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryFloral} ${_t('radar_floral', 'Floral Intensity')}</span>
                                     <strong style="color:#7a5a06;">${radar.floral ?? 80}%</strong>
                                 </div>
                                 <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
@@ -5602,7 +5614,7 @@ const UIComponents = {
                             <!-- Malty -->
                             <div class="spectrum-bar-item">
                                 <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
-                                    <span>🌾 ${_t('radar_malty', 'Malty / Roast')}</span>
+                                    <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryMalty} ${_t('radar_malty', 'Malty / Roast')}</span>
                                     <strong style="color:#7a5a06;">${radar.malty ?? 75}%</strong>
                                 </div>
                                 <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
@@ -5612,7 +5624,7 @@ const UIComponents = {
                             <!-- Sweetness -->
                             <div class="spectrum-bar-item">
                                 <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
-                                    <span>🍯 ${_t('radar_sweetness', 'Natural Sweetness')}</span>
+                                    <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensorySweetness} ${_t('radar_sweetness', 'Natural Sweetness')}</span>
                                     <strong style="color:#7a5a06;">${radar.sweetness ?? 80}%</strong>
                                 </div>
                                 <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
@@ -5622,7 +5634,7 @@ const UIComponents = {
                             <!-- Astringency -->
                             <div class="spectrum-bar-item">
                                 <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
-                                    <span>🍃 ${_t('radar_astringency', 'Astringency')}</span>
+                                    <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryAstringency} ${_t('radar_astringency', 'Astringency')}</span>
                                     <strong style="color:#7a5a06;">${radar.astringency ?? 40}%</strong>
                                 </div>
                                 <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
@@ -5632,7 +5644,7 @@ const UIComponents = {
                             <!-- Body -->
                             <div class="spectrum-bar-item">
                                 <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
-                                    <span>⚖️ ${_t('radar_body', 'Body & Structure')}</span>
+                                    <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryBody} ${_t('radar_body', 'Body & Structure')}</span>
                                     <strong style="color:#7a5a06;">${radar.body ?? 80}%</strong>
                                 </div>
                                 <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">
@@ -5642,7 +5654,7 @@ const UIComponents = {
                             <!-- Aroma -->
                             <div class="spectrum-bar-item">
                                 <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:#374151; margin-bottom:0.25rem;">
-                                    <span>✨ ${_t('radar_aroma', 'Aroma Intensity')}</span>
+                                    <span style="display:inline-flex; align-items:center; gap:0.3rem;">${SVG_ICONS.sensoryAroma} ${_t('radar_aroma', 'Aroma Intensity')}</span>
                                     <strong style="color:#7a5a06;">${radar.aroma ?? 90}%</strong>
                                 </div>
                                 <div style="height:5px; background:#e8e4df; border-radius:3px; overflow:hidden;">

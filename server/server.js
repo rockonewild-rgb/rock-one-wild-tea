@@ -42,10 +42,16 @@ app.use(express.static(path.join(__dirname, '..'), {
     setHeaders: (res, filePath) => {
         if (filePath.endsWith('.html')) {
             res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
         } else if (filePath.match(/\.(jpg|jpeg|png|webp|svg|gif|ico|mp3|wav|ogg)$/i)) {
-            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+            res.setHeader('Cache-Control', 'public, max-age=86400, must-revalidate');
         } else if (filePath.match(/\.(css|js)$/i)) {
             res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+            if (filePath.endsWith('.js')) {
+                res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+            } else if (filePath.endsWith('.css')) {
+                res.setHeader('Content-Type', 'text/css; charset=utf-8');
+            }
         }
     }
 }));
