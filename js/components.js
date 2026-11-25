@@ -1093,7 +1093,7 @@ const UIComponents = {
                         </div>
                     </div>
                     <div>
-                        <button type="button" class="btn btn-primary btn-book-slot" data-id="1" data-timeslot="09:30 AM" style="padding: 0.95rem 2rem; font-size: 0.95rem; white-space: nowrap; box-shadow: 0 4px 20px rgba(184,134,11,0.25);">
+                        <button type="button" class="btn btn-primary btn-book-slot" data-id="1" data-timeslot="09:30 AM" style="padding: 0.95rem 1.75rem; font-size: 0.95rem; box-shadow: 0 4px 20px rgba(184,134,11,0.25);">
                             Reserve Gongfu Experience (LKR 1,450)
                         </button>
                     </div>
@@ -7792,15 +7792,15 @@ const UIComponents = {
                         </div>
 
                         ${isProd ? `
-                        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; margin: 0.45rem 0 0.85rem 0; font-size: 0.82rem;">
-                            <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.25); padding: 0.28rem 0.65rem; border-radius: 4px; color: #cbd5e1;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-                                <span>Shipping: <strong style="color: var(--color-gold);">${shipFee > 0 ? `$${shipFee.toFixed(2)} Flat Worldwide` : 'Complimentary'}</strong></span>
+                        <div class="seventea-chips-row" style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; margin: 0.45rem 0 0.85rem 0; font-size: 0.82rem;">
+                            <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: #fdfbf7; border: 1px solid #ebd9b8; padding: 0.28rem 0.65rem; border-radius: 4px; color: #4b5563;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#854d0e" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                                <span>Shipping: <strong style="color: #855b05;">${shipFee > 0 ? `$${shipFee.toFixed(2)} Flat Worldwide` : 'Complimentary'}</strong></span>
                             </div>
                             ${netWt ? `
-                            <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); padding: 0.28rem 0.65rem; border-radius: 4px; color: #cbd5e1;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-                                <span>Weight: <strong style="color: #f1f5f9;">${netWt}</strong></span>
+                            <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 0.28rem 0.65rem; border-radius: 4px; color: #166534;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                                <span>Weight: <strong style="color: #15803d;">${netWt}</strong></span>
                             </div>
                             ` : ''}
                         </div>

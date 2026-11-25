@@ -15890,6 +15890,18 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             }
         });
 
+        const mobilePrefsBtn = document.getElementById('mobile-prefs-btn');
+        mobilePrefsBtn?.addEventListener('click', () => {
+            if (mobileMenuBtn && mobileNavDrawer) {
+                mobileMenuBtn.classList.remove('open');
+                mobileNavDrawer.classList.remove('open');
+            }
+            const prefsBtn = document.getElementById('floating-global-prefs-btn');
+            if (prefsBtn) {
+                prefsBtn.click();
+            }
+        });
+
         backdrop?.addEventListener('click', () => closeAuthModal(true));
         closeBtn?.addEventListener('click', () => closeAuthModal(true));
 
