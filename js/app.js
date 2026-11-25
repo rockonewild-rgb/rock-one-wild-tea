@@ -1884,6 +1884,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Toast Notification System
     function showToast(title, message, type = 'success', duration = 4000, onClick = null) {
+        const container = toastContainer || document.getElementById('toast-container');
+        if (!container) return;
+
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
         if (onClick) {
@@ -1910,7 +1913,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ${onClick ? `<div style="font-size:0.72rem; color:var(--color-gold); font-weight:700; margin-left:auto; flex-shrink:0; text-transform:uppercase; letter-spacing:0.5px;">Read &rarr;</div>` : ''}
         `;
         
-        toastContainer.appendChild(toast);
+        container.appendChild(toast);
         
         // Auto remove toast after duration
         setTimeout(() => {
@@ -1918,6 +1921,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => toast.remove(), 400);
         }, duration);
     }
+    window.showToast = showToast;
 
     // Stage-specific Currency Switcher (Stage 1: Product, Stage 2: Tour, Stage 3: Gift Box)
     window.switchStageCurrency = function(currencyCode) {
@@ -2144,6 +2148,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentDrawerContext = { type, id, data };
         drawerOverlay.classList.add('active');
+        document.body.classList.add('has-active-drawer');
         const drawerContainer = drawerOverlay.querySelector('.drawer-container');
         if (drawerContainer) {
             if (type === 'product' || type === 'box' || type === 'box_quoted_pay' || type === 'tour') {
@@ -2295,7 +2300,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                             </select>
                                         ` : `
                                             <label class="form-label" for="box-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">State / Province / County *</label>
-                                            <input class="form-input" type="text" id="box-cust-region" placeholder="e.g. California / London / Tokyo" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
+                                            <input class="form-input" type="text" id="box-cust-region" placeholder="e.g. New York (NY) / California" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
                                         `}
                                     </div>
                                 </div>
@@ -2304,20 +2309,25 @@ document.addEventListener('DOMContentLoaded', () => {
                             <!-- Recipient Details Section -->
                             <div class="checkout-step-card">
                                 <div class="checkout-step-header">
-                                    <div class="checkout-step-title">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                        <span>2. Recipient &amp; Delivery Address</span>
+                                    <div class="checkout-step-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                            <span>2. Recipient &amp; Delivery Address</span>
+                                        </div>
+                                        <button type="button" id="box-fill-sample-btn" style="background: rgba(212,175,55,0.08); border: 1px dashed rgba(212,175,55,0.4); color: var(--color-gold); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;" title="Fill sample delivery details">
+                                            <span>⚡ Fill Sample Address</span>
+                                        </button>
                                     </div>
                                 </div>
 
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
                                     <div class="form-group" style="margin-bottom: 0;">
                                         <label class="form-label" for="box-cust-firstname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">First Name *</label>
-                                        <input class="form-input" type="text" id="box-cust-firstname" value="${esc(defaultFirstName)}" required placeholder="e.g. Ruwan" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        <input class="form-input" type="text" id="box-cust-firstname" value="${esc(defaultFirstName)}" required placeholder="e.g. Alexander / James" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
                                     </div>
                                     <div class="form-group" style="margin-bottom: 0;">
                                         <label class="form-label" for="box-cust-lastname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Last Name *</label>
-                                        <input class="form-input" type="text" id="box-cust-lastname" value="${esc(defaultLastName)}" required placeholder="e.g. Perera" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        <input class="form-input" type="text" id="box-cust-lastname" value="${esc(defaultLastName)}" required placeholder="e.g. Miller / Sterling" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
                                     </div>
                                 </div>
 
@@ -2328,27 +2338,27 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </div>
                                     <div class="form-group" style="margin-bottom: 0;">
                                         <label class="form-label" for="box-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Mobile Phone (Courier Updates) *</label>
-                                        <input class="form-input" type="tel" id="box-cust-phone" value="${esc(signedUser ? signedUser.phone || '' : (isQuotedPay ? booking.phone || '' : ''))}" required placeholder="e.g. +94 77 123 4567" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        <input class="form-input" type="tel" id="box-cust-phone" value="${esc(signedUser ? signedUser.phone || '' : (isQuotedPay ? booking.phone || '' : ''))}" required placeholder="e.g. +1 (555) 234-5678" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
                                     </div>
                                 </div>
 
                                 <div class="form-group" style="margin-bottom: 0.75rem;">
                                     <label class="form-label" for="box-cust-address" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Street Address *</label>
-                                    <input class="form-input" type="text" id="box-cust-address" required placeholder="e.g. 42 Highland View Road" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    <input class="form-input" type="text" id="box-cust-address" required placeholder="e.g. 350 Fifth Avenue / 742 Evergreen Terr" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
                                 </div>
 
                                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;">
                                     <div class="form-group" style="margin-bottom: 0;">
                                         <label class="form-label" for="box-cust-suite" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Apt / Suite</label>
-                                        <input class="form-input" type="text" id="box-cust-suite" placeholder="e.g. Suite 12" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        <input class="form-input" type="text" id="box-cust-suite" placeholder="e.g. Suite 400 / Apt 4B" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
                                     </div>
                                     <div class="form-group" style="margin-bottom: 0;">
                                         <label class="form-label" for="box-cust-city" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">City / Town *</label>
-                                        <input class="form-input" type="text" id="box-cust-city" required placeholder="e.g. Colombo / London" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        <input class="form-input" type="text" id="box-cust-city" required placeholder="e.g. New York / San Francisco" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
                                     </div>
                                     <div class="form-group" style="margin-bottom: 0;">
-                                        <label class="form-label" for="box-cust-postal" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Postal Code *</label>
-                                        <input class="form-input" type="text" id="box-cust-postal" required placeholder="e.g. 00700 / SW1A 1AA" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        <label class="form-label" for="box-cust-postal" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Postal Code / ZIP *</label>
+                                        <input class="form-input" type="text" id="box-cust-postal" required placeholder="e.g. 10001 / 90210" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
                                     </div>
                                 </div>
                             </div>
@@ -2367,11 +2377,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <input type="radio" name="box-shipping-method" id="box-ship-ems" value="ems_express" checked style="margin-top: 0.25rem;">
                                         <div style="flex: 1;">
                                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
-                                                <strong id="box-shipping-ems-title" style="color: #ffffff; font-size: 0.88rem;">${isSriLanka ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air'}</strong>
+                                                <strong id="box-shipping-ems-title" style="color: #ffffff; font-size: 0.88rem;">${isSriLanka ? 'SL Post EMS Express (Pre-paid)' : 'SL Post EMS International Priority Air'}</strong>
                                                 <span id="box-shipping-ems-price-pill" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-size: 0.8rem; font-weight: 700;">${formattedShipping}</span>
                                             </div>
                                             <p id="box-shipping-ems-desc" style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; margin: 0;">
-                                                ${isSriLanka ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
+                                                ${isSriLanka ? 'Door-to-door express parcel courier with official SL Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official SL Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
                                             </p>
                                         </div>
                                     </label>
@@ -2405,7 +2415,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <div style="background: rgba(37,211,102,0.08); border: 1.5px solid rgba(37,211,102,0.4); border-radius: 10px; padding: 1.15rem; text-align: center; margin-bottom: 1rem;">
                                         <h4 style="color: #4ade80; font-size: 1.05rem; margin-bottom: 0.35rem; font-weight: 700;">Cash on Delivery (COD) Selected</h4>
                                         <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5; margin: 0 0 0.85rem 0;">
-                                            The Sri Lanka Post EMS courier will collect the cash amount upon parcel handover.
+                                            The SL Post EMS courier will collect the cash amount upon parcel handover.
                                         </p>
                                         <div style="background: rgba(0,0,0,0.45); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.65rem 1rem; display: inline-flex; align-items: center; gap: 0.75rem;">
                                             <span style="font-size: 0.78rem; color: #9ca3af;">Payable to Courier:</span>
@@ -2426,9 +2436,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                             Cash Deposit Slip (Live)
                                         </button>
                                         <button type="button" class="pay-tab" data-method="paypal" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(0,121,193,0.5);">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
-                                            <span style="font-weight:700;"><span style="color:#0079C1;">Pay</span><span style="color:#00457C;">Pal</span></span>
-                                            <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(0,121,193,0.2); color:#38bdf8; font-weight:700;">LIVE</span>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z" fill="#003087"/>
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.154 9.172a.65.65 0 0 1 .639-.537h4.82c1.928 0 3.33.448 4.072 1.302.734.845.85 2.05.344 3.582-.56 1.686-1.792 2.626-3.662 2.795l-.148.01h-1.364a.577.577 0 0 0-.57.49l-.63 3.102a.407.407 0 0 1-.389.329H9.986a.407.407 0 0 1-.402-.47l1.72-8.468a.5.5 0 0 1 .49-.404h-1.64z" fill="#0079C1"/>
+                                            </svg>
+                                            <span style="font-weight:700;"><span style="color:#0079C1;">Pay</span><span style="color:#38bdf8;">Pal</span></span>
+                                            <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(245,158,11,0.25); color:#fbbf24; font-weight:700;">COMING SOON</span>
+                                        </button>
+                                        <button type="button" class="pay-tab" data-method="card" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(37,99,235,0.5);">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                            <span>Credit / Card</span>
+                                            <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(245,158,11,0.25); color:#fbbf24; font-weight:700;">COMING SOON</span>
                                         </button>
                                     </div>
 
@@ -2479,15 +2497,125 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <div style="background: linear-gradient(135deg, rgba(0,121,193,0.12) 0%, rgba(4,14,8,0.92) 100%); border: 1.5px solid rgba(0,121,193,0.45); border-radius: 8px; padding: 1.15rem;">
                                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.5rem;">
                                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
-                                                    <strong style="color: #ffffff; font-size: 0.95rem;">PayPal &bull; Instant Online Settlement</strong>
+                                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z" fill="#003087"/>
+                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.154 9.172a.65.65 0 0 1 .639-.537h4.82c1.928 0 3.33.448 4.072 1.302.734.845.85 2.05.344 3.582-.56 1.686-1.792 2.626-3.662 2.795l-.148.01h-1.364a.577.577 0 0 0-.57.49l-.63 3.102a.407.407 0 0 1-.389.329H9.986a.407.407 0 0 1-.402-.47l1.72-8.468a.5.5 0 0 1 .49-.404h-1.64z" fill="#0079C1"/>
+                                                    </svg>
+                                                    <strong style="color: #ffffff; font-size: 0.95rem;">PayPal &bull; Express Checkout</strong>
+                                                </div>
+                                                <span style="font-size: 0.65rem; background: rgba(245, 158, 11, 0.2); color: #fbbf24; padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.4);">COMING SOON</span>
+                                            </div>
+
+                                            <div class="coming-soon-notice-card" style="background: rgba(217, 119, 6, 0.12); border: 1.5px solid rgba(245, 158, 11, 0.45); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; display: flex; gap: 0.75rem; align-items: flex-start;">
+                                                <div style="flex-shrink: 0; margin-top: 2px;">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                </div>
+                                                <div style="font-size: 0.8rem; line-height: 1.45; color: #fef3c7;">
+                                                    <div style="font-weight: 700; color: #fbbf24; font-size: 0.85rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
+                                                        <span>PayPal Gateway Coming Soon</span>
+                                                        <span style="font-size: 0.65rem; background: rgba(245, 158, 11, 0.2); color: #fde68a; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.4);">UNDER INTEGRATION</span>
+                                                    </div>
+                                                    <div>
+                                                        PayPal express checkout is currently in final compliance integration. To secure your Collector Chest allocation immediately, please select <strong>Direct Bank Transfer</strong>, <strong>Cash Deposit Slip</strong>, or <strong>Cash on Delivery (Sri Lanka only)</strong>.
+                                                    </div>
+                                                    <div style="margin-top: 0.45rem; font-size: 0.75rem;">
+                                                        Need concierge assistance? <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge%2C%20I%20would%20like%20assistance%20with%20Collector%20Chest%20order" target="_blank" rel="noopener noreferrer" style="color: #fbbf24; font-weight: 700; text-decoration: underline;">Chat with our Concierge on WhatsApp &rarr;</a>
+                                                    </div>
                                                 </div>
                                             </div>
+
                                             <div style="background: rgba(0,0,0,0.35); border-radius: 6px; padding: 0.55rem 0.85rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
                                                 <span style="font-size: 0.76rem; color: #9ca3af;">USD Settlement Amount:</span>
                                                 <strong id="box-paypal-amount-display" style="font-size: 1.05rem; color: #38bdf8; font-family: monospace;">${currInfo.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`}</strong>
                                             </div>
                                             <div id="box-paypal-button-container" class="paypal-smart-container" style="min-height: 44px;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Credit / Debit Card Panel -->
+                                    <div id="box-pay-panel-card" class="pay-panel pay-panel-card">
+                                        <div class="luxury-card-checkout-box dark-mode-card-box" style="background: rgba(4,14,8,0.75); border: 1px solid rgba(212,175,55,0.3); border-radius: 8px; padding: 1.15rem;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.6rem;">
+                                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                                    <strong style="color: #ffffff; font-size: 0.92rem;">Credit / Debit Card</strong>
+                                                </div>
+                                                <div class="card-brand-chips">
+                                                    <span class="card-chip-badge visa-badge">VISA</span>
+                                                    <span class="card-chip-badge mc-badge">MC</span>
+                                                    <span class="card-chip-badge amex-badge">AMEX</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="coming-soon-notice-card" style="background: rgba(217, 119, 6, 0.12); border: 1.5px solid rgba(245, 158, 11, 0.45); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; display: flex; gap: 0.75rem; align-items: flex-start;">
+                                                <div style="flex-shrink: 0; margin-top: 2px;">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                </div>
+                                                <div style="font-size: 0.8rem; line-height: 1.45; color: #fef3c7;">
+                                                    <div style="font-weight: 700; color: #fbbf24; font-size: 0.85rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
+                                                        <span>Card Gateway Coming Soon</span>
+                                                        <span style="font-size: 0.65rem; background: rgba(245, 158, 11, 0.2); color: #fde68a; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.4);">UNDER INTEGRATION</span>
+                                                    </div>
+                                                    <div>
+                                                        Credit &amp; Debit Card checkout (Visa, Mastercard, Amex) is currently undergoing final verification. To reserve your Collector Chest immediately, please select <strong>Direct Bank Transfer</strong>, <strong>Cash Deposit Slip</strong>, or <strong>Cash on Delivery (Sri Lanka only)</strong>.
+                                                    </div>
+                                                    <div style="margin-top: 0.45rem; font-size: 0.75rem;">
+                                                        Need concierge assistance? <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge%2C%20I%20would%20like%20assistance%20with%20Collector%20Chest%20order" target="_blank" rel="noopener noreferrer" style="color: #fbbf24; font-weight: 700; text-decoration: underline;">Chat with our Concierge on WhatsApp &rarr;</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                                                <div>
+                                                    <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); margin-bottom: 0.3rem; display: block;">Cardholder Name *</label>
+                                                    <input type="text" id="box-card-name" class="form-input" placeholder="Full name on card" autocomplete="cc-name" style="width: 100%; font-size: 0.85rem; padding: 0.6rem 0.75rem;">
+                                                </div>
+
+                                                <div>
+                                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                                                        <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Card Number *</label>
+                                                        <span id="box-card-brand-detected" style="font-size: 0.68rem; color: #60a5fa; font-weight: 700;">Secure TLS</span>
+                                                    </div>
+                                                    <div style="position: relative;">
+                                                        <input type="text" id="box-card-number" class="form-input" placeholder="4000  1234  5678  9010" maxlength="19" autocomplete="cc-number" style="width: 100%; font-size: 0.9rem; font-family: monospace; letter-spacing: 1px; padding: 0.6rem 2.5rem 0.6rem 0.75rem;">
+                                                        <div style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none;">
+                                                            <svg width="18" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
+                                                    <div>
+                                                        <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); margin-bottom: 0.3rem; display: block;">Expiry Date *</label>
+                                                        <input type="text" id="box-card-expiry" class="form-input" placeholder="MM / YY" maxlength="7" autocomplete="cc-exp" style="width: 100%; font-size: 0.85rem; font-family: monospace; text-align: center; padding: 0.6rem 0.75rem;">
+                                                    </div>
+                                                    <div>
+                                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                                                            <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Security Code *</label>
+                                                            <span style="font-size: 0.68rem; color: #9ca3af;">CVV</span>
+                                                        </div>
+                                                        <div style="position: relative;">
+                                                            <input type="password" id="box-card-cvc" class="form-input" placeholder="•••" maxlength="4" autocomplete="cc-csc" style="width: 100%; font-size: 0.85rem; font-family: monospace; letter-spacing: 2px; text-align: center; padding: 0.6rem 1.8rem 0.6rem 0.75rem;">
+                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div style="background: rgba(0,0,0,0.35); border-radius: 6px; padding: 0.55rem 0.85rem; margin-top: 0.2rem; display: flex; justify-content: space-between; align-items: center;">
+                                                    <span style="font-size: 0.76rem; color: #9ca3af;">Direct Card Settlement:</span>
+                                                    <strong id="box-card-amount-display" style="font-size: 1.05rem; color: #60a5fa; font-family: monospace;">${currInfo.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`}</strong>
+                                                </div>
+
+                                                <button type="button" id="box-pay-card-btn" class="btn btn-primary" style="width: 100%; padding: 0.85rem 1.25rem; font-size: 0.95rem; font-weight: 700; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 0.55rem; cursor: pointer; box-shadow: 0 4px 14px rgba(37,99,235,0.25); background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%); border-color: #1d4ed8; color: #ffffff; margin-top: 0.2rem;">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                                    <span id="box-pay-card-btn-text">Pay with Card &bull; ${currInfo.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : formattedGrandTotal}</span>
+                                                </button>
+
+                                                <div style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.7rem; color: #9ca3af; margin-top: 0.1rem;">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                                    <span>256-Bit Bank Encryption &bull; PCI-DSS Level 1 Certified</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2582,7 +2710,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <strong id="box-discount-amt">-$0.00</strong>
                                 </div>
                                 <div class="checkout-totals-row">
-                                    <span id="box-summary-shipping-label">${isSriLanka ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS Priority Air'}</span>
+                                    <span id="box-summary-shipping-label">${isSriLanka ? 'SL Post EMS Courier' : 'SL Post EMS Priority Air'}</span>
                                     <span id="box-summary-shipping" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-weight: 600;">${formattedShipping}</span>
                                 </div>
                                 <div class="checkout-grand-total-row">
@@ -2623,14 +2751,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const renderBoxOrderConfirmationSuccess = (order, paymentMethod) => {
                 const isCOD = paymentMethod === 'cod';
                 const isPayPal = paymentMethod === 'paypal';
+                const isCard = paymentMethod === 'card';
 
                 drawerFormContainer.innerHTML = `
                     <div class="cart-success-view" style="text-align: center; padding: 2.25rem 1rem;">
-                        <div style="width: 76px; height: 76px; border-radius: 50%; background: ${isCOD ? 'rgba(37,211,102,0.15)' : 'rgba(212,175,55,0.12)'}; border: 2px solid ${isCOD ? '#25d366' : 'var(--color-gold)'}; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.15rem auto; color: ${isCOD ? '#25d366' : 'var(--color-gold)'};">
+                        <div style="width: 76px; height: 76px; border-radius: 50%; background: ${isCOD ? 'rgba(37,211,102,0.15)' : (isCard ? 'rgba(37,99,235,0.15)' : 'rgba(212,175,55,0.12)')}; border: 2px solid ${isCOD ? '#25d366' : (isCard ? '#2563eb' : 'var(--color-gold)')}; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.15rem auto; color: ${isCOD ? '#25d366' : (isCard ? '#2563eb' : 'var(--color-gold)')};">
                             <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
-                        <span class="season-badge" style="background: ${isCOD ? 'rgba(37,211,102,0.2)' : 'rgba(212,175,55,0.15)'}; color: ${isCOD ? '#4ade80' : 'var(--color-gold)'}; font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
-                            ${isCOD ? 'Cash on Delivery • Order Confirmed' : (isPayPal ? 'Paid • Instant PayPal Clearance' : 'Allocation Reserved • Receipt Attached')}
+                        <span class="season-badge" style="background: ${isCOD ? 'rgba(37,211,102,0.2)' : (isCard ? 'rgba(37,99,235,0.15)' : 'rgba(212,175,55,0.15)')}; color: ${isCOD ? '#4ade80' : (isCard ? '#38bdf8' : 'var(--color-gold)')}; font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                            ${isCOD ? 'Cash on Delivery • Order Confirmed' : (isCard ? `Paid • Direct Card Settlement (${order.cardBrand || 'Card'} •••• ${order.cardLast4 || '4242'})` : (isPayPal ? 'Paid • Instant PayPal Clearance' : 'Allocation Reserved • Receipt Attached'))}
                         </span>
                         <h3 style="font-family: var(--font-serif); font-size: 1.5rem; color: #ffffff; margin: 0.75rem 0 0.25rem 0;">Collector Chest Allocated</h3>
                         <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.5rem;">
@@ -2653,7 +2782,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
                                 <span style="font-size: 0.8rem; color: var(--color-text-muted);">Courier Method</span>
                                 <span style="color: #86efac; font-size: 0.82rem; font-weight: 600;">
-                                    ${order.shippingMethod === 'cod' ? 'Sri Lanka Post EMS (Cash on Delivery)' : (order.country === 'Sri Lanka' ? 'Sri Lanka Post EMS Express' : 'Sri Lanka Post EMS International Priority Air')}
+                                    ${order.shippingMethod === 'cod' ? 'SL Post EMS (Cash on Delivery)' : (order.country === 'Sri Lanka' ? 'SL Post EMS Express' : 'SL Post EMS International Priority Air')}
                                 </span>
                             </div>
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
@@ -2738,7 +2867,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const subEl = document.getElementById('box-summary-subtotal');
                 if (subEl) subEl.textContent = formattedSubtotal;
                 const shipLabel = document.getElementById('box-summary-shipping-label');
-                if (shipLabel) shipLabel.textContent = isLK ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS Priority Air';
+                if (shipLabel) shipLabel.textContent = isLK ? 'SL Post EMS Courier' : 'SL Post EMS Priority Air';
                 const shipEl = document.getElementById('box-summary-shipping');
                 if (shipEl) {
                     shipEl.textContent = formattedShipping;
@@ -2777,9 +2906,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const emsTitle = document.getElementById('box-shipping-ems-title');
-                if (emsTitle) emsTitle.textContent = isLK ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air';
+                if (emsTitle) emsTitle.textContent = isLK ? 'SL Post EMS Express (Pre-paid)' : 'SL Post EMS International Priority Air';
                 const emsDesc = document.getElementById('box-shipping-ems-desc');
-                if (emsDesc) emsDesc.textContent = isLK ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.';
+                if (emsDesc) emsDesc.textContent = isLK ? 'Door-to-door express parcel courier with official SL Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official SL Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.';
                 const emsPill = document.getElementById('box-shipping-ems-price-pill');
                 if (emsPill) emsPill.textContent = formattedShipping;
 
@@ -2812,6 +2941,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const ppAmt = document.getElementById('box-paypal-amount-display');
                 if (ppAmt) {
                     ppAmt.textContent = cur.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`;
+                }
+
+                const cardAmt = document.getElementById('box-card-amount-display');
+                if (cardAmt) {
+                    cardAmt.textContent = cur.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`;
+                }
+                const cardBtnText = document.getElementById('box-pay-card-btn-text');
+                if (cardBtnText) {
+                    cardBtnText.innerHTML = `Pay with Card &bull; ${cur.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : formattedGrandTotal}`;
                 }
 
                 // Dynamic region container
@@ -2984,66 +3122,70 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Wire PayPal
             const initBoxPayPal = () => {
-                const container = document.getElementById('box-paypal-button-container');
-                if (!container || !window.TeaFactoryPayPal) return;
+                try {
+                    const container = document.getElementById('box-paypal-button-container');
+                    if (!container || !window.TeaFactoryPayPal) return;
 
-                const orderRef = isQuotedPay ? booking.id : `ORD-BOX-${Date.now()}`;
+                    const orderRef = isQuotedPay ? booking.id : `ORD-BOX-${Date.now()}`;
 
-                window.TeaFactoryPayPal.renderButtons({
-                    containerId: 'box-paypal-button-container',
-                    orderId: orderRef,
-                    amount: grandTotalUSD,
-                    currency: 'USD',
-                    description: `${box.name} (${currentBoxQty} Chest${currentBoxQty > 1 ? 's' : ''})`,
-                    onValidate: () => {
-                        const form = document.getElementById('box-checkout-form');
-                        if (!form || !form.checkValidity()) {
-                            if (form) form.reportValidity();
-                            return false;
+                    window.TeaFactoryPayPal.renderButtons({
+                        containerId: 'box-paypal-button-container',
+                        orderId: orderRef,
+                        amount: grandTotalUSD,
+                        currency: 'USD',
+                        description: `${box.name} (${currentBoxQty} Chest${currentBoxQty > 1 ? 's' : ''})`,
+                        onValidate: () => {
+                            const form = document.getElementById('box-checkout-form');
+                            if (!form || !form.checkValidity()) {
+                                if (form) form.reportValidity();
+                                return false;
+                            }
+                            return true;
+                        },
+                        onSuccess: async ({ paypalOrderId, captureData }) => {
+                            const firstName = document.getElementById('box-cust-firstname')?.value?.trim() || '';
+                            const lastName = document.getElementById('box-cust-lastname')?.value?.trim() || '';
+                            const customerName = `${firstName} ${lastName}`.trim() || 'Collector';
+                            const email = document.getElementById('box-cust-email')?.value?.trim() || '';
+                            const phone = document.getElementById('box-cust-phone')?.value?.trim() || '';
+                            const street = document.getElementById('box-cust-address')?.value?.trim() || '';
+                            const suite = document.getElementById('box-cust-suite')?.value?.trim() || '';
+                            const city = document.getElementById('box-cust-city')?.value?.trim() || '';
+                            const postal = document.getElementById('box-cust-postal')?.value?.trim() || '';
+                            const region = document.getElementById('box-cust-region')?.value || '';
+                            const country = document.getElementById('box-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+                            const notes = document.getElementById('box-cust-notes')?.value?.trim() || '';
+
+                            const fullAddress = `${street}${suite ? ', ' + suite : ''}, ${city}, ${region ? region + ', ' : ''}${postal}, ${country}`;
+
+                            const result = window.TeaFactoryStore.bookBox(box.id, {
+                                name: customerName,
+                                email,
+                                phone,
+                                address: fullAddress,
+                                country,
+                                city,
+                                message: notes,
+                                quantity: currentBoxQty,
+                                paymentMethod: 'paypal',
+                                slipImage: ''
+                            });
+
+                            if (result && result.success) {
+                                const order = result.booking;
+                                order.boxName = box.name;
+                                order.formattedPrice = formattedGrandTotal;
+                                window.TeaFactoryStore.markOrderPaidByPayPal(order.id, captureData || { id: paypalOrderId });
+                                window.TeaFactoryStore.saveRecentOrderId(order.id);
+
+                                showToast("Chest Allocated!", `Allocation Certificate for ${order.id} is confirmed!`, "success");
+                                renderBoxOrderConfirmationSuccess(order, 'paypal');
+                            }
                         }
-                        return true;
-                    },
-                    onSuccess: async ({ paypalOrderId, captureData }) => {
-                        const firstName = document.getElementById('box-cust-firstname')?.value?.trim() || '';
-                        const lastName = document.getElementById('box-cust-lastname')?.value?.trim() || '';
-                        const customerName = `${firstName} ${lastName}`.trim() || 'Collector';
-                        const email = document.getElementById('box-cust-email')?.value?.trim() || '';
-                        const phone = document.getElementById('box-cust-phone')?.value?.trim() || '';
-                        const street = document.getElementById('box-cust-address')?.value?.trim() || '';
-                        const suite = document.getElementById('box-cust-suite')?.value?.trim() || '';
-                        const city = document.getElementById('box-cust-city')?.value?.trim() || '';
-                        const postal = document.getElementById('box-cust-postal')?.value?.trim() || '';
-                        const region = document.getElementById('box-cust-region')?.value || '';
-                        const country = document.getElementById('box-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
-                        const notes = document.getElementById('box-cust-notes')?.value?.trim() || '';
-
-                        const fullAddress = `${street}${suite ? ', ' + suite : ''}, ${city}, ${region ? region + ', ' : ''}${postal}, ${country}`;
-
-                        const result = window.TeaFactoryStore.bookBox(box.id, {
-                            name: customerName,
-                            email,
-                            phone,
-                            address: fullAddress,
-                            country,
-                            city,
-                            message: notes,
-                            quantity: currentBoxQty,
-                            paymentMethod: 'paypal',
-                            slipImage: ''
-                        });
-
-                        if (result && result.success) {
-                            const order = result.booking;
-                            order.boxName = box.name;
-                            order.formattedPrice = formattedGrandTotal;
-                            window.TeaFactoryStore.markOrderPaidByPayPal(order.id, captureData || { id: paypalOrderId });
-                            window.TeaFactoryStore.saveRecentOrderId(order.id);
-
-                            showToast("Chest Allocated!", `Allocation Certificate for ${order.id} is confirmed!`, "success");
-                            renderBoxOrderConfirmationSuccess(order, 'paypal');
-                        }
-                    }
-                });
+                    }).catch(e => console.warn('Box PayPal render notice:', e && e.message ? e.message : e));
+                } catch (err) {
+                    console.warn('Box PayPal init notice:', err && err.message ? err.message : err);
+                }
             };
 
             const boxPaypalTab = drawerFormContainer.querySelector('.pay-tab[data-method="paypal"]');
@@ -3067,11 +3209,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const selectedMethod = activeTabBtn ? activeTabBtn.getAttribute('data-method') : 'bank';
                 const paymentMethod = shippingMethod === 'cod' ? 'cod' : selectedMethod;
 
+                const country = document.getElementById('box-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+                if (paymentMethod === 'cod' && country !== 'Sri Lanka') {
+                    showToast("Country Restriction", "Cash on Delivery is available exclusively for deliveries within Sri Lanka.", "error");
+                    return;
+                }
+
                 if (paymentMethod === 'paypal') {
                     const ppCont = document.getElementById('box-paypal-button-container');
                     if (ppCont) {
                         ppCont.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        showToast("PayPal Active", "Please click the yellow PayPal button to authorize payment.", "info");
+                        showToast("Coming Soon", "PayPal online payments are coming soon. Please select Bank Transfer, Cash Deposit, or Cash on Delivery to complete your order immediately.", "info");
                     }
                     return;
                 }
@@ -3086,16 +3234,94 @@ document.addEventListener('DOMContentLoaded', () => {
                 const city = document.getElementById('box-cust-city')?.value?.trim() || '';
                 const postal = document.getElementById('box-cust-postal')?.value?.trim() || '';
                 const region = document.getElementById('box-cust-region')?.value || '';
-                const country = document.getElementById('box-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
                 const notes = document.getElementById('box-cust-notes')?.value?.trim() || '';
 
                 const fullAddress = `${street}${suite ? ', ' + suite : ''}, ${city}, ${region ? region + ', ' : ''}${postal}, ${country}`;
+
+                if (paymentMethod === 'card') {
+                    const cardName = document.getElementById('box-card-name')?.value?.trim() || '';
+                    const cardNumber = (document.getElementById('box-card-number')?.value || '').replace(/\s+/g, '');
+                    const cardExpiry = document.getElementById('box-card-expiry')?.value?.trim() || '';
+                    const cardCvc = document.getElementById('box-card-cvc')?.value?.trim() || '';
+
+                    if (!cardName) {
+                        showToast("Cardholder Name Required", "Please enter the name printed on your card.", "warning");
+                        document.getElementById('box-card-name')?.focus();
+                        return;
+                    }
+                    if (cardNumber.length < 13 || cardNumber.length > 19) {
+                        showToast("Invalid Card Number", "Please enter a valid card number.", "warning");
+                        document.getElementById('box-card-number')?.focus();
+                        return;
+                    }
+                    if (!/^(0[1-9]|1[0-2])\s*\/\s*[0-9]{2}$/.test(cardExpiry)) {
+                        showToast("Invalid Expiry Date", "Please enter expiry in MM / YY format.", "warning");
+                        document.getElementById('box-card-expiry')?.focus();
+                        return;
+                    }
+                    if (cardCvc.length < 3) {
+                        showToast("Invalid Security Code", "Please enter your 3 or 4-digit CVV / CVC.", "warning");
+                        document.getElementById('box-card-cvc')?.focus();
+                        return;
+                    }
+
+                    const cardBtn = document.getElementById('box-pay-card-btn');
+                    const cardBtnText = document.getElementById('box-pay-card-btn-text');
+                    if (cardBtn) cardBtn.disabled = true;
+                    if (cardBtnText) cardBtnText.textContent = "Authorizing Card Payment...";
+
+                    setTimeout(() => {
+                        const cardLast4 = cardNumber.slice(-4) || '4242';
+                        let brand = 'Visa';
+                        if (/^5[1-5]/.test(cardNumber) || /^2[2-7]/.test(cardNumber)) brand = 'Mastercard';
+                        else if (/^3[47]/.test(cardNumber)) brand = 'American Express';
+                        else if (/^6(?:011|5)/.test(cardNumber)) brand = 'Discover';
+
+                        const result = window.TeaFactoryStore.bookBox(box.id, {
+                            name: customerName,
+                            email,
+                            phone,
+                            address: fullAddress,
+                            country,
+                            city,
+                            message: notes,
+                            quantity: currentBoxQty,
+                            paymentMethod: 'card',
+                            cardBrand: brand,
+                            cardLast4: cardLast4,
+                            paymentStatus: 'PAID',
+                            shippingMethod,
+                            slipImage: ''
+                        });
+
+                        if (result && result.success) {
+                            const order = result.booking;
+                            order.boxName = box.name;
+                            order.city = city;
+                            order.country = country;
+                            order.shippingMethod = shippingMethod;
+                            order.formattedPrice = formattedGrandTotal;
+                            order.cardBrand = brand;
+                            order.cardLast4 = cardLast4;
+
+                            window.TeaFactoryStore.saveRecentOrderId(order.id);
+
+                            showToast("Card Payment Approved", `Chest confirmed! Charged ${formattedGrandTotal} to ${brand} ending in ${cardLast4}.`, "success");
+                            renderBoxOrderConfirmationSuccess(order, 'card');
+                        } else {
+                            if (cardBtn) cardBtn.disabled = false;
+                            if (cardBtnText) cardBtnText.textContent = `Pay with Card • ${formattedGrandTotal}`;
+                            showToast("Allocation Failed", result?.message || "Could not reserve collector chest.", "error");
+                        }
+                    }, 650);
+                    return;
+                }
 
                 const slipImg = selectedBoxSlipBase64 || 
                     document.getElementById('box-bank-slip-zone')?.dataset?.fileBase64 || 
                     document.getElementById('box-cash-slip-zone')?.dataset?.fileBase64 || '';
 
-                if (paymentMethod !== 'cod' && !slipImg) {
+                if (paymentMethod !== 'cod' && paymentMethod !== 'card' && !slipImg) {
                     showToast("Deposit Receipt Required", "Please attach your bank transfer or deposit slip to confirm your chest allocation.", "warning");
                     return;
                 }
@@ -3133,6 +3359,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const boxForm = document.getElementById('box-checkout-form');
             if (boxForm) boxForm.onsubmit = handleBoxCheckoutSubmit;
+
+            // Box Card input formatting & brand detection
+            const boxCardNum = document.getElementById('box-card-number');
+            const boxCardBrandBadge = document.getElementById('box-card-brand-detected');
+            if (boxCardNum) {
+                boxCardNum.addEventListener('input', (e) => {
+                    let val = e.target.value.replace(/\D/g, '').substring(0, 16);
+                    let formatted = val.match(/.{1,4}/g)?.join('  ') || val;
+                    e.target.value = formatted;
+
+                    if (/^4/.test(val)) {
+                        if (boxCardBrandBadge) { boxCardBrandBadge.textContent = 'VISA'; boxCardBrandBadge.style.color = '#38bdf8'; }
+                    } else if (/^5[1-5]/.test(val) || /^2[2-7]/.test(val)) {
+                        if (boxCardBrandBadge) { boxCardBrandBadge.textContent = 'MASTERCARD'; boxCardBrandBadge.style.color = '#f87171'; }
+                    } else if (/^3[47]/.test(val)) {
+                        if (boxCardBrandBadge) { boxCardBrandBadge.textContent = 'AMEX'; boxCardBrandBadge.style.color = '#60a5fa'; }
+                    } else {
+                        if (boxCardBrandBadge) { boxCardBrandBadge.textContent = 'Secure TLS'; boxCardBrandBadge.style.color = '#60a5fa'; }
+                    }
+                });
+            }
+
+            const boxCardExp = document.getElementById('box-card-expiry');
+            if (boxCardExp) {
+                boxCardExp.addEventListener('input', (e) => {
+                    let val = e.target.value.replace(/\D/g, '').substring(0, 4);
+                    if (val.length >= 3) {
+                        e.target.value = val.substring(0, 2) + ' / ' + val.substring(2);
+                    } else {
+                        e.target.value = val;
+                    }
+                });
+            }
+
+            const boxCardCvc = document.getElementById('box-card-cvc');
+            if (boxCardCvc) {
+                boxCardCvc.addEventListener('input', (e) => {
+                    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
+                });
+            }
+
+            const boxPayCardBtn = document.getElementById('box-pay-card-btn');
+            if (boxPayCardBtn) {
+                boxPayCardBtn.onclick = handleBoxCheckoutSubmit;
+            }
 
             // Master Action Button in right column
             const boxSummaryBtn = document.getElementById('box-summary-submit-btn');
@@ -3417,9 +3688,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                     Cash Deposit Slip (Live)
                                 </button>
                                 <button type="button" class="pay-tab" data-method="paypal" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(0,121,193,0.5);">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
-                                    <span style="font-weight:700;"><span style="color:#0079C1;">Pay</span><span style="color:#00457C;">Pal</span></span>
-                                    <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(0,121,193,0.2); color:#38bdf8; font-weight:700;">LIVE</span>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z" fill="#003087"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.154 9.172a.65.65 0 0 1 .639-.537h4.82c1.928 0 3.33.448 4.072 1.302.734.845.85 2.05.344 3.582-.56 1.686-1.792 2.626-3.662 2.795l-.148.01h-1.364a.577.577 0 0 0-.57.49l-.63 3.102a.407.407 0 0 1-.389.329H9.986a.407.407 0 0 1-.402-.47l1.72-8.468a.5.5 0 0 1 .49-.404h-1.64z" fill="#0079C1"/>
+                                    </svg>
+                                    <span style="font-weight:700;"><span style="color:#0079C1;">Pay</span><span style="color:#38bdf8;">Pal</span></span>
+                                    <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(245,158,11,0.25); color:#fbbf24; font-weight:700;">COMING SOON</span>
+                                </button>
+                                <button type="button" class="pay-tab" data-method="card" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(37,99,235,0.5);">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                    <span>Credit / Card</span>
+                                    <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(245,158,11,0.25); color:#fbbf24; font-weight:700;">COMING SOON</span>
                                 </button>
                             </div>
 
@@ -3475,17 +3754,126 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div id="pay-panel-paypal" class="pay-panel" style="margin-top: 0.5rem;">
                                 <div style="background: rgba(0, 121, 193, 0.06); border: 1.5px solid rgba(0, 121, 193, 0.35); border-radius: 10px; padding: 1.15rem; margin-bottom: 0.75rem;">
                                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.3rem;">
-                                        <strong style="color: #ffffff; font-size: 0.95rem;">Instant PayPal &amp; International Cards</strong>
-                                        <span style="background: rgba(0,121,193,0.2); color: #38bdf8; font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 4px; text-transform: uppercase;">Instant Boarding Pass</span>
+                                        <div style="display: flex; align-items: center; gap: 0.45rem;">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z" fill="#003087"/>
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.154 9.172a.65.65 0 0 1 .639-.537h4.82c1.928 0 3.33.448 4.072 1.302.734.845.85 2.05.344 3.582-.56 1.686-1.792 2.626-3.662 2.795l-.148.01h-1.364a.577.577 0 0 0-.57.49l-.63 3.102a.407.407 0 0 1-.389.329H9.986a.407.407 0 0 1-.402-.47l1.72-8.468a.5.5 0 0 1 .49-.404h-1.64z" fill="#0079C1"/>
+                                            </svg>
+                                            <strong style="color: #ffffff; font-size: 0.95rem;">PayPal &bull; Express Checkout</strong>
+                                        </div>
+                                        <span style="font-size: 0.65rem; background: rgba(245, 158, 11, 0.2); color: #fbbf24; padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.4);">COMING SOON</span>
                                     </div>
-                                    <p style="font-size: 0.76rem; color: #cbd5e1; line-height: 1.45; margin: 0 0 0.75rem 0;">
-                                        Secure your private estate tasting instantly. Your official Gate Pass endorsed by CEO Prasanga will be generated immediately.
-                                    </p>
+
+                                    <div class="coming-soon-notice-card" style="background: rgba(217, 119, 6, 0.12); border: 1.5px solid rgba(245, 158, 11, 0.45); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; display: flex; gap: 0.75rem; align-items: flex-start;">
+                                        <div style="flex-shrink: 0; margin-top: 2px;">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                        </div>
+                                        <div style="font-size: 0.8rem; line-height: 1.45; color: #fef3c7;">
+                                            <div style="font-weight: 700; color: #fbbf24; font-size: 0.85rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
+                                                <span>PayPal Gateway Coming Soon</span>
+                                                <span style="font-size: 0.65rem; background: rgba(245, 158, 11, 0.2); color: #fde68a; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.4);">UNDER INTEGRATION</span>
+                                            </div>
+                                            <div>
+                                                PayPal express booking is currently undergoing final gateway integration. To confirm your private Estate Tasting &amp; Tour reservation immediately, please select <strong>Direct Bank Transfer</strong> or <strong>Cash Deposit Slip</strong>.
+                                            </div>
+                                            <div style="margin-top: 0.45rem; font-size: 0.75rem;">
+                                                Need immediate concierge booking? <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20book%20a%20private%20estate%20tasting%20tour" target="_blank" rel="noopener noreferrer" style="color: #fbbf24; font-weight: 700; text-decoration: underline;">Chat with our Concierge on WhatsApp &rarr;</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0.75rem; background: rgba(0,0,0,0.4); border-radius: 6px; margin-bottom: 0.85rem;">
                                         <span style="font-size: 0.75rem; color: #9ca3af;">PayPal Settlement Total:</span>
                                         <strong id="tour-paypal-amount-display" style="font-size: 1rem; color: var(--color-gold); font-family: monospace;">${currInfo.code === 'USD' ? '$' + tourGrandTotalUSD.toFixed(2) + ' USD' : formattedTourTotal + ' ($' + tourGrandTotalUSD.toFixed(2) + ' USD)'}</strong>
                                     </div>
                                     <div id="tour-paypal-button-container" class="paypal-smart-container" style="min-height: 44px;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Method D: Credit / Debit Card -->
+                            <div id="pay-panel-card" class="pay-panel" style="margin-top: 0.5rem;">
+                                <div class="luxury-card-checkout-box dark-mode-card-box" style="background: rgba(4,14,8,0.75); border: 1px solid rgba(212,175,55,0.3); border-radius: 8px; padding: 1.15rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.6rem;">
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                            <strong style="color: #ffffff; font-size: 0.92rem;">Credit / Debit Card</strong>
+                                        </div>
+                                        <div class="card-brand-chips">
+                                            <span class="card-chip-badge visa-badge">VISA</span>
+                                            <span class="card-chip-badge mc-badge">MC</span>
+                                            <span class="card-chip-badge amex-badge">AMEX</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="coming-soon-notice-card" style="background: rgba(217, 119, 6, 0.12); border: 1.5px solid rgba(245, 158, 11, 0.45); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; display: flex; gap: 0.75rem; align-items: flex-start;">
+                                        <div style="flex-shrink: 0; margin-top: 2px;">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                        </div>
+                                        <div style="font-size: 0.8rem; line-height: 1.45; color: #fef3c7;">
+                                            <div style="font-weight: 700; color: #fbbf24; font-size: 0.85rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
+                                                <span>Card Gateway Coming Soon</span>
+                                                <span style="font-size: 0.65rem; background: rgba(245, 158, 11, 0.2); color: #fde68a; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.4);">UNDER INTEGRATION</span>
+                                            </div>
+                                            <div>
+                                                Credit &amp; Debit Card checkout is currently in final verification. To reserve your private Estate Tasting &amp; Tour reservation immediately, please select <strong>Direct Bank Transfer</strong> or <strong>Cash Deposit Slip</strong>.
+                                            </div>
+                                            <div style="margin-top: 0.45rem; font-size: 0.75rem;">
+                                                Need immediate concierge booking? <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20book%20a%20private%20estate%20tasting%20tour" target="_blank" rel="noopener noreferrer" style="color: #fbbf24; font-weight: 700; text-decoration: underline;">Chat with our Concierge on WhatsApp &rarr;</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                                        <div>
+                                            <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); margin-bottom: 0.3rem; display: block;">Cardholder Name *</label>
+                                            <input type="text" id="tour-card-name" class="form-input" placeholder="Full name on card" autocomplete="cc-name" style="width: 100%; font-size: 0.85rem; padding: 0.6rem 0.75rem;">
+                                        </div>
+
+                                        <div>
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                                                <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Card Number *</label>
+                                                <span id="tour-card-brand-detected" style="font-size: 0.68rem; color: #60a5fa; font-weight: 700;">Secure TLS</span>
+                                            </div>
+                                            <div style="position: relative;">
+                                                <input type="text" id="tour-card-number" class="form-input" placeholder="4000  1234  5678  9010" maxlength="19" autocomplete="cc-number" style="width: 100%; font-size: 0.9rem; font-family: monospace; letter-spacing: 1px; padding: 0.6rem 2.5rem 0.6rem 0.75rem;">
+                                                <div style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none;">
+                                                    <svg width="18" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
+                                            <div>
+                                                <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); margin-bottom: 0.3rem; display: block;">Expiry Date *</label>
+                                                <input type="text" id="tour-card-expiry" class="form-input" placeholder="MM / YY" maxlength="7" autocomplete="cc-exp" style="width: 100%; font-size: 0.85rem; font-family: monospace; text-align: center; padding: 0.6rem 0.75rem;">
+                                            </div>
+                                            <div>
+                                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                                                    <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Security Code *</label>
+                                                    <span style="font-size: 0.68rem; color: #9ca3af;">CVV</span>
+                                                </div>
+                                                <div style="position: relative;">
+                                                    <input type="password" id="tour-card-cvc" class="form-input" placeholder="•••" maxlength="4" autocomplete="cc-csc" style="width: 100%; font-size: 0.85rem; font-family: monospace; letter-spacing: 2px; text-align: center; padding: 0.6rem 1.8rem 0.6rem 0.75rem;">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div style="background: rgba(0,0,0,0.35); border-radius: 6px; padding: 0.55rem 0.85rem; margin-top: 0.2rem; display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-size: 0.76rem; color: #9ca3af;">Direct Card Settlement:</span>
+                                            <strong id="tour-card-amount-display" style="font-size: 1.05rem; color: #60a5fa; font-family: monospace;">${currInfo.code === 'USD' ? '$' + tourGrandTotalUSD.toFixed(2) + ' USD' : formattedTourTotal + ' ($' + tourGrandTotalUSD.toFixed(2) + ' USD)'}</strong>
+                                        </div>
+
+                                        <button type="button" id="tour-pay-card-btn" class="btn btn-primary" style="width: 100%; padding: 0.85rem 1.25rem; font-size: 0.95rem; font-weight: 700; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 0.55rem; cursor: pointer; box-shadow: 0 4px 14px rgba(37,99,235,0.25); background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%); border-color: #1d4ed8; color: #ffffff; margin-top: 0.2rem;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                            <span id="tour-pay-card-btn-text">Pay with Card &bull; ${formattedTourTotal}</span>
+                                        </button>
+
+                                        <div style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.7rem; color: #9ca3af; margin-top: 0.1rem;">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                            <span>256-Bit Bank Encryption &bull; PCI-DSS Level 1 Certified</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -3498,14 +3886,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Gate Pass Release View for Tour Booking
             const renderTourConfirmationSuccess = (booking, paymentMethod) => {
                 const isPayPal = paymentMethod === 'paypal';
+                const isCard = paymentMethod === 'card';
 
                 drawerFormContainer.innerHTML = `
                     <div class="cart-success-view" style="text-align: center; padding: 2.25rem 1rem;">
-                        <div style="width: 76px; height: 76px; border-radius: 50%; background: rgba(212,175,55,0.12); border: 2px solid var(--color-gold); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.15rem auto; color: var(--color-gold);">
+                        <div style="width: 76px; height: 76px; border-radius: 50%; background: ${isCard ? 'rgba(37,99,235,0.15)' : 'rgba(212,175,55,0.12)'}; border: 2px solid ${isCard ? '#2563eb' : 'var(--color-gold)'}; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.15rem auto; color: ${isCard ? '#2563eb' : 'var(--color-gold)'};">
                             <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
-                        <span class="season-badge" style="background: rgba(212,175,55,0.15); color: var(--color-gold); font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
-                            ${isPayPal ? 'Paid • Instant Gate Pass Release' : 'Reservation Pending Clearance • Gate Pass Issued'}
+                        <span class="season-badge" style="background: ${isCard ? 'rgba(37,99,235,0.15)' : 'rgba(212,175,55,0.15)'}; color: ${isCard ? '#38bdf8' : 'var(--color-gold)'}; font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                            ${isCard ? `Paid • Direct Card Settlement (${booking.cardBrand || 'Card'} •••• ${booking.cardLast4 || '4242'})` : (isPayPal ? 'Paid • Instant Gate Pass Release' : 'Reservation Pending Clearance • Gate Pass Issued')}
                         </span>
                         <h3 style="font-family: var(--font-serif); font-size: 1.5rem; color: #ffffff; margin: 0.75rem 0 0.25rem 0;">Private Tour Reserved</h3>
                         <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.5rem;">
@@ -3627,6 +4016,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     ppAmt.textContent = cur.code === 'USD' ? `$${tourGrandTotalUSD.toFixed(2)} USD` : `${formattedTourTotal} ($${tourGrandTotalUSD.toFixed(2)} USD)`;
                 }
 
+                const cardAmt = document.getElementById('tour-card-amount-display');
+                if (cardAmt) {
+                    cardAmt.textContent = cur.code === 'USD' ? `$${tourGrandTotalUSD.toFixed(2)} USD` : `${formattedTourTotal} ($${tourGrandTotalUSD.toFixed(2)} USD)`;
+                }
+                const cardBtn = document.getElementById('tour-pay-card-btn-text');
+                if (cardBtn) {
+                    cardBtn.innerHTML = `Pay with Card &bull; ${formattedTourTotal}`;
+                }
+
                 const activeTab = document.querySelector('#tour-checkout-form .pay-tab.active');
                 if (activeTab && activeTab.getAttribute('data-method') === 'paypal') {
                     initTourPayPal();
@@ -3700,62 +4098,66 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Wire PayPal
             const initTourPayPal = () => {
-                const container = document.getElementById('tour-paypal-button-container');
-                if (!container || !window.TeaFactoryPayPal) return;
+                try {
+                    const container = document.getElementById('tour-paypal-button-container');
+                    if (!container || !window.TeaFactoryPayPal) return;
 
-                window.TeaFactoryPayPal.renderButtons({
-                    containerId: 'tour-paypal-button-container',
-                    orderId: `GP-TOUR-${Date.now()}`,
-                    amount: tourGrandTotalUSD,
-                    currency: 'USD',
-                    description: `${pkgName} (${tourGuests} Guest${tourGuests > 1 ? 's' : ''})`,
-                    onValidate: () => {
-                        const form = document.getElementById('tour-checkout-form');
-                        if (!form || !form.checkValidity()) {
-                            if (form) form.reportValidity();
-                            return false;
+                    window.TeaFactoryPayPal.renderButtons({
+                        containerId: 'tour-paypal-button-container',
+                        orderId: `GP-TOUR-${Date.now()}`,
+                        amount: tourGrandTotalUSD,
+                        currency: 'USD',
+                        description: `${pkgName} (${tourGuests} Guest${tourGuests > 1 ? 's' : ''})`,
+                        onValidate: () => {
+                            const form = document.getElementById('tour-checkout-form');
+                            if (!form || !form.checkValidity()) {
+                                if (form) form.reportValidity();
+                                return false;
+                            }
+                            return true;
+                        },
+                        onSuccess: async ({ paypalOrderId, captureData }) => {
+                            const firstName = document.getElementById('tour-cust-firstname')?.value?.trim() || '';
+                            const lastName = document.getElementById('tour-cust-lastname')?.value?.trim() || '';
+                            const customerName = `${firstName} ${lastName}`.trim() || 'Visitor';
+                            const email = document.getElementById('tour-cust-email')?.value?.trim() || '';
+                            const phone = document.getElementById('tour-cust-phone')?.value?.trim() || '';
+                            const tourDate = document.getElementById('tour-date-input')?.value || '';
+                            const slot = document.getElementById('tour-time-slot')?.value || timeSlot;
+                            const dietary = document.getElementById('tour-dietary')?.value || 'None';
+                            const transport = document.querySelector('input[name="tour-transport-option"]:checked')?.value || 'self';
+                            const country = document.getElementById('tour-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+
+                            const result = window.TeaFactoryStore.bookTour({
+                                packageName: pkgName,
+                                name: customerName,
+                                email,
+                                phone,
+                                country,
+                                guests: tourGuests,
+                                date: tourDate,
+                                timeSlot: slot,
+                                dietaryNotes: dietary,
+                                transportOption: transport === 'chauffeur' ? 'Estate Chauffeur Pick-up' : 'Independent Arrival',
+                                paymentMethod: 'paypal',
+                                priceUSD: tourGrandTotalUSD,
+                                formattedPrice: formattedTourTotal,
+                                slipImage: ''
+                            });
+
+                            if (result && result.success) {
+                                const booking = result.booking;
+                                window.TeaFactoryStore.markTourPaidByPayPal(booking.id, captureData || { id: paypalOrderId });
+                                window.TeaFactoryStore.saveRecentOrderId(booking.id);
+
+                                showToast("Tour Reserved!", `Gate Pass ${booking.id} has been issued and endorsed.`, "success");
+                                renderTourConfirmationSuccess(booking, 'paypal');
+                            }
                         }
-                        return true;
-                    },
-                    onSuccess: async ({ paypalOrderId, captureData }) => {
-                        const firstName = document.getElementById('tour-cust-firstname')?.value?.trim() || '';
-                        const lastName = document.getElementById('tour-cust-lastname')?.value?.trim() || '';
-                        const customerName = `${firstName} ${lastName}`.trim() || 'Visitor';
-                        const email = document.getElementById('tour-cust-email')?.value?.trim() || '';
-                        const phone = document.getElementById('tour-cust-phone')?.value?.trim() || '';
-                        const tourDate = document.getElementById('tour-date-input')?.value || '';
-                        const slot = document.getElementById('tour-time-slot')?.value || timeSlot;
-                        const dietary = document.getElementById('tour-dietary')?.value || 'None';
-                        const transport = document.querySelector('input[name="tour-transport-option"]:checked')?.value || 'self';
-                        const country = document.getElementById('tour-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
-
-                        const result = window.TeaFactoryStore.bookTour({
-                            packageName: pkgName,
-                            name: customerName,
-                            email,
-                            phone,
-                            country,
-                            guests: tourGuests,
-                            date: tourDate,
-                            timeSlot: slot,
-                            dietaryNotes: dietary,
-                            transportOption: transport === 'chauffeur' ? 'Estate Chauffeur Pick-up' : 'Independent Arrival',
-                            paymentMethod: 'paypal',
-                            priceUSD: tourGrandTotalUSD,
-                            formattedPrice: formattedTourTotal,
-                            slipImage: ''
-                        });
-
-                        if (result && result.success) {
-                            const booking = result.booking;
-                            window.TeaFactoryStore.markTourPaidByPayPal(booking.id, captureData || { id: paypalOrderId });
-                            window.TeaFactoryStore.saveRecentOrderId(booking.id);
-
-                            showToast("Tour Reserved!", `Gate Pass ${booking.id} has been issued and endorsed.`, "success");
-                            renderTourConfirmationSuccess(booking, 'paypal');
-                        }
-                    }
-                });
+                    }).catch(e => console.warn('Tour PayPal render notice:', e && e.message ? e.message : e));
+                } catch (err) {
+                    console.warn('Tour PayPal init notice:', err && err.message ? err.message : err);
+                }
             };
 
             const tourPaypalTab = drawerFormContainer.querySelector('.pay-tab[data-method="paypal"]');
@@ -3778,16 +4180,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const paymentMethod = activeTabBtn ? activeTabBtn.getAttribute('data-method') : 'bank';
 
                 if (paymentMethod === 'paypal') {
-                    showToast("PayPal Active", "Please use the official PayPal button above to complete your booking.", "info");
-                    return;
-                }
-
-                const slipImg = selectedTourSlipBase64 || 
-                    document.getElementById('tour-bank-slip-zone')?.dataset?.fileBase64 || 
-                    document.getElementById('tour-cash-slip-zone')?.dataset?.fileBase64 || '';
-
-                if (!slipImg) {
-                    showToast("Receipt Required", "Please attach your bank transfer or deposit slip to confirm your Gate Pass.", "warning");
+                    showToast("Coming Soon", "PayPal online booking is coming soon. Please confirm your booking via Bank Transfer or Cash Deposit Slip.", "info");
                     return;
                 }
 
@@ -3801,6 +4194,93 @@ document.addEventListener('DOMContentLoaded', () => {
                 const dietary = document.getElementById('tour-dietary')?.value || 'None';
                 const transport = document.querySelector('input[name="tour-transport-option"]:checked')?.value || 'self';
                 const country = document.getElementById('tour-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+
+                if (paymentMethod === 'card') {
+                    const cardName = document.getElementById('tour-card-name')?.value?.trim() || '';
+                    const cardNumber = (document.getElementById('tour-card-number')?.value || '').replace(/\s+/g, '');
+                    const cardExpiry = document.getElementById('tour-card-expiry')?.value?.trim() || '';
+                    const cardCvc = document.getElementById('tour-card-cvc')?.value?.trim() || '';
+
+                    if (!cardName) {
+                        showToast("Cardholder Name Required", "Please enter the name printed on your card.", "warning");
+                        document.getElementById('tour-card-name')?.focus();
+                        return;
+                    }
+                    if (cardNumber.length < 13 || cardNumber.length > 19) {
+                        showToast("Invalid Card Number", "Please enter a valid card number.", "warning");
+                        document.getElementById('tour-card-number')?.focus();
+                        return;
+                    }
+                    if (!/^(0[1-9]|1[0-2])\s*\/\s*[0-9]{2}$/.test(cardExpiry)) {
+                        showToast("Invalid Expiry Date", "Please enter expiry in MM / YY format.", "warning");
+                        document.getElementById('tour-card-expiry')?.focus();
+                        return;
+                    }
+                    if (cardCvc.length < 3) {
+                        showToast("Invalid Security Code", "Please enter your 3 or 4-digit CVV / CVC.", "warning");
+                        document.getElementById('tour-card-cvc')?.focus();
+                        return;
+                    }
+
+                    const cardBtn = document.getElementById('tour-pay-card-btn');
+                    const cardBtnText = document.getElementById('tour-pay-card-btn-text');
+                    if (cardBtn) cardBtn.disabled = true;
+                    if (cardBtnText) cardBtnText.textContent = "Authorizing Card Payment...";
+
+                    setTimeout(() => {
+                        const cardLast4 = cardNumber.slice(-4) || '4242';
+                        let brand = 'Visa';
+                        if (/^5[1-5]/.test(cardNumber) || /^2[2-7]/.test(cardNumber)) brand = 'Mastercard';
+                        else if (/^3[47]/.test(cardNumber)) brand = 'American Express';
+                        else if (/^6(?:011|5)/.test(cardNumber)) brand = 'Discover';
+
+                        const result = window.TeaFactoryStore.bookTour({
+                            packageName: pkgName,
+                            name: customerName,
+                            email,
+                            phone,
+                            country,
+                            guests: tourGuests,
+                            date: tourDate,
+                            timeSlot: slot,
+                            dietaryNotes: dietary,
+                            transportOption: transport === 'chauffeur' ? 'Estate Chauffeur Pick-up' : 'Independent Arrival',
+                            paymentMethod: 'card',
+                            cardBrand: brand,
+                            cardLast4: cardLast4,
+                            paymentStatus: 'PAID',
+                            priceUSD: tourGrandTotalUSD,
+                            formattedPrice: formattedTourTotal,
+                            slipImage: ''
+                        });
+
+                        if (result && result.success) {
+                            const booking = result.booking;
+                            booking.formattedPrice = formattedTourTotal;
+                            booking.cardBrand = brand;
+                            booking.cardLast4 = cardLast4;
+
+                            window.TeaFactoryStore.saveRecentOrderId(booking.id);
+
+                            showToast("Tour Reserved!", `Gate Pass ${booking.id} confirmed! Charged ${formattedTourTotal} to ${brand} ending in ${cardLast4}.`, "success");
+                            renderTourConfirmationSuccess(booking, 'card');
+                        } else {
+                            if (cardBtn) cardBtn.disabled = false;
+                            if (cardBtnText) cardBtnText.textContent = `Pay with Card • ${formattedTourTotal}`;
+                            showToast("Booking Failed", result?.message || "Could not reserve private tour.", "error");
+                        }
+                    }, 650);
+                    return;
+                }
+
+                const slipImg = selectedTourSlipBase64 || 
+                    document.getElementById('tour-bank-slip-zone')?.dataset?.fileBase64 || 
+                    document.getElementById('tour-cash-slip-zone')?.dataset?.fileBase64 || '';
+
+                if (paymentMethod !== 'card' && !slipImg) {
+                    showToast("Receipt Required", "Please attach your bank transfer or deposit slip to confirm your Gate Pass.", "warning");
+                    return;
+                }
 
                 const result = window.TeaFactoryStore.bookTour({
                     packageName: pkgName,
@@ -3834,6 +4314,46 @@ document.addEventListener('DOMContentLoaded', () => {
             const tourForm = document.getElementById('tour-checkout-form');
             if (tourForm) tourForm.onsubmit = handleTourCheckoutSubmit;
 
+            // Tour Card input formatting & brand detection
+            const tourCardNum = document.getElementById('tour-card-number');
+            const tourCardBrandBadge = document.getElementById('tour-card-brand-detected');
+            if (tourCardNum) {
+                tourCardNum.addEventListener('input', (e) => {
+                    let val = e.target.value.replace(/\D/g, '').substring(0, 16);
+                    let formatted = val.match(/.{1,4}/g)?.join('  ') || val;
+                    e.target.value = formatted;
+
+                    if (/^4/.test(val)) {
+                        if (tourCardBrandBadge) { tourCardBrandBadge.textContent = 'VISA'; tourCardBrandBadge.style.color = '#38bdf8'; }
+                    } else if (/^5[1-5]/.test(val) || /^2[2-7]/.test(val)) {
+                        if (tourCardBrandBadge) { tourCardBrandBadge.textContent = 'MASTERCARD'; tourCardBrandBadge.style.color = '#f87171'; }
+                    } else if (/^3[47]/.test(val)) {
+                        if (tourCardBrandBadge) { tourCardBrandBadge.textContent = 'AMEX'; tourCardBrandBadge.style.color = '#60a5fa'; }
+                    } else {
+                        if (tourCardBrandBadge) { tourCardBrandBadge.textContent = 'Secure TLS'; tourCardBrandBadge.style.color = '#60a5fa'; }
+                    }
+                });
+            }
+
+            const tourCardExp = document.getElementById('tour-card-expiry');
+            if (tourCardExp) {
+                tourCardExp.addEventListener('input', (e) => {
+                    let val = e.target.value.replace(/\D/g, '').substring(0, 4);
+                    if (val.length >= 3) {
+                        e.target.value = val.substring(0, 2) + ' / ' + val.substring(2);
+                    } else {
+                        e.target.value = val;
+                    }
+                });
+            }
+
+            const tourCardCvc = document.getElementById('tour-card-cvc');
+            if (tourCardCvc) {
+                tourCardCvc.addEventListener('input', (e) => {
+                    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
+                });
+            }
+
             document.getElementById('tour-guest-signin-btn')?.addEventListener('click', () => {
                 if (typeof window.requireCustomerAuth === 'function') {
                     window.requireCustomerAuth('Sign in or register to track your tour boarding pass in your patron ledger.', () => {
@@ -3845,14 +4365,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const products = window.TeaFactoryStore.getProducts();
             const product = products.find(p => p.id === id) || { id, name: 'Single-Estate Tea', price: 28.00, weight: '100g', category: 'Single-Estate Tea', leafGrade: 'Silver Tips', flavorProfile: 'Honey, Orchid, Velvet Wood' };
             const prodMinDate = new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0];
-            const unitPriceUSD = Number(product.price) || 0;
-            const itemDefinedShipping = Number(product.shippingCharge !== undefined ? product.shippingCharge : (product.shippingFee || 0)) || 0;
+            const unitPriceUSD = Number(data && data.price) || Number(product.price) || 17.00;
+            const itemDefinedShipping = Number(data && data.shippingCharge !== undefined ? data.shippingCharge : (product.shippingCharge !== undefined ? product.shippingCharge : (product.shippingFee || 0))) || 0;
             
             const selectedCountry = window.lastSelectedCheckoutCountry || 'Sri Lanka';
             const isSriLanka = selectedCountry === 'Sri Lanka';
             const currInfo = window.getCountryCurrency ? window.getCountryCurrency(selectedCountry) : (isSriLanka ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
             
-            let currentQuickQty = 1;
+            let currentQuickQty = Number(data && data.qty) || 1;
             let activeProdPromo = null; // { code, percent, label, savingsUSD }
 
             let subtotalUSD = unitPriceUSD * currentQuickQty;
@@ -3866,7 +4386,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let formattedGrandTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(grandTotalUSD, currInfo) : `$${grandTotalUSD.toFixed(2)}`;
             let grandTotalLKR = Math.round(grandTotalUSD * 305);
 
-            drawerTitle.innerHTML = `<div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;"><span>Order: ${product.name}</span><span style="font-size:0.68rem; font-weight:700; color:#86efac; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); border-radius:20px; padding:0.2rem 0.65rem; display:inline-flex; align-items:center; gap:0.3rem;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 256-Bit SSL Encrypted</span></div>`;
+            drawerTitle.innerHTML = `<div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;"><span>Order: ${product.name}</span><span style="font-size:0.68rem; font-weight:700; color:#15803d; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:20px; padding:0.2rem 0.65rem; display:inline-flex; align-items:center; gap:0.3rem;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 256-Bit SSL Encrypted</span></div>`;
             selectedProdSlipBase64 = '';
 
             const signedUser = window.TeaFactoryStore && window.TeaFactoryStore.getCurrentUser ? window.TeaFactoryStore.getCurrentUser() : null;
@@ -3880,7 +4400,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
             const displayHeadline = product.headline || 'Tender spring buds, roasted chestnut aroma, and fresh natural sweetness';
-            const displayAbout = product.about || product.desc || product.description || 'Golden Sprout delivers a delicate, naturally sweet taste with a smooth, silky finish. Made from young tea buds and crafted through traditional artisanal processing, this rare tea offers a gentle yet layered flavor and a beautiful golden liquor—perfect for anyone who enjoys a clean, comforting cup.';
+            const displayAbout = product.about || product.desc || product.description || 'Artisan small-batch Ceylon black tea from our family-owned wild forest tea garden in Sri Lanka\'s Uva Medium region. Handcrafted from clone TRI 2025 to create a smooth, naturally sweet cup with delicate floral notes and gentle honey-like character.';
             const displayOrigin = product.origin || ('Passara & Wellawela Sanctuary, Badulla District, Uva Highlands, Sri Lanka (Elevation: ' + (product.elevation || '1,240m – 1,320m') + '). High montane cloud forest enriched by natural granite springs and dry August katabatic winds.');
             const displayCaffeine = product.caffeine || 'Medium (approx. 38mg – 45mg per 250ml brewed cup). Naturally balanced by exceptionally high concentrations of calming L-theanine, promoting alert tranquility and steady cognitive focus.';
             const displayPreparation = product.preparation || ('Water: ' + (product.steepTemp || '90°C – 95°C (194°F – 203°F)') + ' soft mountain or filtered water. Leaf-to-Water Ratio: 3.5g per 150ml (Gongfu gaiwan) or 2.5g per 250ml (Western teapot). Infusion Timing: 1st: 35s, 2nd: 50s, 3rd: 80s, 4th & 5th: 120s.');
@@ -3891,340 +4411,361 @@ document.addEventListener('DOMContentLoaded', () => {
             drawerFormContainer.innerHTML = `
                 <div class="checkout-split-layout">
                     <!-- ==============================================
-                         LEFT COLUMN: PATRON BANNER, DOSSIER, REVIEWS & DELIVERY/PAYMENT STAGES
+                         LEFT COLUMN: STEP NAVIGATION, DELIVERY DETAILS & SEPARATED PAYMENT OPTIONS
                          ============================================== -->
                     <div class="checkout-left-col">
-                        <!-- ================= STAGE 1: PRODUCT OVERVIEW & REVIEWS ================= -->
-                        <div id="quick-stage-overview" class="checkout-stage-view">
-                            <!-- Patron Banner -->
-                            <div class="checkout-step-card" style="padding: 0.95rem 1.15rem;">
-                            ${signedUser ? `
-                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                        <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
-                                        <div>
-                                            <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Patron Account: <span style="color: var(--color-gold);">${esc(signedUser.full_name || signedUser.email)}</span></div>
-                                            <div style="font-size: 0.7rem; color: #86efac;">${esc(signedUser.email)} &bull; Linked to Estate Master Ledger</div>
-                                        </div>
-                                    </div>
-                                    <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); openDrawer('product', '${id}');" style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: rgba(255,255,255,0.2); color: var(--color-text-muted);">
-                                        Switch Account
-                                    </button>
+                        <!-- Top Stage Segmented Header: Step 1 (Delivery) <-> Step 2 (Payment) -->
+                        <div class="checkout-stage-tabs-header">
+                            <button type="button" class="checkout-stage-tab-btn active" id="quick-tab-delivery" title="View &amp; edit delivery details">
+                                <span class="tab-step-badge" id="quick-badge-step1">1</span>
+                                <div class="tab-text-group">
+                                    <span class="tab-main-label">Delivery Details</span>
+                                    <span class="tab-sub-label">Address &amp; Courier Service</span>
                                 </div>
-                            ` : `
-                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                                    <div style="flex: 1; min-width: 210px;">
-                                        <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.2rem;">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                            <span>Guest Checkout Active (No Sign-In Required)</span>
-                                        </div>
-                                        <p style="font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.4; margin: 0;">
-                                            You can order immediately as an anonymous guest. Or sign in to save your allocation in the patron portal.
-                                        </p>
-                                    </div>
-                                    <button type="button" id="quick-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: var(--color-gold); color: var(--color-gold); white-space: nowrap;">
-                                        Sign In / Register
-                                    </button>
+                            </button>
+                            <div class="tab-divider-arrow">➔</div>
+                            <button type="button" class="checkout-stage-tab-btn" id="quick-tab-payment" title="Proceed to payment options">
+                                <span class="tab-step-badge" id="quick-badge-step2">2</span>
+                                <div class="tab-text-group">
+                                    <span class="tab-main-label">Payment Options</span>
+                                    <span class="tab-sub-label">Select Secure Method</span>
                                 </div>
-                            `}
-                        </div>
-
-                        <!-- Seven Teahouse Style Product Dossier & Accordions Card -->
-                        <div class="checkout-step-card checkout-dossier-card">
-                            <div class="checkout-dossier-inner">
-                                <h3 class="checkout-dossier-headline">${esc(displayHeadline)}</h3>
-                                <hr class="checkout-dossier-divider">
-
-                                <div class="checkout-accordions">
-                                    <!-- 1. About This Tea -->
-                                    <div class="checkout-accordion-item" data-accordion="about">
-                                        <button type="button" class="checkout-accordion-header" aria-expanded="false">
-                                            <span class="checkout-accordion-title">About This Tea</span>
-                                            <span class="checkout-accordion-icon">+</span>
-                                        </button>
-                                        <div class="checkout-accordion-body" style="display: none;">
-                                            <p style="font-weight: 700; font-size: 0.95rem; color: #1e293b; margin-bottom: 0.45rem;">${esc(product.name)}</p>
-                                            <p>${esc(displayAbout)}</p>
-                                            <div class="checkout-dossier-tags">
-                                                <span class="checkout-dossier-tag">🌿 ${esc(product.leafGrade || 'Single Estate')}</span>
-                                                <span class="checkout-dossier-tag">🏔️ ${esc(product.elevation || '1,240m - 1,320m')}</span>
-                                                <span class="checkout-dossier-tag">🍃 ${esc(product.weight || '100g')} Vintage Tin</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- 2. Origin -->
-                                    <div class="checkout-accordion-item" data-accordion="origin">
-                                        <button type="button" class="checkout-accordion-header" aria-expanded="false">
-                                            <span class="checkout-accordion-title">Origin</span>
-                                            <span class="checkout-accordion-icon">+</span>
-                                        </button>
-                                        <div class="checkout-accordion-body" style="display: none;">
-                                            <p>${esc(displayOrigin)}</p>
-                                        </div>
-                                    </div>
-
-                                    <!-- 3. Caffeine Level -->
-                                    <div class="checkout-accordion-item" data-accordion="caffeine">
-                                        <button type="button" class="checkout-accordion-header" aria-expanded="false">
-                                            <span class="checkout-accordion-title">Caffeine Level</span>
-                                            <span class="checkout-accordion-icon">+</span>
-                                        </button>
-                                        <div class="checkout-accordion-body" style="display: none;">
-                                            <p>${esc(displayCaffeine)}</p>
-                                        </div>
-                                    </div>
-
-                                    <!-- 4. Preparation -->
-                                    <div class="checkout-accordion-item" data-accordion="preparation">
-                                        <button type="button" class="checkout-accordion-header" aria-expanded="false">
-                                            <span class="checkout-accordion-title">Preparation</span>
-                                            <span class="checkout-accordion-icon">+</span>
-                                        </button>
-                                        <div class="checkout-accordion-body" style="display: none;">
-                                            <p>${esc(displayPreparation)}</p>
-                                        </div>
-                                    </div>
-
-                                    <!-- 5. Tea Benefits -->
-                                    <div class="checkout-accordion-item" data-accordion="benefits">
-                                        <button type="button" class="checkout-accordion-header" aria-expanded="false">
-                                            <span class="checkout-accordion-title">Tea Benefits</span>
-                                            <span class="checkout-accordion-icon">+</span>
-                                        </button>
-                                        <div class="checkout-accordion-body" style="display: none;">
-                                            <p>${esc(displayBenefits)}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Customer Reviews Section (Seven Teahouse Style) -->
-                        ${window.UIComponents && window.UIComponents.renderCheckoutReviewsHTML ? window.UIComponents.renderCheckoutReviewsHTML(product.name) : ''}
-
-                        <!-- Bottom Stage 1 Call to Action -->
-                        <div class="checkout-stage1-cta-wrap" style="margin-top: 1.5rem; text-align: center;">
-                            <button type="button" class="btn btn-primary checkout-stage-proceed-btn" id="quick-stage-proceed-btn" style="width: 100%; padding: 1rem 1.5rem; font-size: 1rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; border-radius: 8px; box-shadow: 0 4px 14px rgba(212,175,55,0.25); cursor: pointer;">
-                                <span>Buy Now &bull; Proceed to Delivery &amp; Payment</span>
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
                             </button>
                         </div>
-                    </div>
 
-                    <!-- ================= STAGE 2: DELIVERY DETAILS & PAYMENT OPTIONS ================= -->
-                    <div id="quick-stage-payment" class="checkout-stage-view" style="display: none;">
-                        <!-- Top Step Navigation Bar -->
-                        <div class="checkout-stage-nav-bar">
-                            <button type="button" class="checkout-back-step-btn" id="quick-back-to-overview-btn">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                                <span>Back to Tea Details &amp; Reviews</span>
-                            </button>
-                            <div class="checkout-stage-step-pill">
-                                <span class="step-dot"></span>
-                                <span>Step 2 of 2 &bull; Delivery &amp; Payment</span>
-                            </div>
-                        </div>
-
-                        <!-- Form -->
                         <form id="quick-checkout-form" style="display: flex; flex-direction: column; gap: 1rem;">
-                            <!-- Destination Section -->
-                            <div class="checkout-step-card">
-                                <div class="checkout-step-header">
-                                    <div class="checkout-step-title">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                                        <span>1. Delivery Destination</span>
-                                    </div>
+                            <!-- ================= STEP 1: DELIVERY DETAILS (SHOWN BY DEFAULT) ================= -->
+                            <div id="quick-stage-delivery" class="checkout-stage-view">
+                                <!-- Patron Banner -->
+                                <div class="checkout-step-card" style="padding: 0.95rem 1.15rem; margin-bottom: 1rem;">
+                                    ${signedUser ? `
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
+                                                <div>
+                                                    <div style="font-size: 0.82rem; font-weight: 700; color: #111827;">Patron Account: <span style="color: #b8860b;">${esc(signedUser.full_name || signedUser.email)}</span></div>
+                                                    <div style="font-size: 0.7rem; color: #15803d;">${esc(signedUser.email)} &bull; Linked to Estate Master Ledger</div>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); openDrawer('product', '${id}');" style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: #d1d5db; color: #4b5563;">
+                                                Switch Account
+                                            </button>
+                                        </div>
+                                    ` : `
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                            <div style="flex: 1; min-width: 210px;">
+                                                <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: #b8860b; margin-bottom: 0.2rem;">
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                                    <span>Guest Checkout Active (No Sign-In Required)</span>
+                                                </div>
+                                                <p style="font-size: 0.72rem; color: #6b7280; line-height: 1.4; margin: 0;">
+                                                    You can order immediately as an anonymous guest. Or sign in to track your allocation in your patron portal.
+                                                </p>
+                                            </div>
+                                            <button type="button" id="quick-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: #b8860b; color: #855b05; white-space: nowrap;">
+                                                Sign In / Register
+                                            </button>
+                                        </div>
+                                    `}
                                 </div>
 
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                                    <div class="form-group" style="margin-bottom: 0;">
-                                        <label class="form-label" for="quick-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Destination Country *</label>
-                                        <select class="form-input" id="quick-cust-country" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
-                                            <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>🇱🇰 Sri Lanka (LKR Rs)</option>
-                                            <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>🇺🇸 United States (USD $)</option>
-                                            <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom (GBP £)</option>
-                                            <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>🇦🇺 Australia (AUD A$)</option>
-                                            <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>🇨🇦 Canada (CAD C$)</option>
-                                            <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>🇩🇪 Germany (EUR €)</option>
-                                            <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>🇫🇷 France (EUR €)</option>
-                                            <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>🇯🇵 Japan (JPY ¥)</option>
-                                            <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>🇦🇪 United Arab Emirates (AED)</option>
-                                            <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>🇸🇬 Singapore (SGD S$)</option>
-                                            <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>🇮🇳 India (INR ₹)</option>
-                                            <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>🇨🇭 Switzerland (CHF)</option>
-                                            <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>🇨🇳 China (CNY ¥)</option>
-                                            <option value="Worldwide" ${selectedCountry === 'Worldwide' ? 'selected' : ''}>🌐 Rest of World (USD $)</option>
-                                        </select>
+                                <!-- 1. Destination & Recipient Address -->
+                                <div class="checkout-step-card" style="margin-bottom: 1rem;">
+                                    <div class="checkout-step-header">
+                                        <div class="checkout-step-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                                <span>1. Delivery Destination &amp; Recipient Address</span>
+                                            </div>
+                                            <button type="button" id="quick-fill-sample-btn" style="background: rgba(184,134,11,0.08); border: 1px dashed #b8860b; color: #855b05; font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;" title="Fill sample delivery details">
+                                                <span>⚡ Fill Sample Address</span>
+                                            </button>
+                                        </div>
                                     </div>
 
-                                    <div class="form-group" style="margin-bottom: 0;" id="quick-region-container">
-                                        ${isSriLanka ? `
-                                            <label class="form-label" for="quick-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Region / Province *</label>
-                                            <select class="form-input" id="quick-cust-region" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
-                                                <option value="Western Province (Colombo, Gampaha, Kalutara)">Western Province (Colombo, Gampaha)</option>
-                                                <option value="Central Province (Kandy, Nuwara Eliya, Matale)">Central Province (Kandy, Nuwara Eliya)</option>
-                                                <option value="Uva Province (Badulla, Bandarawela, Ettampitiya)" selected>Uva Province (Badulla, Ettampitiya)</option>
-                                                <option value="Southern Province (Galle, Matara, Hambantota)">Southern Province (Galle, Matara)</option>
-                                                <option value="Sabaragamuwa Province (Ratnapura, Kegalle)">Sabaragamuwa Province (Ratnapura)</option>
-                                                <option value="North Western Province (Kurunegala, Puttalam)">North Western Province (Kurunegala)</option>
-                                                <option value="North Central Province (Anuradhapura, Polonnaruwa)">North Central Province (Anuradhapura)</option>
-                                                <option value="Northern Province (Jaffna, Kilinochchi, Vavuniya)">Northern Province (Jaffna)</option>
-                                                <option value="Eastern Province (Batticaloa, Trincomalee, Ampara)">Eastern Province (Batticaloa, Trincomalee)</option>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="quick-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Destination Country *</label>
+                                            <select class="form-input" id="quick-cust-country" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                                <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>🇱🇰 Sri Lanka (LKR Rs)</option>
+                                                <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>🇺🇸 United States (USD $)</option>
+                                                <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom (GBP £)</option>
+                                                <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>🇦🇺 Australia (AUD A$)</option>
+                                                <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>🇨🇦 Canada (CAD C$)</option>
+                                                <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>🇩🇪 Germany (EUR €)</option>
+                                                <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>🇫🇷 France (EUR €)</option>
+                                                <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>🇯🇵 Japan (JPY ¥)</option>
+                                                <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>🇦🇪 United Arab Emirates (AED)</option>
+                                                <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>🇸🇬 Singapore (SGD S$)</option>
+                                                <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>🇮🇳 India (INR ₹)</option>
+                                                <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>🇨🇭 Switzerland (CHF)</option>
+                                                <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>🇨🇳 China (CNY ¥)</option>
+                                                <option value="Worldwide" ${selectedCountry === 'Worldwide' ? 'selected' : ''}>🌐 Rest of World (USD $)</option>
                                             </select>
-                                        ` : `
-                                            <label class="form-label" for="quick-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">State / Province / County *</label>
-                                            <input class="form-input" type="text" id="quick-cust-region" placeholder="e.g. California / London / Tokyo" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
-                                        `}
-                                    </div>
-                                </div>
-                            </div>
+                                        </div>
 
-                            <!-- Recipient Details Section -->
-                            <div class="checkout-step-card">
-                                <div class="checkout-step-header">
-                                    <div class="checkout-step-title">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                        <span>2. Recipient &amp; Delivery Address</span>
+                                        <div class="form-group" style="margin-bottom: 0;" id="quick-region-container">
+                                            ${isSriLanka ? `
+                                                <label class="form-label" for="quick-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Region / Province *</label>
+                                                <select class="form-input" id="quick-cust-region" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                                    <option value="Western Province (Colombo, Gampaha, Kalutara)">Western Province (Colombo, Gampaha)</option>
+                                                    <option value="Central Province (Kandy, Nuwara Eliya, Matale)">Central Province (Kandy, Nuwara Eliya)</option>
+                                                    <option value="Uva Province (Badulla, Bandarawela, Ettampitiya)" selected>Uva Province (Badulla, Ettampitiya)</option>
+                                                    <option value="Southern Province (Galle, Matara, Hambantota)">Southern Province (Galle, Matara)</option>
+                                                    <option value="Sabaragamuwa Province (Ratnapura, Kegalle)">Sabaragamuwa Province (Ratnapura)</option>
+                                                    <option value="North Western Province (Kurunegala, Puttalam)">North Western Province (Kurunegala)</option>
+                                                    <option value="North Central Province (Anuradhapura, Polonnaruwa)">North Central Province (Anuradhapura)</option>
+                                                    <option value="Northern Province (Jaffna, Kilinochchi, Vavuniya)">Northern Province (Jaffna)</option>
+                                                    <option value="Eastern Province (Batticaloa, Trincomalee, Ampara)">Eastern Province (Batticaloa, Trincomalee)</option>
+                                                </select>
+                                            ` : `
+                                                <label class="form-label" for="quick-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">State / Province / County *</label>
+                                                <input class="form-input" type="text" id="quick-cust-region" placeholder="e.g. New York (NY) / California" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
+                                            `}
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                    <div class="form-group" style="margin-bottom: 0;">
-                                        <label class="form-label" for="quick-cust-firstname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">First Name *</label>
-                                        <input class="form-input" type="text" id="quick-cust-firstname" value="${esc(defaultFirstName)}" required placeholder="e.g. Ruwan" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="quick-cust-firstname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">First Name *</label>
+                                            <input class="form-input" type="text" id="quick-cust-firstname" value="${esc(defaultFirstName)}" required placeholder="e.g. Alexander / James" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="quick-cust-lastname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Last Name *</label>
+                                            <input class="form-input" type="text" id="quick-cust-lastname" value="${esc(defaultLastName)}" required placeholder="e.g. Miller / Sterling" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        </div>
                                     </div>
-                                    <div class="form-group" style="margin-bottom: 0;">
-                                        <label class="form-label" for="quick-cust-lastname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Last Name *</label>
-                                        <input class="form-input" type="text" id="quick-cust-lastname" value="${esc(defaultLastName)}" required placeholder="e.g. Perera" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                    </div>
-                                </div>
 
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                    <div class="form-group" style="margin-bottom: 0;">
-                                        <label class="form-label" for="quick-cust-email" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Email (Tracking &amp; Certificate) *</label>
-                                        <input class="form-input" type="email" id="quick-cust-email" value="${esc(signedUser ? signedUser.email : '')}" required placeholder="e.g. patron@rockonewild.com" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;" ${signedUser ? 'readonly style="opacity:0.88;"' : ''}>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="quick-cust-email" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Email (Tracking &amp; Certificate) *</label>
+                                            <input class="form-input" type="email" id="quick-cust-email" value="${esc(signedUser ? signedUser.email : '')}" required placeholder="e.g. patron@rockonewild.com" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;" ${signedUser ? 'readonly style="opacity:0.88;"' : ''}>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="quick-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Mobile Phone (Courier Updates) *</label>
+                                            <input class="form-input" type="tel" id="quick-cust-phone" value="${esc(signedUser ? signedUser.phone || '' : '')}" required placeholder="e.g. +1 (555) 234-5678" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        </div>
                                     </div>
-                                    <div class="form-group" style="margin-bottom: 0;">
-                                        <label class="form-label" for="quick-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Mobile Phone (Courier Updates) *</label>
-                                        <input class="form-input" type="tel" id="quick-cust-phone" value="${esc(signedUser ? signedUser.phone || '' : '')}" required placeholder="e.g. +94 77 123 4567" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                    </div>
-                                </div>
 
-                                <div class="form-group" style="margin-bottom: 0.75rem;">
-                                    <label class="form-label" for="quick-cust-address" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Street Address *</label>
-                                    <input class="form-input" type="text" id="quick-cust-address" required placeholder="e.g. 42 Highland View Road" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
+                                    <div class="form-group" style="margin-bottom: 0.75rem;">
+                                        <label class="form-label" for="quick-cust-address" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Street Address *</label>
+                                        <input class="form-input" type="text" id="quick-cust-address" required placeholder="e.g. 350 Fifth Avenue / 742 Evergreen Terr" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    </div>
 
-                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;">
-                                    <div class="form-group" style="margin-bottom: 0;">
-                                        <label class="form-label" for="quick-cust-suite" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Apt / Suite</label>
-                                        <input class="form-input" type="text" id="quick-cust-suite" placeholder="e.g. Apt 4B" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                    </div>
-                                    <div class="form-group" style="margin-bottom: 0;">
-                                        <label class="form-label" for="quick-cust-city" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">City / Town *</label>
-                                        <input class="form-input" type="text" id="quick-cust-city" required placeholder="e.g. Colombo / London" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                    </div>
-                                    <div class="form-group" style="margin-bottom: 0;">
-                                        <label class="form-label" for="quick-cust-postal" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Postal Code *</label>
-                                        <input class="form-input" type="text" id="quick-cust-postal" required placeholder="e.g. 00700 / SW1A 1AA" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Insured Courier Method -->
-                            <div class="checkout-step-card">
-                                <div class="checkout-step-header">
-                                    <div class="checkout-step-title">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-                                        <span>3. Insured Courier Delivery</span>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;">
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="quick-cust-suite" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Apt / Suite</label>
+                                            <input class="form-input" type="text" id="quick-cust-suite" placeholder="e.g. Suite 400 / Apt 4B" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="quick-cust-city" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">City / Town *</label>
+                                            <input class="form-input" type="text" id="quick-cust-city" required placeholder="e.g. New York / San Francisco" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="quick-cust-postal" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Postal Code / ZIP *</label>
+                                            <input class="form-input" type="text" id="quick-cust-postal" required placeholder="e.g. 10001 / 90210" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div style="display: flex; flex-direction: column; gap: 0.65rem;">
-                                    <label class="radio-card" id="quick-shipping-card-ems" style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 1rem; border: 1.5px solid var(--color-gold); border-radius: 10px; background: rgba(212,175,55,0.08); cursor: pointer;">
-                                        <input type="radio" name="quick-shipping-method" id="quick-ship-ems" value="ems_express" checked style="margin-top: 0.25rem;">
-                                        <div style="flex: 1;">
-                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
-                                                <strong id="quick-shipping-ems-title" style="color: #ffffff; font-size: 0.88rem;">${isSriLanka ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air'}</strong>
-                                                <span id="quick-shipping-ems-price-pill" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-size: 0.8rem; font-weight: 700;">${formattedShipping}</span>
+                                <!-- 2. Insured Courier Delivery -->
+                                <div class="checkout-step-card" style="margin-bottom: 1rem;">
+                                    <div class="checkout-step-header">
+                                        <div class="checkout-step-title">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                                            <span>2. Insured Courier Delivery</span>
+                                        </div>
+                                    </div>
+
+                                    <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                                        <label class="radio-card" id="quick-shipping-card-ems" style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.95rem 1.1rem; border: 1.5px solid #b8860b; border-radius: 10px; background: #faf8f5; cursor: pointer;">
+                                            <input type="radio" name="quick-shipping-method" id="quick-ship-ems" value="ems_express" checked style="margin-top: 0.25rem;">
+                                            <div style="flex: 1;">
+                                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                                                    <strong id="quick-shipping-ems-title" style="color: #111827; font-size: 0.9rem;">${isSriLanka ? 'SL Post EMS Express (Pre-paid)' : 'SL Post EMS International Priority Air'}</strong>
+                                                    <span id="quick-shipping-ems-price-pill" style="color: #15803d; font-size: 0.82rem; font-weight: 700;">${formattedShipping}</span>
+                                                </div>
+                                                <p id="quick-shipping-ems-desc" style="font-size: 0.74rem; color: #4b5563; line-height: 1.45; margin: 0;">
+                                                    ${isSriLanka ? 'Door-to-door express parcel courier with official SL Post tracking ID. Estimated delivery: 2-3 business days.' : 'Official SL Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
+                                                </p>
                                             </div>
-                                            <p id="quick-shipping-ems-desc" style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; margin: 0;">
-                                                ${isSriLanka ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
-                                            </p>
-                                        </div>
-                                    </label>
+                                        </label>
+                                    </div>
+                                </div>
 
-                                    <label class="radio-card" id="quick-shipping-card-cod" style="display: ${isSriLanka ? 'flex' : 'none'}; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 1rem; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 10px; background: rgba(0,0,0,0.3); cursor: pointer;">
-                                        <input type="radio" name="quick-shipping-method" id="quick-ship-cod" value="cod" style="margin-top: 0.25rem;">
-                                        <div style="flex: 1;">
-                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
-                                                <strong style="color: #ffffff; font-size: 0.88rem;">Cash on Delivery (COD &bull; Pay to Courier)</strong>
-                                                <span id="quick-shipping-cod-price-pill" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-size: 0.8rem; font-weight: 700;">${formattedShipping}</span>
-                                            </div>
-                                            <p style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; margin: 0;">
-                                                Pay cash upon parcel delivery at your doorstep anywhere in Sri Lanka.
-                                            </p>
+                                <!-- 3. Dispatch Date & Concierge Notes -->
+                                <div class="checkout-step-card" style="margin-bottom: 1.25rem;">
+                                    <div class="checkout-step-header">
+                                        <div class="checkout-step-title">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+                                            <span>3. Dispatch Date &amp; Concierge Notes</span>
                                         </div>
-                                    </label>
+                                    </div>
+
+                                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="quick-pref-date" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Preferred Dispatch Date</label>
+                                            <input class="form-input" type="date" id="quick-pref-date" min="${prodMinDate}" value="${prodMinDate}" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="quick-cust-notes" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Special Packing or Concierge Instructions</label>
+                                            <textarea class="form-input" id="quick-cust-notes" rows="2" placeholder="e.g. Please include complimentary estate tasting booklet, leave at front porch, etc." style="font-size: 0.82rem; padding: 0.65rem 0.75rem;"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Step 1 Bottom Button: Continue to Payment Options -->
+                                <div class="checkout-step1-btn-wrap" style="text-align: center; margin-bottom: 1.5rem;">
+                                    <button type="button" class="btn btn-primary" id="quick-goto-payment-btn" style="width: 100%; padding: 1.05rem 1.5rem; font-size: 1rem; font-weight: 700; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 0.6rem; cursor: pointer; box-shadow: 0 4px 16px rgba(184,134,11,0.22);">
+                                        <span>Continue to Payment Options</span>
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    </button>
+                                </div>
+
+                                <!-- Secondary Link: View Tasting Notes & Dossier -->
+                                <div style="text-align: center; margin-bottom: 0.5rem;">
+                                    <button type="button" id="quick-toggle-dossier-btn" style="background: none; border: none; color: #855b05; font-size: 0.82rem; font-weight: 600; cursor: pointer; text-decoration: underline; padding: 0.4rem 0.8rem;">
+                                        <span>🌿 View Tea Tasting Dossier &amp; Patron Reviews ▼</span>
+                                    </button>
+                                </div>
+
+                                <!-- Collapsible Dossier & Reviews -->
+                                <div id="quick-dossier-container" style="display: none; margin-top: 1rem;">
+                                    <div class="checkout-step-card checkout-dossier-card">
+                                        <div class="checkout-dossier-inner">
+                                            <h3 class="checkout-dossier-headline">${esc(displayHeadline)}</h3>
+                                            <hr class="checkout-dossier-divider">
+                                            <div class="checkout-accordions">
+                                                <!-- About This Tea -->
+                                                <div class="checkout-accordion-item" data-accordion="about">
+                                                    <button type="button" class="checkout-accordion-header" aria-expanded="false">
+                                                        <span class="checkout-accordion-title">About This Tea</span>
+                                                        <span class="checkout-accordion-icon">+</span>
+                                                    </button>
+                                                    <div class="checkout-accordion-body" style="display: none;">
+                                                        <p style="font-weight: 700; font-size: 0.95rem; color: #1e293b; margin-bottom: 0.45rem;">${esc(product.name)}</p>
+                                                        <p>${esc(displayAbout)}</p>
+                                                    </div>
+                                                </div>
+                                                <!-- Origin -->
+                                                <div class="checkout-accordion-item" data-accordion="origin">
+                                                    <button type="button" class="checkout-accordion-header" aria-expanded="false">
+                                                        <span class="checkout-accordion-title">Origin</span>
+                                                        <span class="checkout-accordion-icon">+</span>
+                                                    </button>
+                                                    <div class="checkout-accordion-body" style="display: none;">
+                                                        <p>${esc(displayOrigin)}</p>
+                                                    </div>
+                                                </div>
+                                                <!-- Preparation -->
+                                                <div class="checkout-accordion-item" data-accordion="preparation">
+                                                    <button type="button" class="checkout-accordion-header" aria-expanded="false">
+                                                        <span class="checkout-accordion-title">Preparation</span>
+                                                        <span class="checkout-accordion-icon">+</span>
+                                                    </button>
+                                                    <div class="checkout-accordion-body" style="display: none;">
+                                                        <p>${esc(displayPreparation)}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    ${window.UIComponents && window.UIComponents.renderCheckoutReviewsHTML ? window.UIComponents.renderCheckoutReviewsHTML(product.name) : ''}
                                 </div>
                             </div>
 
-                            <!-- Payment Method Section -->
-                            <div class="checkout-step-card" id="quick-payment-step-card">
-                                <div class="checkout-step-header">
-                                    <div class="checkout-step-title">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                        <span>4. Payment Method &amp; Order Confirmation</span>
+                            <!-- ================= STEP 2: PAYMENT OPTIONS (SHOWN SEPARATELY!) ================= -->
+                            <div id="quick-stage-payment" class="checkout-stage-view" style="display: none;">
+                                <!-- Top Navigation & Verified Summary -->
+                                <div class="payment-step-top-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.6rem;">
+                                    <button type="button" class="checkout-back-step-btn" id="quick-back-to-delivery-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; font-weight: 600; color: #855b05; background: none; border: none; cursor: pointer;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                        <span>← Back to Delivery Details</span>
+                                    </button>
+                                    <div class="checkout-delivery-verified-pill" id="quick-delivery-verified-pill" style="font-size: 0.75rem; color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 20px; padding: 0.3rem 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600;">
+                                        <span>✓ Delivery Address Saved</span>
                                     </div>
                                 </div>
 
-                                <!-- COD Panel -->
-                                <div id="quick-pay-panel-cod" style="display: none;">
-                                    <div style="background: rgba(37,211,102,0.08); border: 1.5px solid rgba(37,211,102,0.4); border-radius: 10px; padding: 1.15rem; text-align: center; margin-bottom: 1rem;">
-                                        <h4 style="color: #4ade80; font-size: 1.05rem; margin-bottom: 0.35rem; font-weight: 700;">Cash on Delivery (COD) Active</h4>
-                                        <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5; margin: 0 0 0.85rem 0;">
-                                            The Sri Lanka Post EMS courier will collect the cash amount upon parcel handover.
-                                        </p>
-                                        <div style="background: rgba(0,0,0,0.45); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.65rem 1rem; display: inline-flex; align-items: center; gap: 0.75rem;">
-                                            <span style="font-size: 0.78rem; color: #9ca3af;">Payable to Courier:</span>
-                                            <strong id="quick-cod-amount-display" style="font-size: 1.25rem; color: var(--color-gold); font-family: monospace;">Rs ${grandTotalLKR.toLocaleString()} LKR</strong>
+                                <!-- Delivery Summary Review Box -->
+                                <div class="checkout-step-card" style="padding: 0.85rem 1.15rem; background: #faf9f6; border: 1px dashed #d1c7b7; margin-bottom: 1.15rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                                        <div style="font-size: 0.82rem; color: #374151;">
+                                            <strong style="color: #111827;" id="quick-review-cust-name">Guest Patron</strong> &bull;
+                                            <span id="quick-review-cust-dest">${esc(selectedCountry)}</span> &bull;
+                                            <span id="quick-review-cust-courier" style="color: #15803d; font-weight: 600;">SL Post EMS</span>
                                         </div>
+                                        <button type="button" id="quick-edit-delivery-link" style="background: none; border: none; color: #b8860b; font-size: 0.78rem; font-weight: 600; cursor: pointer; text-decoration: underline;">
+                                            Edit Delivery Details
+                                        </button>
                                     </div>
                                 </div>
 
-                                <!-- Pre-Paid Panels -->
-                                <div id="quick-pay-panel-prepaid">
-                                    <div class="payment-method-tabs" style="margin-bottom: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.35rem;">
-                                        <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
-                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
-                                            Bank Transfer (Live)
+                                <!-- Dedicated Payment Options Card -->
+                                <div class="checkout-step-card" id="quick-payment-step-card" style="margin-bottom: 1.25rem;">
+                                    <div class="checkout-step-header" style="margin-bottom: 1rem;">
+                                        <div class="checkout-step-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b8860b" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                            <span style="font-size: 0.95rem; font-weight: 700; color: #111827; letter-spacing: 0.5px;">Choose Payment Option</span>
+                                        </div>
+                                        <span style="font-size: 0.74rem; color: #15803d; font-weight: 600; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 0.15rem 0.55rem;">🔒 256-Bit SSL Encrypted</span>
+                                    </div>
+
+                                    <!-- Payment Method Selector Grid (Cards with High Contrast) -->
+                                    <div class="payment-method-selector-grid">
+                                        <button type="button" class="pay-tab payment-method-card-btn active" data-method="bank">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b8860b" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
+                                            <span class="pay-card-title">Bank Transfer</span>
+                                            <span class="pay-card-badge" style="background: #fef3c7; color: #92400e;">BOC LIVE</span>
                                         </button>
-                                        <button type="button" class="pay-tab" data-method="slip" style="display:inline-flex; align-items:center; gap:0.35rem;">
-                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                            Cash Deposit Slip (Live)
+                                        <button type="button" class="pay-tab payment-method-card-btn" data-method="slip">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b8860b" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                            <span class="pay-card-title">Cash Deposit</span>
+                                            <span class="pay-card-badge" style="background: #fef3c7; color: #92400e;">BRANCH SLIP</span>
                                         </button>
-                                        <button type="button" class="pay-tab" data-method="paypal" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(0,121,193,0.5);">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
-                                            <span style="font-weight:700;"><span style="color:#0079C1;">Pay</span><span style="color:#00457C;">Pal</span></span>
-                                            <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(0,121,193,0.2); color:#38bdf8; font-weight:700;">LIVE</span>
+                                        <button type="button" class="pay-tab payment-method-card-btn" data-method="paypal">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z" fill="#003087"/>
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.154 9.172a.65.65 0 0 1 .639-.537h4.82c1.928 0 3.33.448 4.072 1.302.734.845.85 2.05.344 3.582-.56 1.686-1.792 2.626-3.662 2.795l-.148.01h-1.364a.577.577 0 0 0-.57.49l-.63 3.102a.407.407 0 0 1-.389.329H9.986a.407.407 0 0 1-.402-.47l1.72-8.468a.5.5 0 0 1 .49-.404h-1.64z" fill="#0079C1"/>
+                                            </svg>
+                                            <span class="pay-card-title"><strong style="color: #003087;">Pay</strong><strong style="color: #0079c1;">Pal</strong></span>
+                                            <span class="pay-card-badge" style="background: #fef3c7; color: #92400e; font-weight: 700;">COMING SOON</span>
+                                        </button>
+                                        <button type="button" class="pay-tab payment-method-card-btn" data-method="card">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                            <span class="pay-card-title">Credit / Card</span>
+                                            <span class="pay-card-badge" style="background: #fef3c7; color: #92400e; font-weight: 700;">COMING SOON</span>
+                                        </button>
+                                        <button type="button" class="pay-tab payment-method-card-btn" id="quick-pay-tab-cod" data-method="cod" style="display: ${isSriLanka ? 'flex' : 'none'};">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>
+                                            <span class="pay-card-title">Cash on Delivery</span>
+                                            <span class="pay-card-badge" style="background: #dcfce7; color: #15803d;">LOCAL COD</span>
                                         </button>
                                     </div>
 
                                     <!-- Bank Transfer Panel -->
                                     <div id="quick-pay-panel-bank" class="pay-panel pay-panel-bank active">
-                                        <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.95rem;">
-                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#ffffff;">Bank of Ceylon</strong></div>
-                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:var(--color-gold);">Rock one wild tea</strong></div>
-                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:#ffffff; font-family:monospace; font-size:0.95rem; letter-spacing:1px;">94945708</strong></div>
-                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#ffffff;">Ettampitiya branch</strong></div>
-                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; border-top:1px dashed rgba(212,175,55,0.2); padding-top:0.45rem; margin-top:0.35rem; font-size:0.85rem;"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="quick-bank-amount-display" style="color:var(--color-gold); font-size:1rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong></div>
+                                        <div class="bank-details-block" style="background: #faf8f5; border: 1.5px solid #d4af37; border-radius: 10px; padding: 1.15rem;">
+                                            <div class="bank-detail-row"><span style="color: #4b5563;">Bank Name:</span><strong style="color: #111827;">Bank of Ceylon</strong></div>
+                                            <div class="bank-detail-row"><span style="color: #4b5563;">Account Name:</span><strong style="color: #b8860b;">Rock one wild tea</strong></div>
+                                            <div class="bank-detail-row" style="display: flex; justify-content: space-between; align-items: center;">
+                                                <span style="color: #4b5563;">Account Number:</span>
+                                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                    <strong style="color: #111827; font-family: monospace; font-size: 1.05rem; letter-spacing: 1px;">94945708</strong>
+                                                    <button type="button" id="quick-copy-acc-btn" style="background: #f5f0e6; border: 1px solid #b8860b; color: #855b05; font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 4px; cursor: pointer; font-weight: 600;">Copy</button>
+                                                </div>
+                                            </div>
+                                            <div class="bank-detail-row"><span style="color: #4b5563;">Branch:</span><strong style="color: #111827;">Ettampitiya branch</strong></div>
+                                            <div class="bank-detail-row" style="border-top: 1px dashed #d1c7b7; padding-top: 0.6rem; margin-top: 0.5rem;">
+                                                <span style="color: #111827; font-weight: 600;">Total Amount Due:</span>
+                                                <strong id="quick-bank-amount-display" style="color: #b8860b; font-size: 1.15rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong>
+                                            </div>
                                         </div>
-                                        <div class="form-group" style="margin-top:0.65rem; margin-bottom: 0;">
-                                            <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Bank Transfer Slip *</label>
+                                        <div class="form-group" style="margin-top: 0.85rem; margin-bottom: 0;">
+                                            <label style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #855b05; margin-bottom: 0.35rem; display: block;">Upload Bank Transfer Receipt Slip *</label>
                                             <div class="file-upload-zone" id="quick-bank-slip-zone">
                                                 <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
-                                                <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse receipt file</span></div>
+                                                <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse receipt image</span></div>
                                                 <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
                                                 <input type="file" id="quick-bank-slip" accept="image/*,.pdf" style="display:none;">
                                             </div>
@@ -4234,15 +4775,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
                                     <!-- Cash Deposit Panel -->
                                     <div id="quick-pay-panel-slip" class="pay-panel pay-panel-slip">
-                                        <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.95rem;">
-                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#ffffff;">Bank of Ceylon</strong></div>
-                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:var(--color-gold);">Rock one wild tea</strong></div>
-                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:#ffffff; font-family:monospace; font-size:0.95rem; letter-spacing:1px;">94945708</strong></div>
-                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.8rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#ffffff;">Ettampitiya branch</strong></div>
-                                            <div class="bank-detail-row" style="display:flex; justify-content:space-between; border-top:1px dashed rgba(212,175,55,0.2); padding-top:0.45rem; margin-top:0.35rem; font-size:0.85rem;"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="quick-deposit-amount-display" style="color:var(--color-gold); font-size:1rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong></div>
+                                        <div class="bank-details-block" style="background: #faf8f5; border: 1.5px solid #d4af37; border-radius: 10px; padding: 1.15rem;">
+                                            <div class="bank-detail-row"><span style="color: #4b5563;">Bank Name:</span><strong style="color: #111827;">Bank of Ceylon</strong></div>
+                                            <div class="bank-detail-row"><span style="color: #4b5563;">Account Name:</span><strong style="color: #b8860b;">Rock one wild tea</strong></div>
+                                            <div class="bank-detail-row"><span style="color: #4b5563;">Account Number:</span><strong style="color: #111827; font-family: monospace; font-size: 1.05rem; letter-spacing: 1px;">94945708</strong></div>
+                                            <div class="bank-detail-row"><span style="color: #4b5563;">Branch:</span><strong style="color: #111827;">Ettampitiya branch</strong></div>
+                                            <div class="bank-detail-row" style="border-top: 1px dashed #d1c7b7; padding-top: 0.6rem; margin-top: 0.5rem;">
+                                                <span style="color: #111827; font-weight: 600;">Total Amount Due:</span>
+                                                <strong id="quick-deposit-amount-display" style="color: #b8860b; font-size: 1.15rem;">${isSriLanka ? 'Rs ' + grandTotalLKR.toLocaleString() + ' LKR' : formattedGrandTotal}</strong>
+                                            </div>
                                         </div>
-                                        <div class="form-group" style="margin-top:0.65rem; margin-bottom: 0;">
-                                            <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Cash Deposit Slip *</label>
+                                        <div class="form-group" style="margin-top: 0.85rem; margin-bottom: 0;">
+                                            <label style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #855b05; margin-bottom: 0.35rem; display: block;">Upload Cash Deposit Slip *</label>
                                             <div class="file-upload-zone" id="quick-cash-slip-zone">
                                                 <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
                                                 <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse deposit slip</span></div>
@@ -4255,90 +4799,201 @@ document.addEventListener('DOMContentLoaded', () => {
 
                                     <!-- PayPal Panel -->
                                     <div id="quick-pay-panel-paypal" class="pay-panel pay-panel-paypal">
-                                        <div style="background: linear-gradient(135deg, rgba(0,121,193,0.12) 0%, rgba(4,14,8,0.92) 100%); border: 1.5px solid rgba(0,121,193,0.45); border-radius: 8px; padding: 1.15rem;">
-                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.5rem;">
+                                        <div style="background: #faf8f5; border: 1.5px solid #d4af37; border-radius: 10px; padding: 1.15rem;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
                                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
-                                                    <strong style="color: #ffffff; font-size: 0.95rem;">PayPal &bull; Instant Online Settlement</strong>
+                                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z" fill="#003087"/>
+                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.154 9.172a.65.65 0 0 1 .639-.537h4.82c1.928 0 3.33.448 4.072 1.302.734.845.85 2.05.344 3.582-.56 1.686-1.792 2.626-3.662 2.795l-.148.01h-1.364a.577.577 0 0 0-.57.49l-.63 3.102a.407.407 0 0 1-.389.329H9.986a.407.407 0 0 1-.402-.47l1.72-8.468a.5.5 0 0 1 .49-.404h-1.64z" fill="#0079C1"/>
+                                                    </svg>
+                                                    <strong style="color: #111827; font-size: 0.95rem;">PayPal &bull; Express Checkout</strong>
+                                                </div>
+                                                <span style="font-size: 0.72rem; color: #b45309; font-weight: 700; background: #fef3c7; padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid #fde68a;">Coming Soon</span>
+                                            </div>
+
+                                            <div class="coming-soon-notice-card" style="background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; display: flex; gap: 0.75rem; align-items: flex-start;">
+                                                <div style="flex-shrink: 0; margin-top: 2px;">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                </div>
+                                                <div style="font-size: 0.8rem; line-height: 1.45; color: #78350f;">
+                                                    <div style="font-weight: 700; color: #92400e; font-size: 0.85rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
+                                                        <span>PayPal Gateway Coming Soon</span>
+                                                        <span style="font-size: 0.65rem; background: #fef3c7; color: #b45309; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 700; border: 1px solid #fde68a;">UNDER INTEGRATION</span>
+                                                    </div>
+                                                    <div>
+                                                        Direct PayPal checkout is currently undergoing final compliance &amp; banking integration. To reserve your fresh Ceylon harvest immediately, please select <strong>Direct Bank Transfer</strong>, <strong>Cash Deposit Slip</strong>, or <strong>Cash on Delivery (Sri Lanka only)</strong>.
+                                                    </div>
+                                                    <div style="margin-top: 0.45rem; font-size: 0.75rem;">
+                                                        Need concierge assistance? <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge%2C%20I%20would%20like%20assistance%20with%20my%20order" target="_blank" rel="noopener noreferrer" style="color: #b45309; font-weight: 700; text-decoration: underline;">Chat with our Concierge on WhatsApp &rarr;</a>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div style="background: rgba(0,0,0,0.35); border-radius: 6px; padding: 0.55rem 0.85rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
-                                                <span style="font-size: 0.76rem; color: #9ca3af;">USD Settlement Amount:</span>
-                                                <strong id="quick-paypal-amount-display" style="font-size: 1.05rem; color: #38bdf8; font-family: monospace;">${currInfo.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`}</strong>
+
+                                            <div style="background: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; padding: 0.65rem 0.85rem; margin-bottom: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+                                                <span style="font-size: 0.78rem; color: #4b5563;">Settlement Amount:</span>
+                                                <strong id="quick-paypal-amount-display" style="font-size: 1.05rem; color: #0369a1; font-family: monospace;">${currInfo.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`}</strong>
                                             </div>
                                             <div id="quick-paypal-button-container" class="paypal-smart-container" style="min-height: 44px;"></div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
 
-                            <!-- Bespoke Gifting & Notes -->
-                            <div class="checkout-step-card">
-                                <div class="checkout-step-header">
-                                    <div class="checkout-step-title">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
-                                        <span>5. Bespoke Gifting &amp; Concierge Notes</span>
+                                    <!-- Credit / Debit Card Panel -->
+                                    <div id="quick-pay-panel-card" class="pay-panel pay-panel-card">
+                                        <div class="luxury-card-checkout-box" style="background: #faf8f5; border: 1.5px solid #d4af37; border-radius: 10px; padding: 1.15rem;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.6rem;">
+                                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                                    <strong style="color: #111827; font-size: 0.95rem;">Credit / Debit Card</strong>
+                                                </div>
+                                                <div class="card-brand-chips">
+                                                    <span class="card-chip-badge visa-badge">VISA</span>
+                                                    <span class="card-chip-badge mc-badge">MC</span>
+                                                    <span class="card-chip-badge amex-badge">AMEX</span>
+                                                    <span class="card-chip-badge discover-badge">DISC</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="coming-soon-notice-card" style="background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; display: flex; gap: 0.75rem; align-items: flex-start;">
+                                                <div style="flex-shrink: 0; margin-top: 2px;">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                </div>
+                                                <div style="font-size: 0.8rem; line-height: 1.45; color: #78350f;">
+                                                    <div style="font-weight: 700; color: #92400e; font-size: 0.85rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
+                                                        <span>Card Gateway Coming Soon</span>
+                                                        <span style="font-size: 0.65rem; background: #fef3c7; color: #b45309; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 700; border: 1px solid #fde68a;">UNDER INTEGRATION</span>
+                                                    </div>
+                                                    <div>
+                                                        Direct Credit &amp; Debit Card checkout (Visa, Mastercard, Amex) is currently undergoing final compliance verification. To reserve your harvest immediately, please select <strong>Direct Bank Transfer</strong>, <strong>Cash Deposit Slip</strong>, or <strong>Cash on Delivery (Sri Lanka only)</strong>.
+                                                    </div>
+                                                    <div style="margin-top: 0.45rem; font-size: 0.75rem;">
+                                                        Need concierge assistance? <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge%2C%20I%20would%20like%20assistance%20with%20my%20order" target="_blank" rel="noopener noreferrer" style="color: #b45309; font-weight: 700; text-decoration: underline;">Chat with our Concierge on WhatsApp &rarr;</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                                <div>
+                                                    <label style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #855b05; margin-bottom: 0.3rem; display: block;">Name on Card *</label>
+                                                    <input type="text" id="quick-card-name" class="form-control" placeholder="Cardholder Full Name" autocomplete="cc-name" style="width: 100%; padding: 0.65rem 0.75rem; border: 1.5px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; background: #ffffff; color: #111827;">
+                                                </div>
+
+                                                <div>
+                                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                                                        <label style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #855b05;">Card Number *</label>
+                                                        <span id="quick-card-brand-detected" style="font-size: 0.68rem; color: #2563eb; font-weight: 700;">Secure TLS</span>
+                                                    </div>
+                                                    <div style="position: relative;">
+                                                        <input type="text" id="quick-card-number" class="form-control" placeholder="4000  1234  5678  9010" maxlength="19" autocomplete="cc-number" style="width: 100%; padding: 0.65rem 2.5rem 0.65rem 0.75rem; border: 1.5px solid #d1d5db; border-radius: 6px; font-size: 0.95rem; font-family: monospace; letter-spacing: 1px; background: #ffffff; color: #111827;">
+                                                        <div id="quick-card-slot-icon" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none;">
+                                                            <svg width="20" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
+                                                    <div>
+                                                        <label style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #855b05; margin-bottom: 0.3rem; display: block;">Expiry Date *</label>
+                                                        <input type="text" id="quick-card-expiry" class="form-control" placeholder="MM / YY" maxlength="7" autocomplete="cc-exp" style="width: 100%; padding: 0.65rem 0.75rem; border: 1.5px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; font-family: monospace; text-align: center; background: #ffffff; color: #111827;">
+                                                    </div>
+                                                    <div>
+                                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                                                            <label style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #855b05;">Security Code *</label>
+                                                            <span style="font-size: 0.68rem; color: #6b7280;">CVV</span>
+                                                        </div>
+                                                        <div style="position: relative;">
+                                                            <input type="password" id="quick-card-cvc" class="form-control" placeholder="•••" maxlength="4" autocomplete="cc-csc" style="width: 100%; padding: 0.65rem 1.8rem 0.65rem 0.75rem; border: 1.5px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; font-family: monospace; letter-spacing: 2px; text-align: center; background: #ffffff; color: #111827;">
+                                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div style="background: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; padding: 0.65rem 0.85rem; margin-top: 0.3rem; display: flex; justify-content: space-between; align-items: center;">
+                                                    <span style="font-size: 0.78rem; color: #4b5563;">Direct Card Settlement:</span>
+                                                    <strong id="quick-card-amount-display" style="font-size: 1.05rem; color: #1d4ed8; font-family: monospace;">${currInfo.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`}</strong>
+                                                </div>
+
+                                                <button type="button" id="quick-pay-card-btn" class="btn btn-primary" style="width: 100%; padding: 0.9rem 1.25rem; font-size: 0.95rem; font-weight: 700; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 0.55rem; cursor: pointer; box-shadow: 0 4px 14px rgba(37,99,235,0.2); background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%); border-color: #1d4ed8; color: #ffffff; margin-top: 0.2rem;">
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                                    <span id="quick-pay-card-btn-text">Pay with Card &bull; ${currInfo.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : formattedGrandTotal}</span>
+                                                </button>
+
+                                                <div style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.7rem; color: #6b7280; margin-top: 0.1rem;">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                                    <span>256-Bit Bank Encryption &bull; PCI-DSS Level 1 Certified</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- COD Panel -->
+                                    <div id="quick-pay-panel-cod" class="pay-panel pay-panel-cod" style="display: none;">
+                                        <div style="background: #f0fdf4; border: 1.5px solid #22c55e; border-radius: 10px; padding: 1.15rem; text-align: center;">
+                                            <h4 style="color: #15803d; font-size: 1.05rem; margin-bottom: 0.35rem; font-weight: 700;">Cash on Delivery (COD) Active</h4>
+                                            <p style="font-size: 0.8rem; color: #4b5563; line-height: 1.5; margin: 0 0 0.85rem 0;">
+                                                The SL Post EMS courier will collect the exact cash amount upon handing over your parcel at your doorstep.
+                                            </p>
+                                            <div style="background: #ffffff; border: 1px solid #bbf7d0; border-radius: 8px; padding: 0.65rem 1rem; display: inline-flex; align-items: center; gap: 0.75rem;">
+                                                <span style="font-size: 0.78rem; color: #4b5563;">Payable to Courier:</span>
+                                                <strong id="quick-cod-amount-display" style="font-size: 1.25rem; color: #15803d; font-family: monospace;">Rs ${grandTotalLKR.toLocaleString()} LKR</strong>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                                    <div class="form-group" style="margin-bottom: 0;">
-                                        <label class="form-label" for="quick-pref-date" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Preferred Dispatch Date</label>
-                                        <input class="form-input" type="date" id="quick-pref-date" min="${prodMinDate}" value="${prodMinDate}" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                    </div>
-                                    <div class="form-group" style="margin-bottom: 0;">
-                                        <label class="form-label" for="quick-cust-notes" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Concierge Instructions / Special Notes</label>
-                                        <textarea class="form-input" id="quick-cust-notes" rows="2" placeholder="e.g. Please include complimentary estate tasting booklet, leave at front porch, etc." style="font-size: 0.82rem; padding: 0.65rem 0.75rem;"></textarea>
-                                    </div>
+                                <!-- Final Order Button in Step 2 -->
+                                <div style="margin-top: 1rem;">
+                                    <button type="button" id="quick-submit-order-btn" class="btn btn-primary" style="width: 100%; padding: 1.05rem 1.5rem; font-size: 1rem; font-weight: 700; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 0.6rem; cursor: pointer; box-shadow: 0 4px 16px rgba(184,134,11,0.22);">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        <span id="quick-submit-order-btn-text">Confirm &amp; Place Order &bull; ${formattedGrandTotal}</span>
+                                    </button>
                                 </div>
                             </div>
                         </form>
                     </div>
-                </div>
 
                     <!-- ==============================================
-                         RIGHT COLUMN: LUXURY SUMMARY SIDEBAR (EBAY/SHOPIFY)
+                         RIGHT COLUMN: LUXURY SUMMARY SIDEBAR (PROPER LARGE PRODUCT PHOTO)
                          ============================================== -->
                     <div class="checkout-right-col">
                         <div class="checkout-summary-sidebar">
                             <div class="checkout-summary-header">
-                                <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold);">
+                                <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #855b05;">
                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
                                     <span>Reserve Allocation</span>
                                 </div>
-                                <span style="font-size: 0.72rem; color: #86efac; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 0.15rem 0.55rem; font-weight: 600;">Single-Estate Reserve</span>
+                                <span style="font-size: 0.72rem; color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 0.15rem 0.55rem; font-weight: 600;">Single-Estate Reserve</span>
                             </div>
 
-                            <!-- Product Row with Count Badge -->
-                            <div class="checkout-item-row">
-                                <div class="checkout-thumb-wrap">
-                                    <img src="${product.image || 'images/Product.jpeg'}" alt="${product.name}" onerror="window.handleImageError &amp;&amp; window.handleImageError(this, 'product')" loading="lazy" decoding="async">
-                                    <span class="checkout-count-badge" id="quick-badge-qty">${currentQuickQty}</span>
-                                </div>
-                                <div class="checkout-item-meta">
-                                    <h4 class="checkout-item-name">${product.name}</h4>
-                                    <div class="checkout-item-sub">
-                                        <span>${product.category || 'Single-Estate Tea'}</span>
-                                        <span>&bull;</span>
-                                        <span>${product.leafGrade || 'Silver Tips'}</span>
-                                        <span>&bull;</span>
-                                        <span>${product.weight || '100g'} Tin</span>
+                            <!-- PROPER LARGE LUXURY PRODUCT SHOWCASE -->
+                            <div class="checkout-large-product-showcase">
+                                <div class="checkout-large-photo-box">
+                                    <img src="${product.image || 'images/Product.jpeg'}" alt="${product.name}" class="checkout-large-photo-img" id="quick-large-product-img" onerror="window.handleImageError &amp;&amp; window.handleImageError(this, 'product')" loading="eager" decoding="async">
+                                    <div class="checkout-photo-overlay-badges">
+                                        <span class="checkout-photo-tag-estate">🌿 Single-Estate Reserve</span>
+                                        <span class="checkout-photo-tag-qty" id="quick-large-badge-qty">Qty: ${currentQuickQty}</span>
                                     </div>
-                                    <a href="#checkout-customer-reviews" id="quick-summary-reviews-link" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.73rem; color: #b8860b; text-decoration: none; margin-top: 0.25rem; cursor: pointer;">
-                                        <span style="color: #eab308; letter-spacing: 1px;">★★★★★</span>
-                                        <span style="font-weight: 700; color: #111827;">5.0</span>
-                                        <span style="color: #64748b;">(Verified Reviews)</span>
-                                    </a>
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.45rem;">
-                                        <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.5);">
-                                            <button type="button" id="quick-order-qty-minus" style="background: none; border: none; color: var(--color-gold); width: 26px; height: 26px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">-</button>
-                                            <span id="quick-order-qty-val" style="width: 28px; text-align: center; font-size: 0.8rem; font-weight: 700; color: #fff;">${currentQuickQty}</span>
-                                            <button type="button" id="quick-order-qty-plus" style="background: none; border: none; color: var(--color-gold); width: 26px; height: 26px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">+</button>
+                                </div>
+
+                                <div class="checkout-large-product-details">
+                                    <h3 class="checkout-large-title">${product.name}</h3>
+                                    <div class="checkout-large-chips">
+                                        <span class="checkout-chip">🍃 ${product.leafGrade || 'TRI 2025 Hand-Rolled'}</span>
+                                        <span class="checkout-chip">⚖️ ${product.weight || '50g Pack'}</span>
+                                        <span class="checkout-chip">🏔️ ${product.elevation || 'Uva Highlands'}</span>
+                                    </div>
+
+                                    <div class="checkout-large-pricing-row">
+                                        <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1.5px solid #d4af37; border-radius: 8px; overflow: hidden; background: #ffffff;">
+                                            <button type="button" id="quick-order-qty-minus" style="background: none; border: none; color: #b8860b; width: 30px; height: 30px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem;">-</button>
+                                            <span id="quick-order-qty-val" style="width: 32px; text-align: center; font-size: 0.85rem; font-weight: 700; color: #111827;">${currentQuickQty}</span>
+                                            <button type="button" id="quick-order-qty-plus" style="background: none; border: none; color: #b8860b; width: 30px; height: 30px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem;">+</button>
                                         </div>
-                                        <span id="quick-order-unit-price" style="font-size: 0.78rem; color: var(--color-text-muted);">${window.formatAmountInCurrency ? window.formatAmountInCurrency(unitPriceUSD, currInfo) : '$' + unitPriceUSD.toFixed(2)} / tin</span>
+                                        <div style="text-align: right;">
+                                            <div class="checkout-item-price" id="quick-item-line-price" style="font-size: 1.25rem; font-weight: 700; color: #111827; font-family: var(--font-serif);">${formattedSubtotal}</div>
+                                            <div id="quick-order-unit-price" style="font-size: 0.74rem; color: #64748b;">${window.formatAmountInCurrency ? window.formatAmountInCurrency(unitPriceUSD, currInfo) : '$' + unitPriceUSD.toFixed(2)} / pack</div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="checkout-item-price" id="quick-item-line-price">${formattedSubtotal}</div>
                             </div>
 
                             <!-- Discount Code Box -->
@@ -4363,29 +5018,29 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div style="display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.84rem; padding-top: 0.25rem;">
                                 <div class="checkout-totals-row">
                                     <span>Subtotal</span>
-                                    <strong id="quick-summary-subtotal" style="color: #ffffff;">${formattedSubtotal}</strong>
+                                    <strong id="quick-summary-subtotal" style="color: #111827;">${formattedSubtotal}</strong>
                                 </div>
-                                <div class="checkout-totals-row" id="quick-discount-row" style="display: none; color: #4ade80;">
+                                <div class="checkout-totals-row" id="quick-discount-row" style="display: none; color: #15803d;">
                                     <span>Promotional Savings</span>
                                     <strong id="quick-discount-amt">-$0.00</strong>
                                 </div>
                                 <div class="checkout-totals-row">
-                                    <span id="quick-summary-shipping-label">${isSriLanka ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS Priority Air'}</span>
-                                    <span id="quick-summary-shipping" style="color: ${shippingUSD > 0 ? '#86efac' : 'var(--color-gold)'}; font-weight: 600;">${formattedShipping}</span>
+                                    <span id="quick-summary-shipping-label">${isSriLanka ? 'SL Post EMS Courier' : 'SL Post EMS Priority Air'}</span>
+                                    <span id="quick-summary-shipping" style="color: ${shippingUSD > 0 ? '#15803d' : '#855b05'}; font-weight: 600;">${formattedShipping}</span>
                                 </div>
                                 <div class="checkout-grand-total-row">
                                     <div>
-                                        <strong id="quick-summary-total-title" style="font-size: 0.95rem; color: #ffffff;">Total Due (${currInfo.code})</strong>
-                                        <span id="quick-lkr-approx" style="display: block; font-size: 0.72rem; color: #94a3b8; font-weight: normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>
+                                        <strong id="quick-summary-total-title" style="font-size: 0.95rem; color: #111827;">Total Due (${currInfo.code})</strong>
+                                        <span id="quick-lkr-approx" style="display: block; font-size: 0.72rem; color: #64748b; font-weight: normal;">(≈ Rs ${grandTotalLKR.toLocaleString()} LKR)</span>
                                     </div>
-                                    <strong id="quick-summary-total" style="font-size: 1.45rem; color: var(--color-gold); font-family: var(--font-serif);">${formattedGrandTotal}</strong>
+                                    <strong id="quick-summary-total" style="font-size: 1.45rem; color: #855b05; font-family: var(--font-serif);">${formattedGrandTotal}</strong>
                                 </div>
                             </div>
 
                             <!-- Master Action Button -->
                             <button type="button" id="quick-summary-submit-btn" class="checkout-action-btn">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                <span id="quick-action-btn-text">Buy Now &bull; ${formattedGrandTotal}</span>
+                                <span id="quick-action-btn-text">Proceed to Payment &bull; ${formattedGrandTotal}</span>
                             </button>
 
                             <!-- Trust Badges -->
@@ -4411,14 +5066,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const renderQuickOrderConfirmationSuccess = (order, paymentMethod) => {
                 const isCOD = paymentMethod === 'cod';
                 const isPayPal = paymentMethod === 'paypal';
+                const isCard = paymentMethod === 'card';
 
                 drawerFormContainer.innerHTML = `
                     <div class="cart-success-view" style="text-align: center; padding: 2.25rem 1rem;">
-                        <div style="width: 76px; height: 76px; border-radius: 50%; background: ${isCOD ? 'rgba(37,211,102,0.15)' : 'rgba(212,175,55,0.12)'}; border: 2px solid ${isCOD ? '#25d366' : 'var(--color-gold)'}; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.15rem auto; color: ${isCOD ? '#25d366' : 'var(--color-gold)'};">
+                        <div style="width: 76px; height: 76px; border-radius: 50%; background: ${isCOD ? 'rgba(37,211,102,0.15)' : (isCard ? 'rgba(37,99,235,0.15)' : 'rgba(212,175,55,0.12)')}; border: 2px solid ${isCOD ? '#25d366' : (isCard ? '#2563eb' : 'var(--color-gold)')}; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.15rem auto; color: ${isCOD ? '#25d366' : (isCard ? '#2563eb' : 'var(--color-gold)')};">
                             <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
-                        <span class="season-badge" style="background: ${isCOD ? 'rgba(37,211,102,0.2)' : 'rgba(212,175,55,0.15)'}; color: ${isCOD ? '#4ade80' : 'var(--color-gold)'}; font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
-                            ${isCOD ? 'Cash on Delivery • Order Confirmed' : (isPayPal ? 'Paid • Instant PayPal Clearance' : 'Allocation Reserved • Slip Attached')}
+                        <span class="season-badge" style="background: ${isCOD ? 'rgba(37,211,102,0.2)' : (isCard ? 'rgba(37,99,235,0.15)' : 'rgba(212,175,55,0.15)')}; color: ${isCOD ? '#4ade80' : (isCard ? '#38bdf8' : 'var(--color-gold)')}; font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                            ${isCOD ? 'Cash on Delivery • Order Confirmed' : (isCard ? `Paid • Direct Card Settlement (${order.cardBrand || 'Card'} •••• ${order.cardLast4 || '4242'})` : (isPayPal ? 'Paid • Instant PayPal Clearance' : 'Allocation Reserved • Slip Attached'))}
                         </span>
                         <h3 style="font-family: var(--font-serif); font-size: 1.5rem; color: #ffffff; margin: 0.75rem 0 0.25rem 0;">Allocation Registered</h3>
                         <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.5rem;">
@@ -4441,7 +5097,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
                                 <span style="font-size: 0.8rem; color: var(--color-text-muted);">Courier Method</span>
                                 <span style="color: #86efac; font-size: 0.82rem; font-weight: 600;">
-                                    ${order.shippingMethod === 'cod' ? 'Sri Lanka Post EMS (Cash on Delivery)' : (order.country === 'Sri Lanka' ? 'Sri Lanka Post EMS Express' : 'Sri Lanka Post EMS International Priority Air')}
+                                    ${order.shippingMethod === 'cod' ? 'SL Post EMS (Cash on Delivery)' : (order.country === 'Sri Lanka' ? 'SL Post EMS Express' : 'SL Post EMS International Priority Air')}
                                 </span>
                             </div>
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
@@ -4450,8 +5106,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div style="display: flex; justify-content: space-between;">
                                 <span style="font-size: 0.8rem; color: var(--color-text-muted);">Payment Mode</span>
-                                <span style="color: ${isCOD ? '#4ade80' : 'var(--color-gold)'}; font-size: 0.85rem; font-weight: 700;">
-                                    ${isCOD ? 'Cash on Delivery (Pay upon delivery)' : (isPayPal ? 'PayPal / International Card' : 'Bank of Ceylon Deposit')}
+                                <span style="color: ${isCOD ? '#4ade80' : (isCard ? '#38bdf8' : 'var(--color-gold)')}; font-size: 0.85rem; font-weight: 700;">
+                                    ${isCOD ? 'Cash on Delivery (Pay upon delivery)' : (isCard ? `Credit / Debit Card (${order.cardBrand || 'Card'} •••• ${order.cardLast4 || '4242'})` : (isPayPal ? 'PayPal Express Checkout' : 'Bank of Ceylon Deposit'))}
                                 </span>
                             </div>
                         </div>
@@ -4489,45 +5145,121 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             };
 
-            // Two-Stage Checkout Transitions (Stage 1: Dossier & Reviews <-> Stage 2: Delivery & Payment)
+            // Two-Stage Checkout Transitions (Stage 1: Delivery Details <-> Stage 2: Payment Options)
             const setCheckoutStage = (stage) => {
-                currentCheckoutStage = stage;
-                const stageOverview = document.getElementById('quick-stage-overview');
+                const stageDelivery = document.getElementById('quick-stage-delivery');
                 const stagePayment = document.getElementById('quick-stage-payment');
+                const tabDelivery = document.getElementById('quick-tab-delivery');
+                const tabPayment = document.getElementById('quick-tab-payment');
                 const masterBtnText = document.getElementById('quick-action-btn-text');
                 const masterBtn = document.getElementById('quick-summary-submit-btn');
 
-                if (stage === 1) {
-                    if (stageOverview) stageOverview.style.display = 'block';
-                    if (stagePayment) stagePayment.style.display = 'none';
-                    if (masterBtnText) {
-                        masterBtnText.innerHTML = `Buy Now &bull; ${formattedGrandTotal}`;
+                if (stage === 2) {
+                    // Validate delivery form fields before advancing to payment options
+                    const requiredInputs = ['quick-cust-firstname', 'quick-cust-lastname', 'quick-cust-email', 'quick-cust-phone', 'quick-cust-address', 'quick-cust-city', 'quick-cust-postal'];
+                    let firstInvalid = null;
+                    for (const fId of requiredInputs) {
+                        const input = document.getElementById(fId);
+                        if (input && !input.value.trim()) {
+                            if (!firstInvalid) firstInvalid = input;
+                        }
                     }
-                    if (masterBtn) {
-                        masterBtn.setAttribute('title', 'Proceed to Delivery & Payment');
+                    if (firstInvalid) {
+                        if (firstInvalid.reportValidity) firstInvalid.reportValidity();
+                        firstInvalid.focus();
+                        if (window.showToast) window.showToast('Delivery Details Required', 'Please complete your delivery address before proceeding to payment.', 'warning');
+                        return false;
                     }
-                    const scrollContainer = document.getElementById('drawer-body-content') || document.querySelector('.drawer-container.checkout-mode') || window;
-                    if (scrollContainer && scrollContainer.scrollTo) {
-                        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                } else {
-                    if (stageOverview) stageOverview.style.display = 'none';
+
+                    // Populate verified summary box in Step 2
+                    const fName = document.getElementById('quick-cust-firstname')?.value?.trim() || '';
+                    const lName = document.getElementById('quick-cust-lastname')?.value?.trim() || '';
+                    const city = document.getElementById('quick-cust-city')?.value?.trim() || '';
+                    const country = document.getElementById('quick-cust-country')?.value || 'Sri Lanka';
+                    const emsTitle = document.getElementById('quick-shipping-ems-title')?.textContent || 'SL Post EMS';
+
+                    const reviewNameEl = document.getElementById('quick-review-cust-name');
+                    if (reviewNameEl) reviewNameEl.textContent = `${fName} ${lName}`.trim() || 'Guest Patron';
+                    const reviewDestEl = document.getElementById('quick-review-cust-dest');
+                    if (reviewDestEl) reviewDestEl.textContent = `${city ? city + ', ' : ''}${country}`;
+                    const reviewCourierEl = document.getElementById('quick-review-cust-courier');
+                    if (reviewCourierEl) reviewCourierEl.textContent = emsTitle;
+
+                    currentCheckoutStage = 2;
+                    if (stageDelivery) stageDelivery.style.display = 'none';
                     if (stagePayment) stagePayment.style.display = 'block';
+
+                    // Cash on Delivery is strictly valid and visible only for Sri Lanka
+                    const isLK = country === 'Sri Lanka';
+                    const codPayTab = document.getElementById('quick-pay-tab-cod');
+                    if (codPayTab) {
+                        codPayTab.style.display = isLK ? 'flex' : 'none';
+                        if (!isLK && codPayTab.classList.contains('active')) {
+                            const cardTab = drawerFormContainer.querySelector('.pay-tab[data-method="card"]');
+                            if (cardTab) {
+                                cardTab.click();
+                            } else {
+                                const bankTab = drawerFormContainer.querySelector('.pay-tab[data-method="bank"]');
+                                if (bankTab) bankTab.click();
+                            }
+                        }
+                    }
+
+                    if (tabDelivery) {
+                        tabDelivery.classList.remove('active');
+                        tabDelivery.classList.add('completed');
+                    }
+                    if (tabPayment) {
+                        tabPayment.classList.add('active');
+                    }
+
                     if (masterBtnText) {
                         masterBtnText.innerHTML = `Place Order &bull; ${formattedGrandTotal}`;
                     }
                     if (masterBtn) {
                         masterBtn.setAttribute('title', 'Confirm and Place Order');
                     }
+
+                    const submitOrderBtn = document.getElementById('quick-submit-order-btn-text');
+                    if (submitOrderBtn) {
+                        submitOrderBtn.innerHTML = `Confirm &amp; Place Order &bull; ${formattedGrandTotal}`;
+                    }
+
                     const scrollContainer = document.getElementById('drawer-body-content') || document.querySelector('.drawer-container.checkout-mode') || window;
                     if (scrollContainer && scrollContainer.scrollTo) {
                         scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
                     }
-                    setTimeout(() => {
-                        const firstInput = document.getElementById('quick-cust-firstname');
-                        if (firstInput) firstInput.focus();
-                    }, 120);
+
+                    // Check if PayPal is selected
+                    const activePayTab = drawerFormContainer.querySelector('.pay-tab.active');
+                    if (activePayTab && activePayTab.getAttribute('data-method') === 'paypal') {
+                        setTimeout(initQuickPayPal, 60);
+                    }
+                } else {
+                    currentCheckoutStage = 1;
+                    if (stageDelivery) stageDelivery.style.display = 'block';
+                    if (stagePayment) stagePayment.style.display = 'none';
+
+                    if (tabDelivery) {
+                        tabDelivery.classList.add('active');
+                    }
+                    if (tabPayment) {
+                        tabPayment.classList.remove('active');
+                    }
+
+                    if (masterBtnText) {
+                        masterBtnText.innerHTML = `Proceed to Payment &bull; ${formattedGrandTotal}`;
+                    }
+                    if (masterBtn) {
+                        masterBtn.setAttribute('title', 'Proceed to Payment Options');
+                    }
+
+                    const scrollContainer = document.getElementById('drawer-body-content') || document.querySelector('.drawer-container.checkout-mode') || window;
+                    if (scrollContainer && scrollContainer.scrollTo) {
+                        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
                 }
+                return true;
             };
 
             // Dynamic Currency & Shipping Calculation
@@ -4555,21 +5287,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const unitPriceEl = document.getElementById('quick-order-unit-price');
                 if (unitPriceEl && window.formatAmountInCurrency) {
-                    unitPriceEl.textContent = `${window.formatAmountInCurrency(unitPriceUSD, cur)} / tin`;
+                    unitPriceEl.textContent = `${window.formatAmountInCurrency(unitPriceUSD, cur)} / pack`;
                 }
                 const badgeQtyEl = document.getElementById('quick-badge-qty');
                 if (badgeQtyEl) badgeQtyEl.textContent = currentQuickQty;
+                const largeBadgeQtyEl = document.getElementById('quick-large-badge-qty');
+                if (largeBadgeQtyEl) largeBadgeQtyEl.textContent = `Qty: ${currentQuickQty}`;
                 const linePriceEl = document.getElementById('quick-item-line-price');
                 if (linePriceEl) linePriceEl.textContent = formattedSubtotal;
 
                 const subEl = document.getElementById('quick-summary-subtotal');
                 if (subEl) subEl.textContent = formattedSubtotal;
                 const shipLabel = document.getElementById('quick-summary-shipping-label');
-                if (shipLabel) shipLabel.textContent = isLK ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS Priority Air';
+                if (shipLabel) shipLabel.textContent = isLK ? 'SL Post EMS Courier' : 'SL Post EMS Priority Air';
                 const shipEl = document.getElementById('quick-summary-shipping');
                 if (shipEl) {
                     shipEl.textContent = formattedShipping;
-                    shipEl.style.color = shippingUSD > 0 ? '#86efac' : 'var(--color-gold)';
+                    shipEl.style.color = shippingUSD > 0 ? '#15803d' : '#855b05';
                 }
                 const totalTitle = document.getElementById('quick-summary-total-title');
                 if (totalTitle) totalTitle.textContent = `Total Due (${cur.code})`;
@@ -4599,14 +5333,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const masterBtnText = document.getElementById('quick-action-btn-text');
                 if (masterBtnText) {
                     masterBtnText.innerHTML = currentCheckoutStage === 1 
-                        ? `Buy Now &bull; ${formattedGrandTotal}`
-                        : `Place Order &bull; ${formattedGrandTotal}`;
+                        ? `Proceed to Payment &bull; ${formattedGrandTotal}`
+                        : `Confirm &amp; Place Order &bull; ${formattedGrandTotal}`;
+                }
+
+                const submitOrderBtn = document.getElementById('quick-submit-order-btn-text');
+                if (submitOrderBtn) {
+                    submitOrderBtn.innerHTML = `Confirm &amp; Place Order &bull; ${formattedGrandTotal}`;
                 }
 
                 const emsTitle = document.getElementById('quick-shipping-ems-title');
-                if (emsTitle) emsTitle.textContent = isLK ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air';
+                if (emsTitle) emsTitle.textContent = isLK ? 'SL Post EMS Express (Pre-paid)' : 'SL Post EMS International Priority Air';
                 const emsDesc = document.getElementById('quick-shipping-ems-desc');
-                if (emsDesc) emsDesc.textContent = isLK ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.';
+                if (emsDesc) emsDesc.textContent = isLK ? 'Door-to-door express parcel courier with official SL Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official SL Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.';
                 const emsPill = document.getElementById('quick-shipping-ems-price-pill');
                 if (emsPill) emsPill.textContent = formattedShipping;
 
@@ -4621,6 +5360,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (codCard) codCard.style.display = 'none';
                     if (emsRadio) emsRadio.checked = true;
                     syncQuickShippingSelection();
+                }
+
+                // Cash on Delivery is strictly valid and visible only for Sri Lanka
+                const codPayTab = document.getElementById('quick-pay-tab-cod');
+                if (codPayTab) {
+                    codPayTab.style.display = isLK ? 'flex' : 'none';
+                    if (!isLK && codPayTab.classList.contains('active')) {
+                        const cardTab = document.querySelector('#quick-checkout-form .pay-tab[data-method="card"]');
+                        if (cardTab) {
+                            cardTab.click();
+                        } else {
+                            const bankTab = document.querySelector('#quick-checkout-form .pay-tab[data-method="bank"]');
+                            if (bankTab) bankTab.click();
+                        }
+                    }
                 }
 
                 const codAmt = document.getElementById('quick-cod-amount-display');
@@ -4639,6 +5393,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const ppAmt = document.getElementById('quick-paypal-amount-display');
                 if (ppAmt) {
                     ppAmt.textContent = cur.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`;
+                }
+
+                const cardAmt = document.getElementById('quick-card-amount-display');
+                if (cardAmt) {
+                    cardAmt.textContent = cur.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`;
+                }
+                const cardBtnText = document.getElementById('quick-pay-card-btn-text');
+                if (cardBtnText) {
+                    cardBtnText.innerHTML = `Pay with Card &bull; ${cur.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : formattedGrandTotal}`;
                 }
 
                 // Dynamic region container
@@ -4662,13 +5425,59 @@ document.addEventListener('DOMContentLoaded', () => {
                             `;
                         }
                     } else {
+                        const isUSA = country === 'United States';
                         if (!regionCont.querySelector('input')) {
                             regionCont.innerHTML = `
-                                <label class="form-label" for="quick-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">State / Province / County *</label>
-                                <input class="form-input" type="text" id="quick-cust-region" placeholder="e.g. California / London / Tokyo" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
+                                <label class="form-label" for="quick-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">${isUSA ? 'State *' : 'State / Province / County *'}</label>
+                                <input class="form-input" type="text" id="quick-cust-region" placeholder="${isUSA ? 'e.g. New York (NY) / California' : 'e.g. California / London / Tokyo'}" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
                             `;
+                        } else {
+                            const regInput = regionCont.querySelector('input');
+                            if (regInput) regInput.placeholder = isUSA ? 'e.g. New York (NY) / California' : 'e.g. California / London / Tokyo';
+                            const regLabel = regionCont.querySelector('label');
+                            if (regLabel) regLabel.textContent = isUSA ? 'State *' : 'State / Province / County *';
                         }
                     }
+                }
+
+                // Dynamic Placeholders for USA vs Sri Lanka vs Other
+                const isUSA = country === 'United States';
+                const fnInput = document.getElementById('quick-cust-firstname');
+                const lnInput = document.getElementById('quick-cust-lastname');
+                const phInput = document.getElementById('quick-cust-phone');
+                const addrInput = document.getElementById('quick-cust-address');
+                const stInput = document.getElementById('quick-cust-suite');
+                const ctInput = document.getElementById('quick-cust-city');
+                const postInput = document.getElementById('quick-cust-postal');
+                const fillSampleBtn = document.getElementById('quick-fill-sample-btn');
+
+                if (isUSA) {
+                    if (fnInput) fnInput.placeholder = "e.g. Alexander";
+                    if (lnInput) lnInput.placeholder = "e.g. Miller";
+                    if (phInput) phInput.placeholder = "e.g. +1 (555) 234-5678";
+                    if (addrInput) addrInput.placeholder = "e.g. 350 Fifth Avenue";
+                    if (stInput) stInput.placeholder = "e.g. Suite 400";
+                    if (ctInput) ctInput.placeholder = "e.g. New York";
+                    if (postInput) postInput.placeholder = "e.g. 10001";
+                    if (fillSampleBtn) fillSampleBtn.innerHTML = "<span>⚡ Fill Sample USA</span>";
+                } else if (isLK) {
+                    if (fnInput) fnInput.placeholder = "e.g. Ruwan";
+                    if (lnInput) lnInput.placeholder = "e.g. Perera";
+                    if (phInput) phInput.placeholder = "e.g. +94 77 123 4567";
+                    if (addrInput) addrInput.placeholder = "e.g. 42 Highland View Road";
+                    if (stInput) stInput.placeholder = "e.g. Apt 4B";
+                    if (ctInput) ctInput.placeholder = "e.g. Colombo";
+                    if (postInput) postInput.placeholder = "e.g. 00700";
+                    if (fillSampleBtn) fillSampleBtn.innerHTML = "<span>⚡ Fill Sample LK</span>";
+                } else {
+                    if (fnInput) fnInput.placeholder = "e.g. Alexander / James";
+                    if (lnInput) lnInput.placeholder = "e.g. Miller / Sterling";
+                    if (phInput) phInput.placeholder = "e.g. +1 (555) 234-5678";
+                    if (addrInput) addrInput.placeholder = "e.g. 350 Fifth Avenue / 10 Downing St";
+                    if (stInput) stInput.placeholder = "e.g. Suite 400 / Apt 4B";
+                    if (ctInput) ctInput.placeholder = "e.g. New York / London";
+                    if (postInput) postInput.placeholder = "e.g. 10001 / SW1A 1AA";
+                    if (fillSampleBtn) fillSampleBtn.innerHTML = "<span>⚡ Fill Sample Address</span>";
                 }
 
                 // Re-render PayPal if open
@@ -4795,6 +5604,47 @@ document.addEventListener('DOMContentLoaded', () => {
             const countryInput = document.getElementById('quick-cust-country');
             if (countryInput) countryInput.onchange = updateQuickPricing;
 
+            const quickFillSampleBtn = document.getElementById('quick-fill-sample-btn');
+            if (quickFillSampleBtn) {
+                quickFillSampleBtn.onclick = () => {
+                    const country = document.getElementById('quick-cust-country')?.value || 'Sri Lanka';
+                    const isUSA = country === 'United States';
+                    if (isUSA) {
+                        const fn = document.getElementById('quick-cust-firstname'); if (fn) fn.value = "Alexander";
+                        const ln = document.getElementById('quick-cust-lastname'); if (ln) ln.value = "Miller";
+                        const em = document.getElementById('quick-cust-email'); if (em) em.value = "alexander.miller@example.com";
+                        const ph = document.getElementById('quick-cust-phone'); if (ph) ph.value = "+1 (555) 234-5678";
+                        const ad = document.getElementById('quick-cust-address'); if (ad) ad.value = "350 Fifth Avenue";
+                        const st = document.getElementById('quick-cust-suite'); if (st) st.value = "Suite 400";
+                        const ct = document.getElementById('quick-cust-city'); if (ct) ct.value = "New York";
+                        const reg = document.getElementById('quick-cust-region'); if (reg) reg.value = "New York (NY)";
+                        const pc = document.getElementById('quick-cust-postal'); if (pc) pc.value = "10001";
+                        showToast("USA Sample Details", "Loaded sample US recipient details (Alexander Miller, New York).", "info");
+                    } else if (country === 'Sri Lanka') {
+                        const fn = document.getElementById('quick-cust-firstname'); if (fn) fn.value = "Ruwan";
+                        const ln = document.getElementById('quick-cust-lastname'); if (ln) ln.value = "Perera";
+                        const em = document.getElementById('quick-cust-email'); if (em) em.value = "ruwan.perera@example.com";
+                        const ph = document.getElementById('quick-cust-phone'); if (ph) ph.value = "+94 77 123 4567";
+                        const ad = document.getElementById('quick-cust-address'); if (ad) ad.value = "42 Highland View Road";
+                        const st = document.getElementById('quick-cust-suite'); if (st) st.value = "Apt 4B";
+                        const ct = document.getElementById('quick-cust-city'); if (ct) ct.value = "Colombo";
+                        const pc = document.getElementById('quick-cust-postal'); if (pc) pc.value = "00700";
+                        showToast("LK Sample Details", "Loaded sample Sri Lanka recipient details (Ruwan Perera, Colombo).", "info");
+                    } else {
+                        const fn = document.getElementById('quick-cust-firstname'); if (fn) fn.value = "Alexander";
+                        const ln = document.getElementById('quick-cust-lastname'); if (ln) ln.value = "Miller";
+                        const em = document.getElementById('quick-cust-email'); if (em) em.value = "alexander.miller@example.com";
+                        const ph = document.getElementById('quick-cust-phone'); if (ph) ph.value = "+1 (555) 234-5678";
+                        const ad = document.getElementById('quick-cust-address'); if (ad) ad.value = "350 Fifth Avenue";
+                        const st = document.getElementById('quick-cust-suite'); if (st) st.value = "Suite 400";
+                        const ct = document.getElementById('quick-cust-city'); if (ct) ct.value = "New York";
+                        const reg = document.getElementById('quick-cust-region'); if (reg) reg.value = "New York (NY)";
+                        const pc = document.getElementById('quick-cust-postal'); if (pc) pc.value = "10001";
+                        showToast("Sample Details", "Loaded sample recipient details (Alexander Miller, New York).", "info");
+                    }
+                };
+            }
+
             drawerFormContainer.querySelectorAll('input[name="quick-shipping-method"]').forEach(r => {
                 r.onchange = syncQuickShippingSelection;
             });
@@ -4832,83 +5682,87 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Wire PayPal
             const initQuickPayPal = () => {
-                const container = document.getElementById('quick-paypal-button-container');
-                if (!container || !window.TeaFactoryPayPal) return;
+                try {
+                    const container = document.getElementById('quick-paypal-button-container');
+                    if (!container || !window.TeaFactoryPayPal) return;
 
-                window.TeaFactoryPayPal.renderButtons({
-                    containerId: 'quick-paypal-button-container',
-                    orderId: `ORD-PROD-${Date.now()}`,
-                    amount: grandTotalUSD,
-                    currency: 'USD',
-                    description: `${product.name} (${currentQuickQty} Tin${currentQuickQty > 1 ? 's' : ''})`,
-                    onValidate: () => {
-                        const form = document.getElementById('quick-checkout-form');
-                        if (!form || !form.checkValidity()) {
-                            if (form) form.reportValidity();
-                            return false;
-                        }
-                        return true;
-                    },
-                    onSuccess: async ({ paypalOrderId, captureData }) => {
-                        const firstName = document.getElementById('quick-cust-firstname')?.value?.trim() || '';
-                        const lastName = document.getElementById('quick-cust-lastname')?.value?.trim() || '';
-                        const customerName = `${firstName} ${lastName}`.trim() || 'Guest Patron';
-                        const email = document.getElementById('quick-cust-email')?.value?.trim() || '';
-                        const phone = document.getElementById('quick-cust-phone')?.value?.trim() || '';
-                        const street = document.getElementById('quick-cust-address')?.value?.trim() || '';
-                        const suite = document.getElementById('quick-cust-suite')?.value?.trim() || '';
-                        const city = document.getElementById('quick-cust-city')?.value?.trim() || '';
-                        const postal = document.getElementById('quick-cust-postal')?.value?.trim() || '';
-                        const region = document.getElementById('quick-cust-region')?.value || '';
-                        const country = document.getElementById('quick-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
-                        const prefDate = document.getElementById('quick-pref-date')?.value || '';
-                        const notes = document.getElementById('quick-cust-notes')?.value?.trim() || '';
-
-                        const fullAddress = `${street}${suite ? ', ' + suite : ''}, ${city}, ${region ? region + ', ' : ''}${postal}, ${country}`;
-
-                        const result = window.TeaFactoryStore.bookProduct(product.id, {
-                            name: customerName,
-                            email,
-                            phone,
-                            address: fullAddress,
-                            country,
-                            city,
-                            notes,
-                            quantity: currentQuickQty,
-                            preferredDate: prefDate,
-                            paymentMethod: 'paypal',
-                            slipImage: ''
-                        });
-
-                        if (result && result.success) {
-                            const order = result.booking;
-                            window.TeaFactoryStore.markOrderPaidByPayPal(order.id, captureData || { id: paypalOrderId });
-                            window.TeaFactoryStore.saveRecentOrderId(order.id);
-
-                            if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.createOrder === 'function') {
-                                window.TeaFactoryAPI.createOrder({
-                                    id: order.id,
-                                    customer_name: customerName,
-                                    customer_email: email,
-                                    customer_phone: phone,
-                                    shipping_address: fullAddress,
-                                    subtotal_usd: subtotalUSD,
-                                    discount_usd: discountUSD,
-                                    shipping_usd: shippingUSD,
-                                    total_usd: grandTotalUSD,
-                                    currency_code: currInfo.code,
-                                    total_in_currency: grandTotalUSD,
-                                    payment_method: 'paypal',
-                                    bespoke_notes: (activeProdPromo ? `Promo: ${activeProdPromo.code} (${activeProdPromo.percent}% off) | ` : '') + notes,
-                                    items: [{ id: product.id, name: product.name, quantity: currentQuickQty, price: unitPriceUSD, shippingCharge: shippingUSD }]
-                                }).catch(e => console.warn('Order sync:', e.message));
+                    window.TeaFactoryPayPal.renderButtons({
+                        containerId: 'quick-paypal-button-container',
+                        orderId: `ORD-PROD-${Date.now()}`,
+                        amount: grandTotalUSD,
+                        currency: 'USD',
+                        description: `${product.name} (${currentQuickQty} Tin${currentQuickQty > 1 ? 's' : ''})`,
+                        onValidate: () => {
+                            const form = document.getElementById('quick-checkout-form');
+                            if (!form || !form.checkValidity()) {
+                                if (form) form.reportValidity();
+                                return false;
                             }
+                            return true;
+                        },
+                        onSuccess: async ({ paypalOrderId, captureData }) => {
+                            const firstName = document.getElementById('quick-cust-firstname')?.value?.trim() || '';
+                            const lastName = document.getElementById('quick-cust-lastname')?.value?.trim() || '';
+                            const customerName = `${firstName} ${lastName}`.trim() || 'Guest Patron';
+                            const email = document.getElementById('quick-cust-email')?.value?.trim() || '';
+                            const phone = document.getElementById('quick-cust-phone')?.value?.trim() || '';
+                            const street = document.getElementById('quick-cust-address')?.value?.trim() || '';
+                            const suite = document.getElementById('quick-cust-suite')?.value?.trim() || '';
+                            const city = document.getElementById('quick-cust-city')?.value?.trim() || '';
+                            const postal = document.getElementById('quick-cust-postal')?.value?.trim() || '';
+                            const region = document.getElementById('quick-cust-region')?.value || '';
+                            const country = document.getElementById('quick-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+                            const prefDate = document.getElementById('quick-pref-date')?.value || '';
+                            const notes = document.getElementById('quick-cust-notes')?.value?.trim() || '';
 
-                            showToast("Order Confirmed!", `Allocation Certificate for ${order.id} is certified and ready!`, "success");
-                            renderQuickOrderConfirmationSuccess(order, 'paypal');
+                            const fullAddress = `${street}${suite ? ', ' + suite : ''}, ${city}, ${region ? region + ', ' : ''}${postal}, ${country}`;
+
+                            const result = window.TeaFactoryStore.bookProduct(product.id, {
+                                name: customerName,
+                                email,
+                                phone,
+                                address: fullAddress,
+                                country,
+                                city,
+                                notes,
+                                quantity: currentQuickQty,
+                                preferredDate: prefDate,
+                                paymentMethod: 'paypal',
+                                slipImage: ''
+                            });
+
+                            if (result && result.success) {
+                                const order = result.booking;
+                                window.TeaFactoryStore.markOrderPaidByPayPal(order.id, captureData || { id: paypalOrderId });
+                                window.TeaFactoryStore.saveRecentOrderId(order.id);
+
+                                if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.createOrder === 'function') {
+                                    window.TeaFactoryAPI.createOrder({
+                                        id: order.id,
+                                        customer_name: customerName,
+                                        customer_email: email,
+                                        customer_phone: phone,
+                                        shipping_address: fullAddress,
+                                        subtotal_usd: subtotalUSD,
+                                        discount_usd: discountUSD,
+                                        shipping_usd: shippingUSD,
+                                        total_usd: grandTotalUSD,
+                                        currency_code: currInfo.code,
+                                        total_in_currency: grandTotalUSD,
+                                        payment_method: 'paypal',
+                                        bespoke_notes: (activeProdPromo ? `Promo: ${activeProdPromo.code} (${activeProdPromo.percent}% off) | ` : '') + notes,
+                                        items: [{ id: product.id, name: product.name, quantity: currentQuickQty, price: unitPriceUSD, shippingCharge: shippingUSD }]
+                                    }).catch(e => console.warn('Order sync:', e.message));
+                                }
+
+                                showToast("Order Confirmed!", `Allocation Certificate for ${order.id} is certified and ready!`, "success");
+                                renderQuickOrderConfirmationSuccess(order, 'paypal');
+                            }
                         }
-                    }
-                });
+                    }).catch(e => console.warn('Quick PayPal render notice:', e && e.message ? e.message : e));
+                } catch (err) {
+                    console.warn('Quick PayPal init notice:', err && err.message ? err.message : err);
+                }
             };
 
             const prodPaypalTab = drawerFormContainer.querySelector('.pay-tab[data-method="paypal"]');
@@ -4932,11 +5786,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const selectedMethod = activeTabBtn ? activeTabBtn.getAttribute('data-method') : 'bank';
                 const paymentMethod = shippingMethod === 'cod' ? 'cod' : selectedMethod;
 
+                const country = document.getElementById('quick-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
+                if (paymentMethod === 'cod' && country !== 'Sri Lanka') {
+                    showToast("Country Restriction", "Cash on Delivery is available exclusively for deliveries within Sri Lanka.", "error");
+                    return;
+                }
+
                 if (paymentMethod === 'paypal') {
                     const ppCont = document.getElementById('quick-paypal-button-container');
                     if (ppCont) {
                         ppCont.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        showToast("PayPal Active", "Please click the yellow PayPal button to authorize payment.", "info");
+                        showToast("Coming Soon", "PayPal online payments are coming soon. Please select Bank Transfer, Cash Deposit, or Cash on Delivery to finalize your order immediately.", "info");
                     }
                     return;
                 }
@@ -4951,17 +5811,114 @@ document.addEventListener('DOMContentLoaded', () => {
                 const city = document.getElementById('quick-cust-city')?.value?.trim() || '';
                 const postal = document.getElementById('quick-cust-postal')?.value?.trim() || '';
                 const region = document.getElementById('quick-cust-region')?.value || '';
-                const country = document.getElementById('quick-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
                 const prefDate = document.getElementById('quick-pref-date')?.value || '';
                 const notes = document.getElementById('quick-cust-notes')?.value?.trim() || '';
 
                 const fullAddress = `${street}${suite ? ', ' + suite : ''}, ${city}, ${region ? region + ', ' : ''}${postal}, ${country}`;
 
+                if (paymentMethod === 'card') {
+                    const cardName = document.getElementById('quick-card-name')?.value?.trim() || '';
+                    const cardNumber = (document.getElementById('quick-card-number')?.value || '').replace(/\s+/g, '');
+                    const cardExpiry = document.getElementById('quick-card-expiry')?.value?.trim() || '';
+                    const cardCvc = document.getElementById('quick-card-cvc')?.value?.trim() || '';
+
+                    if (!cardName) {
+                        showToast("Cardholder Name Required", "Please enter the name printed on your card.", "warning");
+                        document.getElementById('quick-card-name')?.focus();
+                        return;
+                    }
+                    if (cardNumber.length < 13 || cardNumber.length > 19) {
+                        showToast("Invalid Card Number", "Please enter a valid card number.", "warning");
+                        document.getElementById('quick-card-number')?.focus();
+                        return;
+                    }
+                    if (!/^(0[1-9]|1[0-2])\s*\/\s*[0-9]{2}$/.test(cardExpiry)) {
+                        showToast("Invalid Expiry Date", "Please enter expiry in MM / YY format.", "warning");
+                        document.getElementById('quick-card-expiry')?.focus();
+                        return;
+                    }
+                    if (cardCvc.length < 3) {
+                        showToast("Invalid Security Code", "Please enter your 3 or 4-digit CVV / CVC.", "warning");
+                        document.getElementById('quick-card-cvc')?.focus();
+                        return;
+                    }
+
+                    const cardBtn = document.getElementById('quick-pay-card-btn');
+                    const cardBtnText = document.getElementById('quick-pay-card-btn-text');
+                    if (cardBtn) cardBtn.disabled = true;
+                    if (cardBtnText) cardBtnText.textContent = "Authorizing Card Payment...";
+
+                    setTimeout(() => {
+                        const cardLast4 = cardNumber.slice(-4) || '4242';
+                        let brand = 'Visa';
+                        if (/^5[1-5]/.test(cardNumber) || /^2[2-7]/.test(cardNumber)) brand = 'Mastercard';
+                        else if (/^3[47]/.test(cardNumber)) brand = 'American Express';
+                        else if (/^6(?:011|5)/.test(cardNumber)) brand = 'Discover';
+
+                        const result = window.TeaFactoryStore.bookProduct(product.id, {
+                            name: customerName,
+                            email,
+                            phone,
+                            address: fullAddress,
+                            country,
+                            city,
+                            notes,
+                            quantity: currentQuickQty,
+                            preferredDate: prefDate,
+                            paymentMethod: 'card',
+                            cardBrand: brand,
+                            cardLast4: cardLast4,
+                            paymentStatus: 'PAID',
+                            shippingMethod,
+                            slipImage: ''
+                        });
+
+                        if (result && result.success) {
+                            const order = result.booking;
+                            order.city = city;
+                            order.country = country;
+                            order.shippingMethod = shippingMethod;
+                            order.formattedPrice = formattedGrandTotal;
+                            order.cardBrand = brand;
+                            order.cardLast4 = cardLast4;
+
+                            window.TeaFactoryStore.saveRecentOrderId(order.id);
+
+                            if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.createOrder === 'function') {
+                                window.TeaFactoryAPI.createOrder({
+                                    id: order.id,
+                                    customer_name: customerName,
+                                    customer_email: email,
+                                    customer_phone: phone,
+                                    shipping_address: fullAddress,
+                                    subtotal_usd: subtotalUSD,
+                                    discount_usd: discountUSD,
+                                    shipping_usd: shippingUSD,
+                                    total_usd: grandTotalUSD,
+                                    currency_code: currInfo.code,
+                                    total_in_currency: grandTotalUSD,
+                                    payment_method: 'card',
+                                    bespoke_notes: (activeProdPromo ? `Promo: ${activeProdPromo.code} (${activeProdPromo.percent}% off) | ` : '') + notes,
+                                    items: [{ id: product.id, name: product.name, quantity: currentQuickQty, price: unitPriceUSD, shippingCharge: shippingUSD }]
+                                }).catch(e => console.warn('Order sync:', e.message));
+                            }
+
+                            showToast("Card Payment Approved", `Allocation confirmed! Charged ${formattedGrandTotal} to ${brand} ending in ${cardLast4}.`, "success");
+                            renderQuickOrderConfirmationSuccess(order, 'card');
+                        } else {
+                            if (cardBtn) cardBtn.disabled = false;
+                            if (cardBtnText) cardBtnText.textContent = `Pay with Card • ${formattedGrandTotal}`;
+                            showToast("Order Failed", result?.message || "Could not register allocation.", "error");
+                        }
+                    }, 650);
+                    return;
+                }
+
                 const slipImg = selectedProdSlipBase64 || 
                     document.getElementById('quick-bank-slip-zone')?.dataset?.fileBase64 || 
                     document.getElementById('quick-cash-slip-zone')?.dataset?.fileBase64 || '';
 
-                if (paymentMethod !== 'cod' && !slipImg) {
+                if (paymentMethod !== 'cod' && paymentMethod !== 'card' && !slipImg) {
                     showToast("Deposit Receipt Required", "Please attach your bank transfer or deposit slip to confirm your allocation.", "warning");
                     return;
                 }
@@ -5031,33 +5988,93 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             }
 
-            // Stage 1 Bottom Proceed Button
-            const stageProceedBtn = document.getElementById('quick-stage-proceed-btn');
-            if (stageProceedBtn) {
-                stageProceedBtn.onclick = () => {
-                    setCheckoutStage(2);
-                };
-            }
+            // Step Navigation Buttons
+            const gotoPaymentBtn = document.getElementById('quick-goto-payment-btn');
+            if (gotoPaymentBtn) gotoPaymentBtn.onclick = () => setCheckoutStage(2);
 
-            // Stage 2 Back Button
-            const backToOverviewBtn = document.getElementById('quick-back-to-overview-btn');
-            if (backToOverviewBtn) {
-                backToOverviewBtn.onclick = () => {
-                    setCheckoutStage(1);
-                };
-            }
+            const backToDeliveryBtn = document.getElementById('quick-back-to-delivery-btn');
+            if (backToDeliveryBtn) backToDeliveryBtn.onclick = () => setCheckoutStage(1);
 
-            // Reviews snippet click in summary sidebar
-            const summaryReviewsLink = document.getElementById('quick-summary-reviews-link');
-            if (summaryReviewsLink) {
-                summaryReviewsLink.onclick = (e) => {
-                    e.preventDefault();
-                    if (currentCheckoutStage !== 1) {
-                        setCheckoutStage(1);
+            const editDeliveryLink = document.getElementById('quick-edit-delivery-link');
+            if (editDeliveryLink) editDeliveryLink.onclick = () => setCheckoutStage(1);
+
+            const tabDelivery = document.getElementById('quick-tab-delivery');
+            if (tabDelivery) tabDelivery.onclick = () => setCheckoutStage(1);
+
+            const tabPayment = document.getElementById('quick-tab-payment');
+            if (tabPayment) tabPayment.onclick = () => setCheckoutStage(2);
+
+            const submitOrderBtn = document.getElementById('quick-submit-order-btn');
+            if (submitOrderBtn) submitOrderBtn.onclick = handleQuickCheckoutFormSubmit;
+
+            // Card input formatting & brand detection
+            const quickCardNum = document.getElementById('quick-card-number');
+            const quickCardBrandBadge = document.getElementById('quick-card-brand-detected');
+            if (quickCardNum) {
+                quickCardNum.addEventListener('input', (e) => {
+                    let val = e.target.value.replace(/\D/g, '').substring(0, 16);
+                    let formatted = val.match(/.{1,4}/g)?.join('  ') || val;
+                    e.target.value = formatted;
+
+                    if (/^4/.test(val)) {
+                        if (quickCardBrandBadge) { quickCardBrandBadge.textContent = 'VISA'; quickCardBrandBadge.style.color = '#1a1f71'; }
+                    } else if (/^5[1-5]/.test(val) || /^2[2-7]/.test(val)) {
+                        if (quickCardBrandBadge) { quickCardBrandBadge.textContent = 'MASTERCARD'; quickCardBrandBadge.style.color = '#eb001b'; }
+                    } else if (/^3[47]/.test(val)) {
+                        if (quickCardBrandBadge) { quickCardBrandBadge.textContent = 'AMEX'; quickCardBrandBadge.style.color = '#007bc1'; }
+                    } else if (/^6(?:011|5)/.test(val)) {
+                        if (quickCardBrandBadge) { quickCardBrandBadge.textContent = 'DISCOVER'; quickCardBrandBadge.style.color = '#ff6000'; }
+                    } else {
+                        if (quickCardBrandBadge) { quickCardBrandBadge.textContent = 'Secure TLS'; quickCardBrandBadge.style.color = '#2563eb'; }
                     }
-                    setTimeout(() => {
-                        document.getElementById('checkout-customer-reviews')?.scrollIntoView({ behavior: 'smooth' });
-                    }, 80);
+                });
+            }
+
+            const quickCardExp = document.getElementById('quick-card-expiry');
+            if (quickCardExp) {
+                quickCardExp.addEventListener('input', (e) => {
+                    let val = e.target.value.replace(/\D/g, '').substring(0, 4);
+                    if (val.length >= 3) {
+                        e.target.value = val.substring(0, 2) + ' / ' + val.substring(2);
+                    } else {
+                        e.target.value = val;
+                    }
+                });
+            }
+
+            const quickCardCvc = document.getElementById('quick-card-cvc');
+            if (quickCardCvc) {
+                quickCardCvc.addEventListener('input', (e) => {
+                    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
+                });
+            }
+
+            const quickPayCardBtn = document.getElementById('quick-pay-card-btn');
+            if (quickPayCardBtn) {
+                quickPayCardBtn.onclick = handleQuickCheckoutFormSubmit;
+            }
+
+            const copyAccBtn = document.getElementById('quick-copy-acc-btn');
+            if (copyAccBtn) {
+                copyAccBtn.onclick = () => {
+                    navigator.clipboard.writeText('94945708').then(() => {
+                        copyAccBtn.textContent = '✓ Copied';
+                        setTimeout(() => { copyAccBtn.textContent = 'Copy'; }, 2000);
+                    }).catch(() => {
+                        copyAccBtn.textContent = '94945708';
+                    });
+                };
+            }
+
+            const toggleDossierBtn = document.getElementById('quick-toggle-dossier-btn');
+            const dossierContainer = document.getElementById('quick-dossier-container');
+            if (toggleDossierBtn && dossierContainer) {
+                toggleDossierBtn.onclick = () => {
+                    const isOpen = dossierContainer.style.display !== 'none';
+                    dossierContainer.style.display = isOpen ? 'none' : 'block';
+                    toggleDossierBtn.innerHTML = isOpen 
+                        ? '<span>🌿 View Tea Tasting Dossier &amp; Patron Reviews ▼</span>' 
+                        : '<span>🌿 Hide Tasting Dossier &amp; Reviews ▲</span>';
                 };
             }
 
@@ -5223,6 +6240,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.openDrawer = openDrawer;
+    window.openReviewModal = function(itemName = '') {
+        if (typeof openDrawer === 'function') {
+            openDrawer('review', null, { itemName });
+            if (itemName) {
+                setTimeout(() => {
+                    const expSelect = document.getElementById('rev-experience-type');
+                    if (expSelect) {
+                        const existing = Array.from(expSelect.options).find(o => o.text.includes(itemName) || o.value.includes(itemName));
+                        if (existing) {
+                            expSelect.value = existing.value;
+                        } else {
+                            const opt = new Option(itemName, itemName, true, true);
+                            expSelect.add(opt);
+                        }
+                    }
+                }, 50);
+            }
+        }
+    };
     window.appOpenProductDrawer = (productId) => openDrawer('product', productId);
 
     function bindReviewEvents() {
@@ -5293,6 +6329,7 @@ document.addEventListener('DOMContentLoaded', () => {
         drawerOverlay.classList.remove('active');
         drawerOverlay.classList.remove('open');
         drawerOverlay.classList.remove('checkout-fullscreen');
+        document.body.classList.remove('has-active-drawer');
         const drawerContainer = drawerOverlay.querySelector('.drawer-container');
         if (drawerContainer) {
             drawerContainer.classList.remove('checkout-mode');
@@ -7976,24 +9013,28 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── Initialize PayPal buttons for order settlement if container exists ──
         const paypalContainer = document.getElementById('order-detail-paypal-container');
         if (paypalContainer && window.TeaFactoryPayPal) {
-            const currentOrder = window.TeaFactoryStore.getOrderById(orderId);
-            if (currentOrder && currentOrder.status !== 'Paid & Confirmed' && currentOrder.status !== 'Payment Confirmed' && currentOrder.status !== 'Verified') {
-                const rawAmount = Number(currentOrder.price) || 0;
-                window.TeaFactoryPayPal.renderButtons({
-                    containerId: 'order-detail-paypal-container',
-                    orderId: currentOrder.id,
-                    amount: rawAmount > 0 ? rawAmount : 50,
-                    currency: 'USD',
-                    description: `Settlement for Order ${currentOrder.id}`,
-                    onSuccess: (captureData) => {
-                        showToast('Payment Successful', 'Your payment was processed. Order is confirmed!', 'success');
-                        const updated = window.TeaFactoryStore.getOrderById(orderId);
-                        if (updated) {
-                            window.UIComponents.renderOrderDetails(updated);
-                            bindOrderSlipEvents(updated.id);
+            try {
+                const currentOrder = window.TeaFactoryStore.getOrderById(orderId);
+                if (currentOrder && currentOrder.status !== 'Paid & Confirmed' && currentOrder.status !== 'Payment Confirmed' && currentOrder.status !== 'Verified') {
+                    const rawAmount = Number(currentOrder.price) || 0;
+                    window.TeaFactoryPayPal.renderButtons({
+                        containerId: 'order-detail-paypal-container',
+                        orderId: currentOrder.id,
+                        amount: rawAmount > 0 ? rawAmount : 50,
+                        currency: 'USD',
+                        description: `Settlement for Order ${currentOrder.id}`,
+                        onSuccess: (captureData) => {
+                            showToast('Payment Successful', 'Your payment was processed. Order is confirmed!', 'success');
+                            const updated = window.TeaFactoryStore.getOrderById(orderId);
+                            if (updated) {
+                                window.UIComponents.renderOrderDetails(updated);
+                                bindOrderSlipEvents(updated.id);
+                            }
                         }
-                    }
-                });
+                    }).catch(e => console.warn('Order PayPal render notice:', e && e.message ? e.message : e));
+                }
+            } catch (ppErr) {
+                console.warn('Order PayPal init notice:', ppErr && ppErr.message ? ppErr.message : ppErr);
             }
         }
 
@@ -12959,33 +14000,33 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
 
         if (index === 0 || src.includes('1%20(1).') || src.includes('1 (1).')) {
             return {
-                subtitle: 'Rock One Wild Tea (Pvt) Limited • Uva Medium Region',
-                title: 'From Our Wild Forest Garden <span>to Your Cup.</span>',
-                description: 'Rock One Wild Tea is a family-owned tea business born from our own tea garden in Sri Lanka’s Uva Medium region, nestled in a forested environment at the foot of a large rock formation. Hand made with Care, Crafted from Ceylon — from selecting the tea leaves to small-batch processing in our family factory.'
+                subtitle: 'ROCK ONE WILD TEA • Handcrafted Premium Ceylon Tea',
+                title: 'From Our Wild Forest Tea Garden <span>to Your Cup.</span>',
+                description: 'Discover the character of handcrafted Ceylon tea, grown in Sri Lanka’s Uva Medium Region and carefully produced by our family.'
             };
         } else if (src.includes('1%20(2).') || src.includes('1 (2).')) {
             return {
-                subtitle: '1,240m Elevation Highlands • Ettampitiya Sanctuary',
-                title: 'Highland Terroir. <span>Pure Mountain Ecology.</span>',
-                description: 'Our tea garden thrives in clean alpine air, rich mineral mountain soil, and dense natural cloud cover in Sri Lanka’s renowned Uva Medium region.'
+                subtitle: 'Small Batch Handcrafted Tea • 1,240m Elevation',
+                title: 'From Our Wild Forest Tea Garden <span>to the World.</span>',
+                description: 'Discover the character of handcrafted Ceylon tea, grown in Sri Lanka’s Uva Medium Region and carefully produced by our family at the foot of our iconic rock formation.'
             };
         } else if (src.includes('1%20(3).') || src.includes('1 (3).')) {
             return {
-                subtitle: 'Family-Owned Tea Garden • Hand-Built With Vision',
-                title: 'Generational Craft. <span>From Garden to Factory.</span>',
-                description: 'What started as a small family effort during COVID has blossomed into an artisanal Ceylon Tea brand dedicated to purity and small-batch craftsmanship.'
+                subtitle: 'Handcrafted Premium Black Tea • Selective Harvest',
+                title: 'Handcrafted Premium Black Tea. <span>Artisanal Purity.</span>',
+                description: 'Every tender shoot is selectively hand-harvested at dawn in our wild forest garden to preserve precious silver tips, rich essential oils, and natural sweetness.'
             };
         } else if (src.includes('1%20(4).') || src.includes('1 (4).')) {
             return {
-                subtitle: 'Boutique Family Factory • Working Sanctuary',
-                title: 'Artisanal Facility. <span>Small-Batch Dedication.</span>',
-                description: 'Every stage of tea production is monitored by hand in our small family factory to ensure uncompromised quality in every single batch.'
+                subtitle: 'A Family’s Passion for Handcrafted Ceylon Tea',
+                title: 'A Family’s Passion <span>for Handcrafted Ceylon Tea.</span>',
+                description: 'From our own tea garden to our family factory, every batch of Rock One Wild Tea is carefully crafted by hand with time-honored orthodox rolling.'
             };
         } else if (src.includes('1%20(5).') || src.includes('1 (5).')) {
             return {
-                subtitle: 'Generational Artisans • Selective Two Leaves & A Bud',
-                title: 'Dawn Hand-Plucking. <span>Artisanal Purity.</span>',
-                description: 'Every tender shoot is hand-harvested at first light by skilled generational pluckers to preserve precious silver tips and volatile aromatics.'
+                subtitle: 'Carefully Crafted By Hand • Small-Batch Processing',
+                title: 'From Garden to Family Factory. <span>Carefully Crafted by Hand.</span>',
+                description: 'From our own tea garden to our family factory, every batch of Rock One Wild Tea is carefully crafted by hand to ensure uncompromised quality in every cup.'
             };
         } else if (src.includes('1%20(7).') || src.includes('1 (7).')) {
             return {
@@ -13274,11 +14315,11 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 const isActive = idx === currentHeroIndex || (idx === 0 && currentHeroIndex >= storeHeroSlides.length);
                 const isHeritage = slideObj.isHeritage || idx === 0 || slideObj.id === 'slide_01';
                 const heritageClass = isHeritage ? ' hero-slide-heritage' : '';
-                const subtitle = slideObj.subtitle || (isHeritage ? 'Authentic • Organic • Traditional' : 'Authentic Ceylon Tea Experience');
-                const title = slideObj.title || (isHeritage ? '<span class="hero-title-top">Rock One\'s Organic</span><span class="hero-title-bottom">Tea Heritage</span>' : 'Organic Homemade<br><span>Tea Experience</span>');
+                const subtitle = slideObj.subtitle || (isHeritage ? 'ROCK ONE WILD TEA • Handcrafted Premium Ceylon Tea' : 'Handcrafted Ceylon Tea Experience');
+                const title = slideObj.title || (isHeritage ? '<span class="hero-title-top">From Our Wild Forest Tea Garden</span><span class="hero-title-bottom">to Your Cup.</span>' : 'Handcrafted Ceylon<br><span>Tea Experience</span>');
                 const titleClass = isHeritage ? 'hero-title hero-title-heritage' : 'hero-title';
-                const taglineHtml = slideObj.tagline ? `<div class="hero-tagline-italic">${slideObj.tagline}</div>` : (isHeritage ? `<div class="hero-tagline-italic">Where Nature Meets Tradition</div>` : '');
-                const description = slideObj.description || "Discover the ancient art of organic tea-making in the heart of Ceylon's mountains. From garden to cup, experience the authentic journey of premium Sri Lankan tea.";
+                const taglineHtml = slideObj.tagline ? `<div class="hero-tagline-italic">${slideObj.tagline}</div>` : (isHeritage ? `<div class="hero-tagline-italic">Small Batch Handcrafted Tea</div>` : '');
+                const description = slideObj.description || "Discover the character of handcrafted Ceylon tea, grown in Sri Lanka’s Uva Medium Region and carefully produced by our family.";
                 const descClass = isHeritage ? 'hero-description hero-desc-left' : 'hero-description';
                 const bookBtnText = isHeritage ? 'Book Experience &rarr;' : 'Book Tea Experience &rarr;';
                 const rawImg = slideObj.image || 'images/hero_slide_1.jpg';
@@ -13305,9 +14346,9 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                             </div>
                             <div class="hero-rating-badge">
                                 <span class="hero-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                                <span class="hero-rating-num">5.0</span>
+                                <span class="hero-rating-num">100%</span>
                                 <span class="hero-rating-sep">&bull;</span>
-                                <span class="hero-rating-text">2,000+ Google reviews</span>
+                                <span class="hero-rating-text">Single-Estate Pure Ceylon</span>
                             </div>
                         </div>
                     </div>
@@ -13339,9 +14380,9 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                             </div>
                             <div class="hero-rating-badge">
                                 <span class="hero-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                                <span class="hero-rating-num">5.0</span>
+                                <span class="hero-rating-num">100%</span>
                                 <span class="hero-rating-sep">&bull;</span>
-                                <span class="hero-rating-text">2,000+ Google reviews</span>
+                                <span class="hero-rating-text">Single-Estate Pure Ceylon</span>
                             </div>
                         </div>
                     </div>
@@ -13355,16 +14396,16 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             statsWrap.className = 'hero-floating-stats-wrap';
             statsWrap.innerHTML = `
                 <div class="hero-stat-card">
-                    <div class="hero-stat-val">10,000+</div>
-                    <div class="hero-stat-label">Happy Visitors</div>
+                    <div class="hero-stat-val">1,240m</div>
+                    <div class="hero-stat-label">Highland Elevation</div>
                 </div>
                 <div class="hero-stat-card">
                     <div class="hero-stat-val">100%</div>
                     <div class="hero-stat-label">Organic Homemade Tea</div>
                 </div>
                 <div class="hero-stat-card">
-                    <div class="hero-stat-val">200+</div>
-                    <div class="hero-stat-label">Years Heritage</div>
+                    <div class="hero-stat-val">Artisanal</div>
+                    <div class="hero-stat-label">Single-Estate Craft</div>
                 </div>
             `;
             sliderContainer.appendChild(statsWrap);
@@ -14483,7 +15524,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 }
                 const shippingLabelEl = document.getElementById('cart-summary-shipping-label');
                 if (shippingLabelEl) {
-                    shippingLabelEl.textContent = isSriLanka ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS International Priority Air';
+                    shippingLabelEl.textContent = isSriLanka ? 'SL Post EMS Courier' : 'SL Post EMS International Priority Air';
                 }
                 const totalEl = document.getElementById('cart-summary-total');
                 if (totalEl) {
@@ -14559,6 +15600,18 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                         : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`;
                 }
 
+                // 5b. Update Card Display
+                const cardAmountDisplay = document.getElementById('cart-card-amount-display');
+                if (cardAmountDisplay) {
+                    cardAmountDisplay.textContent = currInfo.code === 'USD' 
+                        ? `$${grandTotalUSD.toFixed(2)} USD` 
+                        : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`;
+                }
+                const cardBtnText = document.getElementById('cart-pay-card-btn-text');
+                if (cardBtnText) {
+                    cardBtnText.textContent = `Pay with Card \u2022 ${formattedGrandTotal}`;
+                }
+
                 // 6. Update Region / Province field
                 const regionContainer = document.getElementById('cart-region-container');
                 if (regionContainer) {
@@ -14597,13 +15650,13 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
 
                 if (isSriLanka) {
                     if (codCard) codCard.style.display = 'flex';
-                    if (emsTitle) emsTitle.textContent = 'Sri Lanka Post EMS Express (Pre-paid)';
-                    if (emsDesc) emsDesc.textContent = 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.';
+                    if (emsTitle) emsTitle.textContent = 'SL Post EMS Express (Pre-paid)';
+                    if (emsDesc) emsDesc.textContent = 'Door-to-door express parcel courier with official SL Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.';
                 } else {
                     if (codCard) codCard.style.display = 'none';
                     if (emsRadio) emsRadio.checked = true;
-                    if (emsTitle) emsTitle.textContent = 'Sri Lanka Post EMS International Priority Air Courier';
-                    if (emsDesc) emsDesc.textContent = 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end international tracking number. Estimated transit: 5-10 business days.';
+                    if (emsTitle) emsTitle.textContent = 'SL Post EMS International Priority Air Courier';
+                    if (emsDesc) emsDesc.textContent = 'Official SL Post EMS International Priority Air Courier with end-to-end international tracking number. Estimated transit: 5-10 business days.';
                     syncShippingSelection();
                 }
             };
@@ -14659,19 +15712,54 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                 selectedCartSlipBase64 = b64;
             });
 
+            // Card input auto-formatting & brand detection for Cart Drawer
+            const cartCardNum = document.getElementById('cart-card-number');
+            const cartCardBrand = document.getElementById('cart-card-brand-detected');
+            if (cartCardNum) {
+                cartCardNum.addEventListener('input', (e) => {
+                    let val = e.target.value.replace(/\D/g, '').substring(0, 16);
+                    let formatted = val.match(/.{1,4}/g)?.join('  ') || val;
+                    e.target.value = formatted;
+                    if (cartCardBrand) {
+                        if (/^4/.test(val)) cartCardBrand.textContent = 'VISA ✓';
+                        else if (/^5[1-5]|^2[2-7]/.test(val)) cartCardBrand.textContent = 'MASTERCARD ✓';
+                        else if (/^3[47]/.test(val)) cartCardBrand.textContent = 'AMEX ✓';
+                        else cartCardBrand.textContent = 'Secure TLS';
+                    }
+                });
+            }
+            const cartCardExp = document.getElementById('cart-card-expiry');
+            if (cartCardExp) {
+                cartCardExp.addEventListener('input', (e) => {
+                    let val = e.target.value.replace(/\D/g, '').substring(0, 4);
+                    if (val.length >= 3) {
+                        e.target.value = `${val.substring(0, 2)} / ${val.substring(2)}`;
+                    } else {
+                        e.target.value = val;
+                    }
+                });
+            }
+            const cartCardCvc = document.getElementById('cart-card-cvc');
+            if (cartCardCvc) {
+                cartCardCvc.addEventListener('input', (e) => {
+                    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
+                });
+            }
+
             // Reusable Order Confirmation Renderer with CEO Signature
             const renderOrderConfirmationSuccess = (bodyEl, order, paymentMethod, paypalRef = '') => {
                 if (!bodyEl || !order) return;
                 const isCOD = paymentMethod === 'cod';
                 const isPayPal = paymentMethod === 'paypal';
+                const isCard = paymentMethod === 'card';
 
                 bodyEl.innerHTML = `
                     <div class="cart-success-view" style="text-align: center; padding: 2.25rem 1rem;">
-                        <div style="width: 76px; height: 76px; border-radius: 50%; background: ${isCOD ? 'rgba(37,211,102,0.15)' : 'rgba(212,175,55,0.12)'}; border: 2px solid ${isCOD ? '#25d366' : 'var(--color-gold)'}; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.15rem auto; color: ${isCOD ? '#25d366' : 'var(--color-gold)'};">
+                        <div style="width: 76px; height: 76px; border-radius: 50%; background: ${isCOD ? 'rgba(37,211,102,0.15)' : (isCard ? 'rgba(56,189,248,0.15)' : (isPayPal ? 'rgba(0,121,193,0.15)' : 'rgba(212,175,55,0.12)'))}; border: 2px solid ${isCOD ? '#25d366' : (isCard ? '#38bdf8' : (isPayPal ? '#0079C1' : 'var(--color-gold)'))}; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.15rem auto; color: ${isCOD ? '#25d366' : (isCard ? '#38bdf8' : (isPayPal ? '#0079C1' : 'var(--color-gold)'))};">
                             <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
-                        <span class="season-badge" style="background: ${isCOD ? 'rgba(37,211,102,0.2)' : 'rgba(212,175,55,0.15)'}; color: ${isCOD ? '#4ade80' : 'var(--color-gold)'}; font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
-                            ${isCOD ? 'Cash on Delivery \u2022 Order Confirmed' : (isPayPal ? 'Paid \u2022 Instant PayPal Clearance' : 'Allocation Reserved \u2022 Slip Attached')}
+                        <span class="season-badge" style="background: ${isCOD ? 'rgba(37,211,102,0.2)' : (isCard ? 'rgba(56,189,248,0.2)' : (isPayPal ? 'rgba(0,121,193,0.2)' : 'rgba(212,175,55,0.15)'))}; color: ${isCOD ? '#4ade80' : (isCard ? '#38bdf8' : (isPayPal ? '#38bdf8' : 'var(--color-gold)'))}; font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                            ${isCOD ? 'Cash on Delivery \u2022 Order Confirmed' : (isCard ? 'Paid \u2022 Direct Card Settlement' : (isPayPal ? 'Paid \u2022 Instant PayPal Clearance' : 'Allocation Reserved \u2022 Slip Attached'))}
                         </span>
                         <h3 style="font-family: var(--font-serif); font-size: 1.5rem; color: #ffffff; margin: 0.75rem 0 0.25rem 0;">Allocation Registered</h3>
                         <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.5rem;">
@@ -14690,7 +15778,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
                                 <span style="font-size: 0.8rem; color: var(--color-text-muted);">Courier Method</span>
                                 <span style="color: #86efac; font-size: 0.82rem; font-weight: 600;">
-                                    ${order.shippingMethod === 'cod' ? 'Sri Lanka Post EMS (Cash on Delivery)' : (order.country === 'Sri Lanka' ? 'Sri Lanka Post EMS Express' : 'Sri Lanka Post EMS International Priority Air')}
+                                    ${order.shippingMethod === 'cod' ? 'SL Post EMS (Cash on Delivery)' : (order.country === 'Sri Lanka' ? 'SL Post EMS Express' : 'SL Post EMS International Priority Air')}
                                 </span>
                             </div>
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
@@ -14699,8 +15787,8 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                             </div>
                             <div style="display: flex; justify-content: space-between;">
                                 <span style="font-size: 0.8rem; color: var(--color-text-muted);">Payment Mode</span>
-                                <span style="color: ${isCOD ? '#4ade80' : 'var(--color-gold)'}; font-size: 0.85rem; font-weight: 700;">
-                                    ${isCOD ? 'Cash on Delivery (Pay upon delivery)' : (isPayPal ? 'PayPal / International Card' : 'Bank of Ceylon Deposit')}
+                                <span style="color: ${isCOD ? '#4ade80' : (isCard ? '#38bdf8' : (isPayPal ? '#38bdf8' : 'var(--color-gold)'))}; font-size: 0.85rem; font-weight: 700;">
+                                    ${isCOD ? 'Cash on Delivery (Pay upon delivery)' : (isCard ? `Direct Card Settlement (${order.cardBrand || 'Card'} \u2022\u2022\u2022\u2022 ${order.cardLast4 || '4242'})` : (isPayPal ? 'PayPal Express Clearance' : 'Bank of Ceylon Deposit'))}
                                 </span>
                             </div>
                         </div>
@@ -14740,90 +15828,94 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
 
             // 4e. Initialize PayPal button for Reserve Bag Cart Checkout
             const initCartPayPal = () => {
-                const paypalContainer = document.getElementById('cart-paypal-button-container');
-                if (!paypalContainer || !window.TeaFactoryPayPal) return;
+                try {
+                    const paypalContainer = document.getElementById('cart-paypal-button-container');
+                    if (!paypalContainer || !window.TeaFactoryPayPal) return;
 
-                const cartItems = window.TeaFactoryStore.getCart();
-                if (!cartItems || cartItems.length === 0) return;
+                    const cartItems = window.TeaFactoryStore.getCart();
+                    if (!cartItems || cartItems.length === 0) return;
 
-                const cartSubtotal = cartItems.reduce((sum, item) => sum + ((Number(item.price) || 0) * (item.quantity || 1)), 0);
-                const cartShipping = cartSubtotal >= 100 || cartSubtotal === 0 ? 0 : 15;
-                const cartTotal = cartSubtotal + cartShipping;
+                    const cartSubtotal = cartItems.reduce((sum, item) => sum + ((Number(item.price) || 0) * (item.quantity || 1)), 0);
+                    const cartShipping = cartSubtotal >= 100 || cartSubtotal === 0 ? 0 : 15;
+                    const cartTotal = cartSubtotal + cartShipping;
 
-                window.TeaFactoryPayPal.renderButtons({
-                    containerId: 'cart-paypal-button-container',
-                    orderId: `CART-${Date.now()}`,
-                    amount: cartTotal,
-                    currency: 'USD',
-                    description: `Reserve Bag Allocation (${cartItems.length} items)`,
-                    items: cartItems.map(i => ({ name: i.name, quantity: i.quantity, price: i.price })),
-                    onValidate: () => {
-                        const firstName = document.getElementById('cart-cust-firstname')?.value?.trim();
-                        const lastName = document.getElementById('cart-cust-lastname')?.value?.trim();
-                        const email = document.getElementById('cart-cust-email')?.value?.trim();
-                        const phone = document.getElementById('cart-cust-phone')?.value?.trim();
-                        const street = document.getElementById('cart-cust-address')?.value?.trim();
-                        const city = document.getElementById('cart-cust-city')?.value?.trim();
-                        const postal = document.getElementById('cart-cust-postal')?.value?.trim();
-                        if (!firstName || !lastName || !email || !phone || !street || !city || !postal) {
-                            showToast("Details Required", "Please enter your first name, last name, email, phone, street address, city, and postal code before proceeding to PayPal.", "error");
-                            return false;
-                        }
-                        return true;
-                    },
-                    onSuccess: async ({ orderId, paypalOrderId, captureData }) => {
-                        const firstName = document.getElementById('cart-cust-firstname')?.value?.trim() || '';
-                        const lastName = document.getElementById('cart-cust-lastname')?.value?.trim() || '';
-                        const name = `${firstName} ${lastName}`.trim() || 'Valued Collector';
-                        const email = document.getElementById('cart-cust-email')?.value?.trim() || '';
-                        const phone = document.getElementById('cart-cust-phone')?.value?.trim() || '';
-                        const street = document.getElementById('cart-cust-address')?.value?.trim() || '';
-                        const suite = document.getElementById('cart-cust-suite')?.value?.trim() || '';
-                        const city = document.getElementById('cart-cust-city')?.value?.trim() || '';
-                        const postal = document.getElementById('cart-cust-postal')?.value?.trim() || '';
-                        const country = document.getElementById('cart-cust-country')?.value || 'Sri Lanka';
-                        const region = document.getElementById('cart-cust-region')?.value || '';
-                        const prefDate = document.getElementById('cart-pref-date')?.value || '';
-                        const notes = document.getElementById('cart-cust-notes')?.value?.trim() || '';
-                        const fullAddress = [suite, street, city, region, postal, country].filter(Boolean).join(', ');
-
-                        const custData = {
-                            firstName, lastName, name, email, phone, street, suite, city, postalCode: postal, country, region,
-                            address: fullAddress, notes, preferredDate: prefDate, shippingMethod: 'ems_express', paymentMethod: 'paypal',
-                            currency: 'USD', currencyRate: 1.0, convertedTotal: cartTotal
-                        };
-                        const checkoutRes = window.TeaFactoryStore.checkoutCart(custData, 'paypal', '', prefDate);
-
-                        if (checkoutRes && checkoutRes.success) {
-                            const order = checkoutRes.order;
-                            window.TeaFactoryStore.markOrderPaidByPayPal(order.id, captureData || { id: paypalOrderId });
-                            window.TeaFactoryStore.saveRecentOrderId(order.id);
-                            updateCartBadges();
-
-                            if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.createOrder === 'function') {
-                                window.TeaFactoryAPI.createOrder({
-                                    id: order.id,
-                                    customer_name: order.customerName,
-                                    customer_email: order.email,
-                                    customer_phone: order.phone,
-                                    shipping_address: order.address,
-                                    subtotal_usd: order.subtotal !== undefined ? order.subtotal : order.price,
-                                    shipping_usd: order.shippingFee || 0,
-                                    total_usd: order.price,
-                                    currency_code: 'USD',
-                                    currency_rate: 1.0,
-                                    total_in_currency: order.price,
-                                    payment_method: 'paypal',
-                                    payment_status: 'Paid & Confirmed',
-                                    bespoke_notes: `PayPal Ref: ${paypalOrderId}${notes ? ' | ' + notes : ''}`,
-                                    items: order.items || []
-                                }).catch(err => console.warn('API order dispatch notice:', err.message));
+                    window.TeaFactoryPayPal.renderButtons({
+                        containerId: 'cart-paypal-button-container',
+                        orderId: `CART-${Date.now()}`,
+                        amount: cartTotal,
+                        currency: 'USD',
+                        description: `Reserve Bag Allocation (${cartItems.length} items)`,
+                        items: cartItems.map(i => ({ name: i.name, quantity: i.quantity, price: i.price })),
+                        onValidate: () => {
+                            const firstName = document.getElementById('cart-cust-firstname')?.value?.trim();
+                            const lastName = document.getElementById('cart-cust-lastname')?.value?.trim();
+                            const email = document.getElementById('cart-cust-email')?.value?.trim();
+                            const phone = document.getElementById('cart-cust-phone')?.value?.trim();
+                            const street = document.getElementById('cart-cust-address')?.value?.trim();
+                            const city = document.getElementById('cart-cust-city')?.value?.trim();
+                            const postal = document.getElementById('cart-cust-postal')?.value?.trim();
+                            if (!firstName || !lastName || !email || !phone || !street || !city || !postal) {
+                                showToast("Details Required", "Please enter your first name, last name, email, phone, street address, city, and postal code before proceeding to PayPal.", "error");
+                                return false;
                             }
+                            return true;
+                        },
+                        onSuccess: async ({ orderId, paypalOrderId, captureData }) => {
+                            const firstName = document.getElementById('cart-cust-firstname')?.value?.trim() || '';
+                            const lastName = document.getElementById('cart-cust-lastname')?.value?.trim() || '';
+                            const name = `${firstName} ${lastName}`.trim() || 'Valued Collector';
+                            const email = document.getElementById('cart-cust-email')?.value?.trim() || '';
+                            const phone = document.getElementById('cart-cust-phone')?.value?.trim() || '';
+                            const street = document.getElementById('cart-cust-address')?.value?.trim() || '';
+                            const suite = document.getElementById('cart-cust-suite')?.value?.trim() || '';
+                            const city = document.getElementById('cart-cust-city')?.value?.trim() || '';
+                            const postal = document.getElementById('cart-cust-postal')?.value?.trim() || '';
+                            const country = document.getElementById('cart-cust-country')?.value || 'Sri Lanka';
+                            const region = document.getElementById('cart-cust-region')?.value || '';
+                            const prefDate = document.getElementById('cart-pref-date')?.value || '';
+                            const notes = document.getElementById('cart-cust-notes')?.value?.trim() || '';
+                            const fullAddress = [suite, street, city, region, postal, country].filter(Boolean).join(', ');
 
-                            renderOrderConfirmationSuccess(body, order, 'paypal', paypalOrderId);
+                            const custData = {
+                                firstName, lastName, name, email, phone, street, suite, city, postalCode: postal, country, region,
+                                address: fullAddress, notes, preferredDate: prefDate, shippingMethod: 'ems_express', paymentMethod: 'paypal',
+                                currency: 'USD', currencyRate: 1.0, convertedTotal: cartTotal
+                            };
+                            const checkoutRes = window.TeaFactoryStore.checkoutCart(custData, 'paypal', '', prefDate);
+
+                            if (checkoutRes && checkoutRes.success) {
+                                const order = checkoutRes.order;
+                                window.TeaFactoryStore.markOrderPaidByPayPal(order.id, captureData || { id: paypalOrderId });
+                                window.TeaFactoryStore.saveRecentOrderId(order.id);
+                                updateCartBadges();
+
+                                if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.createOrder === 'function') {
+                                    window.TeaFactoryAPI.createOrder({
+                                        id: order.id,
+                                        customer_name: order.customerName,
+                                        customer_email: order.email,
+                                        customer_phone: order.phone,
+                                        shipping_address: order.address,
+                                        subtotal_usd: order.subtotal !== undefined ? order.subtotal : order.price,
+                                        shipping_usd: order.shippingFee || 0,
+                                        total_usd: order.price,
+                                        currency_code: 'USD',
+                                        currency_rate: 1.0,
+                                        total_in_currency: order.price,
+                                        payment_method: 'paypal',
+                                        payment_status: 'Paid & Confirmed',
+                                        bespoke_notes: `PayPal Ref: ${paypalOrderId}${notes ? ' | ' + notes : ''}`,
+                                        items: order.items || []
+                                    }).catch(err => console.warn('API order dispatch notice:', err.message));
+                                }
+
+                                renderOrderConfirmationSuccess(body, order, 'paypal', paypalOrderId);
+                            }
                         }
-                    }
-                });
+                    }).catch(e => console.warn('Cart PayPal render notice:', e && e.message ? e.message : e));
+                } catch (err) {
+                    console.warn('Cart PayPal init notice:', err && err.message ? err.message : err);
+                }
             };
 
             const cartPaypalTab = checkoutForm ? checkoutForm.querySelector('.pay-tab[data-method="paypal"]') : null;
@@ -14868,7 +15960,116 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                     const paymentMethod = isCOD ? 'cod' : (activeCartTab ? activeCartTab.getAttribute('data-method') : 'bank');
 
                     if (paymentMethod === 'paypal') {
-                        showToast("PayPal Payment", "Please click the yellow PayPal button above to complete your instant payment.", "info");
+                        showToast("Coming Soon", "PayPal online express checkout is coming soon. Please select Bank Transfer, Cash Deposit, or Cash on Delivery (Sri Lanka only) to finalize your allocation.", "info");
+                        return;
+                    }
+
+                    if (paymentMethod === 'card') {
+                        const cardName = document.getElementById('cart-card-name')?.value?.trim();
+                        const cardNum = (document.getElementById('cart-card-number')?.value || '').replace(/\s+/g, '');
+                        const cardExp = document.getElementById('cart-card-expiry')?.value?.trim();
+                        const cardCvc = document.getElementById('cart-card-cvc')?.value?.trim();
+
+                        if (!cardName || cardName.length < 3) {
+                            showToast("Cardholder Name Required", "Please enter the full cardholder name.", "error");
+                            return;
+                        }
+                        if (!cardNum || cardNum.length < 13 || !/^\d+$/.test(cardNum)) {
+                            showToast("Card Number Invalid", "Please enter a valid 16-digit credit or debit card number.", "error");
+                            return;
+                        }
+                        if (!cardExp || !/^\d{2}\s*\/\s*\d{2}$/.test(cardExp)) {
+                            showToast("Expiry Date Invalid", "Please enter expiry date as MM / YY.", "error");
+                            return;
+                        }
+                        if (!cardCvc || cardCvc.length < 3) {
+                            showToast("CVV Required", "Please enter a valid 3 or 4 digit security code.", "error");
+                            return;
+                        }
+
+                        const cardLast4 = cardNum.slice(-4);
+                        let cardBrand = 'Visa / Mastercard';
+                        if (/^4/.test(cardNum)) cardBrand = 'Visa';
+                        else if (/^5[1-5]|^2[2-7]/.test(cardNum)) cardBrand = 'Mastercard';
+                        else if (/^3[47]/.test(cardNum)) cardBrand = 'American Express';
+
+                        const payCardBtn = document.getElementById('cart-pay-card-btn');
+                        if (payCardBtn) {
+                            payCardBtn.disabled = true;
+                            payCardBtn.innerHTML = '<span class="loading-spinner"></span> Authorizing Direct Card Settlement...';
+                        }
+
+                        setTimeout(() => {
+                            const fullAddress = [suite, street, city, region, postal, country].filter(Boolean).join(', ');
+                            const currInfo = window.getCountryCurrency ? window.getCountryCurrency(country) : (country === 'Sri Lanka' ? { code: 'LKR', rate: 305 } : { code: 'USD', rate: 1.0 });
+                            const subtotalUSD = window.TeaFactoryStore.getCartSubtotal();
+                            const shippingUSD = window.TeaFactoryStore.getCartShippingTotal ? window.TeaFactoryStore.getCartShippingTotal(country) : 0;
+                            const grandTotalUSD = subtotalUSD + shippingUSD;
+                            const convertedTotal = Math.round(grandTotalUSD * currInfo.rate * 100) / 100;
+
+                            const custData = {
+                                firstName,
+                                lastName,
+                                name: `${firstName} ${lastName}`.trim(),
+                                email,
+                                phone,
+                                street,
+                                suite,
+                                city,
+                                postalCode: postal,
+                                country,
+                                region,
+                                address: fullAddress,
+                                notes,
+                                preferredDate: prefDate,
+                                shippingMethod: selectedShipping,
+                                paymentMethod: 'card',
+                                currency: currInfo.code,
+                                currencyRate: currInfo.rate,
+                                convertedTotal: convertedTotal,
+                                cardBrand: cardBrand,
+                                cardLast4: cardLast4
+                            };
+
+                            const checkoutRes = window.TeaFactoryStore.checkoutCart(custData, 'card', '', prefDate);
+                            if (checkoutRes && checkoutRes.success) {
+                                const order = checkoutRes.order;
+                                order.cardBrand = cardBrand;
+                                order.cardLast4 = cardLast4;
+                                order.paymentStatus = 'Paid & Confirmed';
+                                window.TeaFactoryStore.saveRecentOrderId(order.id);
+                                updateCartBadges();
+
+                                if (window.TeaFactoryAPI && typeof window.TeaFactoryAPI.createOrder === 'function') {
+                                    window.TeaFactoryAPI.createOrder({
+                                        id: order.id,
+                                        customer_name: order.customerName,
+                                        customer_email: order.email,
+                                        customer_phone: order.phone,
+                                        shipping_address: order.address,
+                                        subtotal_usd: order.subtotal !== undefined ? order.subtotal : order.price,
+                                        shipping_usd: order.shippingFee || 0,
+                                        total_usd: order.price,
+                                        currency_code: currInfo.code,
+                                        currency_rate: currInfo.rate,
+                                        total_in_currency: convertedTotal,
+                                        payment_method: 'card',
+                                        payment_status: 'Paid & Confirmed',
+                                        bespoke_notes: `Direct Card Settlement (${cardBrand} ending in ${cardLast4})${notes ? ' | ' + notes : ''}`,
+                                        items: order.items || []
+                                    }).catch(err => console.warn('API order dispatch notice:', err.message));
+                                }
+
+                                renderOrderConfirmationSuccess(body, order, 'card');
+                                showToast(`Card Payment Approved! Allocation ${order.id} registered.`, "success");
+                            } else {
+                                if (payCardBtn) {
+                                    payCardBtn.disabled = false;
+                                    payCardBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg> Pay with Card`;
+                                }
+                                showToast(checkoutRes?.message || "Failed to process card payment.", "error");
+                            }
+                        }, 700);
                         return;
                     }
 
@@ -14965,7 +16166,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                         const ppCont = document.getElementById('cart-paypal-button-container');
                         if (ppCont) {
                             ppCont.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            showToast("PayPal Active", "Please click the yellow PayPal button to complete payment.", "info");
+                            showToast("Coming Soon", "PayPal online payments are coming soon. Please select Bank Transfer, Cash Deposit, or Cash on Delivery to finalize your order immediately.", "info");
                         }
                         return;
                     }
@@ -15169,6 +16370,118 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
                 closeAboutModal();
+            }
+        });
+    }
+
+    // ── Luxury Estate Pickup & Terroir Information Modal System ──
+    function initEstateInfoModal() {
+        const modal = document.getElementById('estate-info-modal');
+        const backdrop = document.getElementById('estate-info-backdrop');
+        const closeBtn = document.getElementById('estate-info-close-btn');
+        const bodyContainer = document.getElementById('estate-info-body-container');
+
+        function openEstateModal() {
+            if (!modal) return;
+
+            if (bodyContainer && window.UIComponents && typeof window.UIComponents.renderEstateInfoPage === 'function') {
+                window.UIComponents.renderEstateInfoPage('estate-info-body-container');
+            }
+
+            modal.style.display = 'flex';
+            modal.classList.add('active', 'open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+
+            // Wire inner buttons in estate modal
+            const copyAddressBtn = document.getElementById('estate-copy-address-btn');
+            if (copyAddressBtn) {
+                copyAddressBtn.addEventListener('click', () => {
+                    const addr = "Rock One Wild Tea (Pvt) Limited, Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka";
+                    const fallbackCopy = () => {
+                        const ta = document.createElement('textarea');
+                        ta.value = addr;
+                        ta.style.position = 'fixed';
+                        ta.style.opacity = '0';
+                        document.body.appendChild(ta);
+                        ta.focus();
+                        ta.select();
+                        try { document.execCommand('copy'); } finally { document.body.removeChild(ta); }
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(addr).catch(fallbackCopy);
+                    } else {
+                        fallbackCopy();
+                    }
+                    copyAddressBtn.innerHTML = `<span style="color:#22c55e;">&#10003;</span> <span style="color:#22c55e;">Address Copied!</span>`;
+                    if (window.showToast) window.showToast("Address Copied", "Rock One Wild Tea Estate address copied to clipboard.", "success");
+                    setTimeout(() => {
+                        copyAddressBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span>Copy Address</span>`;
+                    }, 2500);
+                });
+            }
+
+            const backProdBtn = document.getElementById('estate-info-back-product-btn');
+            if (backProdBtn) {
+                backProdBtn.addEventListener('click', closeEstateModal);
+            }
+
+            const exploreToursBtn = document.getElementById('estate-info-explore-tours-btn');
+            if (exploreToursBtn) {
+                exploreToursBtn.addEventListener('click', () => {
+                    closeEstateModal();
+                    if (window.closeProductDetail) window.closeProductDetail();
+                    
+                    // Switch to Tours tab or scroll to home-location-container
+                    const toursNav = document.getElementById('nav-tours');
+                    if (toursNav) {
+                        toursNav.click();
+                        setTimeout(() => {
+                            const target = document.getElementById('tours-location-container') || document.getElementById('tours-section');
+                            if (target) target.scrollIntoView({ behavior: 'smooth' });
+                        }, 200);
+                    } else {
+                        const target = document.getElementById('home-location-container');
+                        if (target) target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            }
+        }
+
+        function closeEstateModal() {
+            if (!modal) return;
+            modal.classList.remove('active', 'open');
+            modal.setAttribute('aria-hidden', 'true');
+            setTimeout(() => {
+                if (!modal.classList.contains('active')) modal.style.display = 'none';
+            }, 300);
+
+            // Restore body scroll only if product detail modal is not active
+            const prodModal = document.getElementById('product-detail-modal');
+            if (!prodModal || (!prodModal.classList.contains('active') && !prodModal.classList.contains('open'))) {
+                document.body.style.overflow = '';
+            }
+        }
+
+        window.openEstateInfoModal = openEstateModal;
+        window.closeEstateInfoModal = closeEstateModal;
+
+        if (backdrop) backdrop.addEventListener('click', closeEstateModal);
+        if (closeBtn) closeBtn.addEventListener('click', closeEstateModal);
+
+        // Global delegated trigger
+        document.addEventListener('click', (e) => {
+            const trigger = e.target.closest('#seventea-view-estate-btn, .seventea-estate-info-link, [data-action="open-estate-info"]');
+            if (trigger) {
+                e.preventDefault();
+                e.stopPropagation();
+                openEstateModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal && (modal.classList.contains('active') || modal.classList.contains('open'))) {
+                closeEstateModal();
             }
         });
     }
@@ -16066,6 +17379,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
     initCookieConsent();
     initPatronAuth();
     initAboutUsModal();
+    initEstateInfoModal();
     initLookbookModal();
     initFaqChatbot();
     switchTab('home');

@@ -39,31 +39,55 @@
                 return sdkLoadingPromise;
             }
 
-            sdkLoadingPromise = new Promise(async (resolve, reject) => {
-                const config = await this.getConfig();
-                const clientId = config.clientId || 'sb';
-                const currency = config.currency || 'USD';
+            sdkLoadingPromise = new Promise(async (resolve) => {
+                let resolved = false;
+                const finish = (result) => {
+                    if (resolved) return;
+                    resolved = true;
+                    if (timer) clearTimeout(timer);
+                    resolve(result);
+                };
 
-                // Check if already injected
-                const existingScript = document.querySelector('script[src*="paypal.com/sdk/js"]');
-                if (existingScript) {
-                    existingScript.addEventListener('load', () => resolve(window.paypal));
-                    existingScript.addEventListener('error', () => resolve(null));
-                    return;
+                const timer = setTimeout(() => {
+                    console.warn('⚠️ [PayPal SDK] CDN load timeout (network/sandbox). Direct PayPal card enabled.');
+                    finish(null);
+                }, 3500);
+
+                try {
+                    const config = await this.getConfig();
+                    const clientId = config.clientId || 'sb';
+                    const currency = config.currency || 'USD';
+
+                    // Check if already injected
+                    const existingScript = document.querySelector('script[src*="paypal.com/sdk/js"]');
+                    if (existingScript) {
+                        existingScript.addEventListener('load', () => finish(window.paypal || null));
+                        existingScript.addEventListener('error', (e) => {
+                            if (e && typeof e.preventDefault === 'function') e.preventDefault();
+                            finish(null);
+                        });
+                        return;
+                    }
+
+                    const script = document.createElement('script');
+                    script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${currency}&components=buttons`;
+                    script.async = true;
+                    script.crossOrigin = 'anonymous';
+                    script.onload = () => {
+                        console.log('🌿 [PayPal SDK] Loaded successfully.');
+                        finish(window.paypal || null);
+                    };
+                    script.onerror = (err) => {
+                        if (err && typeof err.preventDefault === 'function') err.preventDefault();
+                        if (err && typeof err.stopPropagation === 'function') err.stopPropagation();
+                        console.warn('⚠️ [PayPal SDK] Failed to load PayPal script from CDN (network/sandbox). Fallback button enabled.');
+                        finish(null);
+                    };
+                    document.head.appendChild(script);
+                } catch (loadErr) {
+                    console.warn('⚠️ [PayPal SDK] Load exception caught:', loadErr);
+                    finish(null);
                 }
-
-                const script = document.createElement('script');
-                script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${currency}&components=buttons,funding-eligibility`;
-                script.async = true;
-                script.onload = () => {
-                    console.log('🌿 [PayPal SDK] Loaded successfully.');
-                    resolve(window.paypal);
-                };
-                script.onerror = (err) => {
-                    console.warn('⚠️ [PayPal SDK] Failed to load PayPal script from CDN (network/sandbox). Fallback button enabled.');
-                    resolve(null);
-                };
-                document.head.appendChild(script);
             });
 
             return sdkLoadingPromise;
@@ -79,6 +103,20 @@
             const numAmount = parseFloat(amount) || 0;
             const formattedUSD = numAmount.toFixed(2);
 
+            let config = null;
+            try {
+                config = await this.getConfig();
+            } catch (cfgErr) {
+                console.warn('⚠️ [PayPal] Config error:', cfgErr);
+            }
+
+            // If real live PayPal credentials are not configured on server (sandbox demo mode),
+            // render the high-reliability native direct PayPal card directly to prevent cross-origin iframe compositor bugs
+            if (!config || !config.configured || config.clientId === 'sb') {
+                this.renderDirectPayPalCard(container, { orderId, amount: numAmount, description, onValidate, onSuccess, onError });
+                return;
+            }
+
             container.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem; color: #94a3b8; font-size: 0.8rem;">
                     <span style="display:inline-block; animation:spin 1s linear infinite;">⟳</span> Connecting to PayPal Gateway...
@@ -89,21 +127,24 @@
             try {
                 paypalSdk = await this.loadSdk();
             } catch (e) {
-                console.warn('⚠️ [PayPal] SDK load catch:', e.message);
+                console.warn('⚠️ [PayPal] SDK load catch:', e && e.message ? e.message : e);
             }
 
+            // Ensure container still in DOM
+            if (!document.getElementById(containerId)) return;
             container.innerHTML = '';
 
             // If PayPal SDK loaded successfully, render real Smart Payment Buttons
             if (paypalSdk && typeof paypalSdk.Buttons === 'function') {
                 try {
-                    paypalSdk.Buttons({
+                    const btn = paypalSdk.Buttons({
+                        fundingSource: (paypalSdk.FUNDING && paypalSdk.FUNDING.PAYPAL) ? paypalSdk.FUNDING.PAYPAL : undefined,
                         style: {
                             layout: 'vertical',
                             color: 'gold',
                             shape: 'rect',
                             label: 'paypal',
-                            height: 44
+                            height: 48
                         },
                         onClick: (data, actions) => {
                             if (typeof onValidate === 'function') {
@@ -162,10 +203,21 @@
                             }
                             if (typeof onError === 'function') onError(err);
                         }
-                    }).render(`#${containerId}`);
-                    return;
+                    });
+
+                    if (btn && typeof btn.render === 'function') {
+                        await btn.render(`#${containerId}`);
+                        const badgeDiv = document.createElement('div');
+                        badgeDiv.style.cssText = 'display:flex; align-items:center; justify-content:center; gap:0.45rem; font-size:0.73rem; color:#475569; margin-top:0.75rem; flex-wrap:wrap;';
+                        badgeDiv.innerHTML = `
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            <span>Supports Debit, Credit Card (Visa, MasterCard, Amex) &amp; PayPal Balance</span>
+                        `;
+                        container.appendChild(badgeDiv);
+                        return;
+                    }
                 } catch (btnErr) {
-                    console.warn('⚠️ [PayPal] Button render error, using direct action card:', btnErr.message);
+                    console.warn('⚠️ [PayPal] Button render error, using direct action card:', btnErr && btnErr.message ? btnErr.message : btnErr);
                 }
             }
 
@@ -179,14 +231,14 @@
         renderDirectPayPalCard(container, { orderId, amount, description, onValidate, onSuccess, onError }) {
             const formattedUSD = (parseFloat(amount) || 0).toFixed(2);
             container.innerHTML = `
-                <div style="display: flex; flex-direction: column; gap: 0.6rem;">
-                    <button type="button" class="btn btn-paypal-trigger" style="background: linear-gradient(135deg, #0079C1 0%, #00457C 100%); color: #ffffff; border: 1px solid #0079C1; padding: 0.8rem 1.25rem; font-weight: 700; font-size: 0.9rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,121,193,0.3); transition: transform 0.15s ease;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <button type="button" class="btn btn-paypal-trigger" style="background: linear-gradient(135deg, #0079C1 0%, #00457C 100%); color: #ffffff; border: 1.5px solid #0079C1; padding: 0.85rem 1.25rem; font-weight: 700; font-size: 0.95rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 0.6rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,121,193,0.3); transition: all 0.2s ease; width: 100%;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
                         <span>Pay with PayPal &bull; $${formattedUSD} USD</span>
                     </button>
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.72rem; color: #94a3b8;">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                        <span>256-bit SSL Encrypted &bull; PayPal Buyer Protection</span>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.74rem; color: #4b5563; flex-wrap: wrap;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <span>Supports Debit &amp; Credit Cards (Visa, MasterCard, Amex) &bull; 256-bit SSL</span>
                     </div>
                 </div>
             `;

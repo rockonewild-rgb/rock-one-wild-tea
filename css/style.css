@@ -1752,17 +1752,21 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
 }
 
 .hero-description {
-    font-size: clamp(0.82rem, 1.05vw, 0.98rem) !important;
-    color: rgba(255, 255, 255, 0.92) !important;
-    line-height: 1.55 !important;
-    max-width: 660px !important;
-    margin: 0 auto clamp(0.65rem, 1.5vh, 1.1rem) auto !important;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
-    font-weight: 400 !important;
-    background: none !important;
-    border: none !important;
-    padding: 0 !important;
-    display: block !important;
+    font-size: clamp(0.85rem, 1.08vw, 1.02rem) !important;
+    color: #ffffff !important;
+    line-height: 1.6 !important;
+    max-width: 760px !important;
+    margin: 0 auto clamp(0.75rem, 1.6vh, 1.25rem) auto !important;
+    font-weight: 500 !important;
+    background: rgba(3, 14, 7, 0.65) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(212, 175, 55, 0.32) !important;
+    border-radius: 14px !important;
+    padding: 0.75rem 1.45rem !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 2px 12px rgba(0, 0, 0, 0.98) !important;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45) !important;
+    display: inline-block !important;
     -webkit-line-clamp: unset !important;
     overflow: visible !important;
 }
@@ -1852,7 +1856,7 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
 
 /* ─── Hero Slide 1: Ella Organic Tea Heritage Banner Style ─── */
 .hero-slide.hero-slide-heritage .hero-slide-overlay {
-    background: linear-gradient(to right, rgba(4, 20, 10, 0.90) 0%, rgba(4, 20, 10, 0.74) 38%, rgba(4, 20, 10, 0.35) 68%, rgba(4, 20, 10, 0.10) 88%, transparent 100%) !important;
+    background: linear-gradient(180deg, rgba(2, 10, 5, 0.65) 0%, rgba(2, 10, 5, 0.40) 35%, rgba(2, 10, 5, 0.52) 70%, rgba(2, 10, 5, 0.82) 100%) !important;
 }
 
 .hero-slide-heritage .hero-title-heritage {
@@ -1860,7 +1864,8 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     font-weight: 800 !important;
     line-height: 1.08 !important;
     letter-spacing: -0.025em !important;
-    margin: 0 0 0.35rem 0 !important;
+    margin: 0 auto 0.35rem auto !important;
+    text-align: center !important;
 }
 
 .hero-slide-heritage .hero-title-heritage .hero-title-top,
@@ -1872,6 +1877,7 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     filter: drop-shadow(0 2px 14px rgba(245, 158, 11, 0.35));
+    text-align: center !important;
 }
 
 .hero-slide-heritage .hero-title-heritage .hero-title-bottom,
@@ -1880,6 +1886,7 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
     text-shadow: 0 4px 24px rgba(0, 0, 0, 0.85);
+    text-align: center !important;
 }
 
 .hero-slide-heritage .hero-tagline-italic {
@@ -1887,46 +1894,50 @@ body.staff-authenticated .staff-only-nav.mobile-nav-item {
     font-style: italic;
     font-size: clamp(1.05rem, 1.4vw, 1.35rem);
     color: #e5e7eb;
-    margin-bottom: clamp(0.45rem, 1.2vh, 0.8rem);
+    margin: 0 auto clamp(0.45rem, 1.2vh, 0.8rem) auto !important;
     letter-spacing: 0.4px;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+    text-align: center !important;
 }
 
 .hero-slide-heritage .hero-desc-left {
-    max-width: 580px !important;
-    color: rgba(255, 255, 255, 0.94) !important;
-    font-size: clamp(0.84rem, 1.05vw, 0.98rem) !important;
-    line-height: 1.55 !important;
-    margin-bottom: clamp(0.75rem, 1.5vh, 1.15rem) !important;
+    max-width: 760px !important;
+    color: #ffffff !important;
+    font-size: clamp(0.85rem, 1.08vw, 1.02rem) !important;
+    line-height: 1.6 !important;
+    margin: 0 auto clamp(0.75rem, 1.5vh, 1.15rem) auto !important;
+    text-align: center !important;
 }
 
 @media (min-width: 860px) {
     .hero-slide-heritage .hero-slide-content {
-        align-items: flex-start !important;
-        text-align: left !important;
-        max-width: 680px !important;
-        margin-left: clamp(2.5rem, 6.5vw, 7rem) !important;
+        align-items: center !important;
+        text-align: center !important;
+        max-width: 880px !important;
+        margin-left: auto !important;
         margin-right: auto !important;
         padding-left: 0 !important;
     }
     .hero-slide-heritage .hero-title-heritage {
-        text-align: left !important;
+        text-align: center !important;
     }
     .hero-slide-heritage .hero-tagline-italic {
-        text-align: left !important;
+        text-align: center !important;
     }
     .hero-slide-heritage .hero-desc-left {
-        text-align: left !important;
-        margin-left: 0 !important;
+        text-align: center !important;
+        margin-left: auto !important;
         margin-right: auto !important;
     }
     .hero-slide-heritage .hero-cta {
-        justify-content: flex-start !important;
-        margin-left: 0 !important;
+        justify-content: center !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
     }
     .hero-slide-heritage .hero-rating-badge {
-        justify-content: flex-start !important;
-        margin-left: 0 !important;
+        justify-content: center !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
     }
 }
 
@@ -4388,6 +4399,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .drawer-overlay.open {
     opacity: 1;
     pointer-events: all;
+    z-index: 2500 !important;
 }
 
 .drawer-container {
@@ -11351,6 +11363,123 @@ mark.search-match-highlight {
     padding: 1rem 1.5rem 3rem 1.5rem;
 }
 
+/* ─── Luxury Estate Pickup & Terroir Information Modal ─── */
+.estate-info-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.estate-info-modal.active,
+.estate-info-modal.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.estate-info-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 8, 4, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    cursor: pointer;
+}
+
+.estate-info-dialog {
+    position: relative;
+    z-index: 2;
+    max-width: 860px;
+    width: 92vw;
+    max-height: 88vh;
+    overflow-y: auto;
+    background: linear-gradient(145deg, rgba(4, 22, 12, 0.98) 0%, rgba(2, 10, 5, 0.99) 100%);
+    border: 1.5px solid rgba(212, 175, 55, 0.45);
+    border-radius: 24px;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 45px rgba(212, 175, 55, 0.2);
+    transform: translateY(24px) scale(0.96);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-gold) rgba(255,255,255,0.05);
+}
+
+.estate-info-modal.active .estate-info-dialog,
+.estate-info-modal.open .estate-info-dialog {
+    transform: translateY(0) scale(1);
+}
+
+.estate-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+    position: sticky;
+    top: 0;
+    background: rgba(3, 16, 9, 0.97);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 10;
+}
+
+.estate-info-brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.estate-info-crest {
+    height: 38px;
+    width: auto;
+    object-fit: contain;
+}
+
+.estate-info-title {
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    color: var(--color-white);
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.estate-info-subtitle {
+    display: block;
+    font-size: 0.68rem;
+    color: var(--color-gold);
+    letter-spacing: 1.5px;
+    font-weight: 700;
+}
+
+.estate-info-close-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    color: var(--color-gold);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.estate-info-close-btn:hover {
+    background: var(--color-gold);
+    color: #040a06;
+    transform: scale(1.08) rotate(90deg);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+}
+
+.estate-info-body {
+    padding: 0;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════════
    COMPREHENSIVE MOBILE OPTIMIZATION & FLOATING DOCK STACKING (< 768px / < 480px)
    ══════════════════════════════════════════════════════════════════════════════ */
@@ -11639,6 +11768,7 @@ mark.search-match-highlight {
 
 /* 2. Fluid Modal Dialog Containment (All Screen Sizes) */
 .about-modal-dialog,
+.estate-info-dialog,
 .order-modal-dialog,
 .reserve-modal-dialog,
 .payment-approval-dialog,
@@ -15728,7 +15858,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .hero-slide-overlay {
-    background: linear-gradient(180deg, rgba(8, 22, 14, 0.28) 0%, rgba(4, 16, 9, 0.10) 35%, rgba(4, 16, 9, 0.22) 70%, rgba(3, 14, 7, 0.40) 100%) !important;
+    background: linear-gradient(180deg, rgba(3, 16, 8, 0.65) 0%, rgba(2, 12, 6, 0.42) 35%, rgba(2, 12, 6, 0.55) 70%, rgba(2, 10, 5, 0.85) 100%) !important;
 }
 
 /* Section tags & badges — Organic Ceylon Estate Pill standard */
@@ -18503,6 +18633,8 @@ div[style*="rgba(6, 24, 14"] p {
 
 .seventea-share-row {
     padding-top: 0.25rem;
+    position: relative;
+    display: inline-block;
 }
 
 .seventea-share-btn {
@@ -18514,11 +18646,143 @@ div[style*="rgba(6, 24, 14"] p {
     align-items: center;
     gap: 0.45rem;
     cursor: pointer;
-    transition: color 0.2s ease;
+    transition: all 0.2s ease;
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
 }
 
 .seventea-share-btn:hover {
     color: #111827;
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.seventea-share-btn.copied {
+    color: #16a34a !important;
+    font-weight: 600 !important;
+    background: rgba(34, 197, 94, 0.08) !important;
+}
+
+.seventea-share-popover {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    width: 300px;
+    max-width: 90vw;
+    background: #ffffff;
+    border: 1px solid #e5e0d8;
+    border-radius: 14px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.16), 0 3px 10px rgba(0, 0, 0, 0.06);
+    padding: 1rem 1.15rem;
+    z-index: 150;
+    animation: popoverFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes popoverFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.seventea-share-popover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f1ece4;
+}
+
+.seventea-share-popover-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+    letter-spacing: 0.2px;
+}
+
+.seventea-share-popover-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    line-height: 1;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 0;
+}
+.seventea-share-popover-close:hover {
+    color: #111827;
+}
+
+.seventea-share-copy-row {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 0.85rem;
+}
+
+.seventea-share-url-input {
+    flex: 1;
+    background: #f9f8f6;
+    border: 1px solid #e5e0d8;
+    border-radius: 6px;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.76rem;
+    color: #374151;
+    outline: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.seventea-share-copy-action-btn {
+    background: #111827;
+    border: 1px solid #111827;
+    color: #ffffff;
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 0.45rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s ease;
+}
+.seventea-share-copy-action-btn:hover {
+    background: #b8860b;
+    border-color: #b8860b;
+}
+
+.seventea-share-social-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.45rem;
+}
+
+.seventea-share-social-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.25rem;
+    border-radius: 8px;
+    background: #f9f8f6;
+    border: 1px solid #eee9e0;
+    color: #374151;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+.seventea-share-social-item:hover {
+    background: #f3efe8;
+    color: #111827;
+    transform: translateY(-1px);
+}
+
+.seventea-estate-info-link {
+    transition: color 0.15s ease, opacity 0.15s ease;
+}
+.seventea-estate-info-link:hover {
+    color: #8c6508 !important;
+    text-decoration: underline !important;
 }
 
 /* Customer Reviews Block (Parity with Screenshot 4) */
@@ -18772,9 +19036,29 @@ div[style*="rgba(6, 24, 14"] p {
     scrollbar-color: #b8860b #f1ede6 !important;
 }
 
-#cart-drawer-overlay,
-.cart-drawer-overlay {
-    z-index: 2800 !important;
+.drawer-overlay,
+.cart-drawer-overlay,
+#drawer-overlay,
+#cart-drawer-overlay {
+    z-index: 100050 !important;
+}
+
+.drawer-overlay.checkout-fullscreen,
+#cart-drawer-overlay.checkout-fullscreen {
+    z-index: 100060 !important;
+}
+
+/* Ensure cookie consent banner does not overlay active modal/checkout overlays */
+.drawer-overlay.active ~ .estate-cookie-banner,
+.drawer-overlay.open ~ .estate-cookie-banner,
+.cart-drawer-overlay.active ~ .estate-cookie-banner,
+.cart-drawer-overlay.open ~ .estate-cookie-banner,
+body.has-active-drawer .estate-cookie-banner,
+body.has-drawer-open .estate-cookie-banner {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    transform: translate(-50%, calc(100% + 100px)) !important;
 }
 
 /* Prominent gold scrollbar for the checkout overlay */
@@ -20329,8 +20613,416 @@ div[style*="rgba(6, 24, 14"] p {
     }
 }
 
+/* ==========================================================================
+   RESERVE ALLOCATION LARGE PRODUCT SHOWCASE & SEPARATED CHECKOUT TABS
+   ========================================================================== */
 
+/* 1. Large Luxury Product Showcase in Reserve Allocation */
+.checkout-large-product-showcase {
+    display: flex;
+    flex-direction: column;
+    gap: 0.95rem;
+    padding-bottom: 1.15rem;
+    border-bottom: 1.5px solid #e5e0d8;
+}
 
+.checkout-large-photo-box {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    border-radius: 14px;
+    background: #faf8f5;
+    border: 1.5px solid #e5e0d8;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.03), 0 4px 16px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
 
+.checkout-large-photo-box:hover {
+    border-color: #b8860b;
+    box-shadow: 0 6px 22px rgba(184, 134, 11, 0.12);
+}
+
+.checkout-large-photo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.checkout-large-photo-box:hover .checkout-large-photo-img {
+    transform: scale(1.03);
+}
+
+.checkout-photo-overlay-badges {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.checkout-photo-tag-estate {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(184, 134, 11, 0.35);
+    color: #855b05;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.checkout-photo-tag-qty {
+    background: #111827;
+    border: 1px solid #b8860b;
+    color: #fbbf24;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.checkout-large-product-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.checkout-large-title {
+    font-family: var(--font-serif), 'Playfair Display', Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.35;
+    margin: 0.15rem 0 0.15rem 0;
+}
+
+.checkout-large-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.checkout-chip {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #4b5563;
+    background: #f3f0e8;
+    border: 1px solid #e2ded5;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+}
+
+.checkout-large-pricing-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.45rem;
+    padding-top: 0.45rem;
+    border-top: 1px dashed #e8e4df;
+}
+
+/* 2. Step Navigation Bar (Delivery Details <-> Payment Options) */
+.checkout-stage-tabs-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #ffffff;
+    border: 1px solid #e5e0d8;
+    border-radius: 12px;
+    padding: 0.5rem 0.65rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.checkout-stage-tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.65rem 0.95rem;
+    background: transparent;
+    border: 1.5px solid transparent;
+    border-radius: 9px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+}
+
+.checkout-stage-tab-btn .tab-step-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f1ede4;
+    border: 1px solid #dcd5c9;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.checkout-stage-tab-btn .tab-text-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.checkout-stage-tab-btn .tab-main-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #4b5563;
+    line-height: 1.25;
+}
+
+.checkout-stage-tab-btn .tab-sub-label {
+    font-size: 0.68rem;
+    color: #94a3b8;
+    line-height: 1.2;
+}
+
+.checkout-stage-tab-btn.active {
+    background: #faf8f5;
+    border-color: #b8860b;
+    box-shadow: 0 2px 8px rgba(184, 134, 11, 0.1);
+}
+
+.checkout-stage-tab-btn.active .tab-step-badge {
+    background: #b8860b;
+    border-color: #b8860b;
+    color: #ffffff;
+}
+
+.checkout-stage-tab-btn.active .tab-main-label {
+    color: #111827;
+}
+
+.checkout-stage-tab-btn.active .tab-sub-label {
+    color: #855b05;
+}
+
+.checkout-stage-tab-btn.completed .tab-step-badge {
+    background: #16a34a;
+    border-color: #16a34a;
+    color: #ffffff;
+}
+
+.tab-divider-arrow {
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    user-select: none;
+    font-weight: 700;
+}
+
+/* 3. High-Contrast Payment Method Cards & Badges */
+.payment-method-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 0.55rem;
+    margin-bottom: 1.15rem;
+}
+
+.payment-method-card-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.35rem;
+    padding: 0.85rem 0.55rem;
+    background: #ffffff;
+    border: 1.5px solid #e2ded5;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 84px;
+}
+
+.payment-method-card-btn:hover {
+    border-color: #b8860b;
+    background: #faf8f5;
+}
+
+.payment-method-card-btn.active {
+    border-color: #b8860b;
+    background: #fbf8f2;
+    box-shadow: 0 0 0 1.5px #b8860b, 0 4px 14px rgba(184, 134, 11, 0.12);
+}
+
+.payment-method-card-btn[data-method="paypal"]:hover,
+.payment-method-card-btn[data-method="paypal"].active {
+    border-color: #0079c1;
+    box-shadow: 0 0 0 1.5px #0079c1, 0 4px 14px rgba(0, 121, 193, 0.15);
+}
+
+.payment-method-card-btn[data-method="card"]:hover,
+.payment-method-card-btn[data-method="card"].active {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 1.5px #2563eb, 0 4px 14px rgba(37, 99, 235, 0.15);
+}
+
+.payment-method-card-btn .pay-card-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.25;
+}
+
+.payment-method-card-btn .pay-card-badge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.12rem 0.45rem;
+    border-radius: 4px;
+    background: #e0f2fe;
+    color: #0369a1;
+    letter-spacing: 0.4px;
+}
+
+/* Card Brand Badges & Luxury Card Inputs */
+.card-brand-chips {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.card-chip-badge {
+    font-size: 0.58rem;
+    font-weight: 800;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    display: inline-block;
+}
+
+.card-chip-badge.visa-badge {
+    background: #1a1f71;
+    color: #ffffff;
+    font-style: italic;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.card-chip-badge.mc-badge {
+    background: linear-gradient(90deg, #eb001b 45%, #ff5f00 45% 55%, #f79e1b 55%);
+    color: #ffffff;
+    font-weight: 900;
+}
+
+.card-chip-badge.amex-badge {
+    background: #007bc1;
+    color: #ffffff;
+}
+
+.card-chip-badge.discover-badge {
+    background: #ff6000;
+    color: #ffffff;
+}
+
+.luxury-card-checkout-box {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.dark-mode-card-box {
+    background: rgba(4, 14, 8, 0.7) !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    color: #ffffff !important;
+}
+
+.dark-mode-card-box input {
+    background: rgba(0, 0, 0, 0.45) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    color: #ffffff !important;
+}
+
+.dark-mode-card-box input::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Light luxury theme bank details block override */
+.checkout-mode .bank-details-block {
+    background: #faf8f5 !important;
+    border: 1.5px solid #d4af37 !important;
+    border-radius: 10px !important;
+    padding: 1.15rem !important;
+    color: #111827 !important;
+}
+
+.checkout-mode .bank-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.45rem;
+    font-size: 0.85rem;
+    color: #4b5563 !important;
+}
+
+.checkout-mode .bank-detail-row strong {
+    color: #111827 !important;
+    font-weight: 700;
+}
+
+@media (max-width: 600px) {
+    .checkout-large-photo-box {
+        height: 210px;
+    }
+    .checkout-stage-tabs-header {
+        padding: 0.35rem 0.45rem;
+    }
+    .checkout-stage-tab-btn {
+        padding: 0.55rem 0.65rem;
+        gap: 0.45rem;
+    }
+    .checkout-stage-tab-btn .tab-step-badge {
+        width: 24px;
+        height: 24px;
+        font-size: 0.72rem;
+    }
+    .checkout-stage-tab-btn .tab-main-label {
+        font-size: 0.76rem;
+    }
+    .checkout-stage-tab-btn .tab-sub-label {
+        display: none;
+    }
+}/* PayPal Smart Payment Container Framing & Isolation */
+.paypal-smart-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    position: relative !important;
+    contain: paint !important;
+    box-sizing: border-box !important;
+    border-radius: 8px !important;
+}
+
+.paypal-smart-container > div,
+.paypal-smart-container iframe {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.pay-panel-paypal {
+    overflow: hidden !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+    overflow: hidden !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
 
 

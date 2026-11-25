@@ -566,8 +566,10 @@ const UIComponents = {
             const tastingNotesText = p.flavorProfile || (p.tastingNotes && p.tastingNotes.length > 0 ? p.tastingNotes.join(' • ') : 'Single-Estate Ceylon Harvest');
             const displayNotes = this.highlightText(tastingNotesText, searchFilter);
             const displayWeight = p.weight || '50g Pack';
-            const ratingVal = Number(p.rating || (p.brewing_guide && p.brewing_guide.rating)) || 5.0;
-            const reviewCount = Number(p.reviewsCount || (p.brewing_guide && p.brewing_guide.reviewsCount)) || 2;
+            const storeReviews = (window.TeaFactoryStore && window.TeaFactoryStore.getReviews ? window.TeaFactoryStore.getReviews() : []) || [];
+            const itemReviews = storeReviews.filter(r => !r.experienceType || r.experienceType === 'general' || r.experienceType === p.name || (r.experienceType && p.name && (r.experienceType.toLowerCase().includes(p.name.toLowerCase()) || p.name.toLowerCase().includes(r.experienceType.toLowerCase()))));
+            const reviewCount = itemReviews.length;
+            const ratingVal = reviewCount > 0 ? (itemReviews.reduce((sum, r) => sum + (Number(r.rating) || 5), 0) / reviewCount) : 0;
             const basePrice = Number(p.price !== undefined ? p.price : 17.00);
             const origPriceVal = Number(p.originalPrice || p.origPrice || (basePrice * 1.176));
             const discountPct = Math.round((1 - basePrice / origPriceVal) * 100) || 15;
@@ -605,6 +607,7 @@ const UIComponents = {
                         <h3 class="product-card-title" title="${p.name}">${displayName}</h3>
 
                         <!-- Customer Rating -->
+                        ${reviewCount > 0 ? `
                         <div class="product-rating-row" title="${ratingVal.toFixed(1)} / 5.0 (${reviewCount} ${_t('reviews_label', 'patron reviews')})">
                             <div class="product-stars-group" aria-label="${ratingVal.toFixed(1)} stars">
                                 <span class="star-icon">★</span><span class="star-icon">★</span><span class="star-icon">★</span><span class="star-icon">★</span><span class="star-icon">★</span>
@@ -612,6 +615,14 @@ const UIComponents = {
                             <span class="product-rating-score">${ratingVal.toFixed(1)}</span>
                             <span class="product-rating-count">(${reviewCount})</span>
                         </div>
+                        ` : `
+                        <div class="product-rating-row" style="cursor: pointer;" onclick="event.stopPropagation(); window.openReviewModal ? window.openReviewModal('${(p.name || '').replace(/'/g, "\\'")}') : (window.openDrawer &amp;&amp; window.openDrawer('review'));" title="Be the first to review">
+                            <div class="product-stars-group" style="color: #94a3b8; font-size: 0.82rem;">
+                                <span class="star-icon">☆</span><span class="star-icon">☆</span><span class="star-icon">☆</span><span class="star-icon">☆</span><span class="star-icon">☆</span>
+                            </div>
+                            <span class="product-rating-count" style="color: var(--color-gold); font-size: 0.72rem; font-weight: 600; text-decoration: underline;">Write a review</span>
+                        </div>
+                        `}
 
                         <!-- Strikethrough Price, Sale Price, Discount Badge & Chips (Parity with Product Detail) -->
                         <div class="product-title-pricing-row" style="display: flex; flex-direction: column; align-items: stretch; gap: 0.35rem; width: 100%;">
@@ -5328,6 +5339,146 @@ const UIComponents = {
         return;
     },
 
+    // ── Dedicated Estate Pickup & Terroir Information Modal View ──
+    renderEstateInfoPage(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="estate-info-content" style="padding: 1.5rem 1.75rem 2.5rem; color: #e2e8f0; font-family: var(--font-sans);">
+                <!-- 1. Top Highlight Box: Local Pickup Guarantee -->
+                <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.6rem;">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #22c55e; color: #022c22; font-weight: 800; font-size: 0.95rem;">&#10003;</span>
+                            <strong style="color: #4ade80; font-size: 1.05rem; letter-spacing: 0.3px;">Local Pickup Available at Estate</strong>
+                        </div>
+                        <span style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: #fef08a; background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.35); padding: 0.35rem 0.8rem; border-radius: 20px; font-weight: 600;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            Usually ready in 24 hours
+                        </span>
+                    </div>
+                    <p style="margin: 0; font-size: 0.88rem; line-height: 1.6; color: #cbd5e1;">
+                        Patrons visiting Sri Lanka or travelling through the Uva Highlands may collect their handcrafted reserve allocations directly from our estate tea concierge. Orders are freshly prepared, vacuum-sealed in botanical aroma preservation pouches, and presented with an official signed Estate Allocation Certificate.
+                    </p>
+                </div>
+
+                <!-- 2. Estate Location & Concierge Desk Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.75rem;">
+                    <!-- Card 1: Physical Estate Address -->
+                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 12px; padding: 1.25rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; color: var(--color-gold);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <h4 style="margin: 0; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.8px;">Estate &amp; Factory Address</h4>
+                        </div>
+                        <div style="font-size: 0.92rem; line-height: 1.6; color: #f8fafc; margin-bottom: 1rem;">
+                            <strong>Rock One Wild Tea (Pvt) Limited</strong><br>
+                            Gannilawaththa, Wellawela,<br>
+                            Ettampitiya 90140, Sri Lanka
+                        </div>
+                        <button type="button" id="estate-copy-address-btn" style="background: rgba(212, 175, 55, 0.12); border: 1px solid rgba(212, 175, 55, 0.4); color: var(--color-gold); font-size: 0.8rem; font-weight: 600; padding: 0.45rem 0.9rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            <span>Copy Address</span>
+                        </button>
+                    </div>
+
+                    <!-- Card 2: Hours & Concierge Contact -->
+                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 12px; padding: 1.25rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; color: var(--color-gold);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <h4 style="margin: 0; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.8px;">Pickup Hours &amp; Concierge</h4>
+                        </div>
+                        <div style="font-size: 0.86rem; line-height: 1.7; color: #cbd5e1; margin-bottom: 0.75rem;">
+                            <div><strong style="color: #f8fafc;">Visiting &amp; Pickup:</strong> Mon &ndash; Sun, 8:00 AM &ndash; 6:00 PM</div>
+                            <div><strong style="color: #f8fafc;">Time Zone:</strong> Sri Lanka Time (IST / UTC+5:30)</div>
+                            <div><strong style="color: #f8fafc;">Direct Hotline:</strong> <a href="tel:+94767897817" style="color: #f8fafc; text-decoration: none;">+94 76 789 7817</a></div>
+                            <div><strong style="color: #f8fafc;">Mobile / WhatsApp:</strong> <a href="https://wa.me/94773209950" target="_blank" rel="noopener" style="color: #4ade80; text-decoration: none;">+94 77 320 9950</a></div>
+                            <div><strong style="color: #f8fafc;">Official Email:</strong> <a href="mailto:rockonewild@gmail.com" style="color: var(--color-gold); text-decoration: none;">rockonewild@gmail.com</a></div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge,%20I%20would%20like%20information%20regarding%20estate%20pickup." target="_blank" rel="noopener" style="background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.4); color: #4ade80; font-size: 0.78rem; font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+                                WhatsApp Concierge &rarr;
+                            </a>
+                            <a href="tel:+94767897817" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #f8fafc; font-size: 0.78rem; font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+                                Call Concierge
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Interactive Google Map Embed -->
+                <div style="margin-bottom: 1.75rem; border-radius: 14px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.3); background: #000;">
+                    <div style="padding: 0.75rem 1.25rem; background: rgba(3, 16, 9, 0.95); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(212, 175, 55, 0.2); flex-wrap: wrap; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #cbd5e1;">
+                            <span style="color: var(--color-gold);">📍</span>
+                            <span>Rock One Wild Tea Estate &amp; Factory (Highland Coordinates)</span>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="https://maps.google.com?ftid=0x3ae4630013bcccbb:0x453d082c477ea3bf" target="_blank" rel="noopener" style="font-size: 0.78rem; color: var(--color-gold); text-decoration: underline; font-weight: 600;">Open in Google Maps &nearr;</a>
+                            <span style="color: rgba(255,255,255,0.2);">&bull;</span>
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=Rock+One+Wild+Tea+(Pvt)+Limited&destination_place_id=0x3ae4630013bcccbb:0x453d082c477ea3bf" target="_blank" rel="noopener" style="font-size: 0.78rem; color: #4ade80; text-decoration: underline; font-weight: 600;">Driving Directions &nearr;</a>
+                        </div>
+                    </div>
+                    <div style="width: 100%; height: 320px; position: relative;">
+                        <iframe 
+                            src="https://maps.google.com/maps?q=Rock+One+Wild+Tea,+Gannilawaththa,+Wellawela,+Ettampitiya,+Sri+Lanka&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0; filter: contrast(1.05) saturate(1.1);" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade" 
+                            title="Rock One Wild Tea Estate Location Map">
+                        </iframe>
+                    </div>
+                </div>
+
+                <!-- 4. Transit Distance Guide -->
+                <div style="margin-bottom: 2rem;">
+                    <h5 style="margin: 0 0 0.85rem 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">
+                        Transit Distances from Regional Hubs
+                    </h5>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.65rem;">
+                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem 0.85rem; text-align: center;">
+                            <div style="font-weight: 600; color: #f8fafc; font-size: 0.85rem;">Bandarawela</div>
+                            <div style="font-size: 0.76rem; color: var(--color-gold); margin-top: 0.15rem;">14 km &bull; 25 min</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem 0.85rem; text-align: center;">
+                            <div style="font-weight: 600; color: #f8fafc; font-size: 0.85rem;">Welimada</div>
+                            <div style="font-size: 0.76rem; color: var(--color-gold); margin-top: 0.15rem;">18 km &bull; 30 min</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem 0.85rem; text-align: center;">
+                            <div style="font-weight: 600; color: #f8fafc; font-size: 0.85rem;">Haputale</div>
+                            <div style="font-size: 0.76rem; color: var(--color-gold); margin-top: 0.15rem;">23 km &bull; 38 min</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem 0.85rem; text-align: center;">
+                            <div style="font-weight: 600; color: #f8fafc; font-size: 0.85rem;">Ella</div>
+                            <div style="font-size: 0.76rem; color: var(--color-gold); margin-top: 0.15rem;">24 km &bull; 45 min</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem 0.85rem; text-align: center;">
+                            <div style="font-weight: 600; color: #f8fafc; font-size: 0.85rem;">Nuwara Eliya</div>
+                            <div style="font-size: 0.76rem; color: var(--color-gold); margin-top: 0.15rem;">45 km &bull; 1h 15m</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.65rem 0.85rem; text-align: center;">
+                            <div style="font-weight: 600; color: #f8fafc; font-size: 0.85rem;">Colombo (BIA)</div>
+                            <div style="font-size: 0.76rem; color: var(--color-gold); margin-top: 0.15rem;">195 km &bull; 4h 30m</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Modal Footer Action Buttons -->
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; padding-top: 1.25rem; border-top: 1px solid rgba(212, 175, 55, 0.2);">
+                    <button type="button" id="estate-info-back-product-btn" style="background: none; border: 1px solid rgba(255,255,255,0.25); color: #cbd5e1; padding: 0.65rem 1.25rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.86rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        &larr; Return to Product Order
+                    </button>
+                    <button type="button" id="estate-info-explore-tours-btn" style="background: var(--color-gold); border: 1px solid var(--color-gold); color: #000; padding: 0.65rem 1.5rem; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.86rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        Explore Full Estate &amp; Tours &rarr;
+                    </button>
+                </div>
+            </div>
+        `;
+    },
+
     renderLocationMapSection(containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -6887,6 +7038,43 @@ const UIComponents = {
             const lineTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(itemLineUSD, currInfo) : `$${itemLineUSD.toFixed(2)}`;
             const hasGifting = item.giftOptions && item.giftOptions.giftPackaging;
 
+            if (cart.length === 1) {
+                return `
+                    <div class="checkout-large-product-showcase" data-cart-key="${item.cartKey}" data-unit-usd="${itemPriceUSD}" data-line-usd="${itemLineUSD}">
+                        <div class="checkout-large-photo-box">
+                            <img src="${item.image || 'images/Product.jpeg'}" alt="${item.name}" class="checkout-large-photo-img" onerror="window.handleImageError &amp;&amp; window.handleImageError(this, 'product')" loading="eager" decoding="async">
+                            <div class="checkout-photo-overlay-badges">
+                                <span class="checkout-photo-tag-estate">🌿 Single-Estate Reserve</span>
+                                <span class="checkout-photo-tag-qty">Qty: ${itemQty}</span>
+                            </div>
+                        </div>
+                        <div class="checkout-large-product-details">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem;">
+                                <h3 class="checkout-large-title">${item.name}</h3>
+                                <button type="button" class="cart-item-remove-btn" data-cart-key="${item.cartKey}" title="Remove item" style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 0.15rem; display: flex; align-items: center; transition: color 0.2s;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            </div>
+                            <div class="checkout-large-chips">
+                                <span class="checkout-chip">🍃 ${item.leafGrade || 'TRI 2025 Hand-Rolled'}</span>
+                                <span class="checkout-chip">⚖️ ${item.weight || '50g Pack'}</span>
+                            </div>
+                            <div class="checkout-large-pricing-row">
+                                <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1.5px solid #d4af37; border-radius: 8px; overflow: hidden; background: #ffffff;">
+                                    <button type="button" class="cart-qty-btn cart-qty-minus" data-cart-key="${item.cartKey}" style="background: none; border: none; color: #b8860b; width: 30px; height: 30px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem;">-</button>
+                                    <span class="cart-qty-val" style="width: 32px; text-align: center; font-size: 0.85rem; font-weight: 700; color: #111827;">${itemQty}</span>
+                                    <button type="button" class="cart-qty-btn cart-qty-plus" data-cart-key="${item.cartKey}" style="background: none; border: none; color: #b8860b; width: 30px; height: 30px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem;">+</button>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span class="checkout-item-price" style="font-size: 1.25rem; font-weight: 700; color: #111827; font-family: var(--font-serif);">${lineTotal}</span>
+                                    <div style="font-size: 0.74rem; color: #64748b;">${unitPrice} / pack</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
             return `
                 <div class="checkout-item-row" data-cart-key="${item.cartKey}" data-unit-usd="${itemPriceUSD}" data-line-usd="${itemLineUSD}">
                     <!-- Thumbnail with Count Badge -->
@@ -7215,11 +7403,11 @@ const UIComponents = {
                                     <input type="radio" name="cart-shipping-method" id="cart-ship-ems" value="ems_express" checked style="margin-top: 0.25rem;">
                                     <div style="flex: 1;">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
-                                            <strong id="cart-shipping-ems-title" style="color: var(--color-text-primary); font-size: 0.88rem;">${isSriLanka ? 'Sri Lanka Post EMS Express (Pre-paid)' : 'Sri Lanka Post EMS International Priority Air'}</strong>
+                                            <strong id="cart-shipping-ems-title" style="color: var(--color-text-primary); font-size: 0.88rem;">${isSriLanka ? 'SL Post EMS Express (Pre-paid)' : 'SL Post EMS International Priority Air'}</strong>
                                             <span id="cart-shipping-ems-price-pill" style="color: ${shippingUSD > 0 ? '#15803d' : 'var(--color-gold)'}; font-size: 0.8rem; font-weight: 700;">${formattedShipping}</span>
                                         </div>
                                         <p id="cart-shipping-ems-desc" style="font-size: 0.72rem; color: var(--color-text-muted); line-height: 1.4; margin: 0;">
-                                            ${isSriLanka ? 'Door-to-door express parcel courier with official Sri Lanka Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official Sri Lanka Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
+                                            ${isSriLanka ? 'Door-to-door express parcel courier with official SL Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official SL Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
                                         </p>
                                     </div>
                                 </label>
@@ -7253,7 +7441,7 @@ const UIComponents = {
                                 <div style="background: rgba(37,211,102,0.08); border: 1.5px solid rgba(37,211,102,0.4); border-radius: 10px; padding: 1.15rem; text-align: center; margin-bottom: 1rem;">
                                     <h4 style="color: #4ade80; font-size: 1.05rem; margin-bottom: 0.35rem; font-weight: 700;">Cash on Delivery (COD) Active</h4>
                                     <p style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.5; margin: 0 0 0.85rem 0;">
-                                        The Sri Lanka Post EMS courier will collect the cash amount upon parcel handover.
+                                        The SL Post EMS courier will collect the cash amount upon parcel handover.
                                     </p>
                                     <div style="background: rgba(0,0,0,0.45); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.65rem 1rem; display: inline-flex; align-items: center; gap: 0.75rem;">
                                         <span style="font-size: 0.78rem; color: #9ca3af;">Payable to Courier:</span>
@@ -7274,9 +7462,17 @@ const UIComponents = {
                                         Cash Deposit Slip (Live)
                                     </button>
                                     <button type="button" class="pay-tab" data-method="paypal" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(0,121,193,0.5);">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z" fill="#003087"/>
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M10.154 9.172a.65.65 0 0 1 .639-.537h4.82c1.928 0 3.33.448 4.072 1.302.734.845.85 2.05.344 3.582-.56 1.686-1.792 2.626-3.662 2.795l-.148.01h-1.364a.577.577 0 0 0-.57.49l-.63 3.102a.407.407 0 0 1-.389.329H9.986a.407.407 0 0 1-.402-.47l1.72-8.468a.5.5 0 0 1 .49-.404h-1.64z" fill="#0079C1"/>
+                                        </svg>
                                         <span style="font-weight:700;"><span style="color:#0079C1;">Pay</span><span style="color:#00457C;">Pal</span></span>
-                                        <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(0,121,193,0.2); color:#38bdf8; font-weight:700;">LIVE</span>
+                                        <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(245,158,11,0.25); color:#fbbf24; font-weight:700;">COMING SOON</span>
+                                    </button>
+                                    <button type="button" class="pay-tab" data-method="card" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(37,99,235,0.5);">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                        <span>Credit / Card</span>
+                                        <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(245,158,11,0.25); color:#fbbf24; font-weight:700;">COMING SOON</span>
                                     </button>
                                 </div>
 
@@ -7327,15 +7523,125 @@ const UIComponents = {
                                     <div style="background: #fbf9f5; border: 1.5px solid #0079C1; border-radius: 8px; padding: 1.15rem;">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.5rem;">
                                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                                <svg width="22" height="22" viewBox="0 0 24 24" fill="#0079C1"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z"/></svg>
-                                                <strong style="color: var(--color-text-primary); font-size: 0.95rem;">PayPal &bull; Instant Online Settlement</strong>
+                                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z" fill="#003087"/>
+                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M10.154 9.172a.65.65 0 0 1 .639-.537h4.82c1.928 0 3.33.448 4.072 1.302.734.845.85 2.05.344 3.582-.56 1.686-1.792 2.626-3.662 2.795l-.148.01h-1.364a.577.577 0 0 0-.57.49l-.63 3.102a.407.407 0 0 1-.389.329H9.986a.407.407 0 0 1-.402-.47l1.72-8.468a.5.5 0 0 1 .49-.404h-1.64z" fill="#0079C1"/>
+                                                </svg>
+                                                <strong style="color: var(--color-text-primary); font-size: 0.95rem;">PayPal &bull; Express Checkout</strong>
+                                            </div>
+                                            <span style="font-size: 0.72rem; color: #b45309; font-weight: 700; background: #fef3c7; padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid #fde68a;">Coming Soon</span>
+                                        </div>
+
+                                        <div class="coming-soon-notice-card" style="background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; display: flex; gap: 0.75rem; align-items: flex-start;">
+                                            <div style="flex-shrink: 0; margin-top: 2px;">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                            </div>
+                                            <div style="font-size: 0.8rem; line-height: 1.45; color: #78350f;">
+                                                <div style="font-weight: 700; color: #92400e; font-size: 0.85rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
+                                                    <span>PayPal Gateway Coming Soon</span>
+                                                    <span style="font-size: 0.65rem; background: #fef3c7; color: #b45309; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 700; border: 1px solid #fde68a;">UNDER INTEGRATION</span>
+                                                </div>
+                                                <div>
+                                                    Direct PayPal checkout is currently undergoing final compliance &amp; banking integration. To reserve your fresh Ceylon harvest immediately, please select <strong>Bank Transfer</strong>, <strong>Cash Deposit Slip</strong>, or <strong>Cash on Delivery (Sri Lanka only)</strong>.
+                                                </div>
+                                                <div style="margin-top: 0.45rem; font-size: 0.75rem;">
+                                                    Need concierge assistance? <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge%2C%20I%20would%20like%20assistance%20with%20my%20order" target="_blank" rel="noopener noreferrer" style="color: #b45309; font-weight: 700; text-decoration: underline;">Chat with our Concierge on WhatsApp &rarr;</a>
+                                                </div>
                                             </div>
                                         </div>
+
                                         <div style="background: #ffffff; border: 1px solid #e8e4df; border-radius: 6px; padding: 0.55rem 0.85rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
                                             <span style="font-size: 0.76rem; color: #4b5563;">USD Settlement Amount:</span>
                                             <strong id="cart-paypal-amount-display" style="font-size: 1.05rem; color: #0284c7; font-family: monospace;">${currInfo.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`}</strong>
                                         </div>
                                         <div id="cart-paypal-button-container" class="paypal-smart-container" style="min-height: 44px;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Credit / Debit Card Panel -->
+                                <div id="cart-pay-panel-card" class="pay-panel pay-panel-card">
+                                    <div class="luxury-card-checkout-box" style="background: #faf8f5; border: 1.5px solid #d4af37; border-radius: 8px; padding: 1.15rem;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.6rem;">
+                                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                                <strong style="color: #111827; font-size: 0.92rem;">Credit or Debit Card</strong>
+                                            </div>
+                                            <div class="card-brand-chips">
+                                                <span class="card-chip-badge visa-badge">VISA</span>
+                                                <span class="card-chip-badge mc-badge">MC</span>
+                                                <span class="card-chip-badge amex-badge">AMEX</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="coming-soon-notice-card" style="background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; display: flex; gap: 0.75rem; align-items: flex-start;">
+                                            <div style="flex-shrink: 0; margin-top: 2px;">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                            </div>
+                                            <div style="font-size: 0.8rem; line-height: 1.45; color: #78350f;">
+                                                <div style="font-weight: 700; color: #92400e; font-size: 0.85rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
+                                                    <span>Card Gateway Coming Soon</span>
+                                                    <span style="font-size: 0.65rem; background: #fef3c7; color: #b45309; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 700; border: 1px solid #fde68a;">UNDER INTEGRATION</span>
+                                                </div>
+                                                <div>
+                                                    Direct Credit &amp; Debit Card checkout (Visa, Mastercard, Amex) is currently undergoing final compliance verification. To reserve your harvest immediately, please select <strong>Bank Transfer</strong>, <strong>Cash Deposit Slip</strong>, or <strong>Cash on Delivery (Sri Lanka only)</strong>.
+                                                </div>
+                                                <div style="margin-top: 0.45rem; font-size: 0.75rem;">
+                                                    Need concierge assistance? <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge%2C%20I%20would%20like%20assistance%20with%20my%20order" target="_blank" rel="noopener noreferrer" style="color: #b45309; font-weight: 700; text-decoration: underline;">Chat with our Concierge on WhatsApp &rarr;</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                                            <div>
+                                                <label style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #855b05; margin-bottom: 0.3rem; display: block;">Cardholder Name *</label>
+                                                <input type="text" id="cart-card-name" class="form-control" placeholder="Full name on card" autocomplete="cc-name" style="width: 100%; font-size: 0.85rem; padding: 0.6rem 0.75rem; border: 1.5px solid #d1d5db; border-radius: 6px; background: #fff; color: #111827;">
+                                            </div>
+
+                                            <div>
+                                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                                                    <label style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #855b05;">Card Number *</label>
+                                                    <span id="cart-card-brand-detected" style="font-size: 0.68rem; color: #2563eb; font-weight: 700;">Secure TLS</span>
+                                                </div>
+                                                <div style="position: relative;">
+                                                    <input type="text" id="cart-card-number" class="form-control" placeholder="4000  1234  5678  9010" maxlength="19" autocomplete="cc-number" style="width: 100%; font-size: 0.9rem; font-family: monospace; letter-spacing: 1px; padding: 0.6rem 2.5rem 0.6rem 0.75rem; border: 1.5px solid #d1d5db; border-radius: 6px; background: #fff; color: #111827;">
+                                                    <div style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none;">
+                                                        <svg width="18" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
+                                                <div>
+                                                    <label style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #855b05; margin-bottom: 0.3rem; display: block;">Expiry Date *</label>
+                                                    <input type="text" id="cart-card-expiry" class="form-control" placeholder="MM / YY" maxlength="7" autocomplete="cc-exp" style="width: 100%; font-size: 0.85rem; font-family: monospace; text-align: center; padding: 0.6rem 0.75rem; border: 1.5px solid #d1d5db; border-radius: 6px; background: #fff; color: #111827;">
+                                                </div>
+                                                <div>
+                                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                                                        <label style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #855b05;">Security Code *</label>
+                                                        <span style="font-size: 0.68rem; color: #6b7280;">CVV</span>
+                                                    </div>
+                                                    <div style="position: relative;">
+                                                        <input type="password" id="cart-card-cvc" class="form-control" placeholder="•••" maxlength="4" autocomplete="cc-csc" style="width: 100%; font-size: 0.85rem; font-family: monospace; letter-spacing: 2px; text-align: center; padding: 0.6rem 1.8rem 0.6rem 0.75rem; border: 1.5px solid #d1d5db; border-radius: 6px; background: #fff; color: #111827;">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div style="background: #ffffff; border: 1px solid #d1d5db; border-radius: 6px; padding: 0.55rem 0.85rem; margin-top: 0.2rem; display: flex; justify-content: space-between; align-items: center;">
+                                                <span style="font-size: 0.76rem; color: #4b5563;">Direct Card Settlement:</span>
+                                                <strong id="cart-card-amount-display" style="font-size: 1.05rem; color: #1d4ed8; font-family: monospace;">${currInfo.code === 'USD' ? `$${grandTotalUSD.toFixed(2)} USD` : `${formattedGrandTotal} ($${grandTotalUSD.toFixed(2)} USD)`}</strong>
+                                            </div>
+
+                                            <button type="submit" id="cart-pay-card-btn" class="btn btn-primary" style="width: 100%; padding: 0.85rem 1.25rem; font-size: 0.95rem; font-weight: 700; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 0.55rem; cursor: pointer; box-shadow: 0 4px 14px rgba(37,99,235,0.25); background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%); border-color: #1d4ed8; color: #ffffff; margin-top: 0.2rem;">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                                <span id="cart-pay-card-btn-text">Pay with Card &bull; ${formattedGrandTotal}</span>
+                                            </button>
+
+                                            <div style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.7rem; color: #6b7280; margin-top: 0.1rem;">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                                <span>256-Bit Bank Encryption &bull; PCI-DSS Level 1 Certified</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -7399,7 +7705,7 @@ const UIComponents = {
                                 <strong id="cart-discount-amt">-${formattedDiscount}</strong>
                             </div>
                             <div class="checkout-totals-row">
-                                <span id="cart-summary-shipping-label">${isSriLanka ? 'Sri Lanka Post EMS Courier' : 'Sri Lanka Post EMS Priority Air'}</span>
+                                <span id="cart-summary-shipping-label">${isSriLanka ? 'SL Post EMS Courier' : 'SL Post EMS Priority Air'}</span>
                                 <span id="cart-summary-shipping" style="color: ${shippingUSD > 0 ? '#15803d' : 'var(--color-gold)'}; font-weight: 600;">${formattedShipping}</span>
                             </div>
                             <div class="checkout-grand-total-row">
@@ -7719,6 +8025,11 @@ const UIComponents = {
         });
 
         // 5. Construct full Seven Teahouse HTML markup
+        const storeReviews = (window.TeaFactoryStore && window.TeaFactoryStore.getReviews ? window.TeaFactoryStore.getReviews() : []) || [];
+        const reviewCount = storeReviews.length;
+        const reviewStats = (window.TeaFactoryStore && window.TeaFactoryStore.getReviewStats ? window.TeaFactoryStore.getReviewStats() : { average: "0.0", count: 0, distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } });
+        const avgRating = reviewCount > 0 ? reviewStats.average : "0.0";
+
         container.innerHTML = `
             <div class="seventea-container">
                 <!-- TOP BREADCRUMB / BRAND EYEBROW -->
@@ -7777,11 +8088,19 @@ const UIComponents = {
                         <!-- Title -->
                         <h1 class="seventea-title">${title}</h1>
 
-                        <!-- Gold Star Rating -->
+                        <!-- Customer Rating Row -->
                         <div class="seventea-rating-row">
-                            <span class="seventea-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                            <span class="seventea-rating-val">5.0</span>
-                            <span class="seventea-rating-count">(2 reviews)</span>
+                            ${reviewCount > 0 ? `
+                                <span class="seventea-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                <span class="seventea-rating-val">${avgRating}</span>
+                                <span class="seventea-rating-count">(${reviewCount} review${reviewCount === 1 ? '' : 's'})</span>
+                            ` : `
+                                <span class="seventea-stars" style="color: #cbd5e1; letter-spacing: 2px;">&#9734;&#9734;&#9734;&#9734;&#9734;</span>
+                                <span class="seventea-rating-val" style="font-size: 0.82rem; color: #64748b; font-weight: normal;">No reviews yet</span>
+                            `}
+                            <button type="button" class="seventea-write-review-link" onclick="window.openReviewModal ? window.openReviewModal('${title.replace(/'/g, "\\'")}') : (window.openDrawer &amp;&amp; window.openDrawer('review'));" style="background: none; border: none; padding: 0 0.45rem; color: #b8860b; font-size: 0.82rem; font-weight: 600; cursor: pointer; text-decoration: underline;">
+                                Write a review
+                            </button>
                         </div>
 
                         <!-- Strikethrough & Current Price -->
@@ -7883,7 +8202,7 @@ const UIComponents = {
                                 <span class="seventea-perk-check">&#10003;</span>
                                 <div>
                                     <div class="seventea-perk-title">Pickup available at Rock One Wild Tea Estate</div>
-                                    <div class="seventea-perk-sub">Usually ready in 24 hours &bull; <a href="#location-section" onclick="window.closeProductDetail && window.closeProductDetail();" style="color: #b8860b; text-decoration: underline;">View estate information</a></div>
+                                    <div class="seventea-perk-sub">Usually ready in 24 hours &bull; <a href="javascript:void(0)" class="seventea-estate-info-link" id="seventea-view-estate-btn" style="color: #b8860b; text-decoration: underline; cursor: pointer; font-weight: 500;">View estate information</a></div>
                                 </div>
                             </div>
                             <div class="seventea-perk-item">
@@ -7895,18 +8214,46 @@ const UIComponents = {
                             </div>
                         </div>
 
-                        <!-- Share Link -->
+                        <!-- Share Link & Luxury Social Popover -->
                         <div class="seventea-share-row">
-                            <button type="button" class="seventea-share-btn" id="seventea-share-btn">
+                            <button type="button" class="seventea-share-btn" id="seventea-share-btn" aria-label="Share this single-estate tea harvest" title="Share or Copy Link">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
                                 <span>Share</span>
                             </button>
+                            <div id="seventea-share-popover" class="seventea-share-popover" style="display: none;">
+                                <div class="seventea-share-popover-header">
+                                    <h4 class="seventea-share-popover-title">Share This Harvest</h4>
+                                    <button type="button" class="seventea-share-popover-close" id="seventea-share-popover-close" aria-label="Close Share Menu">&times;</button>
+                                </div>
+                                <div class="seventea-share-copy-row">
+                                    <input type="text" readonly class="seventea-share-url-input" id="seventea-share-url-input" value="${window.location.href}">
+                                    <button type="button" class="seventea-share-copy-action-btn" id="seventea-share-copy-action-btn">Copy</button>
+                                </div>
+                                <div class="seventea-share-social-grid">
+                                    <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(`Discover ${title} from Rock One Wild Tea Estate, Sri Lanka: ${window.location.href}`)}" target="_blank" rel="noopener" class="seventea-share-social-item" title="Share on WhatsApp">
+                                        <span style="font-size: 1.1rem;">💬</span>
+                                        <span>WhatsApp</span>
+                                    </a>
+                                    <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" rel="noopener" class="seventea-share-social-item" title="Share on Facebook">
+                                        <span style="font-size: 1.1rem; color: #1877f2;">📘</span>
+                                        <span>Facebook</span>
+                                    </a>
+                                    <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(`Discover ${title} from Rock One Wild Tea Estate, Sri Lanka:`)}&url=${encodeURIComponent(window.location.href)}" target="_blank" rel="noopener" class="seventea-share-social-item" title="Share on X">
+                                        <span style="font-size: 1.1rem; color: #000;">✖️</span>
+                                        <span>X</span>
+                                    </a>
+                                    <a href="mailto:?subject=${encodeURIComponent(`${title} | Rock One Wild Tea Estate`)}&body=${encodeURIComponent(`I thought you might appreciate this artisanal Ceylon tea:\n\n${title}\n${window.location.href}`)}" class="seventea-share-social-item" title="Share via Email">
+                                        <span style="font-size: 1.1rem;">✉️</span>
+                                        <span>Email</span>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
                 </div>
 
-                <!-- BOTTOM: FULL CUSTOMER REVIEWS SECTION (PARITY WITH SCREENSHOT 4) -->
+                <!-- BOTTOM: FULL CUSTOMER REVIEWS SECTION -->
                 <div class="seventea-reviews-block">
                     <h2 class="seventea-reviews-header">Customer reviews</h2>
                     
@@ -7914,47 +8261,35 @@ const UIComponents = {
                         <!-- Score Display -->
                         <div class="seventea-review-score-box">
                             <div class="seventea-big-score">
-                                <span class="seventea-score-num">5</span>
+                                <span class="seventea-score-num">${reviewCount > 0 ? avgRating : '0'}</span>
                                 <span class="seventea-score-denom">/ 5</span>
                             </div>
-                            <div class="seventea-score-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                            <div class="seventea-score-sub">2 verified reviews</div>
+                            <div class="seventea-score-stars" style="color: ${reviewCount > 0 ? '#eab308' : '#cbd5e1'};">
+                                ${reviewCount > 0 ? '&#9733;&#9733;&#9733;&#9733;&#9733;' : '&#9734;&#9734;&#9734;&#9734;&#9734;'}
+                            </div>
+                            <div class="seventea-score-sub">${reviewCount} verified review${reviewCount === 1 ? '' : 's'}</div>
                         </div>
 
                         <!-- 5-Star Breakdown Progress Bars -->
                         <div class="seventea-rating-bars">
-                            <div class="seventea-bar-row">
-                                <span class="seventea-bar-label">5 &starf;</span>
-                                <div class="seventea-bar-track">
-                                    <div class="seventea-bar-fill" style="width: 100%;"></div>
-                                </div>
-                                <span class="seventea-bar-pct">100%</span>
-                            </div>
-                            <div class="seventea-bar-row">
-                                <span class="seventea-bar-label">4 &starf;</span>
-                                <div class="seventea-bar-track"><div class="seventea-bar-fill" style="width: 0%;"></div></div>
-                                <span class="seventea-bar-pct">0%</span>
-                            </div>
-                            <div class="seventea-bar-row">
-                                <span class="seventea-bar-label">3 &starf;</span>
-                                <div class="seventea-bar-track"><div class="seventea-bar-fill" style="width: 0%;"></div></div>
-                                <span class="seventea-bar-pct">0%</span>
-                            </div>
-                            <div class="seventea-bar-row">
-                                <span class="seventea-bar-label">2 &starf;</span>
-                                <div class="seventea-bar-track"><div class="seventea-bar-fill" style="width: 0%;"></div></div>
-                                <span class="seventea-bar-pct">0%</span>
-                            </div>
-                            <div class="seventea-bar-row">
-                                <span class="seventea-bar-label">1 &starf;</span>
-                                <div class="seventea-bar-track"><div class="seventea-bar-fill" style="width: 0%;"></div></div>
-                                <span class="seventea-bar-pct">0%</span>
-                            </div>
+                            ${[5, 4, 3, 2, 1].map(star => {
+                                const countForStar = reviewStats.distribution ? (reviewStats.distribution[star] || 0) : 0;
+                                const pct = reviewCount > 0 ? Math.round((countForStar / reviewCount) * 100) : 0;
+                                return `
+                                    <div class="seventea-bar-row">
+                                        <span class="seventea-bar-label">${star} &starf;</span>
+                                        <div class="seventea-bar-track">
+                                            <div class="seventea-bar-fill" style="width: ${pct}%;"></div>
+                                        </div>
+                                        <span class="seventea-bar-pct">${pct}%</span>
+                                    </div>
+                                `;
+                            }).join('')}
                         </div>
 
-                        <!-- Write Review Action -->
+                        <!-- Write Review Action (KEPT ACTIVE AS REQUESTED) -->
                         <div class="seventea-write-review-wrap">
-                            <button type="button" class="seventea-btn-write-review" onclick="window.showToast ? window.showToast('Patron Review Portal', 'Review submission form opened for verified patrons.', 'info') : alert('Review Portal');">
+                            <button type="button" class="seventea-btn-write-review" onclick="window.openReviewModal ? window.openReviewModal('${title.replace(/'/g, "\\'")}') : (window.openDrawer &amp;&amp; window.openDrawer('review'));">
                                 Write a review
                             </button>
                         </div>
@@ -7962,7 +8297,8 @@ const UIComponents = {
 
                     <!-- Filter Controls Strip -->
                     <div class="seventea-filter-strip">
-                        <div class="seventea-filter-tab active">Reviews 2</div>
+                        <div class="seventea-filter-tab active">Reviews ${reviewCount}</div>
+                        ${reviewCount > 0 ? `
                         <div class="seventea-filter-tools">
                             <div class="seventea-search-input-wrap">
                                 <span>&#128269;</span>
@@ -7973,47 +8309,36 @@ const UIComponents = {
                                 <option>Highest rating</option>
                                 <option>Most recent</option>
                             </select>
-                            <select class="seventea-filter-select">
-                                <option>All ratings</option>
-                                <option>5 stars only</option>
-                            </select>
-                            <button type="button" class="seventea-media-filter-btn">With media</button>
                         </div>
+                        ` : ''}
                     </div>
 
-                    <!-- Verified Review Cards -->
+                    <!-- Verified Review Cards or Clean Empty State -->
                     <div class="seventea-review-cards-list">
-                        
-                        <!-- Review 1 -->
-                        <div class="seventea-review-card">
-                            <div class="seventea-card-top">
-                                <div class="seventea-card-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                                <div class="seventea-card-date">2 months ago</div>
+                        ${reviewCount > 0 ? storeReviews.map(r => `
+                            <div class="seventea-review-card">
+                                <div class="seventea-card-top">
+                                    <div class="seventea-card-stars">${'★'.repeat(Number(r.rating) || 5)}</div>
+                                    <div class="seventea-card-date">${r.date || 'Recent'}</div>
+                                </div>
+                                <div class="seventea-card-author">
+                                    <strong class="seventea-author-name">${r.name || r.author || 'Anonymous Patron'}</strong>
+                                    <span class="seventea-verified-badge">&#10003; Verified buyer</span>
+                                </div>
+                                <p class="seventea-card-text">${r.comment || r.content || ''}</p>
                             </div>
-                            <div class="seventea-card-author">
-                                <strong class="seventea-author-name">K B.</strong>
-                                <span class="seventea-verified-badge">&#10003; Verified buyer</span>
+                        `).join('') : `
+                            <div class="seventea-no-reviews-box" style="text-align: center; padding: 2.75rem 1.5rem; background: #faf9f6; border: 1.5px dashed #e2ded5; border-radius: 12px; margin-top: 0.75rem;">
+                                <div style="font-size: 1.8rem; margin-bottom: 0.4rem;">🍃</div>
+                                <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: #1f2937; margin-bottom: 0.35rem;">No Customer Reviews Yet</h4>
+                                <p style="font-size: 0.85rem; color: #6b7280; max-width: 440px; margin: 0 auto 1.25rem auto; line-height: 1.6;">
+                                    There are currently no customer reviews published for this single-estate tea. Have you experienced this harvest? Be the first to share your tasting impressions.
+                                </p>
+                                <button type="button" class="seventea-btn-add" onclick="window.openReviewModal ? window.openReviewModal('${title.replace(/'/g, "\\'")}') : (window.openDrawer &amp;&amp; window.openDrawer('review'));" style="max-width: 220px; margin: 0 auto; display: inline-flex; align-items: center; justify-content: center; height: 42px; font-size: 0.82rem;">
+                                    Write the First Review
+                                </button>
                             </div>
-                            <p class="seventea-card-text">
-                                Exceptional smoothness and natural sweetness. The liquor pours a luminous golden amber with subtle floral nuances. Even after the 4th infusion, the delicate honey sweetness lingers on the palate. One of the finest single-origin teas I have experienced worldwide.
-                            </p>
-                        </div>
-
-                        <!-- Review 2 -->
-                        <div class="seventea-review-card">
-                            <div class="seventea-card-top">
-                                <div class="seventea-card-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                                <div class="seventea-card-date">3 weeks ago</div>
-                            </div>
-                            <div class="seventea-card-author">
-                                <strong class="seventea-author-name">Eleanor Vance</strong>
-                                <span class="seventea-verified-badge">&#10003; Verified buyer</span>
-                            </div>
-                            <p class="seventea-card-text">
-                                Arrived promptly in London directly from the Sri Lanka estate, sealed in a gorgeous luxury tin. The leaf aroma before steeping is heavenly, and the taste is silky and refined without any bitterness. Highest recommendation.
-                            </p>
-                        </div>
-
+                        `}
                     </div>
 
                 </div>
@@ -8238,22 +8563,129 @@ const UIComponents = {
         if (expressBuyBtn) expressBuyBtn.addEventListener('click', triggerDirectCheckout);
         if (morePaymentBtn) morePaymentBtn.addEventListener('click', triggerDirectCheckout);
 
-        // Share button
-        const shareBtn = document.getElementById('seventea-share-btn');
-        if (shareBtn) {
-            shareBtn.addEventListener('click', () => {
-                const url = window.location.href;
-                if (navigator.clipboard) {
-                    navigator.clipboard.writeText(url).then(() => {
-                        if (window.showToast) window.showToast('Link Copied', 'Product link copied to clipboard.', 'success');
-                    }).catch(() => {
-                        if (window.showToast) window.showToast('Share Link', url, 'info');
-                    });
-                } else if (window.showToast) {
-                    window.showToast('Share Link', url, 'info');
+        // View Estate Information Button
+        const viewEstateBtn = document.getElementById('seventea-view-estate-btn');
+        if (viewEstateBtn) {
+            viewEstateBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (window.openEstateInfoModal) {
+                    window.openEstateInfoModal();
                 }
             });
         }
+
+        // Share button & Popover Logic
+        const shareBtn = document.getElementById('seventea-share-btn');
+        const sharePopover = document.getElementById('seventea-share-popover');
+        const sharePopoverClose = document.getElementById('seventea-share-popover-close');
+        const shareCopyBtn = document.getElementById('seventea-share-copy-action-btn');
+        const shareInput = document.getElementById('seventea-share-url-input');
+
+        const executeCopy = () => {
+            const url = window.location.href;
+            const fallbackCopy = () => {
+                const ta = document.createElement('textarea');
+                ta.value = url;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                try { document.execCommand('copy'); } finally { document.body.removeChild(ta); }
+            };
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).catch(fallbackCopy);
+            } else {
+                fallbackCopy();
+            }
+
+            // In-button visual state
+            if (shareBtn) {
+                shareBtn.classList.add('copied');
+                shareBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> <span>Link Copied!</span>`;
+                setTimeout(() => {
+                    shareBtn.classList.remove('copied');
+                    shareBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> <span>Share</span>`;
+                }, 2500);
+            }
+
+            if (shareCopyBtn) {
+                shareCopyBtn.textContent = 'Copied!';
+                shareCopyBtn.style.background = '#16a34a';
+                shareCopyBtn.style.borderColor = '#16a34a';
+                setTimeout(() => {
+                    shareCopyBtn.textContent = 'Copy';
+                    shareCopyBtn.style.background = '';
+                    shareCopyBtn.style.borderColor = '';
+                }, 2500);
+            }
+
+            if (window.showToast) {
+                window.showToast('Link Copied', `Direct share link for ${title} copied to clipboard.`, 'success');
+            }
+        };
+
+        if (shareBtn) {
+            shareBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const url = window.location.href;
+                const shareData = {
+                    title: `${title} | Rock One Wild Tea Estate`,
+                    text: `Discover ${title} from Rock One Wild Tea Estate, Sri Lanka:`,
+                    url: url
+                };
+
+                // Try Web Share API on mobile devices first
+                if (navigator.share && /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+                    navigator.share(shareData).then(() => {
+                        if (window.showToast) window.showToast('Shared', 'Thank you for sharing Rock One Wild Tea!', 'success');
+                    }).catch((err) => {
+                        if (err.name !== 'AbortError') {
+                            executeCopy();
+                            if (sharePopover) sharePopover.style.display = 'block';
+                        }
+                    });
+                } else {
+                    executeCopy();
+                    if (sharePopover) {
+                        sharePopover.style.display = sharePopover.style.display === 'block' ? 'none' : 'block';
+                    }
+                }
+            });
+        }
+
+        if (shareCopyBtn) {
+            shareCopyBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                executeCopy();
+            });
+        }
+
+        if (sharePopoverClose) {
+            sharePopoverClose.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (sharePopover) sharePopover.style.display = 'none';
+            });
+        }
+
+        if (shareInput) {
+            shareInput.addEventListener('click', (e) => {
+                e.stopPropagation();
+                shareInput.select();
+            });
+        }
+
+        // Close popover when clicking anywhere else
+        const handleOutsideClick = (e) => {
+            if (sharePopover && sharePopover.style.display === 'block') {
+                if (!sharePopover.contains(e.target) && e.target !== shareBtn && !shareBtn.contains(e.target)) {
+                    sharePopover.style.display = 'none';
+                }
+            }
+        };
+        document.addEventListener('click', handleOutsideClick);
 
         // 7. Reveal Modal
         modal.classList.add('active', 'open');
@@ -8263,50 +8695,18 @@ const UIComponents = {
 
     renderCheckoutReviewsHTML(itemName = 'Single-Estate Artisanal Harvest') {
         const storeReviews = (window.TeaFactoryStore && window.TeaFactoryStore.getReviews ? window.TeaFactoryStore.getReviews() : []) || [];
+        const reviewStats = (window.TeaFactoryStore && window.TeaFactoryStore.getReviewStats ? window.TeaFactoryStore.getReviewStats() : { average: "0.0", count: 0, distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } });
         
-        // Base verified customer reviews modeled after Seven Teahouse (Screenshot 4)
-        const defaultReviews = [
-            {
-                author: 'K B.',
-                badge: 'Verified buyer',
-                date: '2 months ago',
-                rating: 5,
-                content: 'Exceptional smoothness and natural sweetness. The liquor pours a luminous golden amber with subtle floral nuances. Even after the 4th infusion, the delicate honey sweetness lingers on the palate. One of the finest single-origin teas I have experienced worldwide.'
-            },
-            {
-                author: 'Eleanor Vance',
-                badge: 'Verified buyer',
-                date: '3 weeks ago',
-                rating: 5,
-                content: 'Arrived promptly in London directly from the Sri Lanka estate, sealed in a gorgeous luxury tin. The leaf aroma before steeping is heavenly, and the taste is silky and refined without any bitterness. Highest recommendation.'
-            },
-            {
-                author: 'Master Sommelier Jean-Luc',
-                badge: 'Verified patron',
-                date: '1 month ago',
-                rating: 5,
-                content: 'The high-elevation terroir of Passara and Wellawela comes alive in every steep. A brilliant balance of wild floral notes and malted honey sweetness. Beautifully presented with complete provenance.'
-            },
-            {
-                author: 'Priya Dharmasena',
-                badge: 'Verified buyer',
-                date: '2 weeks ago',
-                rating: 5,
-                content: 'Remarkable quality! Fresh, aromatic, and distinctly Ceylon high-grown. Ordering directly from the estate was seamless and parcel tracking was clear throughout.'
-            }
-        ];
-
         // Format any user submitted reviews from store
-        const formattedStoreReviews = storeReviews.map(r => ({
+        const allReviews = storeReviews.map(r => ({
             author: r.name || r.author || 'Anonymous Patron',
             badge: 'Verified buyer',
             date: r.date || 'Recent order',
             rating: Number(r.rating) || 5,
             content: r.comment || r.content || 'Exceptional single-estate quality and exquisite aroma.'
         }));
-
-        const allReviews = [...formattedStoreReviews, ...defaultReviews];
         const totalCount = allReviews.length;
+        const avgRating = totalCount > 0 ? reviewStats.average : "0.0";
 
         const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
@@ -8326,47 +8726,35 @@ const UIComponents = {
                     <!-- Big Score Display -->
                     <div class="seventea-review-score-box">
                         <div class="seventea-big-score">
-                            <span class="seventea-score-num">5</span>
+                            <span class="seventea-score-num">${totalCount > 0 ? avgRating : '0'}</span>
                             <span class="seventea-score-denom">/ 5</span>
                         </div>
-                        <div class="seventea-score-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                        <div class="seventea-score-sub">${totalCount} verified reviews</div>
+                        <div class="seventea-score-stars" style="color: ${totalCount > 0 ? '#eab308' : '#cbd5e1'};">
+                            ${totalCount > 0 ? '&#9733;&#9733;&#9733;&#9733;&#9733;' : '&#9734;&#9734;&#9734;&#9734;&#9734;'}
+                        </div>
+                        <div class="seventea-score-sub">${totalCount} verified review${totalCount === 1 ? '' : 's'}</div>
                     </div>
 
                     <!-- 5-Star Breakdown Progress Bars -->
                     <div class="seventea-rating-bars">
-                        <div class="seventea-bar-row">
-                            <span class="seventea-bar-label">5 &starf;</span>
-                            <div class="seventea-bar-track">
-                                <div class="seventea-bar-fill" style="width: 100%;"></div>
-                            </div>
-                            <span class="seventea-bar-pct">100%</span>
-                        </div>
-                        <div class="seventea-bar-row">
-                            <span class="seventea-bar-label">4 &starf;</span>
-                            <div class="seventea-bar-track"><div class="seventea-bar-fill" style="width: 0%;"></div></div>
-                            <span class="seventea-bar-pct">0%</span>
-                        </div>
-                        <div class="seventea-bar-row">
-                            <span class="seventea-bar-label">3 &starf;</span>
-                            <div class="seventea-bar-track"><div class="seventea-bar-fill" style="width: 0%;"></div></div>
-                            <span class="seventea-bar-pct">0%</span>
-                        </div>
-                        <div class="seventea-bar-row">
-                            <span class="seventea-bar-label">2 &starf;</span>
-                            <div class="seventea-bar-track"><div class="seventea-bar-fill" style="width: 0%;"></div></div>
-                            <span class="seventea-bar-pct">0%</span>
-                        </div>
-                        <div class="seventea-bar-row">
-                            <span class="seventea-bar-label">1 &starf;</span>
-                            <div class="seventea-bar-track"><div class="seventea-bar-fill" style="width: 0%;"></div></div>
-                            <span class="seventea-bar-pct">0%</span>
-                        </div>
+                        ${[5, 4, 3, 2, 1].map(star => {
+                            const countForStar = reviewStats.distribution ? (reviewStats.distribution[star] || 0) : 0;
+                            const pct = totalCount > 0 ? Math.round((countForStar / totalCount) * 100) : 0;
+                            return `
+                                <div class="seventea-bar-row">
+                                    <span class="seventea-bar-label">${star} &starf;</span>
+                                    <div class="seventea-bar-track">
+                                        <div class="seventea-bar-fill" style="width: ${pct}%;"></div>
+                                    </div>
+                                    <span class="seventea-bar-pct">${pct}%</span>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
 
-                    <!-- Write Review Action Button -->
+                    <!-- Write Review Action Button (KEPT ACTIVE AS REQUESTED) -->
                     <div class="seventea-write-review-wrap">
-                        <button type="button" class="seventea-btn-write-review" onclick="window.openDrawer ? window.openDrawer('review') : (window.showToast &amp;&amp; window.showToast('Patron Review', 'Write a review portal', 'info'));">
+                        <button type="button" class="seventea-btn-write-review" onclick="window.openReviewModal ? window.openReviewModal('${esc(itemName)}') : (window.openDrawer &amp;&amp; window.openDrawer('review'));">
                             Write a review
                         </button>
                     </div>
@@ -8375,6 +8763,7 @@ const UIComponents = {
                 <!-- Filter Controls Strip -->
                 <div class="seventea-filter-strip">
                     <div class="seventea-filter-tab active" id="checkout-reviews-tab-count">Reviews ${totalCount}</div>
+                    ${totalCount > 0 ? `
                     <div class="seventea-filter-tools">
                         <div class="seventea-search-input-wrap">
                             <span>&#128269;</span>
@@ -8391,11 +8780,12 @@ const UIComponents = {
                         </select>
                         <button type="button" class="seventea-media-filter-btn" id="checkout-reviews-media-btn">With media</button>
                     </div>
+                    ` : ''}
                 </div>
 
-                <!-- Verified Review Cards List -->
+                <!-- Verified Review Cards List or Clean Empty State -->
                 <div class="seventea-review-cards-list" id="checkout-review-cards-list">
-                    ${allReviews.map(r => `
+                    ${totalCount > 0 ? allReviews.map(r => `
                         <div class="seventea-review-card" data-rating="${r.rating}" data-author="${esc(r.author.toLowerCase())}" data-content="${esc(r.content.toLowerCase())}">
                             <div class="seventea-card-top">
                                 <div class="seventea-card-stars">${this.renderStars(r.rating)}</div>
@@ -8409,7 +8799,18 @@ const UIComponents = {
                                 ${esc(r.content)}
                             </p>
                         </div>
-                    `).join('')}
+                    `).join('') : `
+                        <div class="seventea-no-reviews-box" style="text-align: center; padding: 2.5rem 1.25rem; background: #faf9f6; border: 1.5px dashed #e2ded5; border-radius: 12px; margin-top: 0.75rem;">
+                            <div style="font-size: 1.8rem; margin-bottom: 0.4rem;">🍃</div>
+                            <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: #1f2937; margin-bottom: 0.35rem;">No Customer Reviews Yet</h4>
+                            <p style="font-size: 0.85rem; color: #6b7280; max-width: 440px; margin: 0 auto 1.25rem auto; line-height: 1.6;">
+                                Be the first to share your tasting impressions of this single-estate tea allocation.
+                            </p>
+                            <button type="button" class="btn btn-primary" onclick="window.openReviewModal ? window.openReviewModal('${esc(itemName)}') : (window.openDrawer &amp;&amp; window.openDrawer('review'));" style="padding: 0.7rem 1.5rem; font-size: 0.82rem; font-weight: 700; border-radius: 6px;">
+                                Write a Review
+                            </button>
+                        </div>
+                    `}
                 </div>
             </div>
         `;

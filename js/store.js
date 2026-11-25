@@ -385,67 +385,71 @@ const DEFAULT_GALLERY_IMAGES = [
 const DEFAULT_HERO_SLIDES = [
     {
         id: "slide_01",
-        image: "images/hero_slide_1.jpg?v=3.70.0",
-        subtitle: "Authentic • Organic • Traditional",
-        title: "<span class=\"hero-title-top\">Rock One's Organic</span><span class=\"hero-title-bottom\">Tea Heritage</span>",
-        tagline: "Where Nature Meets Tradition",
-        description: "Discover the ancient art of organic tea-making in the heart of Ceylon's mountains. From our wild forest garden to your cup, experience the authentic journey of premium artisanal tea.",
+        image: "images/hero_slide_1.jpg?v=3.88.1",
+        subtitle: "ROCK ONE WILD TEA • Handcrafted Premium Ceylon Tea",
+        title: "<span class=\"hero-title-top\">From Our Wild Forest Tea Garden</span><span class=\"hero-title-bottom\">to Your Cup.</span>",
+        tagline: "Small Batch Handcrafted Tea",
+        description: "Discover the character of handcrafted Ceylon tea, grown in Sri Lanka’s Uva Medium Region and carefully produced by our family.",
         enabled: true,
         isHeritage: true
     },
     {
         id: "slide_02",
-        image: "images/hero_slide_2.jpg?v=3.70.0",
-        subtitle: "Forested Mountain Terroir • 1,240m Elevation",
-        title: "Wild Arbor Garden. <span>Mountain Foothill Heritage.</span>",
-        description: "Grown naturally amidst virgin mountain forest and ancient flora at the foot of our iconic rock formation in Ettampitiya, free from chemical fertilizers and synthetic pesticides.",
+        image: "images/hero_slide_2.jpg?v=3.88.1",
+        subtitle: "Small Batch Handcrafted Tea • 1,240m Elevation",
+        title: "From Our Wild Forest Tea Garden<br><span>to the World.</span>",
+        tagline: "From Our Wild Forest Tea Garden to the World",
+        description: "Discover the character of handcrafted Ceylon tea, grown in Sri Lanka’s Uva Medium Region and carefully produced by our family at the foot of our iconic rock formation.",
         enabled: true
     },
     {
         id: "slide_03",
-        image: "images/hero_slide_3.jpg?v=3.70.0",
-        subtitle: "Generational Artisans • Selective Two Leaves & A Bud",
-        title: "Dawn Hand-Plucking. <span>Artisanal Purity.</span>",
-        description: "Every tender shoot is hand-harvested at first light by skilled generational pluckers to preserve precious silver tips, essential oils, and volatile aromatics.",
+        image: "images/hero_slide_3.jpg?v=3.88.1",
+        subtitle: "Handcrafted Premium Black Tea • Selective Harvest",
+        title: "Handcrafted Premium Black Tea.<br><span>Artisanal Purity.</span>",
+        tagline: "Handcrafted Premium Black Tea",
+        description: "Every tender shoot is selectively hand-harvested at dawn in our wild forest garden to preserve precious silver tips, rich essential oils, and natural sweetness.",
         enabled: true
     },
     {
         id: "slide_04",
-        image: "images/hero_slide_4.jpg?v=3.70.0",
-        subtitle: "Time-Honored Orthodox Methods • Fragrant Cedar Air-Withering",
-        title: "Orthodox Rolling. <span>Traditional Family Craft.</span>",
-        description: "Leaves undergo natural mountain air-withering on cedar troughs and gentle brass rolling to unlock rich polyphenols and the signature brisk character of Uva Medium teas.",
+        image: "images/hero_slide_4.jpg?v=3.88.1",
+        subtitle: "A Family’s Passion for Handcrafted Ceylon Tea",
+        title: "A Family’s Passion<br><span>for Handcrafted Ceylon Tea.</span>",
+        tagline: "A Family’s Passion for Handcrafted Ceylon Tea",
+        description: "From our own tea garden to our family factory, every batch of Rock One Wild Tea is carefully crafted by hand with time-honored orthodox rolling.",
         enabled: true
     },
     {
         id: "slide_05",
-        image: "images/hero_slide_5.jpg?v=3.70.0",
-        subtitle: "Small-Batch Processing • Precision Temperature Control",
-        title: "Historic Wood-Firing. <span>Flavor Perfection.</span>",
-        description: "Calibrated wood-fired curing locks in volatile aromas and amber liquor notes, crafting an unforgettable Ceylon tea tasting experience.",
+        image: "images/hero_slide_5.jpg?v=3.88.1",
+        subtitle: "Carefully Crafted By Hand • Small-Batch Processing",
+        title: "From Garden to Family Factory.<br><span>Carefully Crafted by Hand.</span>",
+        tagline: "From Our Own Garden to Our Family Factory",
+        description: "From our own tea garden to our family factory, every batch of Rock One Wild Tea is carefully crafted by hand to ensure uncompromised quality in every cup.",
         enabled: true
     },
     {
         id: "slide_06",
-        image: "images/hero_slide_6.jpg?v=3.70.0",
+        image: "images/hero_slide_6.jpg?v=3.88.1",
         subtitle: "Solid Light-Wood Teak Chests • Individually Numbered (1 to 10)",
-        title: "Numbered Collector Chests. <span>Limited Allocations.</span>",
+        title: "Numbered Collector Chests.<br><span>Limited Allocations.</span>",
         description: "Each seasonal equinox release yields strictly 10 individually numbered collector chests, hand-sealed with private estate gold bullion wax and registered with certified provenance deeds.",
         enabled: true
     },
     {
         id: "slide_07",
-        image: "images/hero_slide_7.jpg?v=3.70.0",
+        image: "images/hero_slide_7.jpg?v=3.88.0",
         subtitle: "Private Tours (Mon–Sat) • Max 10 Visitors Per Session",
-        title: "Visit Our Family Factory. <span>Artisanal Tea Tasting.</span>",
+        title: "Visit Our Family Factory.<br><span>Artisanal Tea Tasting.</span>",
         description: "Discover the story of Rock One Wild Tea with guided walkthroughs, tea leaf selection, orthodox processing, and sommelier cupping (9:30 AM, 11:00 AM, 1:30 PM, 3:30 PM).",
         enabled: true
     },
     {
         id: "slide_08",
-        image: "images/hero_slide_8.jpg?v=3.70.0",
-        subtitle: "Artisanal Packaging • Handcrafted from Sri Lankan Teak",
-        title: "Artisanal Packaging. <span>The Perfect Gift.</span>",
+        image: "images/hero_slide_8.jpg?v=3.88.0",
+        subtitle: "Handmade With Care • Crafted From Ceylon",
+        title: "Artisanal Packaging.<br><span>The Perfect Gift.</span>",
         description: "Presentation boxes handcrafted by local carpenters from solid Sri Lankan teak, containing our finest whole-leaf Ceylon black and green tea selections.",
         enabled: true
     }
@@ -525,10 +529,10 @@ if (typeof window !== 'undefined') {
         }
 
         if (isDomestic) {
-            // Domestic Sri Lanka Post EMS Express: Rs 650 (~$2.13 USD), complimentary for orders >= $80 USD
+            // Domestic SL Post EMS Express: Rs 650 (~$2.13 USD), complimentary for orders >= $80 USD
             return subtotalUSD >= 80 ? 0 : 2.13;
         } else {
-            // International Sri Lanka Post EMS Priority Air Courier: $15.00 USD, complimentary for orders >= $150 USD
+            // International SL Post EMS Priority Air Courier: $15.00 USD, complimentary for orders >= $150 USD
             return subtotalUSD >= 150 ? 0 : 15.0;
         }
     };
@@ -617,6 +621,15 @@ class TeaFactoryStore {
                 if (!this.state.reviews || !Array.isArray(this.state.reviews)) {
                     this.state.reviews = [];
                     needsSave = true;
+                }
+                if (Array.isArray(this.state.products)) {
+                    this.state.products.forEach(p => {
+                        if (p.reviewsCount === 38 || p.reviewsCount === 2) {
+                            p.reviewsCount = 0;
+                            p.rating = 0;
+                            needsSave = true;
+                        }
+                    });
                 }
                 if (!this.state.inquiries || !Array.isArray(this.state.inquiries)) {
                     this.state.inquiries = [];
@@ -944,8 +957,8 @@ class TeaFactoryStore {
                 tastingNotes: ['Smooth Sweetness', 'Delicate Floral', 'Honey-Like Character', 'Uva Seasonal Notes'],
                 flavor_notes: ['Smooth Sweetness', 'Delicate Floral', 'Honey-Like Character', 'Uva Seasonal Notes'],
                 sensoryRadar: { floral: 92, malty: 78, sweetness: 88, astringency: 32, body: 82, aroma: 94 },
-                rating: 5.0,
-                reviewsCount: 38,
+                rating: 0,
+                reviewsCount: 0,
                 cultivar: 'TRI 2025',
                 origin: 'Uva Medium Growing Region, Sri Lanka (3,000–5,000 ft)',
                 caffeine: 'Naturally Contains Caffeine',
@@ -1333,19 +1346,21 @@ class TeaFactoryStore {
     }
 
     getHeroSlides() {
-        if (!this.state.heroSlides || !Array.isArray(this.state.heroSlides) || this.state.heroSlides.length === 0) {
+        const CURRENT_SLIDES_VERSION = "v3.88.1";
+        if (!this.state.heroSlides || !Array.isArray(this.state.heroSlides) || this.state.heroSlides.length === 0 || this.state.heroSlidesVersion !== CURRENT_SLIDES_VERSION) {
             this.state.heroSlides = [...DEFAULT_HERO_SLIDES];
+            this.state.heroSlidesVersion = CURRENT_SLIDES_VERSION;
             this.saveState();
         } else {
             // Auto-migrate any old portrait images or unversioned slides to sharp 1080p slides
             let updated = false;
             this.state.heroSlides.forEach(s => {
                 if (s && s.id === 'slide_01') {
-                    s.image = "images/hero_slide_1.jpg?v=3.70.0";
-                    s.subtitle = "Authentic • Organic • Traditional";
-                    s.title = "<span class=\"hero-title-top\">Rock One's Organic</span><span class=\"hero-title-bottom\">Tea Heritage</span>";
-                    s.tagline = "Where Nature Meets Tradition";
-                    s.description = "Discover the ancient art of organic tea-making in the heart of Ceylon's mountains. From our wild forest garden to your cup, experience the authentic journey of premium artisanal tea.";
+                    s.image = "images/hero_slide_1.jpg?v=3.88.1";
+                    s.subtitle = "ROCK ONE WILD TEA • Handcrafted Premium Ceylon Tea";
+                    s.title = "<span class=\"hero-title-top\">From Our Wild Forest Tea Garden</span><span class=\"hero-title-bottom\">to Your Cup.</span>";
+                    s.tagline = "Small Batch Handcrafted Tea";
+                    s.description = "Discover the character of handcrafted Ceylon tea, grown in Sri Lanka’s Uva Medium Region and carefully produced by our family.";
                     s.isHeritage = true;
                     updated = true;
                 } else if (s && s.image) {
@@ -2926,6 +2941,7 @@ Direct Desk: +94 76 789 7817 (Voice) | +94 77 320 9950 (WhatsApp) | rockonewild@
 
         const isCOD = paymentMethod === 'cod';
         const isPayPal = paymentMethod === 'paypal';
+        const isCard = paymentMethod === 'card';
 
         // 1. Create order record in state.orders
         const newOrder = {
@@ -2958,15 +2974,17 @@ Direct Desk: +94 76 789 7817 (Voice) | +94 77 320 9950 (WhatsApp) | rockonewild@
             createdAt: dateNow.toLocaleDateString('en-US', { ...options, hour: '2-digit', minute: '2-digit' }),
             deliveryRange: deliveryRange,
             paymentMethod: paymentMethod,
-            paymentStatus: isCOD ? 'pending_cod' : (isPayPal ? 'Paid & Confirmed' : 'pending_deposit'),
+            paymentStatus: isCOD ? 'pending_cod' : (isPayPal || isCard ? 'Paid & Confirmed' : 'pending_deposit'),
             slipImage: slipImage || customerData.slipImage || '',
+            cardBrand: customerData.cardBrand || '',
+            cardLast4: customerData.cardLast4 || '',
             bankName: "Bank of Ceylon",
             accountName: "Rock one wild tea",
             accountNo: "94945708",
             branch: "Ettampitiya branch",
             referenceNote: orderId,
-            ownerNote: customerData.notes || (isCOD ? "Cash on Delivery via Sri Lanka Post EMS" : "Order placed via Multi-Item Connoisseur Reserve Basket."),
-            status: isCOD ? "Order Confirmed (COD)" : (isPayPal ? "Paid & Confirmed" : "Order Created")
+            ownerNote: customerData.notes || (isCOD ? "Cash on Delivery via SL Post EMS" : (isCard ? `Direct Card Settlement (${customerData.cardBrand || 'Card'} ending in ${customerData.cardLast4 || '4242'})` : "Order placed via Multi-Item Connoisseur Reserve Basket.")),
+            status: isCOD ? "Order Confirmed (COD)" : (isPayPal || isCard ? "Paid & Confirmed" : "Order Created")
         };
 
         if (!this.state.orders) this.state.orders = [];
@@ -3152,8 +3170,8 @@ Rock One Wild Tea Sanctuary Concierge Team
                         teaGarden: bg.teaGarden || p.teaGarden || '',
                         processing: bg.processing || p.processing || '',
                         variants: Array.isArray(p.variants) ? p.variants : (bg.variants || undefined),
-                        rating: Number(p.rating || bg.rating) || 5.0,
-                        reviewsCount: Number(p.reviewsCount || p.reviews_count || bg.reviewsCount) || 38,
+                        rating: Number(p.rating !== undefined ? p.rating : (bg.rating || 0)) || 0,
+                        reviewsCount: Number(p.reviewsCount !== undefined ? p.reviewsCount : (p.reviews_count || bg.reviewsCount || 0)) || 0,
                         symbol: p.symbol || ''
                     };
                 });

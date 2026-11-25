@@ -228,7 +228,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png?v=1.26.0">
 
     <!-- Main Style Sheet -->
-    <link rel="stylesheet" href="css/style.css?v=3.87.3">
+    <link rel="stylesheet" href="css/style.css?v=3.88.1">
     
     <!-- Instant Scroll Position Reset (Ensures refresh & load always start at Top Hero Slideshow) -->
     <script>
@@ -238,24 +238,14 @@
         window.scrollTo(0, 0);
     </script>
     
-    <!-- Remote Debugging global error catcher -->
+    <!-- Global runtime error handler (console logger, suppresses cross-origin script error popups) -->
     <script>
         window.addEventListener('error', function(event) {
-            const errDiv = document.createElement('div');
-            errDiv.style.position = 'fixed';
-            errDiv.style.top = '10px';
-            errDiv.style.left = '10px';
-            errDiv.style.right = '10px';
-            errDiv.style.background = '#c62828';
-            errDiv.style.color = '#fff';
-            errDiv.style.padding = '15px';
-            errDiv.style.zIndex = '99999';
-            errDiv.style.borderRadius = '5px';
-            errDiv.style.fontFamily = 'monospace';
-            errDiv.style.fontSize = '12px';
-            errDiv.style.boxShadow = '0 5px 15px rgba(0,0,0,0.5)';
-            errDiv.innerHTML = '<strong>[Runtime Error]:</strong> ' + event.message + ' at ' + event.filename + ':' + event.lineno;
-            document.body.appendChild(errDiv);
+            if (event.message === 'Script error.' && (!event.filename || event.lineno === 0)) {
+                // Cross-origin script load notice (e.g. PayPal SDK, Google Identity)
+                return;
+            }
+            console.error('⚠️ [Runtime Error]:', event.message, 'at', (event.filename || 'unknown') + ':' + (event.lineno || 0));
         });
     </script>
 </head>
@@ -778,21 +768,21 @@
             <div class="hero-section" id="hero-slider-container">
                 <!-- Slideshow Background & Content Layers -->
                 <div class="hero-slides-wrapper">
-                    <!-- Slide 1: Organic Homemade Tea Heritage (Ella Garden Reference Style) -->
+                    <!-- Slide 1: From Our Wild Forest Tea Garden to Your Cup -->
                     <div class="hero-slide active hero-slide-heritage" style="background-image: url('images/hero_slide_1.jpg');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
                             <span class="hero-pill-badge">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
-                                <span>Authentic • Organic • Traditional</span>
+                                <span>ROCK ONE WILD TEA • Handcrafted Premium Ceylon Tea</span>
                             </span>
                             <h1 class="hero-title hero-title-heritage">
-                                <span class="hero-title-top">Rock One's Organic</span>
-                                <span class="hero-title-bottom">Tea Heritage</span>
+                                <span class="hero-title-top">From Our Wild Forest Tea Garden</span>
+                                <span class="hero-title-bottom">to Your Cup.</span>
                             </h1>
-                            <div class="hero-tagline-italic">Where Nature Meets Tradition</div>
+                            <div class="hero-tagline-italic">Small Batch Handcrafted Tea</div>
                             <p class="hero-description hero-desc-left">
-                                Discover the ancient art of organic tea-making in the heart of Ceylon's mountains. From our wild forest garden to your cup, experience the authentic journey of premium artisanal tea.
+                                Discover the character of handcrafted Ceylon tea, grown in Sri Lanka’s Uva Medium Region and carefully produced by our family.
                             </p>
                             <div class="hero-cta">
                                 <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('booking') : (document.getElementById('nav-booking') && document.getElementById('nav-booking').click());">
@@ -804,24 +794,24 @@
                             </div>
                             <div class="hero-rating-badge">
                                 <span class="hero-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                                <span class="hero-rating-num">5.0</span>
+                                <span class="hero-rating-num">100%</span>
                                 <span class="hero-rating-sep">&bull;</span>
-                                <span class="hero-rating-text">2,000+ Google reviews</span>
+                                <span class="hero-rating-text">Single-Estate Pure Ceylon</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Slide 2: Mountain Foothill Heritage -->
+                    <!-- Slide 2: From Our Wild Forest Tea Garden to the World -->
                     <div class="hero-slide" style="background-image: url('images/hero_slide_2.jpg');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
                             <span class="hero-pill-badge">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
-                                <span>Forested Rock Formation Terroir • 1,240m Elevation</span>
+                                <span>Small Batch Handcrafted Tea • 1,240m Elevation</span>
                             </span>
-                            <h1 class="hero-title">Wild Arbor Garden.<br><span>Mountain Foothill Heritage.</span></h1>
+                            <h1 class="hero-title">From Our Wild Forest Tea Garden<br><span>to the World.</span></h1>
                             <p class="hero-description">
-                                Grown naturally amidst virgin mountain forest and ancient flora at the foot of our iconic rock formation in Ettampitiya, free from chemical fertilizers and synthetic pesticides.
+                                Discover the character of handcrafted Ceylon tea, grown in Sri Lanka’s Uva Medium Region and carefully produced by our family at the foot of our iconic rock formation.
                             </p>
                             <div class="hero-cta">
                                 <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('catalog') : (document.getElementById('nav-catalog') && document.getElementById('nav-catalog').click());">
@@ -840,17 +830,17 @@
                         </div>
                     </div>
 
-                    <!-- Slide 3: Dawn Hand-Plucking -->
+                    <!-- Slide 3: Handcrafted Premium Black Tea -->
                     <div class="hero-slide" style="background-image: url('images/hero_slide_3.jpg');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
                             <span class="hero-pill-badge">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
-                                <span>Generational Artisans • Selective Two Leaves &amp; A Bud</span>
+                                <span>Handcrafted Premium Black Tea • Selective Harvest</span>
                             </span>
-                            <h1 class="hero-title">Dawn Hand-Plucking.<br><span>Artisanal Purity.</span></h1>
+                            <h1 class="hero-title">Handcrafted Premium Black Tea.<br><span>Artisanal Purity.</span></h1>
                             <p class="hero-description">
-                                Every tender shoot is hand-harvested at first light by skilled generational artisans to preserve precious silver tips, essential oils, and delicate aromatic bouquet.
+                                Every tender shoot is selectively hand-harvested at dawn in our wild forest garden to preserve precious silver tips, rich essential oils, and natural sweetness.
                             </p>
                             <div class="hero-cta">
                                 <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('catalog') : (document.getElementById('nav-catalog') && document.getElementById('nav-catalog').click());">
@@ -869,17 +859,17 @@
                         </div>
                     </div>
 
-                    <!-- Slide 4: Orthodox Rolling -->
+                    <!-- Slide 4: A Family’s Passion for Handcrafted Ceylon Tea -->
                     <div class="hero-slide" style="background-image: url('images/hero_slide_4.jpg');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
                             <span class="hero-pill-badge">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
-                                <span>Time-Honored Orthodox Methods • Fragrant Cedar Air-Withering</span>
+                                <span>A Family’s Passion for Handcrafted Ceylon Tea</span>
                             </span>
-                            <h1 class="hero-title">Orthodox Rolling.<br><span>Traditional Family Craft.</span></h1>
+                            <h1 class="hero-title">A Family’s Passion<br><span>for Handcrafted Ceylon Tea.</span></h1>
                             <p class="hero-description">
-                                Leaves undergo natural mountain air-withering on cedar troughs and gentle brass rolling to unlock rich polyphenols and the signature brisk character of Uva Medium teas.
+                                From our own tea garden to our family factory, every batch of Rock One Wild Tea is carefully crafted by hand with time-honored orthodox rolling.
                             </p>
                             <div class="hero-cta">
                                 <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('catalog') : (document.getElementById('nav-catalog') && document.getElementById('nav-catalog').click());">
@@ -898,17 +888,17 @@
                         </div>
                     </div>
 
-                    <!-- Slide 5: Precision Wood-Fired Curing -->
+                    <!-- Slide 5: From Garden to Family Factory -->
                     <div class="hero-slide" style="background-image: url('images/hero_slide_5.jpg');">
                         <div class="hero-slide-overlay"></div>
                         <div class="hero-slide-content">
                             <span class="hero-pill-badge">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-5 4-9 9-9 1.5 0 3 .2 4.4.6C17.6 3.8 14.5 2 12 2z"/></svg>
-                                <span>Small-Batch Processing • Precision Temperature Control</span>
+                                <span>Carefully Crafted By Hand • Small-Batch Processing</span>
                             </span>
-                            <h1 class="hero-title">Historic Wood-Firing.<br><span>Flavor Perfection.</span></h1>
+                            <h1 class="hero-title">From Garden to Family Factory.<br><span>Carefully Crafted by Hand.</span></h1>
                             <p class="hero-description">
-                                Calibrated wood-fired curing locks in volatile aromas and amber liquor notes, crafting an unforgettable Ceylon tea tasting experience.
+                                From our own tea garden to our family factory, every batch of Rock One Wild Tea is carefully crafted by hand to ensure uncompromised quality in every cup.
                             </p>
                             <div class="hero-cta">
                                 <button type="button" class="btn btn-hero-primary" onclick="window.appSwitchTab ? window.appSwitchTab('catalog') : (document.getElementById('nav-catalog') && document.getElementById('nav-catalog').click());">
@@ -1007,27 +997,27 @@
                             </div>
                             <div class="hero-rating-badge">
                                 <span class="hero-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                                <span class="hero-rating-num">200+</span>
+                                <span class="hero-rating-num">Artisanal</span>
                                 <span class="hero-rating-sep">&bull;</span>
-                                <span class="hero-rating-text">Years Heritage Craft</span>
+                                <span class="hero-rating-text">Family Garden Craft</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Bottom Floating Stat Cards (Ella Organic Tea Garden Reference) -->
+                <!-- Bottom Floating Stat Cards -->
                 <div class="hero-floating-stats-wrap">
                     <div class="hero-stat-card">
-                        <div class="hero-stat-val">10,000+</div>
-                        <div class="hero-stat-label">Happy Visitors</div>
+                        <div class="hero-stat-val">1,240m</div>
+                        <div class="hero-stat-label">Highland Elevation</div>
                     </div>
                     <div class="hero-stat-card">
                         <div class="hero-stat-val">100%</div>
                         <div class="hero-stat-label">Organic Homemade Tea</div>
                     </div>
                     <div class="hero-stat-card">
-                        <div class="hero-stat-val">200+</div>
-                        <div class="hero-stat-label">Years Heritage</div>
+                        <div class="hero-stat-val">Artisanal</div>
+                        <div class="hero-stat-label">Single-Estate Craft</div>
                     </div>
                 </div>
 
@@ -2351,6 +2341,28 @@
         </div>
     </div>
 
+    <!-- Luxury Estate Pickup & Terroir Information Modal -->
+    <div id="estate-info-modal" class="estate-info-modal" aria-hidden="true" role="dialog" aria-modal="true" style="display: none;">
+        <div class="estate-info-backdrop" id="estate-info-backdrop"></div>
+        <div class="estate-info-dialog">
+            <div class="estate-info-header">
+                <div class="estate-info-brand-lockup">
+                    <img src="images/logo-gold.png" alt="Rock One Wild Tea Crest" class="estate-info-crest" style="max-width: 36px; max-height: 36px; object-fit: contain;" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
+                    <div>
+                        <h3 class="estate-info-title">ROCK ONE WILD TEA ESTATE</h3>
+                        <span class="estate-info-subtitle">HIGHLAND ARTISAN FACTORY &amp; DIRECT PICKUP CONCIERGE</span>
+                    </div>
+                </div>
+                <button id="estate-info-close-btn" class="estate-info-close-btn" aria-label="Close Estate Information">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="estate-info-body" id="estate-info-body-container">
+                <!-- Rendered dynamically by window.UIComponents.renderEstateInfoPage -->
+            </div>
+        </div>
+    </div>
+
     <!-- Luxury Patron Email Sign In / Registration Modal -->
     <div id="patron-auth-modal" class="patron-auth-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Patron Email Sign In">
         <div class="patron-auth-backdrop" id="patron-auth-backdrop"></div>
@@ -2611,11 +2623,11 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <!-- Script Loads (Execution dependency order: i18n -> store -> components -> paypal -> app) -->
-    <script defer charset="utf-8" src="js/i18n.js?v=3.87.3"></script>
-    <script defer charset="utf-8" src="js/store.js?v=3.87.3"></script>
-    <script defer charset="utf-8" src="js/components.js?v=3.87.3"></script>
-    <script defer charset="utf-8" src="js/paypal.js?v=3.87.3"></script>
-    <script defer charset="utf-8" src="js/app.js?v=3.87.3"></script>
-    <script defer charset="utf-8" src="js/contrast-guard.js?v=3.87.3"></script>
+    <script defer charset="utf-8" src="js/i18n.js?v=3.88.1"></script>
+    <script defer charset="utf-8" src="js/store.js?v=3.88.1"></script>
+    <script defer charset="utf-8" src="js/components.js?v=3.88.1"></script>
+    <script defer charset="utf-8" src="js/paypal.js?v=3.88.1"></script>
+    <script defer charset="utf-8" src="js/app.js?v=3.88.1"></script>
+    <script defer charset="utf-8" src="js/contrast-guard.js?v=3.88.1"></script>
 </body>
 </html>
