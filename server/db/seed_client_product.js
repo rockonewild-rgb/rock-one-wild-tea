@@ -17,6 +17,8 @@ const clientProduct = {
     description: 'Artisan small-batch Ceylon black tea from our family-owned wild forest tea garden in Sri Lanka\'s Uva Medium region. Handcrafted from clone TRI 2025 to create a smooth, naturally sweet cup with delicate floral notes and gentle honey-like character.',
     flavor_notes: JSON.stringify(['Smooth & Sweet', 'Delicate Floral', 'Honey-Like Character', 'Wild Forest Terroir']),
     brewing_guide: JSON.stringify({
+        shipping_lkr: 500,
+        shippingCharge_lkr: 500,
         temp: '95°C - 100°C',
         time: '3 - 4 mins',
         leaves: '2.5g per 200ml',

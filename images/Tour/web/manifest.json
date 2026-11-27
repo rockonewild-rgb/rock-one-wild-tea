@@ -1,0 +1,421 @@
+[
+  {
+    "original": "IMG_3381.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3381.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3381.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3382.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3382.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3382.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3399.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3399.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3399.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3400.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3400.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3400.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3433.JPG.jpeg",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3433.webp",
+    "jpg": "images/Tour/web/IMG_3433.jpg",
+    "width": 4517,
+    "height": 5573,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3440.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3440.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3440.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3443.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3443.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3443.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3537.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3537.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3537.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3551.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3551.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3551.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3552.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3552.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3552.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3787.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3787.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3787.HEIC.jpg",
+    "width": 4284,
+    "height": 5712,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3788.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3788.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3788.HEIC.jpg",
+    "width": 4284,
+    "height": 5712,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3789.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3789.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3789.HEIC.jpg",
+    "width": 4284,
+    "height": 5712,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3790.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3790.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3790.HEIC.jpg",
+    "width": 4284,
+    "height": 5712,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3816.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3816.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3816.HEIC.jpg",
+    "width": 4284,
+    "height": 5712,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3817.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3817.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3817.HEIC.jpg",
+    "width": 4284,
+    "height": 5712,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3855.MP4",
+    "type": "video",
+    "webPath": "images/Tour/IMG_3855.MP4"
+  },
+  {
+    "original": "IMG_3915.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3915.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3915.HEIC.jpg",
+    "width": 4284,
+    "height": 5712,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3955.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3955.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3955.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3961.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3961.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3961.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3962.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3962.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3962.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3963.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3963.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3963.HEIC.jpg",
+    "width": 4284,
+    "height": 5712,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3964.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3964.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3964.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3965.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3965.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3965.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_3966.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_3966.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_3966.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_4710.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_4710.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_4710.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_4720.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_4720.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_4720.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_4722.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_4722.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_4722.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_4723.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_4723.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_4723.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_4741.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_4741.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_4741.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_4743.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_4743.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_4743.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_4744.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_4744.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_4744.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_6671.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_6671.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_6671.HEIC.jpg",
+    "width": 5712,
+    "height": 4284,
+    "orientation": "landscape"
+  },
+  {
+    "original": "IMG_6683.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_6683.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_6683.HEIC.jpg",
+    "width": 5712,
+    "height": 4284,
+    "orientation": "landscape"
+  },
+  {
+    "original": "IMG_6688.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_6688.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_6688.HEIC.jpg",
+    "width": 4284,
+    "height": 5712,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_6711.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_6711.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_6711.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_6808.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_6808.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_6808.HEIC.jpg",
+    "width": 4284,
+    "height": 5712,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_6920.PNG",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_6920.PNG.webp",
+    "jpg": "images/Tour/web/IMG_6920.PNG.jpg",
+    "width": 1086,
+    "height": 1448,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_7488.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_7488.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_7488.HEIC.jpg",
+    "width": 4032,
+    "height": 3024,
+    "orientation": "landscape"
+  },
+  {
+    "original": "IMG_7503.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_7503.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_7503.HEIC.jpg",
+    "width": 4032,
+    "height": 3024,
+    "orientation": "landscape"
+  },
+  {
+    "original": "IMG_7506.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_7506.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_7506.HEIC.jpg",
+    "width": 4032,
+    "height": 3024,
+    "orientation": "landscape"
+  },
+  {
+    "original": "IMG_7509.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_7509.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_7509.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_7524.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_7524.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_7524.HEIC.jpg",
+    "width": 4032,
+    "height": 3024,
+    "orientation": "landscape"
+  },
+  {
+    "original": "IMG_7527.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_7527.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_7527.HEIC.jpg",
+    "width": 4032,
+    "height": 3024,
+    "orientation": "landscape"
+  },
+  {
+    "original": "IMG_7612.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_7612.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_7612.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_7619.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_7619.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_7619.HEIC.jpg",
+    "width": 3024,
+    "height": 4032,
+    "orientation": "portrait"
+  },
+  {
+    "original": "IMG_7663.HEIC",
+    "type": "image",
+    "webp": "images/Tour/web/IMG_7663.HEIC.webp",
+    "jpg": "images/Tour/web/IMG_7663.HEIC.jpg",
+    "width": 4032,
+    "height": 3024,
+    "orientation": "landscape"
+  }
+]

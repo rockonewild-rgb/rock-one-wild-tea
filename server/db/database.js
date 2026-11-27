@@ -210,6 +210,13 @@ function initSchema() {
             status TEXT DEFAULT 'active',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
+
+        -- 13. Tour Operations & Pricing Configuration Table
+        CREATE TABLE IF NOT EXISTS tour_settings (
+            key TEXT PRIMARY KEY,
+            value TEXT,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
     `);
 
     // Seed initial promotional coupons if empty
@@ -263,7 +270,12 @@ function initSchema() {
  * Seed initial database records if empty
  */
 function seedInitialData() {
-    // 1. Seed Products
+    // Clean out obsolete sample mock products if any exist
+    try {
+        db.prepare("DELETE FROM products WHERE id IN ('prod-01', 'prod-02', 'prod-03', 'prod-04')").run();
+    } catch (_) {}
+
+    // 1. Seed Products (Only client single real product)
     const prodCount = db.prepare('SELECT COUNT(*) as count FROM products').get().count;
     if (prodCount === 0) {
         const insertProd = db.prepare(`
@@ -273,68 +285,42 @@ function seedInitialData() {
 
         const defaultProducts = [
             {
-                id: 'prod-01',
-                name: 'Wild High-Mountain Silver Tips',
-                category: 'artisan',
-                type: 'White Tea',
-                season: 'Spring Equinox 2026',
-                grade: 'Imperial Silver Velvet',
-                elevation: '1,240m Montane Ridge',
-                price_usd: 145.0,
-                stock: 18,
-                image: 'images/Product.jpeg',
-                description: 'Sun-withered velvety buds harvested at dawn before direct mountain sunlight touches the forest canopy. Imparts floral wildflower honey and raw pear aromatics.',
-                flavor_notes: JSON.stringify(['Wild Orchid', 'Mountain Honey', 'White Peach', 'Subtle Pine']),
-                brewing_guide: JSON.stringify({ temp: '75°C - 80°C', time: '4 - 5 mins', leaves: '3g per 150ml' }),
-                is_reserve: 1
-            },
-            {
-                id: 'prod-02',
-                name: 'Orthodox Highland Black OP1',
-                category: 'artisan',
+                id: 'prod-rock-one-black-tea',
+                name: 'Rock One Wild Tea – Premium Black Tea',
+                category: 'Black Tea',
                 type: 'Black Tea',
-                season: 'Equinox 2026',
-                grade: 'Orange Pekoe 1 (OP1)',
-                elevation: '1,200m Wellawela Slopes',
-                price_usd: 85.0,
-                stock: 45,
-                image: 'images/luxury_tea_tin.jpg',
-                description: 'Full-leaf whole orthodox black tea hand-rolled on cedar tables and cured over slow-burning cinnamon wood kilns.',
-                flavor_notes: JSON.stringify(['Malt & Date', 'Dark Cocoa', 'Wood Smoke', 'Golden Caramel']),
-                brewing_guide: JSON.stringify({ temp: '95°C - 100°C', time: '3 - 4 mins', leaves: '2.5g per 200ml' }),
+                season: 'Uva Seasonal Flush 2026',
+                grade: 'TRI 2025 Hand-Rolled Whole Leaf',
+                elevation: 'Uva Region (3,000–5,000 ft)',
+                price_usd: 17.0,
+                stock: 50,
+                image: 'images/products/rock_one_black_tea_7.jpg',
+                description: 'Artisan small-batch Ceylon black tea from our family-owned wild forest tea garden in Sri Lanka\'s Uva Medium region. Handcrafted from clone TRI 2025 to create a smooth, naturally sweet cup with delicate floral notes and gentle honey-like character.',
+                flavor_notes: JSON.stringify(['Smooth & Sweet', 'Delicate Floral', 'Honey-Like Character', 'Wild Forest Terroir']),
+                brewing_guide: JSON.stringify({
+                    shipping_lkr: 500,
+                    shippingCharge_lkr: 500,
+                    shippingCharge: 19.0,
+                    shipping_fee_usd: 19.0,
+                    temp: '95°C - 100°C',
+                    time: '3 - 4 mins',
+                    leaves: '2.5g per 200ml',
+                    weight: '50g Pack',
+                    netWeight: '50g per Pack',
+                    cultivar: 'TRI 2025',
+                    origin: 'Uva Medium Growing Region, Sri Lanka',
+                    images: [
+                        'images/products/rock_one_black_tea_7.jpg',
+                        'images/products/rock_one_black_tea_4.jpg',
+                        'images/products/rock_one_black_tea_1.jpg',
+                        'images/products/rock_one_black_tea_2.jpg',
+                        'images/products/rock_one_black_tea_3.jpg',
+                        'images/products/rock_one_black_tea_5.jpg',
+                        'images/products/rock_one_black_tea_6.jpg'
+                    ],
+                    sensoryRadar: { floral: 92, malty: 78, sweetness: 88, astringency: 32, body: 82, aroma: 94 }
+                }),
                 is_reserve: 0
-            },
-            {
-                id: 'prod-03',
-                name: 'Wild Canopy Forest Green',
-                category: 'artisan',
-                type: 'Green Tea',
-                season: 'Early Dawn Flush',
-                grade: 'Fine Young Tip',
-                elevation: '1,280m Peak Sanctuary',
-                price_usd: 95.0,
-                stock: 30,
-                image: 'images/luxury_tea_chest.jpg',
-                description: 'Wok-fired whole leaf green tea retaining vibrant antioxidant chlorophyll and sweet vegetative minerals.',
-                flavor_notes: JSON.stringify(['Sweet Grass', 'Steamed Bamboo', 'Toasted Pine Nut', 'Fresh Dew']),
-                brewing_guide: JSON.stringify({ temp: '80°C - 85°C', time: '2 - 3 mins', leaves: '2g per 150ml' }),
-                is_reserve: 0
-            },
-            {
-                id: 'prod-04',
-                name: 'Reserve Highland Golden Flush',
-                category: 'private_reserve',
-                type: 'Specialty Black',
-                season: 'Monsoon Break Limited',
-                grade: 'Golden Flowery Orange Pekoe (GFOP)',
-                elevation: '1,320m Cloud Peak',
-                price_usd: 220.0,
-                stock: 8,
-                image: 'images/Gift Box.jpeg',
-                description: 'Strictly allocated micro-harvest from 80-year-old wild tea arbor trees. Numbered and sealed with private wax estate stamp.',
-                flavor_notes: JSON.stringify(['Cinnamon Bark', 'Dried Apricot', 'Muscatel Grape', 'Amber Resin']),
-                brewing_guide: JSON.stringify({ temp: '90°C - 95°C', time: '3.5 mins', leaves: '3g per 180ml' }),
-                is_reserve: 1
             }
         ];
 

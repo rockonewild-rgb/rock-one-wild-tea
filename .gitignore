@@ -18,3 +18,8 @@ Thumbs.db
 *.db-shm
 *.db-wal
 
+# Large media files (>100MB exceeds GitHub limits)
+*.mp4
+*.MP4
+
+

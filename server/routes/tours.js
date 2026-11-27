@@ -10,6 +10,74 @@ const {
 } = require('../services/email');
 
 /**
+ * GET /api/tours/settings
+ * Retrieves persisted tour operations & pricing configuration
+ */
+router.get('/settings', async (req, res) => {
+    try {
+        let settingsRow = null;
+        if (isTursoAvailable()) {
+            try {
+                const tursoRows = await queryTurso('SELECT value FROM tour_settings WHERE key = ?', ['main_tour_config']);
+                if (Array.isArray(tursoRows) && tursoRows[0]) {
+                    settingsRow = tursoRows[0];
+                }
+            } catch (te) {}
+        }
+        if (!settingsRow) {
+            try {
+                settingsRow = db.prepare('SELECT value FROM tour_settings WHERE key = ?').get('main_tour_config');
+            } catch (e) {}
+        }
+        if (settingsRow && settingsRow.value) {
+            return res.json({
+                success: true,
+                data: typeof settingsRow.value === 'string' ? JSON.parse(settingsRow.value) : settingsRow.value
+            });
+        }
+        res.json({ success: true, data: null });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+/**
+ * POST /api/tours/settings
+ * Updates and persists tour operations & pricing configuration
+ */
+router.post('/settings', async (req, res) => {
+    try {
+        const settings = req.body || {};
+        const valStr = JSON.stringify(settings);
+        const nowIso = new Date().toISOString();
+
+        try {
+            db.prepare('CREATE TABLE IF NOT EXISTS tour_settings (key TEXT PRIMARY KEY, value TEXT, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)').run();
+            db.prepare('INSERT OR REPLACE INTO tour_settings (key, value, updated_at) VALUES (?, ?, ?)').run('main_tour_config', valStr, nowIso);
+        } catch (e) {
+            console.warn('SQLite tour_settings save notice:', e.message);
+        }
+
+        if (isTursoAvailable()) {
+            try {
+                await executeTurso('CREATE TABLE IF NOT EXISTS tour_settings (key TEXT PRIMARY KEY, value TEXT, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)');
+                await executeTurso('INSERT OR REPLACE INTO tour_settings (key, value, updated_at) VALUES (?, ?, ?)', ['main_tour_config', valStr, nowIso]);
+            } catch (te) {
+                console.warn('Turso tour_settings save notice:', te.message);
+            }
+        }
+
+        res.json({
+            success: true,
+            message: 'Tour configuration successfully persisted.',
+            data: settings
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+/**
  * GET /api/tours/slots
  */
 router.get('/slots', async (req, res) => {

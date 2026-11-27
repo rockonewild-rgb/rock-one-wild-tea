@@ -208,27 +208,31 @@
     }, true);
 })();
 
-// ─── Estate Preloader Life-Cycle Controller ───
+// ─── Estate Preloader Life-Cycle Controller (Enhanced) ───
 (function initEstatePreloader() {
     const preloader = document.getElementById('estate-preloader');
     if (!preloader) return;
 
     const progressBar = document.getElementById('preloader-progress-bar');
     const statusText = document.getElementById('preloader-status-text');
+    const pctText = document.getElementById('preloader-pct');
 
-    let currentProgress = 8;
-    let isLoaded = false;
+    let currentProgress = 10;
+    let isDismissed = false;
+    let windowLoaded = false;
 
     const statusMessages = [
-        { threshold: 10, text: "Unveiling Montane Terroir..." },
-        { threshold: 40, text: "Harvesting Connoisseur Reserves..." },
-        { threshold: 72, text: "Harmonizing Sommelier Rituals..." },
-        { threshold: 95, text: "Welcome to the Sanctuary." }
+        { threshold: 10, text: "Unveiling our wild forest tea garden in Uva Medium..." },
+        { threshold: 35, text: "Harvesting handcrafted single-estate Ceylon leaves..." },
+        { threshold: 65, text: "Crafted from elite TRI 2025 cultivar by our family..." },
+        { threshold: 88, text: "From our wild forest tea garden to your cup..." },
+        { threshold: 100, text: "Welcome to Rock One Wild Tea." }
     ];
 
-    function setProgress(val) {
-        currentProgress = Math.min(100, Math.max(currentProgress, val));
+    function renderProgress(val) {
+        currentProgress = Math.min(100, Math.max(currentProgress, Math.round(val)));
         if (progressBar) progressBar.style.width = `${currentProgress}%`;
+        if (pctText) pctText.textContent = `${currentProgress}%`;
 
         if (statusText) {
             const currentMsg = statusMessages.slice().reverse().find(m => currentProgress >= m.threshold);
@@ -242,37 +246,74 @@
         }
     }
 
-    // Simulate smooth natural progress curve
+    renderProgress(currentProgress);
+
+    // Natural smooth progress increments over ~1.4 seconds
+    const intervalMs = 60;
     const progressTimer = setInterval(() => {
-        if (currentProgress < 75) {
-            setProgress(currentProgress + Math.floor(Math.random() * 12 + 6));
-        } else if (currentProgress < 90 && isLoaded) {
-            setProgress(currentProgress + 8);
+        if (isDismissed) return;
+        if (currentProgress < 90) {
+            renderProgress(currentProgress + (Math.random() * 5 + 3));
+        } else if (currentProgress < 100) {
+            if (windowLoaded || document.readyState === 'complete') {
+                renderProgress(currentProgress + 4);
+                if (currentProgress >= 100) {
+                    finishAndFadeOut();
+                }
+            }
         }
-    }, 110);
+    }, intervalMs);
 
-    function dismissPreloader() {
-        if (preloader.classList.contains('fade-out')) return;
-        isLoaded = true;
-        setProgress(100);
+    function finishAndFadeOut() {
+        if (isDismissed) return;
+        isDismissed = true;
         clearInterval(progressTimer);
+        renderProgress(100);
 
+        setTimeout(() => {
+            if (statusText) statusText.textContent = "Welcome to Rock One Wild Tea.";
+            preloader.classList.add('fade-out');
+            setTimeout(() => {
+                if (preloader.parentNode) {
+                    preloader.style.display = 'none';
+                }
+            }, 850);
+        }, 220);
+    }
+
+    function dismissImmediately() {
+        if (isDismissed) return;
+        isDismissed = true;
+        clearInterval(progressTimer);
+        renderProgress(100);
         preloader.classList.add('fade-out');
         setTimeout(() => {
             if (preloader.parentNode) {
                 preloader.style.display = 'none';
             }
-        }, 500);
+        }, 400);
     }
 
-    // Dismiss immediately when DOM is interactive/ready for instant page render
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        setTimeout(dismissPreloader, 200);
+    if (document.readyState === 'complete') {
+        windowLoaded = true;
     } else {
-        document.addEventListener('DOMContentLoaded', () => setTimeout(dismissPreloader, 200), { once: true });
+        window.addEventListener('load', () => {
+            windowLoaded = true;
+        }, { once: true });
     }
-    window.addEventListener('load', () => setTimeout(dismissPreloader, 100), { once: true });
-    setTimeout(dismissPreloader, 1200); // Safety fallback
+
+    // Click anywhere or press Escape/Enter to enter immediately
+    preloader.addEventListener('click', dismissImmediately);
+    document.addEventListener('keydown', (e) => {
+        if (!isDismissed && (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ')) {
+            dismissImmediately();
+        }
+    }, { once: true });
+
+    // Absolute fallback safety timeout
+    setTimeout(() => {
+        if (!isDismissed) finishAndFadeOut();
+    }, 2400);
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -358,14 +399,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Hash navigation (e.g. #admin)
-    window.addEventListener('hashchange', () => {
-        if (window.location.hash === '#admin') {
+    // Hash navigation (e.g. #admin, #tours, #catalog, #gallery, #reserve)
+    function handleUrlHash() {
+        const hash = (window.location.hash || '').toLowerCase().replace('#', '').trim();
+        if (!hash) return;
+        if (hash === 'admin') {
             switchTab('admin');
+        } else if (hash === 'tours' || hash === 'tour') {
+            switchTab('tours');
+        } else if (hash === 'catalog' || hash === 'shop') {
+            switchTab('catalog');
+        } else if (hash === 'gallery') {
+            switchTab('gallery');
+        } else if (hash === 'reserve') {
+            switchTab('reserve');
         }
-    });
-    if (window.location.hash === '#admin') {
-        setTimeout(() => switchTab('admin'), 250);
+    }
+    window.addEventListener('hashchange', handleUrlHash);
+    if (window.location.hash) {
+        setTimeout(handleUrlHash, 250);
     }
 
     // Direct Payment Link / QR Code Navigation (e.g. ?pay=ENQ-01-01-1234)
@@ -2188,7 +2240,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let discountedSubtotalUSD = subtotalUSD;
             let shippingUSD = isQuotedPay && booking.quotedShipping !== undefined 
                 ? booking.quotedShipping 
-                : (window.calculateShippingFee ? window.calculateShippingFee(discountedSubtotalUSD, selectedCountry) : (isSriLanka ? 2.13 : 15.0));
+                : (window.calculateShippingFee ? window.calculateShippingFee(discountedSubtotalUSD, selectedCountry) : (isSriLanka ? 1.64 : 15.0));
             let grandTotalUSD = discountedSubtotalUSD + shippingUSD;
 
             let formattedSubtotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(subtotalUSD, currInfo) : `$${subtotalUSD.toFixed(2)}`;
@@ -2782,7 +2834,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
                                 <span style="font-size: 0.8rem; color: var(--color-text-muted);">Courier Method</span>
                                 <span style="color: #86efac; font-size: 0.82rem; font-weight: 600;">
-                                    ${order.shippingMethod === 'cod' ? 'SL Post EMS (Cash on Delivery)' : (order.country === 'Sri Lanka' ? 'SL Post EMS Express' : 'SL Post EMS International Priority Air')}
+                                    ${order.shippingMethod === 'cod' ? 'SL Post EMS (Cash on Delivery • Rs 500 LKR)' : (order.country === 'Sri Lanka' ? 'SL Post EMS Express (Local • Rs 500 LKR)' : 'SL Post EMS International Priority Air')}
                                 </span>
                             </div>
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
@@ -2846,7 +2898,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 shippingUSD = isQuotedPay && booking.quotedShipping !== undefined 
                     ? booking.quotedShipping 
-                    : (window.calculateShippingFee ? window.calculateShippingFee(discountedSubtotalUSD, country) : (isLK ? 2.13 : 15.0));
+                    : (window.calculateShippingFee ? window.calculateShippingFee(discountedSubtotalUSD, country) : (isLK ? 1.64 : 15.0));
                 grandTotalUSD = discountedSubtotalUSD + shippingUSD;
 
                 formattedSubtotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(subtotalUSD, cur) : `$${subtotalUSD.toFixed(2)}`;
@@ -3427,31 +3479,40 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         
         } else if (type === 'tour') {
-            const timeSlot = data.timeSlot || '09:30 AM';
+            const timeSlot = (data && data.timeSlot) || '09:30 AM';
             selectedTourSlipBase64 = '';
 
             const tourMinDate = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+            const initialDate = (data && (data.date || data.tourDate)) || tourMinDate;
 
             // Get selected package details
+            const tourCfg = (window.TeaFactoryStore && typeof window.TeaFactoryStore.getTourSettings === 'function')
+                ? window.TeaFactoryStore.getTourSettings()
+                : null;
             const selectedPkgCard = document.querySelector('.package-card.selected');
-            const pkgName = data.package || (selectedPkgCard ? selectedPkgCard.getAttribute('data-package') : '01. Gongfu-Style Black Tea Brewing Experience');
-            const lkrPerGuest = data.price_lkr || (selectedPkgCard ? (parseFloat(selectedPkgCard.getAttribute('data-price-lkr')) || 1450) : 1450);
-            const baseUsdPerGuest = data.price || (selectedPkgCard ? parseFloat(selectedPkgCard.getAttribute('data-price')) : (lkrPerGuest / 305)) || (lkrPerGuest / 305);
+            const pkgName = (data && data.package) || (tourCfg && tourCfg.packageName) || (selectedPkgCard ? selectedPkgCard.getAttribute('data-package') : '01. Gongfu-Style Black Tea Brewing Experience');
+            const lkrPerGuest = Number(data && (data.price_lkr !== undefined ? data.price_lkr : data.unitPriceLkr)) || (tourCfg ? Number(tourCfg.priceLkr) : 1450) || (selectedPkgCard ? (parseFloat(selectedPkgCard.getAttribute('data-price-lkr')) || 1450) : 1450);
+            const baseUsdPerGuest = Number(data && (data.price !== undefined ? data.price : data.unitPriceUsd)) || (tourCfg ? Number(tourCfg.priceUsd) : (lkrPerGuest / 305)) || (selectedPkgCard ? parseFloat(selectedPkgCard.getAttribute('data-price')) : (lkrPerGuest / 305)) || (lkrPerGuest / 305);
 
-            const selectedCountry = window.lastSelectedCheckoutCountry || 'Sri Lanka';
+            const selectedCountry = window.lastSelectedCheckoutCountry || (data && data.country) || 'Sri Lanka';
             const isSriLanka = selectedCountry === 'Sri Lanka';
             const currInfo = window.getCountryCurrency ? window.getCountryCurrency(selectedCountry) : (isSriLanka ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
 
-            let tourGuests = 1;
-            let transportFeeUSD = 0; // 0 for Self-Drive, 25 for Concierge Transfer
+            let tourGuests = Math.max(1, Math.min(10, Number(data && (data.guests || data.guestCount)) || 1));
+            let transportOption = (data && data.transportOption) || 'self'; // 'self' or 'chauffeur'
+            let transportFeeUSD = transportOption === 'chauffeur' ? (Number(tourCfg?.transportFeeUsd) || 25.0) : 0.0;
+            let activeTourPromo = null; // { code, percent, label, savingsUSD }
+
             let tourSubtotalUSD = baseUsdPerGuest * tourGuests;
-            let tourGrandTotalUSD = tourSubtotalUSD + transportFeeUSD;
+            let discountUSD = 0;
+            let discountedTourSubtotalUSD = tourSubtotalUSD;
+            let tourGrandTotalUSD = discountedTourSubtotalUSD + transportFeeUSD;
 
             let formattedPerGuest = window.formatAmountInCurrency ? window.formatAmountInCurrency(baseUsdPerGuest, currInfo) : `$${baseUsdPerGuest.toFixed(2)}`;
             let formattedTourTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(tourGrandTotalUSD, currInfo) : `$${tourGrandTotalUSD.toFixed(2)}`;
             let tourGrandTotalLKR = Math.round(tourGrandTotalUSD * 305);
 
-            drawerTitle.innerText = `Book Tour: ${pkgName}`;
+            drawerTitle.innerHTML = `<div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;"><span>Tour Reservation: ${pkgName}</span><span style="font-size:0.68rem; font-weight:700; color:#15803d; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:20px; padding:0.2rem 0.65rem; display:inline-flex; align-items:center; gap:0.3rem;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 256-Bit SSL Encrypted</span></div>`;
 
             const signedUser = window.TeaFactoryStore && window.TeaFactoryStore.getCurrentUser ? window.TeaFactoryStore.getCurrentUser() : null;
             let defaultFirstName = '';
@@ -3460,441 +3521,638 @@ document.addEventListener('DOMContentLoaded', () => {
                 const parts = signedUser.full_name.trim().split(' ');
                 defaultFirstName = parts[0] || '';
                 defaultLastName = parts.slice(1).join(' ') || '';
+            } else if (data && data.name) {
+                const parts = data.name.trim().split(' ');
+                defaultFirstName = parts[0] || '';
+                defaultLastName = parts.slice(1).join(' ') || '';
             }
+            const defaultEmail = (data && data.email) || (signedUser ? signedUser.email : '');
+            const defaultPhone = (data && (data.phone || data.guestPhone)) || (signedUser ? signedUser.phone : '');
+            const defaultNotes = (data && (data.notes || data.guestNotes)) || '';
             const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
+            let currentCheckoutStage = 1;
+
             drawerFormContainer.innerHTML = `
-                <div class="cart-drawer-inner" style="display: flex; flex-direction: column; gap: 1.15rem; padding-bottom: 2rem;">
-                    
-                    <!-- 1. TOUR EXPERIENCE SUMMARY -->
-                    <div class="cart-step-card" style="background: rgba(4,14,8,0.78); border: 1.5px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 1.15rem; box-shadow: 0 4px 18px rgba(0,0,0,0.35);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 0.6rem; margin-bottom: 0.75rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold);">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                <span>1. Experience Summary</span>
-                            </div>
-                            <span style="font-size: 0.72rem; color: #86efac; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 0.15rem 0.55rem; font-weight: 600;">Mon &ndash; Sat &bull; Open</span>
+                <div class="checkout-split-layout">
+                    <!-- ==============================================
+                         LEFT COLUMN: TWO-STAGE STEPPED RESERVATION FLOW
+                         ============================================== -->
+                    <div class="checkout-left-col">
+                        <!-- Top Stage Segmented Header: Step 1 (Booking Details) <-> Step 2 (Payment Options) -->
+                        <div class="checkout-stage-tabs-header">
+                            <button type="button" class="checkout-stage-tab-btn active" id="tour-tab-details" title="View &amp; edit tour booking details">
+                                <span class="tab-step-badge" id="tour-badge-step1">1</span>
+                                <div class="tab-text-group">
+                                    <span class="tab-main-label">Booking Details</span>
+                                    <span class="tab-sub-label">Schedule &amp; Visitor Info</span>
+                                </div>
+                            </button>
+                            <div class="tab-divider-arrow">➔</div>
+                            <button type="button" class="checkout-stage-tab-btn" id="tour-tab-payment" title="Proceed to payment options">
+                                <span class="tab-step-badge" id="tour-badge-step2">2</span>
+                                <div class="tab-text-group">
+                                    <span class="tab-main-label">Payment Options</span>
+                                    <span class="tab-sub-label">Select Secure Method</span>
+                                </div>
+                            </button>
                         </div>
 
-                        <div style="margin-bottom: 0.85rem;">
-                            <h4 style="margin: 0 0 0.35rem 0; font-family: var(--font-serif); font-size: 1.05rem; color: #ffffff; line-height: 1.35;">${pkgName}</h4>
-                            <div style="display: flex; gap: 0.85rem; font-size: 0.75rem; color: var(--color-text-muted); flex-wrap: wrap;">
-                                <span>Time Slot: <strong style="color: #fff;">${timeSlot}</strong></span>
-                                <span>&bull;</span>
-                                <span>Duration: <strong style="color: #fff;">Approx. 1.5 &ndash; 2 Hours</strong></span>
-                                <span>&bull;</span>
-                                <span style="color: #86efac;">Sunday Closed for Maintenance</span>
-                            </div>
-                        </div>
-
-                        <!-- Guest Count Stepper -->
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-top: 1px dashed rgba(212,175,55,0.2); border-bottom: 1px dashed rgba(212,175,55,0.2);">
-                            <div>
-                                <span style="font-size: 0.8rem; color: var(--color-text-muted); display: block;">Number of Guests:</span>
-                                <span id="tour-rate-per-guest" style="font-size: 0.72rem; color: var(--color-gold);">${formattedPerGuest} per guest</span>
-                            </div>
-                            <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1px solid rgba(212,175,55,0.35); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.5);">
-                                <button type="button" id="tour-qty-minus" style="background: none; border: none; color: var(--color-gold); width: 28px; height: 28px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">-</button>
-                                <span id="tour-qty-val" style="width: 32px; text-align: center; font-size: 0.82rem; font-weight: 700; color: #fff;">1</span>
-                                <button type="button" id="tour-qty-plus" style="background: none; border: none; color: var(--color-gold); width: 28px; height: 28px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">+</button>
-                            </div>
-                        </div>
-
-                        <!-- Financial Total Breakdown -->
-                        <div style="margin-top: 0.65rem; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.82rem;">
-                            <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
-                                <span>Experience Subtotal</span>
-                                <strong id="tour-summary-subtotal" style="color: #ffffff;">${formattedTourTotal}</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; color: var(--color-text-muted);">
-                                <span>Estate Transport</span>
-                                <span id="tour-summary-transport" style="color: var(--color-gold); font-weight: 600;">Complimentary Arrival</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid rgba(212,175,55,0.25); padding-top: 0.55rem; margin-top: 0.25rem;">
-                                <div>
-                                    <strong id="tour-summary-total-title" style="font-size: 0.95rem; color: #ffffff;">Total Payable (${currInfo.code})</strong>
-                                </div>
-                                <strong id="tour-summary-total" style="font-size: 1.35rem; color: var(--color-gold); font-family: var(--font-serif);">${formattedTourTotal}</strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. PATRON ACCOUNT / GUEST BANNER -->
-                    <div class="cart-step-card" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.95rem 1.15rem;">
-                        ${signedUser ? `
-                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
-                                    <div>
-                                        <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">Patron Visitor: <span style="color: var(--color-gold);">${esc(signedUser.full_name || signedUser.email)}</span></div>
-                                        <div style="font-size: 0.7rem; color: #86efac;">${esc(signedUser.email)} &bull; Boarding Pass auto-linked</div>
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); openDrawer('tour', '${id}', ${JSON.stringify(data)}); " style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: rgba(255,255,255,0.2); color: var(--color-text-muted);">
-                                    Switch Account
-                                </button>
-                            </div>
-                        ` : `
-                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                                <div style="flex: 1; min-width: 210px;">
-                                    <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.2rem;">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                        <span>Direct Booking Active (Sign-In Optional)</span>
-                                    </div>
-                                    <p style="font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.4; margin: 0;">
-                                        You can reserve seats immediately as a visitor. Or sign in to sync with your patron history.
-                                    </p>
-                                </div>
-                                <button type="button" id="tour-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: var(--color-gold); color: var(--color-gold); white-space: nowrap;">
-                                    Sign In / Register
-                                </button>
-                            </div>
-                        `}
-                    </div>
-
-                    <!-- 3. FORM: VISITOR ORIGIN & CONTACT -->
-                    <form id="tour-checkout-form" style="display: flex; flex-direction: column; gap: 1rem;">
-                        <!-- Country of Origin & Currency -->
-                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                                <span>2. Visitor Origin Country &amp; Settlement Currency</span>
-                            </div>
-
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label class="form-label" for="tour-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Visitor Origin Country *</label>
-                                <select class="form-input" id="tour-cust-country" style="font-size: 0.85rem; padding: 0.65rem 0.75rem;">
-                                    <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>🇱🇰 Sri Lanka (LKR Rs)</option>
-                                    <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>🇺🇸 United States (USD $)</option>
-                                    <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom (GBP £)</option>
-                                    <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>🇦🇺 Australia (AUD A$)</option>
-                                    <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>🇨🇦 Canada (CAD C$)</option>
-                                    <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>🇩🇪 Germany (EUR €)</option>
-                                    <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>🇫🇷 France (EUR €)</option>
-                                    <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>🇯🇵 Japan (JPY ¥)</option>
-                                    <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>🇦🇪 United Arab Emirates (AED)</option>
-                                    <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>🇸🇬 Singapore (SGD S$)</option>
-                                    <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>🇮🇳 India (INR ₹)</option>
-                                    <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>🇨🇭 Switzerland (CHF)</option>
-                                    <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>🇨🇳 China (CNY ¥)</option>
-                                    <option value="Worldwide" ${selectedCountry === 'Worldwide' ? 'selected' : ''}>🌐 Rest of World (USD $)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Primary Guest Details -->
-                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                <span>3. Primary Guest &amp; Schedule Details</span>
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="tour-cust-firstname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">First Name *</label>
-                                    <input class="form-input" type="text" id="tour-cust-firstname" value="${esc(defaultFirstName)}" required placeholder="e.g. David" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="tour-cust-lastname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Last Name *</label>
-                                    <input class="form-input" type="text" id="tour-cust-lastname" value="${esc(defaultLastName)}" required placeholder="e.g. Miller" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="tour-cust-email" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Email (For Gate Pass) *</label>
-                                    <input class="form-input" type="email" id="tour-cust-email" value="${esc(signedUser ? signedUser.email : '')}" required placeholder="name@domain.com" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="tour-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">WhatsApp / Mobile *</label>
-                                    <input class="form-input" type="tel" id="tour-cust-phone" value="${esc(signedUser ? signedUser.phone : '')}" required placeholder="+94 77 123 4567" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="tour-date-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Tour Date (Mon &ndash; Sat) *</label>
-                                    <input class="form-input" type="date" id="tour-date-input" min="${tourMinDate}" value="${tourMinDate}" required style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                </div>
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="form-label" for="tour-time-slot" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Arrival Time Slot *</label>
-                                    <select class="form-input" id="tour-time-slot" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                                        <option value="09:30 AM" ${timeSlot === '09:30 AM' ? 'selected' : ''}>09:30 AM Morning Tasting</option>
-                                        <option value="11:30 AM" ${timeSlot === '11:30 AM' ? 'selected' : ''}>11:30 AM Midday Harvest Walk</option>
-                                        <option value="02:00 PM" ${timeSlot === '02:00 PM' ? 'selected' : ''}>02:00 PM Afternoon Masterclass</option>
-                                        <option value="03:30 PM" ${timeSlot === '03:30 PM' ? 'selected' : ''}>03:30 PM Sunset Gongfu Session</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label class="form-label" for="tour-dietary" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Dietary &amp; Experience Notes</label>
-                                <input class="form-input" type="text" id="tour-dietary" placeholder="e.g. Gluten-free tea pairings, anniversary visit" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
-                            </div>
-                        </div>
-
-                        <!-- Estate Transfer & Transport Selection -->
-                        <div class="cart-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-                                <span>4. Estate Transport &amp; Arrival</span>
-                            </div>
-
-                            <div style="display: flex; flex-direction: column; gap: 0.65rem;">
-                                <!-- Option 1: Self-Drive / Independent Arrival -->
-                                <label class="shipping-option-card active" id="tour-transport-card-self" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid var(--color-gold); border-radius: 8px; background: rgba(212,175,55,0.08); cursor: pointer;">
-                                    <input type="radio" name="tour-transport-option" value="self" id="tour-trans-self" checked style="margin-top: 0.2rem; accent-color: var(--color-gold);">
-                                    <div style="flex: 1;">
-                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
-                                            <strong style="color: #ffffff; font-size: 0.88rem;">Independent Arrival &bull; Factory Gate</strong>
-                                            <span style="font-size: 0.72rem; color: var(--color-gold); font-weight: 700; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.3); border-radius: 6px; padding: 0.2rem 0.55rem;">Complimentary</span>
-                                        </div>
-                                        <p style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
-                                            Self-drive, taxi, or tuk-tuk arrival directly at the Rock One Tea Factory Gate in Ettampitiya, Badulla. Reserved estate parking provided.
-                                        </p>
-                                    </div>
-                                </label>
-
-                                <!-- Option 2: Estate Concierge Chauffeur Transfer -->
-                                <label class="shipping-option-card" id="tour-transport-card-chauffeur" style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 8px; background: rgba(0,0,0,0.3); cursor: pointer;">
-                                    <input type="radio" name="tour-transport-option" value="chauffeur" id="tour-trans-chauffeur" style="margin-top: 0.2rem; accent-color: var(--color-gold);">
-                                    <div style="flex: 1;">
-                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; gap: 0.5rem; flex-wrap: wrap;">
-                                            <strong style="color: #ffffff; font-size: 0.88rem;">Concierge Chauffeur Transfer (Roundtrip)</strong>
-                                            <span id="tour-transport-surcharge-pill" style="font-size: 0.72rem; color: #86efac; font-weight: 700; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 6px; padding: 0.2rem 0.55rem;">+ ${window.formatAmountInCurrency ? window.formatAmountInCurrency(25, currInfo) : '$25.00'}</span>
-                                        </div>
-                                        <p style="font-size: 0.74rem; color: var(--color-text-muted); margin: 0; line-height: 1.4;">
-                                            Private estate chauffeur pick-up &amp; drop-off from your hotel or station in Ella, Haputale, Bandarawela, Badulla, or Nuwara Eliya.
-                                        </p>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Payment Method Section -->
-                        <div class="cart-step-card" id="tour-payment-step-card" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.15rem;">
-                            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--color-gold); margin-bottom: 0.85rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                <span>5. Payment Method &amp; Gate Pass Issuance</span>
-                            </div>
-
-                            <div class="payment-method-tabs" style="margin-bottom: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.35rem;">
-                                <button type="button" class="pay-tab active" data-method="bank" style="display:inline-flex; align-items:center; gap:0.35rem;">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
-                                    Bank Transfer (Live)
-                                </button>
-                                <button type="button" class="pay-tab" data-method="slip" style="display:inline-flex; align-items:center; gap:0.35rem;">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                    Cash Deposit Slip (Live)
-                                </button>
-                                <button type="button" class="pay-tab" data-method="paypal" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(0,121,193,0.5);">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z" fill="#003087"/>
-                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.154 9.172a.65.65 0 0 1 .639-.537h4.82c1.928 0 3.33.448 4.072 1.302.734.845.85 2.05.344 3.582-.56 1.686-1.792 2.626-3.662 2.795l-.148.01h-1.364a.577.577 0 0 0-.57.49l-.63 3.102a.407.407 0 0 1-.389.329H9.986a.407.407 0 0 1-.402-.47l1.72-8.468a.5.5 0 0 1 .49-.404h-1.64z" fill="#0079C1"/>
-                                    </svg>
-                                    <span style="font-weight:700;"><span style="color:#0079C1;">Pay</span><span style="color:#38bdf8;">Pal</span></span>
-                                    <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(245,158,11,0.25); color:#fbbf24; font-weight:700;">COMING SOON</span>
-                                </button>
-                                <button type="button" class="pay-tab" data-method="card" style="display:inline-flex; align-items:center; gap:0.35rem; border-color: rgba(37,99,235,0.5);">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                    <span>Credit / Card</span>
-                                    <span style="font-size:0.6rem; padding:0.1rem 0.35rem; border-radius:3px; background:rgba(245,158,11,0.25); color:#fbbf24; font-weight:700;">COMING SOON</span>
-                                </button>
-                            </div>
-
-                            <!-- Method A: Bank Transfer -->
-                            <div id="pay-panel-bank" class="pay-panel active" style="margin-top: 0.5rem;">
-                                <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.85rem; font-size: 0.8rem; margin-bottom: 0.75rem;">
-                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#fff;">Bank of Ceylon</strong></div>
-                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:#fff;">Rock one wild tea</strong></div>
-                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:var(--color-gold); font-family:monospace; font-size:0.95rem;">94945708</strong></div>
-                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#fff;">Ettampitiya branch</strong></div>
-                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; padding-top:0.4rem; border-top:1px dashed rgba(212,175,55,0.2);"><span style="color:var(--color-text-muted);">Amount Due:</span><strong id="tour-bank-amount-display" style="color:var(--color-gold); font-size:1.05rem;">${isSriLanka ? 'Rs ' + tourGrandTotalLKR.toLocaleString() + ' LKR' : formattedTourTotal}</strong></div>
-                                </div>
-                                <div class="form-group" style="margin-bottom: 0.75rem;">
-                                    <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Bank Transfer Receipt *</label>
-                                    <div class="file-upload-zone" id="tour-bank-slip-zone">
-                                        <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
-                                        <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse receipt</span></div>
-                                        <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
-                                        <input type="file" id="tour-bank-slip" accept="image/*,.pdf" style="display:none;">
-                                    </div>
-                                    <div id="tour-bank-slip-preview" class="slip-preview" style="display:none;"></div>
-                                </div>
-                                <button type="submit" id="btn-submit-tour-bank" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                                    <span id="tour-bank-btn-text">Confirm Booking via Bank Transfer &bull; ${formattedTourTotal}</span>
-                                </button>
-                            </div>
-
-                            <!-- Method B: Cash Deposit Slip -->
-                            <div id="pay-panel-slip" class="pay-panel" style="margin-top: 0.5rem;">
-                                <div class="bank-details-block" style="background: rgba(4,14,8,0.7); border: 1px solid rgba(212,175,55,0.25); border-radius: 8px; padding: 0.85rem; font-size: 0.8rem; margin-bottom: 0.75rem;">
-                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Bank Name:</span><strong style="color:#fff;">Bank of Ceylon</strong></div>
-                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Name:</span><strong style="color:#fff;">Rock one wild tea</strong></div>
-                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Account Number:</span><strong style="color:var(--color-gold); font-family:monospace; font-size:0.95rem;">94945708</strong></div>
-                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; margin-bottom:0.3rem;"><span style="color:var(--color-text-muted);">Branch:</span><strong style="color:#fff;">Ettampitiya branch</strong></div>
-                                    <div class="bank-detail-row" style="display:flex; justify-content:space-between; padding-top:0.4rem; border-top:1px dashed rgba(212,175,55,0.2);"><span style="color:var(--color-text-muted);">Exact Deposit Amount:</span><strong id="tour-deposit-amount-display" style="color:var(--color-gold); font-size:1.05rem;">${isSriLanka ? 'Rs ' + tourGrandTotalLKR.toLocaleString() + ' LKR' : formattedTourTotal}</strong></div>
-                                </div>
-                                <div class="form-group" style="margin-bottom: 0.75rem;">
-                                    <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Upload Cash Deposit Slip *</label>
-                                    <div class="file-upload-zone" id="tour-cash-slip-zone">
-                                        <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
-                                        <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse deposit slip</span></div>
-                                        <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
-                                        <input type="file" id="tour-cash-slip" accept="image/*,.pdf" style="display:none;">
-                                    </div>
-                                    <div id="tour-cash-slip-preview" class="slip-preview" style="display:none;"></div>
-                                </div>
-                                <button type="submit" id="btn-submit-tour-slip" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                                    <span id="tour-slip-btn-text">Submit Cash Deposit Slip &bull; ${formattedTourTotal}</span>
-                                </button>
-                            </div>
-
-                            <!-- Method C: PayPal -->
-                            <div id="pay-panel-paypal" class="pay-panel" style="margin-top: 0.5rem;">
-                                <div style="background: rgba(0, 121, 193, 0.06); border: 1.5px solid rgba(0, 121, 193, 0.35); border-radius: 10px; padding: 1.15rem; margin-bottom: 0.75rem;">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.3rem;">
-                                        <div style="display: flex; align-items: center; gap: 0.45rem;">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z" fill="#003087"/>
-                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.154 9.172a.65.65 0 0 1 .639-.537h4.82c1.928 0 3.33.448 4.072 1.302.734.845.85 2.05.344 3.582-.56 1.686-1.792 2.626-3.662 2.795l-.148.01h-1.364a.577.577 0 0 0-.57.49l-.63 3.102a.407.407 0 0 1-.389.329H9.986a.407.407 0 0 1-.402-.47l1.72-8.468a.5.5 0 0 1 .49-.404h-1.64z" fill="#0079C1"/>
-                                            </svg>
-                                            <strong style="color: #ffffff; font-size: 0.95rem;">PayPal &bull; Express Checkout</strong>
-                                        </div>
-                                        <span style="font-size: 0.65rem; background: rgba(245, 158, 11, 0.2); color: #fbbf24; padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.4);">COMING SOON</span>
-                                    </div>
-
-                                    <div class="coming-soon-notice-card" style="background: rgba(217, 119, 6, 0.12); border: 1.5px solid rgba(245, 158, 11, 0.45); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; display: flex; gap: 0.75rem; align-items: flex-start;">
-                                        <div style="flex-shrink: 0; margin-top: 2px;">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                        </div>
-                                        <div style="font-size: 0.8rem; line-height: 1.45; color: #fef3c7;">
-                                            <div style="font-weight: 700; color: #fbbf24; font-size: 0.85rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
-                                                <span>PayPal Gateway Coming Soon</span>
-                                                <span style="font-size: 0.65rem; background: rgba(245, 158, 11, 0.2); color: #fde68a; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.4);">UNDER INTEGRATION</span>
+                        <form id="tour-checkout-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <!-- ================= STEP 1: BOOKING & VISITOR DETAILS ================= -->
+                            <div id="tour-stage-details" class="checkout-stage-view">
+                                <!-- Patron Account Banner -->
+                                <div class="checkout-step-card" style="padding: 0.95rem 1.15rem; margin-bottom: 1rem;">
+                                    ${signedUser ? `
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(34,197,94,0.15); border: 1px solid #22c55e; color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: bold;">✓</span>
+                                                <div>
+                                                    <div style="font-size: 0.82rem; font-weight: 700; color: #111827;">Patron Visitor: <span style="color: #b8860b;">${esc(signedUser.full_name || signedUser.email)}</span></div>
+                                                    <div style="font-size: 0.7rem; color: #15803d;">${esc(signedUser.email)} &bull; Linked to Estate Master Ledger</div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                PayPal express booking is currently undergoing final gateway integration. To confirm your private Estate Tasting &amp; Tour reservation immediately, please select <strong>Direct Bank Transfer</strong> or <strong>Cash Deposit Slip</strong>.
-                                            </div>
-                                            <div style="margin-top: 0.45rem; font-size: 0.75rem;">
-                                                Need immediate concierge booking? <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20book%20a%20private%20estate%20tasting%20tour" target="_blank" rel="noopener noreferrer" style="color: #fbbf24; font-weight: 700; text-decoration: underline;">Chat with our Concierge on WhatsApp &rarr;</a>
-                                            </div>
+                                            <button type="button" class="btn btn-outline" onclick="window.TeaFactoryStore.logoutCustomer &amp;&amp; window.TeaFactoryStore.logoutCustomer(); openDrawer('tour', '${id}', ${JSON.stringify(data)});" style="font-size: 0.68rem; padding: 0.25rem 0.6rem; border-color: #d1d5db; color: #4b5563;">
+                                                Switch Account
+                                            </button>
                                         </div>
-                                    </div>
-
-                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0.75rem; background: rgba(0,0,0,0.4); border-radius: 6px; margin-bottom: 0.85rem;">
-                                        <span style="font-size: 0.75rem; color: #9ca3af;">PayPal Settlement Total:</span>
-                                        <strong id="tour-paypal-amount-display" style="font-size: 1rem; color: var(--color-gold); font-family: monospace;">${currInfo.code === 'USD' ? '$' + tourGrandTotalUSD.toFixed(2) + ' USD' : formattedTourTotal + ' ($' + tourGrandTotalUSD.toFixed(2) + ' USD)'}</strong>
-                                    </div>
-                                    <div id="tour-paypal-button-container" class="paypal-smart-container" style="min-height: 44px;"></div>
+                                    ` : `
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                            <div style="flex: 1; min-width: 210px;">
+                                                <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 700; color: #b8860b; margin-bottom: 0.2rem;">
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                                    <span>Direct Tour Booking Active (No Sign-In Required)</span>
+                                                </div>
+                                                <p style="font-size: 0.72rem; color: #6b7280; line-height: 1.4; margin: 0;">
+                                                    Reserve your private estate slot immediately as a guest. Or sign in to track your reservation in your patron portal.
+                                                </p>
+                                            </div>
+                                            <button type="button" id="tour-guest-signin-btn" class="btn btn-outline" style="font-size: 0.72rem; padding: 0.35rem 0.8rem; border-color: #b8860b; color: #855b05; white-space: nowrap;">
+                                                Sign In / Register
+                                            </button>
+                                        </div>
+                                    `}
                                 </div>
-                            </div>
 
-                            <!-- Method D: Credit / Debit Card -->
-                            <div id="pay-panel-card" class="pay-panel" style="margin-top: 0.5rem;">
-                                <div class="luxury-card-checkout-box dark-mode-card-box" style="background: rgba(4,14,8,0.75); border: 1px solid rgba(212,175,55,0.3); border-radius: 8px; padding: 1.15rem;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.6rem;">
-                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                            <strong style="color: #ffffff; font-size: 0.92rem;">Credit / Debit Card</strong>
-                                        </div>
-                                        <div class="card-brand-chips">
-                                            <span class="card-chip-badge visa-badge">VISA</span>
-                                            <span class="card-chip-badge mc-badge">MC</span>
-                                            <span class="card-chip-badge amex-badge">AMEX</span>
+                                <!-- 1. Visitor Origin & Settlement Currency -->
+                                <div class="checkout-step-card" style="margin-bottom: 1rem;">
+                                    <div class="checkout-step-header">
+                                        <div class="checkout-step-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                                <span>1. Visitor Origin Country &amp; Settlement Currency</span>
+                                            </div>
+                                            <button type="button" id="tour-fill-sample-btn" style="background: rgba(184,134,11,0.08); border: 1px dashed #b8860b; color: #855b05; font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;" title="Fill sample visitor details">
+                                                <span>⚡ Fill Sample Details</span>
+                                            </button>
                                         </div>
                                     </div>
 
-                                    <div class="coming-soon-notice-card" style="background: rgba(217, 119, 6, 0.12); border: 1.5px solid rgba(245, 158, 11, 0.45); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; display: flex; gap: 0.75rem; align-items: flex-start;">
-                                        <div style="flex-shrink: 0; margin-top: 2px;">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="tour-cust-country" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Visitor Nationality / Country *</label>
+                                            <select class="form-input" id="tour-cust-country" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                                <option value="Sri Lanka" ${selectedCountry === 'Sri Lanka' ? 'selected' : ''}>🇱🇰 Sri Lanka (LKR Rs)</option>
+                                                <option value="United States" ${selectedCountry === 'United States' ? 'selected' : ''}>🇺🇸 United States (USD $)</option>
+                                                <option value="United Kingdom" ${selectedCountry === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom (GBP £)</option>
+                                                <option value="Australia" ${selectedCountry === 'Australia' ? 'selected' : ''}>🇦🇺 Australia (AUD A$)</option>
+                                                <option value="Canada" ${selectedCountry === 'Canada' ? 'selected' : ''}>🇨🇦 Canada (CAD C$)</option>
+                                                <option value="Germany" ${selectedCountry === 'Germany' ? 'selected' : ''}>🇩🇪 Germany (EUR €)</option>
+                                                <option value="France" ${selectedCountry === 'France' ? 'selected' : ''}>🇫🇷 France (EUR €)</option>
+                                                <option value="Japan" ${selectedCountry === 'Japan' ? 'selected' : ''}>🇯🇵 Japan (JPY ¥)</option>
+                                                <option value="United Arab Emirates" ${selectedCountry === 'United Arab Emirates' ? 'selected' : ''}>🇦🇪 United Arab Emirates (AED)</option>
+                                                <option value="Singapore" ${selectedCountry === 'Singapore' ? 'selected' : ''}>🇸🇬 Singapore (SGD S$)</option>
+                                                <option value="India" ${selectedCountry === 'India' ? 'selected' : ''}>🇮🇳 India (INR ₹)</option>
+                                                <option value="Switzerland" ${selectedCountry === 'Switzerland' ? 'selected' : ''}>🇨🇭 Switzerland (CHF)</option>
+                                                <option value="China" ${selectedCountry === 'China' ? 'selected' : ''}>🇨🇳 China (CNY ¥)</option>
+                                                <option value="Worldwide" ${selectedCountry === 'Worldwide' ? 'selected' : ''}>🌐 Rest of World (USD $)</option>
+                                            </select>
                                         </div>
-                                        <div style="font-size: 0.8rem; line-height: 1.45; color: #fef3c7;">
-                                            <div style="font-weight: 700; color: #fbbf24; font-size: 0.85rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
-                                                <span>Card Gateway Coming Soon</span>
-                                                <span style="font-size: 0.65rem; background: rgba(245, 158, 11, 0.2); color: #fde68a; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.4);">UNDER INTEGRATION</span>
-                                            </div>
-                                            <div>
-                                                Credit &amp; Debit Card checkout is currently in final verification. To reserve your private Estate Tasting &amp; Tour reservation immediately, please select <strong>Direct Bank Transfer</strong> or <strong>Cash Deposit Slip</strong>.
-                                            </div>
-                                            <div style="margin-top: 0.45rem; font-size: 0.75rem;">
-                                                Need immediate concierge booking? <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20would%20like%20to%20book%20a%20private%20estate%20tasting%20tour" target="_blank" rel="noopener noreferrer" style="color: #fbbf24; font-weight: 700; text-decoration: underline;">Chat with our Concierge on WhatsApp &rarr;</a>
-                                            </div>
+
+                                        <div class="form-group" style="margin-bottom: 0;" id="tour-region-container">
+                                            ${isSriLanka ? `
+                                                <label class="form-label" for="tour-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Region / Province *</label>
+                                                <select class="form-input" id="tour-cust-region" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                                                    <option value="Western Province (Colombo, Gampaha, Kalutara)">Western Province (Colombo, Gampaha)</option>
+                                                    <option value="Central Province (Kandy, Nuwara Eliya, Matale)">Central Province (Kandy, Nuwara Eliya)</option>
+                                                    <option value="Uva Province (Badulla, Bandarawela, Ettampitiya)" selected>Uva Province (Badulla, Ettampitiya)</option>
+                                                    <option value="Southern Province (Galle, Matara, Hambantota)">Southern Province (Galle, Matara)</option>
+                                                    <option value="Sabaragamuwa Province (Ratnapura, Kegalle)">Sabaragamuwa Province (Ratnapura)</option>
+                                                    <option value="North Western Province (Kurunegala, Puttalam)">North Western Province (Kurunegala)</option>
+                                                    <option value="North Central Province (Anuradhapura, Polonnaruwa)">North Central Province (Anuradhapura)</option>
+                                                    <option value="Northern Province (Jaffna, Kilinochchi, Vavuniya)">Northern Province (Jaffna)</option>
+                                                    <option value="Eastern Province (Batticaloa, Trincomalee, Ampara)">Eastern Province (Batticaloa, Trincomalee)</option>
+                                                </select>
+                                            ` : `
+                                                <label class="form-label" for="tour-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">State / Province / City *</label>
+                                                <input class="form-input" type="text" id="tour-cust-region" placeholder="e.g. London / Zurich / Berlin" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
+                                            `}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Primary Visitor Details -->
+                                <div class="checkout-step-card" style="margin-bottom: 1rem;">
+                                    <div class="checkout-step-header">
+                                        <div class="checkout-step-title">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                            <span>2. Primary Visitor &amp; Gate Pass Details</span>
+                                        </div>
+                                    </div>
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="tour-cust-firstname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">First Name *</label>
+                                            <input class="form-input" type="text" id="tour-cust-firstname" value="${esc(defaultFirstName)}" required placeholder="e.g. Elena" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="tour-cust-lastname" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Last Name *</label>
+                                            <input class="form-input" type="text" id="tour-cust-lastname" value="${esc(defaultLastName)}" required placeholder="e.g. Rostova" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        </div>
+                                    </div>
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="tour-cust-email" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Email (For Digital Gate Pass) *</label>
+                                            <input class="form-input" type="email" id="tour-cust-email" value="${esc(defaultEmail)}" required placeholder="e.g. visitor@example.com" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;" ${signedUser ? 'readonly style="opacity:0.88;"' : ''}>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="tour-cust-phone" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">WhatsApp / Mobile *</label>
+                                            <input class="form-input" type="tel" id="tour-cust-phone" value="${esc(defaultPhone)}" required placeholder="e.g. +94 77 123 4567" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 3. Tour Schedule & Experience Details -->
+                                <div class="checkout-step-card" style="margin-bottom: 1rem;">
+                                    <div class="checkout-step-header">
+                                        <div class="checkout-step-title">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                            <span>3. Tour Schedule &amp; Arrival Slot</span>
+                                        </div>
+                                    </div>
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="tour-date-input" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Tour Date (Mon &ndash; Sat) *</label>
+                                            <input class="form-input" type="date" id="tour-date-input" min="${tourMinDate}" value="${initialDate}" required style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label class="form-label" for="tour-time-slot" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Arrival Time Slot *</label>
+                                            <select class="form-input" id="tour-time-slot" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                                <option value="09:30 AM" ${timeSlot === '09:30 AM' ? 'selected' : ''}>09:30 AM &bull; Morning Mist Pluck</option>
+                                                <option value="11:00 AM" ${timeSlot === '11:00 AM' ? 'selected' : ''}>11:00 AM &bull; Midday Factory Craft</option>
+                                                <option value="01:30 PM" ${timeSlot === '01:30 PM' ? 'selected' : ''}>01:30 PM &bull; Afternoon Sommelier</option>
+                                                <option value="03:30 PM" ${timeSlot === '03:30 PM' ? 'selected' : ''}>03:30 PM &bull; Highland Golden Hour</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="tour-dietary" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Special Requests &amp; Dietary Notes</label>
+                                        <input class="form-input" type="text" id="tour-dietary" value="${esc(defaultNotes)}" placeholder="e.g. Vegetarian tea snacks, anniversary celebration, English/German guide" style="font-size: 0.85rem; padding: 0.65rem 0.85rem;">
+                                    </div>
+                                </div>
+
+                                <!-- 4. Estate Transport & Arrival Selection -->
+                                <div class="checkout-step-card" style="margin-bottom: 1.25rem;">
+                                    <div class="checkout-step-header">
+                                        <div class="checkout-step-title">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                                            <span>4. Estate Transport &amp; Arrival Option</span>
                                         </div>
                                     </div>
 
                                     <div style="display: flex; flex-direction: column; gap: 0.65rem;">
-                                        <div>
-                                            <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); margin-bottom: 0.3rem; display: block;">Cardholder Name *</label>
-                                            <input type="text" id="tour-card-name" class="form-input" placeholder="Full name on card" autocomplete="cc-name" style="width: 100%; font-size: 0.85rem; padding: 0.6rem 0.75rem;">
-                                        </div>
-
-                                        <div>
-                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
-                                                <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Card Number *</label>
-                                                <span id="tour-card-brand-detected" style="font-size: 0.68rem; color: #60a5fa; font-weight: 700;">Secure TLS</span>
+                                        <label class="radio-card" id="tour-transport-card-self" style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.95rem 1.1rem; border: 1.5px solid #b8860b; border-radius: 10px; background: #faf8f5; cursor: pointer;">
+                                            <input type="radio" name="tour-transport-option" id="tour-trans-self" value="self" ${transportOption === 'self' ? 'checked' : ''} style="margin-top: 0.25rem;">
+                                            <div style="flex: 1;">
+                                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                                                    <strong style="color: #111827; font-size: 0.9rem;">Independent Arrival &bull; Factory Gate</strong>
+                                                    <span style="color: #15803d; font-size: 0.82rem; font-weight: 700;">Complimentary</span>
+                                                </div>
+                                                <p style="font-size: 0.74rem; color: #4b5563; line-height: 1.45; margin: 0;">
+                                                    Self-drive, taxi, or tuk-tuk arrival directly at our Ettampitiya Gate. Free reserved parking provided with WhatsApp GPS navigation support.
+                                                </p>
                                             </div>
-                                            <div style="position: relative;">
-                                                <input type="text" id="tour-card-number" class="form-input" placeholder="4000  1234  5678  9010" maxlength="19" autocomplete="cc-number" style="width: 100%; font-size: 0.9rem; font-family: monospace; letter-spacing: 1px; padding: 0.6rem 2.5rem 0.6rem 0.75rem;">
-                                                <div style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none;">
-                                                    <svg width="18" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                        </label>
+
+                                        <label class="radio-card" id="tour-transport-card-chauffeur" style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.95rem 1.1rem; border: 1.5px solid #e2ded5; border-radius: 10px; background: #ffffff; cursor: pointer;">
+                                            <input type="radio" name="tour-transport-option" id="tour-trans-chauffeur" value="chauffeur" ${transportOption === 'chauffeur' ? 'checked' : ''} style="margin-top: 0.25rem;">
+                                            <div style="flex: 1;">
+                                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                                                    <strong style="color: #111827; font-size: 0.9rem;">Concierge Chauffeur Transfer (Roundtrip)</strong>
+                                                    <span style="color: #855b05; font-size: 0.82rem; font-weight: 700;">+ ${window.formatAmountInCurrency ? window.formatAmountInCurrency(25, currInfo) : '$25.00 USD'}</span>
+                                                </div>
+                                                <p style="font-size: 0.74rem; color: #4b5563; line-height: 1.45; margin: 0;">
+                                                    Private hotel pick-up &amp; drop-off from Ella, Bandarawela, Haputale, Badulla, or Nuwara Eliya in a comfortable climate-controlled vehicle.
+                                                </p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Step 1 Bottom Button: Continue to Payment Options -->
+                                <div class="checkout-step1-btn-wrap" style="text-align: center; margin-bottom: 1.5rem;">
+                                    <button type="button" class="btn btn-primary" id="tour-goto-payment-btn" style="width: 100%; padding: 1.05rem 1.5rem; font-size: 1rem; font-weight: 700; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 0.6rem; cursor: pointer; box-shadow: 0 4px 16px rgba(184,134,11,0.22);">
+                                        <span>Continue to Payment Options</span>
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    </button>
+                                </div>
+
+                                <!-- Secondary Link: View Tour Experience Dossier -->
+                                <div style="text-align: center; margin-bottom: 0.5rem;">
+                                    <button type="button" id="tour-toggle-dossier-btn" style="background: none; border: none; color: #855b05; font-size: 0.82rem; font-weight: 600; cursor: pointer; text-decoration: underline; padding: 0.4rem 0.8rem;">
+                                        <span>🌿 View Experience Highlights, Inclusions &amp; Guidelines ▼</span>
+                                    </button>
+                                </div>
+
+                                <!-- Collapsible Tour Dossier & Inclusions -->
+                                <div id="tour-dossier-container" style="display: none; margin-top: 1rem;">
+                                    <div class="checkout-step-card checkout-dossier-card">
+                                        <div class="checkout-dossier-inner">
+                                            <h3 class="checkout-dossier-headline">Gongfu-Style Tea Experience &bull; Ettampitiya Sanctuary</h3>
+                                            <hr class="checkout-dossier-divider">
+                                            <div class="checkout-accordions">
+                                                <div class="checkout-accordion-item" data-accordion="about">
+                                                    <button type="button" class="checkout-accordion-header" aria-expanded="false">
+                                                        <span class="checkout-accordion-title">About the Experience</span>
+                                                        <span class="checkout-accordion-icon">+</span>
+                                                    </button>
+                                                    <div class="checkout-accordion-body" style="display: none;">
+                                                        <p style="font-weight: 700; font-size: 0.95rem; color: #1e293b; margin-bottom: 0.45rem;">${pkgName}</p>
+                                                        <p>Experience an intimate walk across misty mountain terraces beneath the iconic "Rock One" cliff summit, witness small-batch orthodox leaf rolling in our family factory, and enjoy an authentic Gongfu-style brewing ritual with our head tea maker.</p>
+                                                    </div>
+                                                </div>
+                                                <div class="checkout-accordion-item" data-accordion="inclusions">
+                                                    <button type="button" class="checkout-accordion-header" aria-expanded="false">
+                                                        <span class="checkout-accordion-title">What’s Included</span>
+                                                        <span class="checkout-accordion-icon">+</span>
+                                                    </button>
+                                                    <div class="checkout-accordion-body" style="display: none;">
+                                                        <p>&bull; Dedicated Personal Tea Host &amp; Guide<br>&bull; Hands-On Plucking Gear &amp; Garden Walk<br>&bull; Small-Batch Family Factory Walkthrough<br>&bull; Gongfu Brewing Masterclass with Gaiwans<br>&bull; Multi-Infusion Tasting Flight (5+ steepings)<br>&bull; Fresh Estate Accompaniments &amp; Refreshments<br>&bull; Complimentary Freshly Sealed Tea Keepsake<br>&bull; Reserved Free Parking &amp; WhatsApp Road Navigation</p>
+                                                    </div>
+                                                </div>
+                                                <div class="checkout-accordion-item" data-accordion="guidelines">
+                                                    <button type="button" class="checkout-accordion-header" aria-expanded="false">
+                                                        <span class="checkout-accordion-title">Visitor Guidelines (Know Before You Go)</span>
+                                                        <span class="checkout-accordion-icon">+</span>
+                                                    </button>
+                                                    <div class="checkout-accordion-body" style="display: none;">
+                                                        <p>&bull; <strong>Footwear:</strong> Flat walking shoes or trainers suitable for garden paths.<br>&bull; <strong>Weather:</strong> Misty mornings and warm afternoons at 1,320m elevation. A light windbreaker is recommended.<br>&bull; <strong>Photography:</strong> Full camera and smartphone photography welcome throughout the garden and cupping pavilion.</p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-
-                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
-                                            <div>
-                                                <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold); margin-bottom: 0.3rem; display: block;">Expiry Date *</label>
-                                                <input type="text" id="tour-card-expiry" class="form-input" placeholder="MM / YY" maxlength="7" autocomplete="cc-exp" style="width: 100%; font-size: 0.85rem; font-family: monospace; text-align: center; padding: 0.6rem 0.75rem;">
-                                            </div>
-                                            <div>
-                                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
-                                                    <label style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--color-gold);">Security Code *</label>
-                                                    <span style="font-size: 0.68rem; color: #9ca3af;">CVV</span>
-                                                </div>
-                                                <div style="position: relative;">
-                                                    <input type="password" id="tour-card-cvc" class="form-input" placeholder="•••" maxlength="4" autocomplete="cc-csc" style="width: 100%; font-size: 0.85rem; font-family: monospace; letter-spacing: 2px; text-align: center; padding: 0.6rem 1.8rem 0.6rem 0.75rem;">
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div style="background: rgba(0,0,0,0.35); border-radius: 6px; padding: 0.55rem 0.85rem; margin-top: 0.2rem; display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-size: 0.76rem; color: #9ca3af;">Direct Card Settlement:</span>
-                                            <strong id="tour-card-amount-display" style="font-size: 1.05rem; color: #60a5fa; font-family: monospace;">${currInfo.code === 'USD' ? '$' + tourGrandTotalUSD.toFixed(2) + ' USD' : formattedTourTotal + ' ($' + tourGrandTotalUSD.toFixed(2) + ' USD)'}</strong>
-                                        </div>
-
-                                        <button type="button" id="tour-pay-card-btn" class="btn btn-primary" style="width: 100%; padding: 0.85rem 1.25rem; font-size: 0.95rem; font-weight: 700; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 0.55rem; cursor: pointer; box-shadow: 0 4px 14px rgba(37,99,235,0.25); background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%); border-color: #1d4ed8; color: #ffffff; margin-top: 0.2rem;">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                                            <span id="tour-pay-card-btn-text">Pay with Card &bull; ${formattedTourTotal}</span>
-                                        </button>
-
-                                        <div style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.7rem; color: #9ca3af; margin-top: 0.1rem;">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                                            <span>256-Bit Bank Encryption &bull; PCI-DSS Level 1 Certified</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- ================= STEP 2: PAYMENT OPTIONS ================= -->
+                            <div id="tour-stage-payment" class="checkout-stage-view" style="display: none;">
+                                <!-- Top Navigation & Verified Summary -->
+                                <div class="payment-step-top-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.6rem;">
+                                    <button type="button" class="checkout-back-step-btn" id="tour-back-to-details-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; font-weight: 600; color: #855b05; background: none; border: none; cursor: pointer;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                        <span>← Back to Booking Details</span>
+                                    </button>
+                                    <div class="checkout-delivery-verified-pill" id="tour-details-verified-pill" style="font-size: 0.75rem; color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 20px; padding: 0.3rem 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600;">
+                                        <span>✓ Booking Details Saved</span>
+                                    </div>
+                                </div>
+
+                                <!-- Booking Summary Review Box -->
+                                <div class="checkout-step-card" style="padding: 0.85rem 1.15rem; background: #faf9f6; border: 1px dashed #d1c7b7; margin-bottom: 1.15rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                                        <div style="font-size: 0.82rem; color: #374151;">
+                                            <strong style="color: #111827;" id="tour-review-cust-name">Guest Visitor</strong> &bull;
+                                            <span id="tour-review-cust-dest">${esc(selectedCountry)}</span> &bull;
+                                            <span id="tour-review-schedule" style="color: #15803d; font-weight: 600;">${initialDate} at ${timeSlot}</span>
+                                        </div>
+                                        <button type="button" id="tour-edit-details-link" style="background: none; border: none; color: #b8860b; font-size: 0.78rem; font-weight: 600; cursor: pointer; text-decoration: underline;">
+                                            Edit Details
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Dedicated Payment Options Card -->
+                                <div class="checkout-step-card" id="tour-payment-step-card" style="margin-bottom: 1.25rem;">
+                                    <div class="checkout-step-header" style="margin-bottom: 1rem;">
+                                        <div class="checkout-step-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b8860b" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                            <span style="font-size: 0.95rem; font-weight: 700; color: #111827; letter-spacing: 0.5px;">Choose Payment Option</span>
+                                        </div>
+                                        <span style="font-size: 0.74rem; color: #15803d; font-weight: 600; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 0.15rem 0.55rem;">🔒 256-Bit SSL Encrypted</span>
+                                    </div>
+
+                                    <!-- Payment Method Selector Grid -->
+                                    <div class="payment-method-selector-grid">
+                                        <button type="button" class="pay-tab payment-method-card-btn active" data-method="arrival">
+                                            <span style="font-size: 1.35rem; line-height: 1;">🏡</span>
+                                            <span class="pay-card-title">Pay on Arrival</span>
+                                            <span class="pay-card-badge" style="background: #dcfce7; color: #15803d;">ESTATE GATE</span>
+                                        </button>
+                                        <button type="button" class="pay-tab payment-method-card-btn" data-method="bank">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b8860b" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg>
+                                            <span class="pay-card-title">Bank Transfer</span>
+                                            <span class="pay-card-badge" style="background: #fef3c7; color: #92400e;">BOC LIVE</span>
+                                        </button>
+                                        <button type="button" class="pay-tab payment-method-card-btn" data-method="slip">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b8860b" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                            <span class="pay-card-title">Cash Deposit</span>
+                                            <span class="pay-card-badge" style="background: #fef3c7; color: #92400e;">BRANCH SLIP</span>
+                                        </button>
+                                        <button type="button" class="pay-tab payment-method-card-btn" data-method="paypal">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z" fill="#003087"/>
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.154 9.172a.65.65 0 0 1 .639-.537h4.82c1.928 0 3.33.448 4.072 1.302.734.845.85 2.05.344 3.582-.56 1.686-1.792 2.626-3.662 2.795l-.148.01h-1.364a.577.577 0 0 0-.57.49l-.63 3.102a.407.407 0 0 1-.389.329H9.986a.407.407 0 0 1-.402-.47l1.72-8.468a.5.5 0 0 1 .49-.404h-1.64z" fill="#0079C1"/>
+                                            </svg>
+                                            <span class="pay-card-title"><strong style="color: #003087;">Pay</strong><strong style="color: #0079c1;">Pal</strong></span>
+                                            <span class="pay-card-badge" style="background: #fef3c7; color: #92400e; font-weight: 700;">COMING SOON</span>
+                                        </button>
+                                        <button type="button" class="pay-tab payment-method-card-btn" data-method="card">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                            <span class="pay-card-title">Credit / Card</span>
+                                            <span class="pay-card-badge" style="background: #fef3c7; color: #92400e; font-weight: 700;">COMING SOON</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Panel 1: Pay on Arrival -->
+                                    <div id="tour-pay-panel-arrival" class="pay-panel active" style="display: block;">
+                                        <div style="background: #f0fdf4; border: 1.5px solid #22c55e; border-radius: 10px; padding: 1.15rem; text-align: center;">
+                                            <div style="font-size: 1.6rem; margin-bottom: 0.35rem;">🏡</div>
+                                            <h4 style="color: #15803d; font-size: 1.05rem; margin-bottom: 0.35rem; font-weight: 700;">Pay on Arrival at Estate Gate Active</h4>
+                                            <p style="font-size: 0.8rem; color: #4b5563; line-height: 1.5; margin: 0 0 0.85rem 0;">
+                                                Your private booking slot is reserved immediately. Settle the fee upon arrival at our Tasting Pavilion in Cash (LKR, USD, EUR, GBP) or via local mobile QR.
+                                            </p>
+                                            <div style="background: #ffffff; border: 1px solid #bbf7d0; border-radius: 8px; padding: 0.65rem 1rem; display: inline-flex; align-items: center; gap: 0.75rem;">
+                                                <span style="font-size: 0.78rem; color: #4b5563;">Settlement Due at Pavilion:</span>
+                                                <strong id="tour-arrival-amount-display" style="font-size: 1.25rem; color: #15803d; font-family: monospace;">${isSriLanka ? 'Rs ' + tourGrandTotalLKR.toLocaleString() + ' LKR' : formattedTourTotal}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Panel 2: Bank Transfer -->
+                                    <div id="tour-pay-panel-bank" class="pay-panel" style="display: none;">
+                                        <div class="bank-details-block" style="background: #faf8f5; border: 1.5px solid #d4af37; border-radius: 10px; padding: 1.15rem;">
+                                            <div class="bank-detail-row"><span style="color: #4b5563;">Bank Name:</span><strong style="color: #111827;">Bank of Ceylon</strong></div>
+                                            <div class="bank-detail-row"><span style="color: #4b5563;">Account Name:</span><strong style="color: #b8860b;">Rock one wild tea</strong></div>
+                                            <div class="bank-detail-row" style="display: flex; justify-content: space-between; align-items: center;">
+                                                <span style="color: #4b5563;">Account Number:</span>
+                                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                    <strong style="color: #111827; font-family: monospace; font-size: 1.05rem; letter-spacing: 1px;">94945708</strong>
+                                                    <button type="button" id="tour-copy-acc-btn" style="background: #f5f0e6; border: 1px solid #b8860b; color: #855b05; font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 4px; cursor: pointer; font-weight: 600;">Copy</button>
+                                                </div>
+                                            </div>
+                                            <div class="bank-detail-row"><span style="color: #4b5563;">Branch:</span><strong style="color: #111827;">Ettampitiya branch</strong></div>
+                                            <div class="bank-detail-row" style="border-top: 1px dashed #d1c7b7; padding-top: 0.6rem; margin-top: 0.5rem;">
+                                                <span style="color: #111827; font-weight: 600;">Total Amount Due:</span>
+                                                <strong id="tour-bank-amount-display" style="color: #b8860b; font-size: 1.15rem;">${isSriLanka ? 'Rs ' + tourGrandTotalLKR.toLocaleString() + ' LKR' : formattedTourTotal}</strong>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-top: 0.85rem; margin-bottom: 0;">
+                                            <label style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #855b05; margin-bottom: 0.35rem; display: block;">Upload Bank Transfer Receipt Slip *</label>
+                                            <div class="file-upload-zone" id="tour-bank-slip-zone">
+                                                <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
+                                                <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse receipt image</span></div>
+                                                <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
+                                                <input type="file" id="tour-bank-slip" accept="image/*,.pdf" style="display:none;">
+                                            </div>
+                                            <div id="tour-bank-slip-preview" class="slip-preview" style="display:none;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Panel 3: Cash Deposit Slip -->
+                                    <div id="tour-pay-panel-slip" class="pay-panel" style="display: none;">
+                                        <div class="bank-details-block" style="background: #faf8f5; border: 1.5px solid #d4af37; border-radius: 10px; padding: 1.15rem;">
+                                            <div class="bank-detail-row"><span style="color: #4b5563;">Bank Name:</span><strong style="color: #111827;">Bank of Ceylon</strong></div>
+                                            <div class="bank-detail-row"><span style="color: #4b5563;">Account Name:</span><strong style="color: #b8860b;">Rock one wild tea</strong></div>
+                                            <div class="bank-detail-row"><span style="color: #4b5563;">Account Number:</span><strong style="color: #111827; font-family: monospace; font-size: 1.05rem; letter-spacing: 1px;">94945708</strong></div>
+                                            <div class="bank-detail-row"><span style="color: #4b5563;">Branch:</span><strong style="color: #111827;">Ettampitiya branch</strong></div>
+                                            <div class="bank-detail-row" style="border-top: 1px dashed #d1c7b7; padding-top: 0.6rem; margin-top: 0.5rem;">
+                                                <span style="color: #111827; font-weight: 600;">Exact Deposit Amount:</span>
+                                                <strong id="tour-deposit-amount-display" style="color: #b8860b; font-size: 1.15rem;">${isSriLanka ? 'Rs ' + tourGrandTotalLKR.toLocaleString() + ' LKR' : formattedTourTotal}</strong>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-top: 0.85rem; margin-bottom: 0;">
+                                            <label style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #855b05; margin-bottom: 0.35rem; display: block;">Upload Cash Deposit Slip *</label>
+                                            <div class="file-upload-zone" id="tour-cash-slip-zone">
+                                                <div class="file-upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
+                                                <div class="file-upload-text">Drag &amp; drop or <span class="file-upload-link">browse deposit slip</span></div>
+                                                <div class="file-upload-hint">JPG, PNG or PDF &bull; Max 5MB</div>
+                                                <input type="file" id="tour-cash-slip" accept="image/*,.pdf" style="display:none;">
+                                            </div>
+                                            <div id="tour-cash-slip-preview" class="slip-preview" style="display:none;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Panel 4: PayPal -->
+                                    <div id="tour-pay-panel-paypal" class="pay-panel" style="display: none;">
+                                        <div style="background: #faf8f5; border: 1.5px solid #d4af37; border-radius: 10px; padding: 1.15rem;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+                                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.78.78 0 0 1 .77-.643h7.14c3.04 0 5.25.707 6.42 2.054 1.157 1.332 1.34 3.23.542 5.645-.034.103-.073.208-.117.313-.884 2.658-2.825 4.14-5.772 4.407l-.234.015h-2.15a.91.91 0 0 0-.9.774l-.994 4.887a.641.641 0 0 1-.613.519zm7.14-15.76h-5.9a.28.28 0 0 0-.276.23L5.352 20.337h2.72l.9-4.428a1.41 1.41 0 0 1 1.385-1.129h2.15c2.475-.224 4.123-1.464 4.887-3.76.037-.09.07-.179.1-.27.674-2.04.53-3.567-.432-4.673-.956-1.098-2.766-1.517-5.046-1.517z" fill="#003087"/>
+                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.154 9.172a.65.65 0 0 1 .639-.537h4.82c1.928 0 3.33.448 4.072 1.302.734.845.85 2.05.344 3.582-.56 1.686-1.792 2.626-3.662 2.795l-.148.01h-1.364a.577.577 0 0 0-.57.49l-.63 3.102a.407.407 0 0 1-.389.329H9.986a.407.407 0 0 1-.402-.47l1.72-8.468a.5.5 0 0 1 .49-.404h-1.64z" fill="#0079C1"/>
+                                                    </svg>
+                                                    <strong style="color: #111827; font-size: 0.95rem;">PayPal &bull; Express Checkout</strong>
+                                                </div>
+                                                <span style="font-size: 0.65rem; background: #fef3c7; color: #92400e; padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 700; border: 1px solid #fde68a;">COMING SOON</span>
+                                            </div>
+                                            <div class="coming-soon-notice-card" style="background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; display: flex; gap: 0.75rem; align-items: flex-start;">
+                                                <div style="flex-shrink: 0; margin-top: 2px;">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                </div>
+                                                <div style="font-size: 0.8rem; line-height: 1.45; color: #78350f;">
+                                                    <div style="font-weight: 700; color: #92400e; font-size: 0.85rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
+                                                        <span>PayPal Gateway Coming Soon</span>
+                                                        <span style="font-size: 0.65rem; background: #fef3c7; color: #b45309; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 700; border: 1px solid #fde68a;">UNDER INTEGRATION</span>
+                                                    </div>
+                                                    <div>
+                                                        PayPal express booking is currently undergoing final gateway integration. To reserve your private tour slot immediately, please select <strong>Pay on Arrival</strong>, <strong>Bank Transfer</strong>, or <strong>Cash Deposit Slip</strong>.
+                                                    </div>
+                                                    <div style="margin-top: 0.45rem; font-size: 0.75rem;">
+                                                        Need concierge booking assistance? <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge%2C%20I%20would%20like%20to%20reserve%20a%20private%20estate%20tour" target="_blank" rel="noopener noreferrer" style="color: #b45309; font-weight: 700; text-decoration: underline;">Chat with our Concierge on WhatsApp &rarr;</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Panel 5: Credit / Debit Card -->
+                                    <div id="tour-pay-panel-card" class="pay-panel" style="display: none;">
+                                        <div style="background: #faf8f5; border: 1.5px solid #d4af37; border-radius: 10px; padding: 1.15rem;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; border-bottom: 1px solid #e5e0d8; padding-bottom: 0.6rem;">
+                                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                                    <strong style="color: #111827; font-size: 0.92rem;">Credit / Debit Card</strong>
+                                                </div>
+                                                <div class="card-brand-chips">
+                                                    <span class="card-chip-badge visa-badge">VISA</span>
+                                                    <span class="card-chip-badge mc-badge">MC</span>
+                                                    <span class="card-chip-badge amex-badge">AMEX</span>
+                                                </div>
+                                            </div>
+                                            <div class="coming-soon-notice-card" style="background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; display: flex; gap: 0.75rem; align-items: flex-start;">
+                                                <div style="flex-shrink: 0; margin-top: 2px;">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                </div>
+                                                <div style="font-size: 0.8rem; line-height: 1.45; color: #78350f;">
+                                                    <div style="font-weight: 700; color: #92400e; font-size: 0.85rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
+                                                        <span>Card Gateway Coming Soon</span>
+                                                        <span style="font-size: 0.65rem; background: #fef3c7; color: #b45309; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 700; border: 1px solid #fde68a;">UNDER INTEGRATION</span>
+                                                    </div>
+                                                    <div>
+                                                        Direct Credit &amp; Debit Card booking is in final compliance verification. Please choose <strong>Pay on Arrival</strong> or <strong>Direct Bank Transfer</strong> for instant reservation confirmation.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Step 2 Submit Order Button -->
+                                <div style="margin-top: 1rem;">
+                                    <button type="button" id="tour-submit-order-btn" class="btn btn-primary" style="width: 100%; padding: 1.05rem 1.5rem; font-size: 1rem; font-weight: 700; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 0.6rem; cursor: pointer; box-shadow: 0 4px 16px rgba(184,134,11,0.22);">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        <span id="tour-submit-order-btn-text">Confirm &amp; Reserve Tour &bull; ${formattedTourTotal}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- ==============================================
+                         RIGHT COLUMN: LUXURY TOUR SUMMARY SIDEBAR
+                         ============================================== -->
+                    <div class="checkout-right-col">
+                        <div class="checkout-summary-sidebar">
+                            <div class="checkout-summary-header">
+                                <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #855b05;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                    <span>Experience Allocation</span>
+                                </div>
+                                <span style="font-size: 0.72rem; color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 0.15rem 0.55rem; font-weight: 600;">Single-Estate Sanctuary</span>
+                            </div>
+
+                            <!-- LARGE LUXURY PHOTO SHOWCASE -->
+                            <div class="checkout-large-product-showcase">
+                                <div class="checkout-large-photo-box" style="padding: 0; background: #111827; overflow: hidden;">
+                                    <img src="${(data && data.image) || 'images/Tour/web/tourist_plucking_experience.webp'}" 
+                                         onerror="this.onerror=null; this.src='images/Tour/tourist_plucking_experience.jpg';" 
+                                         alt="Rock One Wild Tea Estate Experience - Authentic Ceylon Tea Plucking &amp; Factory Tour" 
+                                         class="checkout-large-photo-img" 
+                                         id="tour-large-photo-img" 
+                                         style="object-fit: cover; width: 100%; height: 100%; display: block;" 
+                                         loading="eager" 
+                                         decoding="async">
+                                    <div class="checkout-photo-overlay-badges">
+                                        <span class="checkout-photo-tag-estate">⛰️ 1,320m Elevation</span>
+                                        <span class="checkout-photo-tag-qty" id="tour-large-badge-guests">Guests: ${tourGuests}</span>
+                                    </div>
+                                </div>
+
+                                <div class="checkout-large-product-details">
+                                    <h3 class="checkout-large-title">${pkgName}</h3>
+                                    <div class="checkout-large-chips">
+                                        <span class="checkout-chip">🍃 Gongfu Ceremony</span>
+                                        <span class="checkout-chip">⏱️ ~1.5–2 Hours</span>
+                                        <span class="checkout-chip" id="tour-sidebar-slot-chip">🕒 ${timeSlot}</span>
+                                    </div>
+
+                                    <div class="checkout-large-pricing-row">
+                                        <div class="cart-qty-stepper" style="display: inline-flex; align-items: center; border: 1.5px solid #d4af37; border-radius: 8px; overflow: hidden; background: #ffffff;">
+                                            <button type="button" id="tour-sidebar-qty-minus" style="background: none; border: none; color: #b8860b; width: 30px; height: 30px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem;">-</button>
+                                            <span id="tour-sidebar-qty-val" style="width: 32px; text-align: center; font-size: 0.85rem; font-weight: 700; color: #111827;">${tourGuests}</span>
+                                            <button type="button" id="tour-sidebar-qty-plus" style="background: none; border: none; color: #b8860b; width: 30px; height: 30px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem;">+</button>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div class="checkout-item-price" id="tour-item-line-price" style="font-size: 1.25rem; font-weight: 700; color: #111827; font-family: var(--font-serif);">${formattedTourTotal}</div>
+                                            <div id="tour-sidebar-unit-price" style="font-size: 0.74rem; color: #64748b;">${formattedPerGuest} / visitor</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Discount Code Box -->
+                            <div class="checkout-discount-box">
+                                <input type="text" id="tour-promo-code" class="checkout-discount-input" placeholder="Privilege voucher code" style="background:#ffffff !important; color:#111827 !important; border:1.5px solid #d1d5db !important;">
+                                <button type="button" id="tour-apply-promo-btn" class="checkout-discount-btn">Apply</button>
+                            </div>
+
+                            <!-- Available Privilege Coupons -->
+                            ${window.renderCheckoutCouponsHTML ? window.renderCheckoutCouponsHTML(activeTourPromo ? activeTourPromo.code : '', 'tour-promo-code') : ''}
+
+                            <!-- Savings Pill -->
+                            <div class="checkout-savings-pill" id="tour-savings-pill" style="display: none;">
+                                <span style="display: flex; align-items: center; gap: 0.35rem;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                                    <span id="tour-savings-label">TOTAL SAVINGS</span>
+                                </span>
+                                <strong id="tour-savings-amt">-$0.00</strong>
+                            </div>
+
+                            <!-- Line Items Breakdown -->
+                            <div style="display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.84rem; padding-top: 0.25rem;">
+                                <div class="checkout-totals-row">
+                                    <span>Experience Rate (<span id="tour-breakdown-guest-count">${tourGuests}</span> &times; <span id="tour-breakdown-rate-chip">${formattedPerGuest}</span>)</span>
+                                    <strong id="tour-summary-subtotal" style="color: #111827;">${formattedTourTotal}</strong>
+                                </div>
+                                <div class="checkout-totals-row" id="tour-discount-row" style="display: none; color: #15803d;">
+                                    <span>Promotional Savings</span>
+                                    <strong id="tour-discount-amt">-$0.00</strong>
+                                </div>
+                                <div class="checkout-totals-row">
+                                    <span id="tour-summary-transport-label">Estate Parking &amp; Access</span>
+                                    <span id="tour-summary-transport" style="color: ${transportFeeUSD > 0 ? '#855b05' : '#15803d'}; font-weight: 600;">${transportFeeUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(transportFeeUSD, currInfo) : '+$25.00') : 'Complimentary'}</span>
+                                </div>
+                                <div class="checkout-grand-total-row">
+                                    <div>
+                                        <strong id="tour-summary-total-title" style="font-size: 0.95rem; color: #111827;">Total Due (${currInfo.code})</strong>
+                                        <span id="tour-lkr-approx" style="display: block; font-size: 0.72rem; color: #64748b; font-weight: normal; ${isSriLanka ? 'display:none;' : ''}">(≈ Rs ${tourGrandTotalLKR.toLocaleString()} LKR)</span>
+                                    </div>
+                                    <strong id="tour-summary-total" style="font-size: 1.45rem; color: #855b05; font-family: var(--font-serif);">${formattedTourTotal}</strong>
+                                </div>
+                            </div>
+
+                            <!-- Master Action Button in Sidebar -->
+                            <button type="button" id="tour-summary-submit-btn" class="checkout-action-btn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span id="tour-action-btn-text">Proceed to Payment &bull; ${formattedTourTotal}</span>
+                            </button>
+
+                            <!-- Trust Badges -->
+                            <div class="checkout-trust-badges">
+                                <span>🔒 256-Bit SSL Encrypted</span>
+                                <span>🎫 Instant Gate Pass Release</span>
+                                <span>🔄 Free Reschedule up to 24h</span>
+                            </div>
+
+                            <div class="checkout-footer-links">
+                                <a href="#terms" onclick="event.preventDefault();">Terms and policies</a>
+                                <span>&bull;</span>
+                                <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20a%20question%20about%20estate%20tours" target="_blank" rel="noopener noreferrer">Concierge WhatsApp: +94 77 320 9950</a>
+                            </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             `;
 
             drawerFooter.innerHTML = '';
 
-            // Gate Pass Release View for Tour Booking
+            // Render Success Screen for Tour Reservation
             const renderTourConfirmationSuccess = (booking, paymentMethod) => {
+                const isArrival = paymentMethod === 'arrival';
                 const isPayPal = paymentMethod === 'paypal';
                 const isCard = paymentMethod === 'card';
 
                 drawerFormContainer.innerHTML = `
                     <div class="cart-success-view" style="text-align: center; padding: 2.25rem 1rem;">
-                        <div style="width: 76px; height: 76px; border-radius: 50%; background: ${isCard ? 'rgba(37,99,235,0.15)' : 'rgba(212,175,55,0.12)'}; border: 2px solid ${isCard ? '#2563eb' : 'var(--color-gold)'}; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.15rem auto; color: ${isCard ? '#2563eb' : 'var(--color-gold)'};">
+                        <div style="width: 76px; height: 76px; border-radius: 50%; background: ${isArrival ? 'rgba(37,211,102,0.15)' : (isCard ? 'rgba(37,99,235,0.15)' : 'rgba(212,175,55,0.12)')}; border: 2px solid ${isArrival ? '#25d366' : (isCard ? '#2563eb' : 'var(--color-gold)')}; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.15rem auto; color: ${isArrival ? '#25d366' : (isCard ? '#2563eb' : 'var(--color-gold)')};">
                             <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
-                        <span class="season-badge" style="background: ${isCard ? 'rgba(37,99,235,0.15)' : 'rgba(212,175,55,0.15)'}; color: ${isCard ? '#38bdf8' : 'var(--color-gold)'}; font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
-                            ${isCard ? `Paid • Direct Card Settlement (${booking.cardBrand || 'Card'} •••• ${booking.cardLast4 || '4242'})` : (isPayPal ? 'Paid • Instant Gate Pass Release' : 'Reservation Pending Clearance • Gate Pass Issued')}
+                        <span class="season-badge" style="background: ${isArrival ? 'rgba(37,211,102,0.2)' : (isCard ? 'rgba(37,99,235,0.15)' : 'rgba(212,175,55,0.15)')}; color: ${isArrival ? '#4ade80' : (isCard ? '#38bdf8' : 'var(--color-gold)')}; font-size: 0.72rem; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                            ${isArrival ? 'Reserved &bull; Pay on Arrival at Gate' : (isCard ? `Paid &bull; Direct Card Settlement (${booking.cardBrand || 'Card'} •••• ${booking.cardLast4 || '4242'})` : (isPayPal ? 'Paid &bull; Instant Gate Pass Release' : 'Reservation Registered &bull; Slip Attached'))}
                         </span>
                         <h3 style="font-family: var(--font-serif); font-size: 1.5rem; color: #ffffff; margin: 0.75rem 0 0.25rem 0;">Private Tour Reserved</h3>
                         <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.5rem;">
@@ -3923,12 +4181,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <strong style="color: var(--color-gold); font-size: 1.1rem;">${booking.formattedPrice}</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
-                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Operating Days</span>
-                                <span style="color: #cbd5e1; font-size: 0.82rem;">Monday &ndash; Saturday (9:00 AM &ndash; 5:00 PM)</span>
+                                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Payment Mode</span>
+                                <span style="color: ${isArrival ? '#4ade80' : (isCard ? '#38bdf8' : 'var(--color-gold)')}; font-size: 0.85rem; font-weight: 700;">
+                                    ${isArrival ? 'Pay on Arrival at Estate Gate' : (isCard ? `Credit / Debit Card` : (isPayPal ? 'PayPal Express' : 'Bank of Ceylon Deposit'))}
+                                </span>
                             </div>
                         </div>
 
-                        <!-- Executive Director & CEO Verification Seal -->
+                        <!-- CEO Seal -->
                         <div style="background: rgba(212,175,55,0.06); border: 1px dashed rgba(212,175,55,0.35); border-radius: 10px; padding: 0.9rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
                             <div style="text-align: left;">
                                 <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold); font-weight: 700; display: block;">Gate Pass Endorsed &bull; CEO Sign-Off</span>
@@ -3942,421 +4202,533 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
 
                         <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                            <button type="button" class="btn btn-outline btn-tour-download-pdf" style="padding: 0.8rem; font-size: 0.85rem; border-color: rgba(212,175,55,0.5); color: var(--color-gold); display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: rgba(0,0,0,0.35);">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-                                Download Estate Gate Pass (PDF)
-                            </button>
-                            <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%2C%20I%20have%20booked%20Private%20Tour%20${booking.id}%20(${encodeURIComponent(booking.packageName)})%20for%20${booking.guests}%20guests%20on%20${booking.date || booking.tourDate}.%20Please%20confirm%20my%20gate%20clearance." target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; font-weight: 700;">
+                            <a href="https://wa.me/94773209950?text=Hello%20Rock%20One%20Wild%20Tea%20Concierge%2C%20I%20have%20reserved%20Tour%20${booking.id}%20for%20${booking.guests || 1}%20guest(s)%20on%20${encodeURIComponent(booking.date || booking.tourDate)}%20at%20${encodeURIComponent(booking.timeSlot)}%20(${encodeURIComponent(booking.formattedPrice)}).%20Please%20confirm%20my%20slot." target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 0.85rem 1.5rem; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #25d366; border-color: #25d366; color: #040e08; font-weight: 700;">
                                 <span>Notify Concierge on WhatsApp</span>
                             </a>
-                            <button type="button" class="btn btn-outline" onclick="closeDrawer(); window.appSwitchTab ? window.appSwitchTab('tour') : (document.getElementById('nav-tour') &amp;&amp; document.getElementById('nav-tour').click())" style="padding: 0.8rem; font-size: 0.85rem; border-color: rgba(255,255,255,0.25); color: #fff;">
-                                View Tour Master Schedule &rarr;
+                            <button type="button" class="btn btn-outline" onclick="closeDrawer();" style="padding: 0.8rem; font-size: 0.85rem; border-color: rgba(255,255,255,0.25); color: #fff;">
+                                Close &amp; Return to Estate Portal
                             </button>
                         </div>
                     </div>
                 `;
-
-                drawerFormContainer.querySelector('.btn-tour-download-pdf')?.addEventListener('click', () => {
-                    generateGatePassPDF(booking);
-                });
             };
 
-            // Dynamic Tour Pricing & Currency Updates
+            // Two-Stage Checkout Transitions (Stage 1: Booking Details <-> Stage 2: Payment Options)
+            const setTourCheckoutStage = (stage) => {
+                const stageDetails = document.getElementById('tour-stage-details');
+                const stagePayment = document.getElementById('tour-stage-payment');
+                const tabDetails = document.getElementById('tour-tab-details');
+                const tabPayment = document.getElementById('tour-tab-payment');
+                const masterBtnText = document.getElementById('tour-action-btn-text');
+                const masterBtn = document.getElementById('tour-summary-submit-btn');
+
+                if (stage === 2) {
+                    const requiredInputs = ['tour-cust-firstname', 'tour-cust-lastname', 'tour-cust-email', 'tour-cust-phone', 'tour-date-input'];
+                    let firstInvalid = null;
+                    for (const fId of requiredInputs) {
+                        const input = document.getElementById(fId);
+                        if (input && !input.value.trim()) {
+                            if (!firstInvalid) firstInvalid = input;
+                        }
+                    }
+                    if (firstInvalid) {
+                        if (firstInvalid.reportValidity) firstInvalid.reportValidity();
+                        firstInvalid.focus();
+                        if (window.showToast) window.showToast('Booking Details Required', 'Please complete your contact and schedule details before proceeding to payment.', 'warning');
+                        return false;
+                    }
+
+                    const fName = document.getElementById('tour-cust-firstname')?.value?.trim() || '';
+                    const lName = document.getElementById('tour-cust-lastname')?.value?.trim() || '';
+                    const country = document.getElementById('tour-cust-country')?.value || 'Sri Lanka';
+                    const dateVal = document.getElementById('tour-date-input')?.value || initialDate;
+                    const slotVal = document.getElementById('tour-time-slot')?.value || timeSlot;
+
+                    const reviewNameEl = document.getElementById('tour-review-cust-name');
+                    if (reviewNameEl) reviewNameEl.textContent = `${fName} ${lName}`.trim() || 'Guest Visitor';
+                    const reviewDestEl = document.getElementById('tour-review-cust-dest');
+                    if (reviewDestEl) reviewDestEl.textContent = country;
+                    const reviewScheduleEl = document.getElementById('tour-review-schedule');
+                    if (reviewScheduleEl) reviewScheduleEl.textContent = `${dateVal} at ${slotVal}`;
+
+                    currentCheckoutStage = 2;
+                    if (stageDetails) stageDetails.style.display = 'none';
+                    if (stagePayment) stagePayment.style.display = 'block';
+
+                    if (tabDetails) {
+                        tabDetails.classList.remove('active');
+                        tabDetails.classList.add('completed');
+                    }
+                    if (tabPayment) {
+                        tabPayment.classList.add('active');
+                    }
+
+                    if (masterBtnText) {
+                        masterBtnText.innerHTML = `Confirm &amp; Reserve &bull; ${formattedTourTotal}`;
+                    }
+                    if (masterBtn) {
+                        masterBtn.setAttribute('title', 'Confirm and Reserve Tour');
+                    }
+
+                    const submitOrderBtn = document.getElementById('tour-submit-order-btn-text');
+                    if (submitOrderBtn) {
+                        submitOrderBtn.innerHTML = `Confirm &amp; Reserve Tour &bull; ${formattedTourTotal}`;
+                    }
+
+                    const scrollContainer = document.getElementById('drawer-body-content') || document.querySelector('.drawer-container.checkout-mode') || window;
+                    if (scrollContainer && scrollContainer.scrollTo) {
+                        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                } else {
+                    currentCheckoutStage = 1;
+                    if (stageDetails) stageDetails.style.display = 'block';
+                    if (stagePayment) stagePayment.style.display = 'none';
+
+                    if (tabDetails) {
+                        tabDetails.classList.add('active');
+                    }
+                    if (tabPayment) {
+                        tabPayment.classList.remove('active');
+                    }
+
+                    if (masterBtnText) {
+                        masterBtnText.innerHTML = `Proceed to Payment &bull; ${formattedTourTotal}`;
+                    }
+                    if (masterBtn) {
+                        masterBtn.setAttribute('title', 'Proceed to Payment Options');
+                    }
+
+                    const scrollContainer = document.getElementById('drawer-body-content') || document.querySelector('.drawer-container.checkout-mode') || window;
+                    if (scrollContainer && scrollContainer.scrollTo) {
+                        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                }
+                return true;
+            };
+
+            // Dynamic Currency & Total Calculation
             const updateTourPricing = () => {
                 const country = document.getElementById('tour-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
                 window.lastSelectedCheckoutCountry = country;
                 const isLK = country === 'Sri Lanka';
                 const cur = window.getCountryCurrency ? window.getCountryCurrency(country) : (isLK ? { code: 'LKR', symbol: 'Rs ', rate: 305, decimals: 0 } : { code: 'USD', symbol: '$', rate: 1.0, decimals: 2 });
-                
-                const transportOpt = document.querySelector('input[name="tour-transport-option"]:checked')?.value || 'self';
-                transportFeeUSD = transportOpt === 'chauffeur' ? 25.0 : 0.0;
+
+                const selectedTrans = drawerFormContainer.querySelector('input[name="tour-transport-option"]:checked')?.value || 'self';
+                transportFeeUSD = selectedTrans === 'chauffeur' ? 25.0 : 0.0;
+
                 tourSubtotalUSD = baseUsdPerGuest * tourGuests;
-                tourGrandTotalUSD = tourSubtotalUSD + transportFeeUSD;
+                discountUSD = 0;
+                if (activeTourPromo) {
+                    discountUSD = Number((tourSubtotalUSD * (activeTourPromo.percent / 100)).toFixed(2));
+                }
+                discountedTourSubtotalUSD = Math.max(0, tourSubtotalUSD - discountUSD);
+                tourGrandTotalUSD = discountedTourSubtotalUSD + transportFeeUSD;
 
                 formattedPerGuest = window.formatAmountInCurrency ? window.formatAmountInCurrency(baseUsdPerGuest, cur) : `$${baseUsdPerGuest.toFixed(2)}`;
-                const formattedSub = window.formatAmountInCurrency ? window.formatAmountInCurrency(tourSubtotalUSD, cur) : `$${tourSubtotalUSD.toFixed(2)}`;
+                const formattedDiscount = discountUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(discountUSD, cur) : `$${discountUSD.toFixed(2)}`) : '';
+                const formattedTransport = transportFeeUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(transportFeeUSD, cur) : `+$25.00`) : 'Complimentary';
                 formattedTourTotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(tourGrandTotalUSD, cur) : `$${tourGrandTotalUSD.toFixed(2)}`;
                 tourGrandTotalLKR = Math.round(tourGrandTotalUSD * 305);
 
-                const ratePerGuestEl = document.getElementById('tour-rate-per-guest');
-                if (ratePerGuestEl) ratePerGuestEl.textContent = `${formattedPerGuest} per guest`;
-                const subEl = document.getElementById('tour-summary-subtotal');
-                if (subEl) subEl.textContent = formattedSub;
-                const transEl = document.getElementById('tour-summary-transport');
-                if (transEl) {
-                    transEl.textContent = transportFeeUSD > 0 ? (window.formatAmountInCurrency ? window.formatAmountInCurrency(transportFeeUSD, cur) : '$25.00') : 'Complimentary Arrival';
-                    transEl.style.color = transportFeeUSD > 0 ? '#86efac' : 'var(--color-gold)';
+                const unitPriceEl = document.getElementById('tour-sidebar-unit-price');
+                if (unitPriceEl && window.formatAmountInCurrency) {
+                    unitPriceEl.textContent = `${formattedPerGuest} / visitor`;
                 }
+                const largeBadgeGuestsEl = document.getElementById('tour-large-badge-guests');
+                if (largeBadgeGuestsEl) largeBadgeGuestsEl.textContent = `Guests: ${tourGuests}`;
+                const linePriceEl = document.getElementById('tour-item-line-price');
+                if (linePriceEl) linePriceEl.textContent = formattedTourTotal;
+                const stepperValEl = document.getElementById('tour-sidebar-qty-val');
+                if (stepperValEl) stepperValEl.textContent = tourGuests;
+
+                const guestCountEl = document.getElementById('tour-breakdown-guest-count');
+                if (guestCountEl) guestCountEl.textContent = tourGuests;
+                const rateChipEl = document.getElementById('tour-breakdown-rate-chip');
+                if (rateChipEl) rateChipEl.textContent = formattedPerGuest;
+
+                const summarySubtotal = document.getElementById('tour-summary-subtotal');
+                if (summarySubtotal) summarySubtotal.textContent = window.formatAmountInCurrency ? window.formatAmountInCurrency(tourSubtotalUSD, cur) : `$${tourSubtotalUSD.toFixed(2)}`;
+
+                const discountRow = document.getElementById('tour-discount-row');
+                const discountAmtEl = document.getElementById('tour-discount-amt');
+                const savingsPill = document.getElementById('tour-savings-pill');
+                const savingsAmtEl = document.getElementById('tour-savings-amt');
+                if (discountUSD > 0) {
+                    if (discountRow) discountRow.style.display = 'flex';
+                    if (discountAmtEl) discountAmtEl.textContent = `-${formattedDiscount}`;
+                    if (savingsPill) savingsPill.style.display = 'flex';
+                    if (savingsAmtEl) savingsAmtEl.textContent = `-${formattedDiscount} (${activeTourPromo.code})`;
+                } else {
+                    if (discountRow) discountRow.style.display = 'none';
+                    if (savingsPill) savingsPill.style.display = 'none';
+                }
+
+                const summaryTransport = document.getElementById('tour-summary-transport');
+                if (summaryTransport) {
+                    summaryTransport.textContent = formattedTransport;
+                    summaryTransport.style.color = transportFeeUSD > 0 ? '#855b05' : '#15803d';
+                }
+
                 const totalTitle = document.getElementById('tour-summary-total-title');
-                if (totalTitle) totalTitle.textContent = `Total Payable (${cur.code})`;
-                const totalEl = document.getElementById('tour-summary-total');
-                if (totalEl) totalEl.textContent = formattedTourTotal;
+                if (totalTitle) totalTitle.textContent = `Total Due (${cur.code})`;
+                const summaryTotal = document.getElementById('tour-summary-total');
+                if (summaryTotal) summaryTotal.textContent = formattedTourTotal;
 
-                const transPill = document.getElementById('tour-transport-surcharge-pill');
-                if (transPill && window.formatAmountInCurrency) {
-                    transPill.textContent = `+ ${window.formatAmountInCurrency(25, cur)}`;
+                const lkrApprox = document.getElementById('tour-lkr-approx');
+                if (lkrApprox) {
+                    if (isLK) {
+                        lkrApprox.style.display = 'none';
+                    } else {
+                        lkrApprox.style.display = 'block';
+                        lkrApprox.textContent = `(≈ Rs ${tourGrandTotalLKR.toLocaleString()} LKR)`;
+                    }
                 }
 
-                const bankAmt = document.getElementById('tour-bank-amount-display');
-                if (bankAmt) {
-                    bankAmt.innerHTML = isLK ? `Rs ${tourGrandTotalLKR.toLocaleString()} LKR` : `${formattedTourTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${tourGrandTotalLKR.toLocaleString()} LKR)</span>`;
-                }
-                const bankBtn = document.getElementById('tour-bank-btn-text');
-                if (bankBtn) bankBtn.textContent = `Confirm Booking via Bank Transfer • ${formattedTourTotal}`;
+                const arrivalAmountDisplay = document.getElementById('tour-arrival-amount-display');
+                if (arrivalAmountDisplay) arrivalAmountDisplay.textContent = isLK ? 'Rs ' + tourGrandTotalLKR.toLocaleString() + ' LKR' : formattedTourTotal;
+                const bankAmountDisplay = document.getElementById('tour-bank-amount-display');
+                if (bankAmountDisplay) bankAmountDisplay.textContent = isLK ? 'Rs ' + tourGrandTotalLKR.toLocaleString() + ' LKR' : formattedTourTotal;
+                const depositAmountDisplay = document.getElementById('tour-deposit-amount-display');
+                if (depositAmountDisplay) depositAmountDisplay.textContent = isLK ? 'Rs ' + tourGrandTotalLKR.toLocaleString() + ' LKR' : formattedTourTotal;
 
-                const depAmt = document.getElementById('tour-deposit-amount-display');
-                if (depAmt) {
-                    depAmt.innerHTML = isLK ? `Rs ${tourGrandTotalLKR.toLocaleString()} LKR` : `${formattedTourTotal} <span style="font-size:0.75rem; color:#cbd5e1; font-weight:normal;">(≈ Rs ${tourGrandTotalLKR.toLocaleString()} LKR)</span>`;
-                }
-                const slipBtn = document.getElementById('tour-slip-btn-text');
-                if (slipBtn) slipBtn.textContent = `Submit Cash Deposit Slip • ${formattedTourTotal}`;
+                const submitOrderBtn = document.getElementById('tour-submit-order-btn-text');
+                if (submitOrderBtn) submitOrderBtn.innerHTML = `Confirm &amp; Reserve Tour &bull; ${formattedTourTotal}`;
 
-                const ppAmt = document.getElementById('tour-paypal-amount-display');
-                if (ppAmt) {
-                    ppAmt.textContent = cur.code === 'USD' ? `$${tourGrandTotalUSD.toFixed(2)} USD` : `${formattedTourTotal} ($${tourGrandTotalUSD.toFixed(2)} USD)`;
-                }
-
-                const cardAmt = document.getElementById('tour-card-amount-display');
-                if (cardAmt) {
-                    cardAmt.textContent = cur.code === 'USD' ? `$${tourGrandTotalUSD.toFixed(2)} USD` : `${formattedTourTotal} ($${tourGrandTotalUSD.toFixed(2)} USD)`;
-                }
-                const cardBtn = document.getElementById('tour-pay-card-btn-text');
-                if (cardBtn) {
-                    cardBtn.innerHTML = `Pay with Card &bull; ${formattedTourTotal}`;
-                }
-
-                const activeTab = document.querySelector('#tour-checkout-form .pay-tab.active');
-                if (activeTab && activeTab.getAttribute('data-method') === 'paypal') {
-                    initTourPayPal();
+                const actionBtnText = document.getElementById('tour-action-btn-text');
+                if (actionBtnText) {
+                    actionBtnText.innerHTML = currentCheckoutStage === 1 
+                        ? `Proceed to Payment &bull; ${formattedTourTotal}` 
+                        : `Confirm &amp; Reserve &bull; ${formattedTourTotal}`;
                 }
             };
 
-            // Stepper
-            const minusBtn = document.getElementById('tour-qty-minus');
-            const plusBtn = document.getElementById('tour-qty-plus');
-            const qtyVal = document.getElementById('tour-qty-val');
+            // Event Listeners for Stepper, Stage Tabs, Buttons
+            document.getElementById('tour-tab-details')?.addEventListener('click', () => setTourCheckoutStage(1));
+            document.getElementById('tour-tab-payment')?.addEventListener('click', () => setTourCheckoutStage(2));
+            document.getElementById('tour-goto-payment-btn')?.addEventListener('click', () => setTourCheckoutStage(2));
+            document.getElementById('tour-back-to-details-btn')?.addEventListener('click', () => setTourCheckoutStage(1));
+            document.getElementById('tour-edit-details-link')?.addEventListener('click', () => setTourCheckoutStage(1));
 
-            if (minusBtn) {
-                minusBtn.onclick = () => {
-                    if (tourGuests > 1) {
-                        tourGuests--;
-                        if (qtyVal) qtyVal.textContent = tourGuests;
-                        updateTourPricing();
-                    }
-                };
-            }
-            if (plusBtn) {
-                plusBtn.onclick = () => {
-                    if (tourGuests < 10) {
-                        tourGuests++;
-                        if (qtyVal) qtyVal.textContent = tourGuests;
-                        updateTourPricing();
-                    }
-                };
-            }
+            // Master Sidebar Action Button
+            document.getElementById('tour-summary-submit-btn')?.addEventListener('click', () => {
+                if (currentCheckoutStage === 1) {
+                    setTourCheckoutStage(2);
+                } else {
+                    document.getElementById('tour-submit-order-btn')?.click();
+                }
+            });
 
-            const countryInput = document.getElementById('tour-cust-country');
-            if (countryInput) countryInput.onchange = updateTourPricing;
+            // Guest Count Stepper
+            document.getElementById('tour-sidebar-qty-minus')?.addEventListener('click', () => {
+                if (tourGuests > 1) {
+                    tourGuests--;
+                    updateTourPricing();
+                }
+            });
+            document.getElementById('tour-sidebar-qty-plus')?.addEventListener('click', () => {
+                if (tourGuests < 10) {
+                    tourGuests++;
+                    updateTourPricing();
+                } else if (window.showToast) {
+                    window.showToast('Maximum Group Limit', 'Single tour slots are limited to 10 visitors to ensure personal artisan attention.', 'info');
+                }
+            });
 
-            drawerFormContainer.querySelectorAll('input[name="tour-transport-option"]').forEach(r => {
-                r.onchange = () => {
+            // Country Changer
+            document.getElementById('tour-cust-country')?.addEventListener('change', (e) => {
+                const isLK = e.target.value === 'Sri Lanka';
+                const regionCont = document.getElementById('tour-region-container');
+                if (regionCont) {
+                    regionCont.innerHTML = isLK ? `
+                        <label class="form-label" for="tour-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">Region / Province *</label>
+                        <select class="form-input" id="tour-cust-region" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;">
+                            <option value="Western Province (Colombo, Gampaha, Kalutara)">Western Province (Colombo, Gampaha)</option>
+                            <option value="Central Province (Kandy, Nuwara Eliya, Matale)">Central Province (Kandy, Nuwara Eliya)</option>
+                            <option value="Uva Province (Badulla, Bandarawela, Ettampitiya)" selected>Uva Province (Badulla, Ettampitiya)</option>
+                            <option value="Southern Province (Galle, Matara, Hambantota)">Southern Province (Galle, Matara)</option>
+                            <option value="Sabaragamuwa Province (Ratnapura, Kegalle)">Sabaragamuwa Province (Ratnapura)</option>
+                            <option value="North Western Province (Kurunegala, Puttalam)">North Western Province (Kurunegala)</option>
+                            <option value="North Central Province (Anuradhapura, Polonnaruwa)">North Central Province (Anuradhapura)</option>
+                            <option value="Northern Province (Jaffna, Kilinochchi, Vavuniya)">Northern Province (Jaffna)</option>
+                            <option value="Eastern Province (Batticaloa, Trincomalee, Ampara)">Eastern Province (Batticaloa, Trincomalee)</option>
+                        </select>
+                    ` : `
+                        <label class="form-label" for="tour-cust-region" style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #b8860b;">State / Province / City *</label>
+                        <input class="form-input" type="text" id="tour-cust-region" placeholder="e.g. London / Zurich / Berlin" style="font-size: 0.82rem; padding: 0.65rem 0.75rem;" required>
+                    `;
+                }
+                updateTourPricing();
+            });
+
+            // Transport Radios
+            drawerFormContainer.querySelectorAll('input[name="tour-transport-option"]').forEach(radio => {
+                radio.addEventListener('change', () => {
                     const selfCard = document.getElementById('tour-transport-card-self');
-                    const chaufCard = document.getElementById('tour-transport-card-chauffeur');
-                    if (r.value === 'chauffeur') {
-                        if (chaufCard) { chaufCard.style.border = '1.5px solid var(--color-gold)'; chaufCard.style.background = 'rgba(212,175,55,0.08)'; }
-                        if (selfCard) { selfCard.style.border = '1.5px solid rgba(255,255,255,0.15)'; selfCard.style.background = 'rgba(0,0,0,0.3)'; }
+                    const chauffeurCard = document.getElementById('tour-transport-card-chauffeur');
+                    if (radio.value === 'chauffeur') {
+                        if (chauffeurCard) {
+                            chauffeurCard.style.borderColor = '#b8860b';
+                            chauffeurCard.style.background = '#faf8f5';
+                        }
+                        if (selfCard) {
+                            selfCard.style.borderColor = '#e2ded5';
+                            selfCard.style.background = '#ffffff';
+                        }
                     } else {
-                        if (selfCard) { selfCard.style.border = '1.5px solid var(--color-gold)'; selfCard.style.background = 'rgba(212,175,55,0.08)'; }
-                        if (chaufCard) { chaufCard.style.border = '1.5px solid rgba(255,255,255,0.15)'; chaufCard.style.background = 'rgba(0,0,0,0.3)'; }
+                        if (selfCard) {
+                            selfCard.style.borderColor = '#b8860b';
+                            selfCard.style.background = '#faf8f5';
+                        }
+                        if (chauffeurCard) {
+                            chauffeurCard.style.borderColor = '#e2ded5';
+                            chauffeurCard.style.background = '#ffffff';
+                        }
                     }
                     updateTourPricing();
-                };
+                });
             });
 
-            // Date validation (Reject Sunday)
-            const dateInput = document.getElementById('tour-date-input');
-            if (dateInput) {
-                dateInput.onchange = () => {
-                    if (dateInput.value) {
-                        const d = new Date(dateInput.value + 'T00:00:00');
-                        if (d.getDay() === 0) { // Sunday
-                            showToast("Estate Closed on Sunday", "Rock One Tea Factory operates Monday through Saturday (9:00 AM – 5:00 PM). Please select a Monday through Saturday date.", "warning");
-                            const nextDay = new Date(d.getTime() + 86400000).toISOString().split('T')[0];
-                            dateInput.value = nextDay;
+            // Time Slot sync to right sidebar
+            document.getElementById('tour-time-slot')?.addEventListener('change', (e) => {
+                const chip = document.getElementById('tour-sidebar-slot-chip');
+                if (chip) chip.textContent = `🕒 ${e.target.value}`;
+            });
+
+            // Payment Methods Tabs
+            let currentTourPayMethod = 'arrival';
+            drawerFormContainer.querySelectorAll('#tour-payment-step-card .pay-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    drawerFormContainer.querySelectorAll('#tour-payment-step-card .pay-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const method = tab.getAttribute('data-method');
+                    currentTourPayMethod = method;
+
+                    // Panels
+                    const panels = {
+                        arrival: document.getElementById('tour-pay-panel-arrival'),
+                        bank: document.getElementById('tour-pay-panel-bank'),
+                        slip: document.getElementById('tour-pay-panel-slip'),
+                        paypal: document.getElementById('tour-pay-panel-paypal'),
+                        card: document.getElementById('tour-pay-panel-card')
+                    };
+                    Object.keys(panels).forEach(k => {
+                        if (panels[k]) {
+                            panels[k].style.display = k === method ? 'block' : 'none';
                         }
+                    });
+                });
+            });
+
+            // Copy Bank Account
+            document.getElementById('tour-copy-acc-btn')?.addEventListener('click', () => {
+                navigator.clipboard?.writeText('94945708').then(() => {
+                    if (window.showToast) window.showToast('Copied', 'Bank of Ceylon Account Number 94945708 copied.', 'success');
+                }).catch(() => {});
+            });
+
+            // Slip Uploads
+            const setupTourSlipZone = (zoneId, inputId, previewId) => {
+                const zone = document.getElementById(zoneId);
+                const input = document.getElementById(inputId);
+                const preview = document.getElementById(previewId);
+                if (!zone || !input || !preview) return;
+
+                zone.addEventListener('click', () => input.click());
+                input.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    if (file.size > 5 * 1024 * 1024) {
+                        if (window.showToast) window.showToast('File Too Large', 'Please upload a receipt under 5MB.', 'error');
+                        return;
                     }
-                };
-            }
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        selectedTourSlipBase64 = ev.target.result;
+                        preview.style.display = 'block';
+                        preview.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;background:#f0fdf4;border:1px solid #bbf7d0;padding:0.5rem 0.85rem;border-radius:6px;margin-top:0.4rem;font-size:0.75rem;color:#15803d;"><span>✓ ${file.name} attached</span><button type="button" style="background:none;border:none;color:#dc2626;cursor:pointer;font-weight:700;">&times;</button></div>`;
+                        preview.querySelector('button')?.addEventListener('click', (ev2) => {
+                            ev2.stopPropagation();
+                            selectedTourSlipBase64 = '';
+                            input.value = '';
+                            preview.style.display = 'none';
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                });
+            };
+            setupTourSlipZone('tour-bank-slip-zone', 'tour-bank-slip', 'tour-bank-slip-preview');
+            setupTourSlipZone('tour-cash-slip-zone', 'tour-cash-slip', 'tour-cash-slip-preview');
 
-            bindPaymentTabs('tour-checkout-form');
-            bindFileUpload('tour-bank-slip', 'tour-bank-slip-zone', 'tour-bank-slip-preview', (b64) => {
-                selectedTourSlipBase64 = b64;
+            // Quick Fill Sample Details
+            document.getElementById('tour-fill-sample-btn')?.addEventListener('click', () => {
+                const f = document.getElementById('tour-cust-firstname');
+                const l = document.getElementById('tour-cust-lastname');
+                const e = document.getElementById('tour-cust-email');
+                const p = document.getElementById('tour-cust-phone');
+                if (f) f.value = 'Elena';
+                if (l) l.value = 'Rostova';
+                if (e) e.value = 'elena.rostova@example.com';
+                if (p) p.value = '+94 77 123 4567';
+                if (window.showToast) window.showToast('Sample Details Filled', 'Visitor contact details filled.', 'info');
             });
-            bindFileUpload('tour-cash-slip', 'tour-cash-slip-zone', 'tour-cash-slip-preview', (b64) => {
-                selectedTourSlipBase64 = b64;
+
+            // Toggle Dossier
+            document.getElementById('tour-toggle-dossier-btn')?.addEventListener('click', () => {
+                const cont = document.getElementById('tour-dossier-container');
+                if (cont) {
+                    const isHidden = cont.style.display === 'none';
+                    cont.style.display = isHidden ? 'block' : 'none';
+                    const btn = document.getElementById('tour-toggle-dossier-btn');
+                    if (btn) btn.innerHTML = isHidden 
+                        ? '<span>🌿 Hide Experience Highlights, Inclusions &amp; Guidelines ▲</span>' 
+                        : '<span>🌿 View Experience Highlights, Inclusions &amp; Guidelines ▼</span>';
+                }
             });
 
-            // Wire PayPal
-            const initTourPayPal = () => {
-                try {
-                    const container = document.getElementById('tour-paypal-button-container');
-                    if (!container || !window.TeaFactoryPayPal) return;
+            // Accordion headers
+            drawerFormContainer.querySelectorAll('#tour-dossier-container .checkout-accordion-header').forEach(hdr => {
+                hdr.addEventListener('click', () => {
+                    const body = hdr.nextElementSibling;
+                    const icon = hdr.querySelector('.checkout-accordion-icon');
+                    if (!body) return;
+                    const isOpen = body.style.display !== 'none';
+                    body.style.display = isOpen ? 'none' : 'block';
+                    if (icon) icon.textContent = isOpen ? '+' : '−';
+                });
+            });
 
-                    window.TeaFactoryPayPal.renderButtons({
-                        containerId: 'tour-paypal-button-container',
-                        orderId: `GP-TOUR-${Date.now()}`,
-                        amount: tourGrandTotalUSD,
-                        currency: 'USD',
-                        description: `${pkgName} (${tourGuests} Guest${tourGuests > 1 ? 's' : ''})`,
-                        onValidate: () => {
-                            const form = document.getElementById('tour-checkout-form');
-                            if (!form || !form.checkValidity()) {
-                                if (form) form.reportValidity();
-                                return false;
-                            }
-                            return true;
-                        },
-                        onSuccess: async ({ paypalOrderId, captureData }) => {
-                            const firstName = document.getElementById('tour-cust-firstname')?.value?.trim() || '';
-                            const lastName = document.getElementById('tour-cust-lastname')?.value?.trim() || '';
-                            const customerName = `${firstName} ${lastName}`.trim() || 'Visitor';
-                            const email = document.getElementById('tour-cust-email')?.value?.trim() || '';
-                            const phone = document.getElementById('tour-cust-phone')?.value?.trim() || '';
-                            const tourDate = document.getElementById('tour-date-input')?.value || '';
-                            const slot = document.getElementById('tour-time-slot')?.value || timeSlot;
-                            const dietary = document.getElementById('tour-dietary')?.value || 'None';
-                            const transport = document.querySelector('input[name="tour-transport-option"]:checked')?.value || 'self';
-                            const country = document.getElementById('tour-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
-
-                            const result = window.TeaFactoryStore.bookTour({
-                                packageName: pkgName,
-                                name: customerName,
-                                email,
-                                phone,
-                                country,
-                                guests: tourGuests,
-                                date: tourDate,
-                                timeSlot: slot,
-                                dietaryNotes: dietary,
-                                transportOption: transport === 'chauffeur' ? 'Estate Chauffeur Pick-up' : 'Independent Arrival',
-                                paymentMethod: 'paypal',
-                                priceUSD: tourGrandTotalUSD,
-                                formattedPrice: formattedTourTotal,
-                                slipImage: ''
-                            });
-
-                            if (result && result.success) {
-                                const booking = result.booking;
-                                window.TeaFactoryStore.markTourPaidByPayPal(booking.id, captureData || { id: paypalOrderId });
-                                window.TeaFactoryStore.saveRecentOrderId(booking.id);
-
-                                showToast("Tour Reserved!", `Gate Pass ${booking.id} has been issued and endorsed.`, "success");
-                                renderTourConfirmationSuccess(booking, 'paypal');
-                            }
-                        }
-                    }).catch(e => console.warn('Tour PayPal render notice:', e && e.message ? e.message : e));
-                } catch (err) {
-                    console.warn('Tour PayPal init notice:', err && err.message ? err.message : err);
+            // Coupon Code Application
+            const applyTourPromo = (code) => {
+                const cleanCode = (code || '').trim().toUpperCase();
+                if (!cleanCode) return;
+                const coupons = [
+                    { code: 'FIRSTSIP', percent: 10, label: 'First Sip Welcome (10% Off)' },
+                    { code: 'HERITAGE10', percent: 10, label: 'Heritage Patron Privilege (10% Off)' },
+                    { code: 'PRIVATE15', percent: 15, label: 'Small-Batch VIP Tasting (15% Off)' },
+                    { code: 'CEYLON20', percent: 20, label: 'Artisan Collector Reserve (20% Off)' }
+                ];
+                const found = coupons.find(c => c.code === cleanCode);
+                if (found) {
+                    activeTourPromo = found;
+                    updateTourPricing();
+                    if (window.showToast) window.showToast('Voucher Applied!', `${found.label} has been activated.`, 'success');
+                } else if (window.showToast) {
+                    window.showToast('Invalid Voucher', 'Code not recognized or has reached maximum allocation.', 'warning');
                 }
             };
-
-            const tourPaypalTab = drawerFormContainer.querySelector('.pay-tab[data-method="paypal"]');
-            if (tourPaypalTab) {
-                tourPaypalTab.addEventListener('click', () => {
-                    setTimeout(initTourPayPal, 50);
-                });
+            document.getElementById('tour-apply-promo-btn')?.addEventListener('click', () => {
+                const val = document.getElementById('tour-promo-code')?.value;
+                applyTourPromo(val);
+            });
+            if (window.bindCheckoutCouponPills) {
+                window.bindCheckoutCouponPills(drawerFormContainer, 'tour-promo-code', (code) => applyTourPromo(code));
             }
 
-            // Tour Checkout Form Submit (Bank Transfer & Slip)
-            const handleTourCheckoutSubmit = (e) => {
-                if (e) e.preventDefault();
-                const form = document.getElementById('tour-checkout-form');
-                if (!form || !form.checkValidity()) {
-                    if (form) form.reportValidity();
+            // Final Tour Reservation Submission
+            document.getElementById('tour-submit-order-btn')?.addEventListener('click', async () => {
+                const fName = document.getElementById('tour-cust-firstname')?.value?.trim();
+                const lName = document.getElementById('tour-cust-lastname')?.value?.trim();
+                const email = document.getElementById('tour-cust-email')?.value?.trim();
+                const phone = document.getElementById('tour-cust-phone')?.value?.trim();
+                const country = document.getElementById('tour-cust-country')?.value || 'Sri Lanka';
+                const dateVal = document.getElementById('tour-date-input')?.value || initialDate;
+                const slotVal = document.getElementById('tour-time-slot')?.value || timeSlot;
+                const notes = document.getElementById('tour-dietary')?.value?.trim() || '';
+
+                if (!fName || !lName || !email || !phone || !dateVal) {
+                    setTourCheckoutStage(1);
                     return;
                 }
 
-                const activeTabBtn = form.querySelector('.pay-tab.active');
-                const paymentMethod = activeTabBtn ? activeTabBtn.getAttribute('data-method') : 'bank';
-
-                if (paymentMethod === 'paypal') {
-                    showToast("Coming Soon", "PayPal online booking is coming soon. Please confirm your booking via Bank Transfer or Cash Deposit Slip.", "info");
+                if ((currentTourPayMethod === 'bank' || currentTourPayMethod === 'slip') && !selectedTourSlipBase64) {
+                    if (window.showToast) window.showToast('Deposit Slip Required', 'Please attach your bank transfer receipt or cash deposit slip image to authorize your booking.', 'warning');
                     return;
                 }
 
-                const firstName = document.getElementById('tour-cust-firstname')?.value?.trim() || '';
-                const lastName = document.getElementById('tour-cust-lastname')?.value?.trim() || '';
-                const customerName = `${firstName} ${lastName}`.trim() || 'Visitor';
-                const email = document.getElementById('tour-cust-email')?.value?.trim() || '';
-                const phone = document.getElementById('tour-cust-phone')?.value?.trim() || '';
-                const tourDate = document.getElementById('tour-date-input')?.value || '';
-                const slot = document.getElementById('tour-time-slot')?.value || timeSlot;
-                const dietary = document.getElementById('tour-dietary')?.value || 'None';
-                const transport = document.querySelector('input[name="tour-transport-option"]:checked')?.value || 'self';
-                const country = document.getElementById('tour-cust-country')?.value || (window.lastSelectedCheckoutCountry || 'Sri Lanka');
-
-                if (paymentMethod === 'card') {
-                    const cardName = document.getElementById('tour-card-name')?.value?.trim() || '';
-                    const cardNumber = (document.getElementById('tour-card-number')?.value || '').replace(/\s+/g, '');
-                    const cardExpiry = document.getElementById('tour-card-expiry')?.value?.trim() || '';
-                    const cardCvc = document.getElementById('tour-card-cvc')?.value?.trim() || '';
-
-                    if (!cardName) {
-                        showToast("Cardholder Name Required", "Please enter the name printed on your card.", "warning");
-                        document.getElementById('tour-card-name')?.focus();
-                        return;
-                    }
-                    if (cardNumber.length < 13 || cardNumber.length > 19) {
-                        showToast("Invalid Card Number", "Please enter a valid card number.", "warning");
-                        document.getElementById('tour-card-number')?.focus();
-                        return;
-                    }
-                    if (!/^(0[1-9]|1[0-2])\s*\/\s*[0-9]{2}$/.test(cardExpiry)) {
-                        showToast("Invalid Expiry Date", "Please enter expiry in MM / YY format.", "warning");
-                        document.getElementById('tour-card-expiry')?.focus();
-                        return;
-                    }
-                    if (cardCvc.length < 3) {
-                        showToast("Invalid Security Code", "Please enter your 3 or 4-digit CVV / CVC.", "warning");
-                        document.getElementById('tour-card-cvc')?.focus();
-                        return;
-                    }
-
-                    const cardBtn = document.getElementById('tour-pay-card-btn');
-                    const cardBtnText = document.getElementById('tour-pay-card-btn-text');
-                    if (cardBtn) cardBtn.disabled = true;
-                    if (cardBtnText) cardBtnText.textContent = "Authorizing Card Payment...";
-
-                    setTimeout(() => {
-                        const cardLast4 = cardNumber.slice(-4) || '4242';
-                        let brand = 'Visa';
-                        if (/^5[1-5]/.test(cardNumber) || /^2[2-7]/.test(cardNumber)) brand = 'Mastercard';
-                        else if (/^3[47]/.test(cardNumber)) brand = 'American Express';
-                        else if (/^6(?:011|5)/.test(cardNumber)) brand = 'Discover';
-
-                        const result = window.TeaFactoryStore.bookTour({
-                            packageName: pkgName,
-                            name: customerName,
-                            email,
-                            phone,
-                            country,
-                            guests: tourGuests,
-                            date: tourDate,
-                            timeSlot: slot,
-                            dietaryNotes: dietary,
-                            transportOption: transport === 'chauffeur' ? 'Estate Chauffeur Pick-up' : 'Independent Arrival',
-                            paymentMethod: 'card',
-                            cardBrand: brand,
-                            cardLast4: cardLast4,
-                            paymentStatus: 'PAID',
-                            priceUSD: tourGrandTotalUSD,
-                            formattedPrice: formattedTourTotal,
-                            slipImage: ''
-                        });
-
-                        if (result && result.success) {
-                            const booking = result.booking;
-                            booking.formattedPrice = formattedTourTotal;
-                            booking.cardBrand = brand;
-                            booking.cardLast4 = cardLast4;
-
-                            window.TeaFactoryStore.saveRecentOrderId(booking.id);
-
-                            showToast("Tour Reserved!", `Gate Pass ${booking.id} confirmed! Charged ${formattedTourTotal} to ${brand} ending in ${cardLast4}.`, "success");
-                            renderTourConfirmationSuccess(booking, 'card');
-                        } else {
-                            if (cardBtn) cardBtn.disabled = false;
-                            if (cardBtnText) cardBtnText.textContent = `Pay with Card • ${formattedTourTotal}`;
-                            showToast("Booking Failed", result?.message || "Could not reserve private tour.", "error");
-                        }
-                    }, 650);
-                    return;
+                const submitBtn = document.getElementById('tour-submit-order-btn');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = '0.7';
+                    submitBtn.innerHTML = '<span class="loading-spinner"></span> Confirming Gate Pass...';
                 }
 
-                const slipImg = selectedTourSlipBase64 || 
-                    document.getElementById('tour-bank-slip-zone')?.dataset?.fileBase64 || 
-                    document.getElementById('tour-cash-slip-zone')?.dataset?.fileBase64 || '';
+                const bookingPayload = {
+                    tour_date: dateVal,
+                    time_slot: slotVal,
+                    guest_name: `${fName} ${lName}`.trim(),
+                    guest_email: email,
+                    guest_phone: phone,
+                    guest_count: tourGuests,
+                    notes: `Country: ${country} | Transport: ${transportFeeUSD > 0 ? 'Concierge Chauffeur Transfer' : 'Independent Arrival'} | Notes: ${notes}`,
+                    package_name: pkgName,
+                    currency_code: currInfo.code,
+                    total_price: tourGrandTotalUSD,
+                    total_in_currency: tourGrandTotalUSD,
+                    payment_method: currentTourPayMethod,
+                    slip_image: selectedTourSlipBase64 || null
+                };
 
-                if (paymentMethod !== 'card' && !slipImg) {
-                    showToast("Receipt Required", "Please attach your bank transfer or deposit slip to confirm your Gate Pass.", "warning");
-                    return;
+                let bookingRef = 'TB-' + Date.now().toString(36).toUpperCase();
+                bookingPayload.booking_id = bookingRef;
+                bookingPayload.id = bookingRef;
+                try {
+                    const res = await fetch('/api/tours/book', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(bookingPayload)
+                    });
+                    if (res.ok) {
+                        const json = await res.json();
+                        bookingRef = json.booking_id || (json.booking && json.booking.id) || json.bookingId || bookingRef;
+                    }
+                } catch (err) {
+                    console.warn('Tour API post fallback:', err);
                 }
 
-                const result = window.TeaFactoryStore.bookTour({
-                    packageName: pkgName,
-                    name: customerName,
+                // Save into TeaFactoryStore
+                if (window.TeaFactoryStore && window.TeaFactoryStore.saveTourBooking) {
+                    window.TeaFactoryStore.saveTourBooking({
+                        id: bookingRef,
+                        customerName: `${fName} ${lName}`.trim(),
+                        email: email,
+                        phone: phone,
+                        country: country,
+                        tourDate: dateVal,
+                        timeSlot: slotVal,
+                        guests: tourGuests,
+                        packageName: pkgName,
+                        formattedPrice: formattedTourTotal,
+                        price: tourGrandTotalUSD,
+                        priceLkr: tourGrandTotalLKR,
+                        paymentMethod: currentTourPayMethod,
+                        status: currentTourPayMethod === 'arrival' ? 'Confirmed (Pay on Arrival)' : (selectedTourSlipBase64 ? 'Slip Submitted' : 'Pending'),
+                        slipImage: selectedTourSlipBase64,
+                        bookingDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+                    });
+                }
+
+                const finalBooking = {
+                    id: bookingRef,
+                    customerName: `${fName} ${lName}`.trim(),
                     email,
                     phone,
                     country,
+                    date: dateVal,
+                    timeSlot: slotVal,
                     guests: tourGuests,
-                    date: tourDate,
-                    timeSlot: slot,
-                    dietaryNotes: dietary,
-                    transportOption: transport === 'chauffeur' ? 'Estate Chauffeur Pick-up' : 'Independent Arrival',
-                    paymentMethod,
-                    priceUSD: tourGrandTotalUSD,
+                    packageName: pkgName,
                     formattedPrice: formattedTourTotal,
-                    slipImage: slipImg
-                });
+                    cardBrand: 'Visa',
+                    cardLast4: '4242'
+                };
 
-                if (result && result.success) {
-                    const booking = result.booking;
-                    booking.formattedPrice = formattedTourTotal;
-                    window.TeaFactoryStore.saveRecentOrderId(booking.id);
-
-                    showToast("Gate Pass Issued!", `Tour booking ${booking.id} confirmed.`, "success");
-                    renderTourConfirmationSuccess(booking, paymentMethod);
-                } else {
-                    showToast("Booking Failed", result?.message || "Could not reserve private tour.", "error");
-                }
-            };
-
-            const tourForm = document.getElementById('tour-checkout-form');
-            if (tourForm) tourForm.onsubmit = handleTourCheckoutSubmit;
-
-            // Tour Card input formatting & brand detection
-            const tourCardNum = document.getElementById('tour-card-number');
-            const tourCardBrandBadge = document.getElementById('tour-card-brand-detected');
-            if (tourCardNum) {
-                tourCardNum.addEventListener('input', (e) => {
-                    let val = e.target.value.replace(/\D/g, '').substring(0, 16);
-                    let formatted = val.match(/.{1,4}/g)?.join('  ') || val;
-                    e.target.value = formatted;
-
-                    if (/^4/.test(val)) {
-                        if (tourCardBrandBadge) { tourCardBrandBadge.textContent = 'VISA'; tourCardBrandBadge.style.color = '#38bdf8'; }
-                    } else if (/^5[1-5]/.test(val) || /^2[2-7]/.test(val)) {
-                        if (tourCardBrandBadge) { tourCardBrandBadge.textContent = 'MASTERCARD'; tourCardBrandBadge.style.color = '#f87171'; }
-                    } else if (/^3[47]/.test(val)) {
-                        if (tourCardBrandBadge) { tourCardBrandBadge.textContent = 'AMEX'; tourCardBrandBadge.style.color = '#60a5fa'; }
-                    } else {
-                        if (tourCardBrandBadge) { tourCardBrandBadge.textContent = 'Secure TLS'; tourCardBrandBadge.style.color = '#60a5fa'; }
-                    }
-                });
-            }
-
-            const tourCardExp = document.getElementById('tour-card-expiry');
-            if (tourCardExp) {
-                tourCardExp.addEventListener('input', (e) => {
-                    let val = e.target.value.replace(/\D/g, '').substring(0, 4);
-                    if (val.length >= 3) {
-                        e.target.value = val.substring(0, 2) + ' / ' + val.substring(2);
-                    } else {
-                        e.target.value = val;
-                    }
-                });
-            }
-
-            const tourCardCvc = document.getElementById('tour-card-cvc');
-            if (tourCardCvc) {
-                tourCardCvc.addEventListener('input', (e) => {
-                    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
-                });
-            }
+                renderTourConfirmationSuccess(finalBooking, currentTourPayMethod);
+                if (window.showToast) window.showToast('Tour Reserved!', `Gate Pass ${bookingRef} has been issued.`, 'success');
+            });
 
             document.getElementById('tour-guest-signin-btn')?.addEventListener('click', () => {
                 if (typeof window.requireCustomerAuth === 'function') {
-                    window.requireCustomerAuth('Sign in or register to track your tour boarding pass in your patron ledger.', () => {
+                    window.requireCustomerAuth('Sign in or register to link this tour reservation with your patron account.', () => {
                         openDrawer('tour', id, data);
                     });
                 }
@@ -4367,6 +4739,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const prodMinDate = new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0];
             const unitPriceUSD = Number(data && data.price) || Number(product.price) || 17.00;
             const itemDefinedShipping = Number(data && data.shippingCharge !== undefined ? data.shippingCharge : (product.shippingCharge !== undefined ? product.shippingCharge : (product.shippingFee || 0))) || 0;
+            const itemDefinedShippingLkr = Number(data && (data.shipping_lkr !== undefined ? data.shipping_lkr : data.shippingCharge_lkr)) || Number(product.shipping_lkr !== undefined ? product.shipping_lkr : product.shippingCharge_lkr) || 500;
             
             const selectedCountry = window.lastSelectedCheckoutCountry || 'Sri Lanka';
             const isSriLanka = selectedCountry === 'Sri Lanka';
@@ -4378,7 +4751,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let subtotalUSD = unitPriceUSD * currentQuickQty;
             let discountUSD = 0;
             let discountedSubtotalUSD = subtotalUSD;
-            let shippingUSD = window.calculateShippingFee ? window.calculateShippingFee(discountedSubtotalUSD, selectedCountry, itemDefinedShipping) : (isSriLanka ? 2.13 : 15.0);
+            let shippingUSD = window.calculateShippingFee ? window.calculateShippingFee(discountedSubtotalUSD, selectedCountry, itemDefinedShipping, itemDefinedShippingLkr) : (isSriLanka ? Number((itemDefinedShippingLkr / 305).toFixed(2)) : 15.0);
             let grandTotalUSD = discountedSubtotalUSD + shippingUSD;
 
             let formattedSubtotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(subtotalUSD, currInfo) : `$${subtotalUSD.toFixed(2)}`;
@@ -4582,11 +4955,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                             <input type="radio" name="quick-shipping-method" id="quick-ship-ems" value="ems_express" checked style="margin-top: 0.25rem;">
                                             <div style="flex: 1;">
                                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
-                                                    <strong id="quick-shipping-ems-title" style="color: #111827; font-size: 0.9rem;">${isSriLanka ? 'SL Post EMS Express (Pre-paid)' : 'SL Post EMS International Priority Air'}</strong>
+                                                    <strong id="quick-shipping-ems-title" style="color: #111827; font-size: 0.9rem;">${isSriLanka ? 'SL Post EMS Courier (Domestic Sri Lanka)' : 'SL Post EMS International Priority Air'}</strong>
                                                     <span id="quick-shipping-ems-price-pill" style="color: #15803d; font-size: 0.82rem; font-weight: 700;">${formattedShipping}</span>
                                                 </div>
                                                 <p id="quick-shipping-ems-desc" style="font-size: 0.74rem; color: #4b5563; line-height: 1.45; margin: 0;">
-                                                    ${isSriLanka ? 'Door-to-door express parcel courier with official SL Post tracking ID. Estimated delivery: 2-3 business days.' : 'Official SL Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
+                                                    ${isSriLanka ? 'Door-to-door express parcel courier with official SL Post tracking ID across Sri Lanka (Rs ' + itemDefinedShippingLkr + ' LKR). Estimated delivery: 2-3 business days.' : 'Official SL Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.'}
                                                 </p>
                                             </div>
                                         </label>
@@ -5025,7 +5398,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <strong id="quick-discount-amt">-$0.00</strong>
                                 </div>
                                 <div class="checkout-totals-row">
-                                    <span id="quick-summary-shipping-label">${isSriLanka ? 'SL Post EMS Courier' : 'SL Post EMS Priority Air'}</span>
+                                    <span id="quick-summary-shipping-label">${isSriLanka ? 'SL Post EMS Courier (Local Sri Lanka)' : 'SL Post EMS Priority Air'}</span>
                                     <span id="quick-summary-shipping" style="color: ${shippingUSD > 0 ? '#15803d' : '#855b05'}; font-weight: 600;">${formattedShipping}</span>
                                 </div>
                                 <div class="checkout-grand-total-row">
@@ -5097,7 +5470,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
                                 <span style="font-size: 0.8rem; color: var(--color-text-muted);">Courier Method</span>
                                 <span style="color: #86efac; font-size: 0.82rem; font-weight: 600;">
-                                    ${order.shippingMethod === 'cod' ? 'SL Post EMS (Cash on Delivery)' : (order.country === 'Sri Lanka' ? 'SL Post EMS Express' : 'SL Post EMS International Priority Air')}
+                                    ${order.shippingMethod === 'cod' ? 'SL Post EMS (Cash on Delivery • Rs 500 LKR)' : (order.country === 'Sri Lanka' ? 'SL Post EMS Express (Local • Rs 500 LKR)' : 'SL Post EMS International Priority Air')}
                                 </span>
                             </div>
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
@@ -5276,7 +5649,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 discountedSubtotalUSD = Math.max(0, subtotalUSD - discountUSD);
 
-                shippingUSD = window.calculateShippingFee ? window.calculateShippingFee(discountedSubtotalUSD, country, itemDefinedShipping) : (isLK ? 2.13 : 15.0);
+                shippingUSD = window.calculateShippingFee ? window.calculateShippingFee(discountedSubtotalUSD, country, itemDefinedShipping, itemDefinedShippingLkr) : (isLK ? Number((itemDefinedShippingLkr / 305).toFixed(2)) : 15.0);
                 grandTotalUSD = discountedSubtotalUSD + shippingUSD;
 
                 formattedSubtotal = window.formatAmountInCurrency ? window.formatAmountInCurrency(subtotalUSD, cur) : `$${subtotalUSD.toFixed(2)}`;
@@ -5299,7 +5672,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const subEl = document.getElementById('quick-summary-subtotal');
                 if (subEl) subEl.textContent = formattedSubtotal;
                 const shipLabel = document.getElementById('quick-summary-shipping-label');
-                if (shipLabel) shipLabel.textContent = isLK ? 'SL Post EMS Courier' : 'SL Post EMS Priority Air';
+                if (shipLabel) shipLabel.textContent = isLK ? 'SL Post EMS Courier (Local Sri Lanka)' : 'SL Post EMS Priority Air';
                 const shipEl = document.getElementById('quick-summary-shipping');
                 if (shipEl) {
                     shipEl.textContent = formattedShipping;
@@ -5343,9 +5716,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const emsTitle = document.getElementById('quick-shipping-ems-title');
-                if (emsTitle) emsTitle.textContent = isLK ? 'SL Post EMS Express (Pre-paid)' : 'SL Post EMS International Priority Air';
+                if (emsTitle) emsTitle.textContent = isLK ? 'SL Post EMS Courier (Domestic Sri Lanka)' : 'SL Post EMS International Priority Air';
                 const emsDesc = document.getElementById('quick-shipping-ems-desc');
-                if (emsDesc) emsDesc.textContent = isLK ? 'Door-to-door express parcel courier with official SL Post tracking ID. Settle online via PayPal/Card or Direct Bank Transfer.' : 'Official SL Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.';
+                if (emsDesc) emsDesc.textContent = isLK ? `Door-to-door express parcel courier with official SL Post tracking ID across Sri Lanka (Rs ${itemDefinedShippingLkr} LKR). Estimated delivery: 2-3 business days.` : 'Official SL Post EMS International Priority Air Courier with end-to-end tracking number. Estimated transit: 5-10 business days.';
                 const emsPill = document.getElementById('quick-shipping-ems-price-pill');
                 if (emsPill) emsPill.textContent = formattedShipping;
 
@@ -6232,9 +6605,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeDrawer();
                 showToast("Review Recorded", "Thank you! Your connoisseur review has been recorded.", "success");
 
-                // Re-render testimonials section
+                // Re-render testimonials section and tour ratings
                 window.UIComponents.renderTestimonials('home-testimonials-container');
                 bindReviewEvents();
+                if (typeof window.renderTourRatings === 'function') {
+                    window.renderTourRatings();
+                }
             });
         }
     }
@@ -6260,6 +6636,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     window.appOpenProductDrawer = (productId) => openDrawer('product', productId);
+    window.appOpenTourDrawer = (tourId, data) => openDrawer('tour', tourId || 1, data || {});
+    window.openTourCheckout = (options = {}) => openDrawer('tour', 1, options);
 
     function bindReviewEvents() {
         const btn = document.getElementById('btn-write-review');
@@ -11365,6 +11743,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const prodCurrency = document.getElementById('prod-currency');
             const prodAmountInput = document.getElementById('prod-amount-input');
             const prodShippingAmountInput = document.getElementById('prod-shipping-amount-input');
+            const prodShippingLkrInput = document.getElementById('prod-shipping-lkr-input');
             const prodCounterpartPrice = document.getElementById('prod-counterpart-price');
             const prodCounterpartShipping = document.getElementById('prod-counterpart-shipping');
 
@@ -11396,28 +11775,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (prodPriceLkr) prodPriceLkr.value = pLkr;
 
                 const sVal = parseFloat(prodShippingAmountInput?.value);
-                let sUsd = 0, sLkr = 0;
+                let sUsd = 0;
                 if (!isNaN(sVal) && sVal > 0) {
-                    if (curr === 'USD') {
-                        sUsd = sVal;
-                        sLkr = Math.round(sVal * 305);
-                        if (prodCounterpartShipping) prodCounterpartShipping.innerText = `≈ Rs ${sLkr.toLocaleString()} LKR`;
-                        if (prodShippingAmountInput) prodShippingAmountInput.step = "0.01";
-                    } else {
-                        sLkr = Math.round(sVal);
-                        sUsd = parseFloat((sVal / 305).toFixed(2));
-                        if (prodCounterpartShipping) prodCounterpartShipping.innerText = `≈ $${sUsd.toFixed(2)} USD`;
-                        if (prodShippingAmountInput) prodShippingAmountInput.step = "1";
-                    }
+                    sUsd = sVal;
+                    if (prodCounterpartShipping) prodCounterpartShipping.innerText = `Flat worldwide air courier fee for orders outside Sri Lanka ($${sUsd.toFixed(2)} USD).`;
                 } else {
-                    if (prodCounterpartShipping) prodCounterpartShipping.innerText = 'Free / Complimentary';
+                    if (prodCounterpartShipping) prodCounterpartShipping.innerText = 'Free / Complimentary International Shipping';
                 }
                 if (prodShip) prodShip.value = sUsd > 0 ? sUsd.toFixed(2) : '0';
+
+                const sLkrVal = parseFloat(prodShippingLkrInput?.value);
+                const sLkr = (!isNaN(sLkrVal) && sLkrVal >= 0) ? sLkrVal : 500;
                 if (prodShipLkr) prodShipLkr.value = sLkr;
             };
 
             prodAmountInput?.addEventListener('input', syncProductPricing);
             prodShippingAmountInput?.addEventListener('input', syncProductPricing);
+            prodShippingLkrInput?.addEventListener('input', syncProductPricing);
 
             prodCurrency?.addEventListener('change', () => {
                 const curP = parseFloat(prodAmountInput?.value);
@@ -11448,7 +11822,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const price = parseFloat(document.getElementById('prod-price').value) || 0;
                 const priceLkr = parseFloat(document.getElementById('prod-price-lkr')?.value) || Math.round(price * 305);
                 const shippingCharge = parseFloat(document.getElementById('prod-shipping')?.value) || 0;
-                const shippingLkr = parseFloat(document.getElementById('prod-shipping-lkr')?.value) || Math.round(shippingCharge * 305);
+                const shippingLkr = parseFloat(document.getElementById('prod-shipping-lkr-input')?.value) || parseFloat(document.getElementById('prod-shipping-lkr')?.value) || 500;
                 const weight = document.getElementById('prod-weight').value.trim();
                 const symbol = document.getElementById('prod-symbol').value;
                 const stock = document.getElementById('prod-stock').value;
@@ -11541,6 +11915,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (pAmt) pAmt.value = '';
                 const pShipAmt = document.getElementById('prod-shipping-amount-input');
                 if (pShipAmt) pShipAmt.value = '';
+                const pShipLkrInput = document.getElementById('prod-shipping-lkr-input');
+                if (pShipLkrInput) pShipLkrInput.value = '500';
                 if (document.getElementById('prod-headline')) document.getElementById('prod-headline').value = '';
                 if (document.getElementById('prod-about')) document.getElementById('prod-about').value = '';
                 if (document.getElementById('prod-origin')) document.getElementById('prod-origin').value = '';
@@ -11634,14 +12010,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (pAmt) pAmt.value = parseFloat(price).toFixed(2);
                 const pShipAmt = document.getElementById('prod-shipping-amount-input');
                 if (pShipAmt) pShipAmt.value = parseFloat(shipping) > 0 ? parseFloat(shipping).toFixed(2) : '';
+                const pShipLkrInput = document.getElementById('prod-shipping-lkr-input');
+                if (pShipLkrInput) pShipLkrInput.value = shippingLkr || '500';
                 if (priceInput) priceInput.value = parseFloat(price).toFixed(2);
                 if (priceLkrInput) priceLkrInput.value = priceLkr;
                 if (shippingInput) shippingInput.value = parseFloat(shipping) > 0 ? parseFloat(shipping).toFixed(2) : '';
-                if (shippingLkrInput) shippingLkrInput.value = parseFloat(shipping) > 0 ? shippingLkr : '';
+                if (shippingLkrInput) shippingLkrInput.value = shippingLkr || '500';
                 const pCounterpart = document.getElementById('prod-counterpart-price');
                 if (pCounterpart) pCounterpart.innerText = `≈ Rs ${parseInt(priceLkr).toLocaleString()} LKR`;
                 const sCounterpart = document.getElementById('prod-counterpart-shipping');
-                if (sCounterpart) sCounterpart.innerText = parseFloat(shipping) > 0 ? `≈ Rs ${parseInt(shippingLkr).toLocaleString()} LKR` : 'Free / Complimentary';
+                if (sCounterpart) sCounterpart.innerText = parseFloat(shipping) > 0 ? `Flat worldwide air courier fee for orders outside Sri Lanka ($${parseFloat(shipping).toFixed(2)} USD).` : 'Free / Complimentary International Shipping';
                 if (weightInput) weightInput.value = weight;
                 if (symbolInput) symbolInput.value = symbol;
                 if (stockInput) stockInput.value = stock;
@@ -11743,6 +12121,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (pAmt) pAmt.value = '';
                 const pShipAmt = document.getElementById('prod-shipping-amount-input');
                 if (pShipAmt) pShipAmt.value = '';
+                const pShipLkrInput = document.getElementById('prod-shipping-lkr-input');
+                if (pShipLkrInput) pShipLkrInput.value = '500';
                 if (document.getElementById('prod-headline')) document.getElementById('prod-headline').value = '';
                 if (document.getElementById('prod-about')) document.getElementById('prod-about').value = '';
                 if (document.getElementById('prod-origin')) document.getElementById('prod-origin').value = '';
@@ -12286,6 +12666,204 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.TeaFactoryStore.deleteTourSlot(slotId);
                         showToast("Slot Removed", `Slot #${slotId} was removed from the schedule.`, "success");
                         renderTabContent('admin');
+                    }
+                });
+            });
+        });
+
+        // ─── Tour Operations & Pricing Configuration Form Handler ─────────────
+        const tourSettingsForm = document.getElementById('admin-tour-settings-form');
+        if (tourSettingsForm) {
+            const pLkrIn = document.getElementById('tour-cfg-price-lkr');
+            const pUsdIn = document.getElementById('tour-cfg-price-usd');
+            const tUsdIn = document.getElementById('tour-cfg-transfer-usd');
+            const tLkrIn = document.getElementById('tour-cfg-transfer-lkr');
+
+            // Live rate sync
+            pLkrIn?.addEventListener('input', () => {
+                const val = parseFloat(pLkrIn.value);
+                if (!isNaN(val) && val >= 0 && pUsdIn) {
+                    pUsdIn.value = (val / 305).toFixed(2);
+                }
+            });
+            pUsdIn?.addEventListener('input', () => {
+                const val = parseFloat(pUsdIn.value);
+                if (!isNaN(val) && val >= 0 && pLkrIn) {
+                    pLkrIn.value = Math.round(val * 305);
+                }
+            });
+            tUsdIn?.addEventListener('input', () => {
+                const val = parseFloat(tUsdIn.value);
+                if (!isNaN(val) && val >= 0 && tLkrIn) {
+                    tLkrIn.value = Math.round(val * 305);
+                }
+            });
+            tLkrIn?.addEventListener('input', () => {
+                const val = parseFloat(tLkrIn.value);
+                if (!isNaN(val) && val >= 0 && tUsdIn) {
+                    tUsdIn.value = (val / 305).toFixed(2);
+                }
+            });
+
+            tourSettingsForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const pkgName = document.getElementById('tour-cfg-pkg-name')?.value.trim() || '01. Gongfu-Style Black Tea Brewing Experience';
+                const pkgDesc = document.getElementById('tour-cfg-pkg-desc')?.value.trim() || 'Handcrafted Ceylon Black Tea from our wild forest garden in Sri Lanka’s Uva Medium Region.';
+                const priceLkr = parseFloat(pLkrIn?.value) || 1450;
+                const priceUsd = parseFloat(pUsdIn?.value) || (priceLkr / 305);
+                const transferUsd = parseFloat(tUsdIn?.value) || 25.0;
+                const transferLkr = parseFloat(tLkrIn?.value) || 7625;
+                const opDays = document.getElementById('tour-cfg-operating-days')?.value.trim() || 'Monday – Saturday';
+                const opHours = document.getElementById('tour-cfg-operating-hours')?.value.trim() || '9:00 AM – 5:00 PM';
+                const duration = document.getElementById('tour-cfg-duration')?.value.trim() || '~1.5 – 2.0 Hours';
+                const maxCap = parseInt(document.getElementById('tour-cfg-max-capacity')?.value) || 10;
+                const bocAcc = document.getElementById('tour-cfg-boc-acc')?.value.trim() || '94945708';
+                const bocName = document.getElementById('tour-cfg-boc-name')?.value.trim() || 'P.G.P.B.S. Thilakarathna';
+                const bocBranch = document.getElementById('tour-cfg-boc-branch')?.value.trim() || 'Ettampitiya';
+                const whatsapp = document.getElementById('tour-cfg-whatsapp')?.value.trim() || '+94 77 320 9950';
+                const payArrival = document.getElementById('tour-cfg-pay-arrival') ? document.getElementById('tour-cfg-pay-arrival').checked : true;
+                const payBank = document.getElementById('tour-cfg-pay-bank') ? document.getElementById('tour-cfg-pay-bank').checked : true;
+                const paySlip = document.getElementById('tour-cfg-pay-slip') ? document.getElementById('tour-cfg-pay-slip').checked : true;
+
+                if (window.TeaFactoryStore && window.TeaFactoryStore.updateTourSettings) {
+                    window.TeaFactoryStore.updateTourSettings({
+                        packageName: pkgName,
+                        packageSubtitle: pkgDesc,
+                        priceLkr: priceLkr,
+                        priceUsd: priceUsd,
+                        transportFeeUsd: transferUsd,
+                        transportFeeLkr: transferLkr,
+                        operatingDays: opDays,
+                        operatingHours: opHours,
+                        sessionDuration: duration,
+                        maxCapacity: maxCap,
+                        bocAccount: bocAcc,
+                        bocBeneficiary: bocName,
+                        bocBranch: bocBranch,
+                        whatsappHotline: whatsapp,
+                        payOnArrivalEnabled: payArrival,
+                        bankTransferEnabled: payBank,
+                        cashDepositEnabled: paySlip
+                    });
+                }
+
+                showToast("Tour Configuration Saved", "Tour experience rates, transport fees, and settlement settings updated successfully.", "success");
+                renderTabContent('admin');
+            });
+        }
+
+        // ─── Tour Manifest Filter & Search Handlers ──────────────────────────
+        const tourSearchIn = document.getElementById('tour-manifest-search');
+        const tourFilterChips = document.querySelectorAll('.tour-manifest-chip');
+        const filterTourRows = () => {
+            const query = (tourSearchIn?.value || '').toLowerCase().trim();
+            const activeChip = document.querySelector('.tour-manifest-chip.active');
+            const activeFilter = activeChip ? activeChip.getAttribute('data-filter') : 'all';
+            const rows = document.querySelectorAll('.tour-manifest-row');
+
+            rows.forEach(row => {
+                const searchStr = row.getAttribute('data-search') || '';
+                const statusStr = row.getAttribute('data-status') || '';
+                const matchesSearch = !query || searchStr.includes(query);
+                const matchesFilter = activeFilter === 'all' || statusStr === activeFilter;
+                row.style.display = (matchesSearch && matchesFilter) ? '' : 'none';
+            });
+        };
+
+        if (tourSearchIn) {
+            tourSearchIn.addEventListener('input', filterTourRows);
+        }
+
+        tourFilterChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                tourFilterChips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                filterTourRows();
+            });
+        });
+
+        // ─── Confirm Tour Booking & Dispatch Gate Pass ────────────────────────
+        document.querySelectorAll('.btn-confirm-tour-booking').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-id');
+                if (!id) return;
+
+                btn.disabled = true;
+                btn.innerHTML = `<span class="spinner-small" style="display:inline-block; width:12px; height:12px; border:2px solid currentColor; border-top-color:transparent; border-radius:50%; animation:spin 0.6s linear infinite;"></span> Confirming...`;
+
+                try {
+                    const res = await fetch(`/api/tours/bookings/${encodeURIComponent(id)}/confirm`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ note: 'Gate Pass approved by Admin' })
+                    });
+                    const json = await res.json();
+
+                    if (window.TeaFactoryStore && window.TeaFactoryStore.state && window.TeaFactoryStore.state.bookings) {
+                        const b = window.TeaFactoryStore.state.bookings.find(x => x.id === id || x.bookingId === id);
+                        if (b) {
+                            b.status = 'Paid & Confirmed';
+                            b.validatedAt = new Date().toISOString();
+                            window.TeaFactoryStore.saveState();
+                        }
+                    }
+
+                    showToast("Gate Pass Confirmed", json.message || `Official Gate Pass issued for ${id}.`, "success");
+                    renderTabContent('admin');
+                } catch (err) {
+                    showToast("Confirmation Error", err.message || "Failed to confirm booking.", "error");
+                    btn.disabled = false;
+                    btn.innerHTML = `Confirm Pass`;
+                }
+            });
+        });
+
+        // ─── Resend Gate Pass Email ───────────────────────────────────────────
+        document.querySelectorAll('.btn-resend-tour-gatepass').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-id');
+                if (!id) return;
+
+                btn.disabled = true;
+                try {
+                    const res = await fetch(`/api/tours/bookings/${encodeURIComponent(id)}/send-gatepass`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const json = await res.json();
+                    showToast("Gate Pass Email", json.message || `Gate Pass email sent for ${id}.`, "info");
+                } catch (err) {
+                    showToast("Email Error", err.message || "Failed to send Gate Pass.", "error");
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+        });
+
+        // ─── Delete Tour Booking ──────────────────────────────────────────────
+        document.querySelectorAll('.btn-delete-tour-booking').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                if (!id) return;
+
+                showDeleteConfirmModal({
+                    title: 'Cancel & Remove Tour Booking',
+                    subtitle: 'Patron Reservations Desk',
+                    itemName: `Booking ${id}`,
+                    message: `Are you sure you want to cancel and remove booking ${id}? This cannot be undone.`,
+                    confirmText: 'Delete Booking',
+                    onConfirm: async () => {
+                        try {
+                            await fetch(`/api/tours/bookings/${encodeURIComponent(id)}`, { method: 'DELETE' });
+                            if (window.TeaFactoryStore && window.TeaFactoryStore.state && window.TeaFactoryStore.state.bookings) {
+                                window.TeaFactoryStore.state.bookings = window.TeaFactoryStore.state.bookings.filter(x => x.id !== id && x.bookingId !== id);
+                                window.TeaFactoryStore.saveState();
+                            }
+                            showToast("Booking Removed", `Booking ${id} was cancelled and removed.`, "info");
+                            renderTabContent('admin');
+                        } catch (e) {
+                            showToast("Error", "Failed to delete booking.", "error");
+                        }
                     }
                 });
             });
@@ -15778,7 +16356,7 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
                                 <span style="font-size: 0.8rem; color: var(--color-text-muted);">Courier Method</span>
                                 <span style="color: #86efac; font-size: 0.82rem; font-weight: 600;">
-                                    ${order.shippingMethod === 'cod' ? 'SL Post EMS (Cash on Delivery)' : (order.country === 'Sri Lanka' ? 'SL Post EMS Express' : 'SL Post EMS International Priority Air')}
+                                    ${order.shippingMethod === 'cod' ? 'SL Post EMS (Cash on Delivery • Rs 500 LKR)' : (order.country === 'Sri Lanka' ? 'SL Post EMS Express (Local • Rs 500 LKR)' : 'SL Post EMS International Priority Air')}
                                 </span>
                             </div>
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
@@ -16387,6 +16965,10 @@ Sanctuary: Gannilawaththa, Wellawela, Ettampitiya 90140, Sri Lanka
             if (bodyContainer && window.UIComponents && typeof window.UIComponents.renderEstateInfoPage === 'function') {
                 window.UIComponents.renderEstateInfoPage('estate-info-body-container');
             }
+
+            const dialog = modal.querySelector('.estate-info-dialog');
+            if (dialog) dialog.scrollTop = 0;
+            if (bodyContainer) bodyContainer.scrollTop = 0;
 
             modal.style.display = 'flex';
             modal.classList.add('active', 'open');

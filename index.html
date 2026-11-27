@@ -228,7 +228,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png?v=1.26.0">
 
     <!-- Main Style Sheet -->
-    <link rel="stylesheet" href="css/style.css?v=3.88.1">
+    <link rel="stylesheet" href="css/style.css?v=3.89.16">
     
     <!-- Instant Scroll Position Reset (Ensures refresh & load always start at Top Hero Slideshow) -->
     <script>
@@ -253,33 +253,56 @@
 
     <!-- Luxury Estate Preloader & Brand Loading Screen -->
     <div id="estate-preloader" class="estate-preloader" aria-label="Loading Rock One Wild Tea Estate">
+        <!-- Cinematic Background Estate Photography with Ken Burns slow pan -->
+        <div class="preloader-bg-media" style="background-image: url('images/hero_slide_1.jpg');"></div>
+        <div class="preloader-bg-overlay"></div>
         <div class="preloader-backdrop-glow"></div>
-        <div class="preloader-content">
-            <!-- Animated Luxury Crest Emblem -->
-            <div class="preloader-emblem-wrap">
-                <div class="preloader-crest-ring ring-outer"></div>
-                <div class="preloader-crest-ring ring-inner"></div>
-                <div class="preloader-logo-box">
-                    <img src="images/logo-gold.png" alt="Rock One Wild Tea Crest" class="preloader-logo-img" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
-                </div>
+
+        <div class="preloader-stage">
+            <!-- Top Subtle Estate Location & Elevation Tag -->
+            <div class="preloader-top-tag">
+                <span class="preloader-tag-line"></span>
+                <span class="preloader-tag-text">SRI LANKA &bull; UVA MEDIUM REGION &bull; 3,000–5,000 FT</span>
+                <span class="preloader-tag-line"></span>
             </div>
 
-            <!-- Brand Hierarchy & Typography -->
-            <div class="preloader-brand-title">ROCK ONE WILD TEA</div>
-            <div class="preloader-brand-motto">SINGLE-ESTATE ARTISANAL RESERVES • ETTAMPITIYA</div>
+            <!-- Central Hero Brand Emblem & Seal -->
+            <div class="preloader-hero-brand">
+                <div class="preloader-emblem-wrap">
+                    <div class="preloader-crest-ring ring-outer"></div>
+                    <div class="preloader-crest-ring ring-inner"></div>
+                    <div class="preloader-logo-box">
+                        <img src="images/logo-gold.png" alt="Rock One Wild Tea Crest" class="preloader-logo-img" onerror="window.handleImageError && window.handleImageError(this, 'logo')" decoding="async">
+                    </div>
+                </div>
 
-            <!-- Loading Progress Bar & Status Text -->
-            <div class="preloader-progress-container">
+                <h1 class="preloader-brand-title">ROCK ONE WILD TEA</h1>
+                <div class="preloader-brand-subtitle">Handcrafted Premium Ceylon Tea</div>
+                <div class="preloader-brand-motto">&ldquo;From Our Wild Forest Tea Garden to Your Cup&rdquo;</div>
+            </div>
+
+            <!-- Elegant Minimalist Progress Centerpiece -->
+            <div class="preloader-progress-wrap">
+                <div class="preloader-pct-row">
+                    <span id="preloader-status-text" class="preloader-status-text">Unveiling our wild forest tea garden in Uva Medium...</span>
+                    <span id="preloader-pct" class="preloader-pct">0%</span>
+                </div>
+
                 <div class="preloader-progress-track">
                     <div id="preloader-progress-bar" class="preloader-progress-bar">
                         <div class="preloader-progress-glow"></div>
                     </div>
                 </div>
-                <div id="preloader-status-text" class="preloader-status-text">Preparing Estate Experience...</div>
+
+                <div class="preloader-heritage-quote">
+                    <span>A Family&rsquo;s Passion for Handcrafted Ceylon Tea &bull; Single-Estate Artisanal Production</span>
+                </div>
             </div>
 
-            <!-- Subtle Ceylon Inscription -->
-            <div class="preloader-latin-seal">HAND MADE WITH CARE • CRAFTED FROM CEYLON</div>
+            <!-- Bottom Subtle Skip / Enter Hint -->
+            <div class="preloader-footer-hint">
+                <span>Click anywhere to enter &bull; 100% Pure Ceylon</span>
+            </div>
         </div>
     </div>
 
@@ -1325,94 +1348,247 @@
                     <div class="science-section-header">
                         <span class="science-section-tag">COMPARATIVE GERMPLASM ANALYSIS</span>
                         <h2 class="science-section-heading">Laboratory Data: WT26 vs. Conventional Clones</h2>
-                        <p class="science-section-sub">Data directly extracted from Table 1 and Table 3 of the Journal of the National Science Foundation Sri Lanka (2013).</p>
+                        <p class="science-section-sub">Empirical data extracted directly from Table 1 and Table 3 of the Journal of the National Science Foundation Sri Lanka (2013).</p>
                     </div>
 
-                    <div class="science-table-wrapper">
-                        <table class="science-data-table">
-                            <thead>
-                                <tr>
-                                    <th>Accession / Cultivar</th>
-                                    <th>Origin &amp; Category</th>
-                                    <th>Fermentation (FM)</th>
-                                    <th>Total Polyphenols (TPP)</th>
-                                    <th>Total Catechins (TCT)</th>
-                                    <th>Plant Pigments (Ch-a)</th>
-                                    <th>Quality Cluster</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="highlight-row">
-                                    <td>
-                                        <div class="cultivar-name-cell">
-                                            <strong>WT26 (Rock One Wild)</strong>
-                                            <span class="cultivar-pill-gold">Single Estate Selection</span>
-                                        </div>
-                                    </td>
-                                    <td>Wellawela, Ettampitiya (4,800 ft)</td>
-                                    <td><strong>37 ± 7.4 min</strong> (Fast)</td>
-                                    <td><strong class="text-gold">216.79 ± 4.9 mg/g</strong></td>
-                                    <td><strong class="text-gold">194.02 ± 3.1 mg/g</strong></td>
-                                    <td>2.10 mg/g (Optimal Low)</td>
-                                    <td><span class="cluster-badge cluster-2">Cluster II (Elite High Quality)</span></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <strong>DT1</strong>
-                                    </td>
-                                    <td>Dimbula Elite Selection</td>
-                                    <td>49 ± 8.1 min</td>
-                                    <td>217.56 ± 9.8 mg/g</td>
-                                    <td>205.91 ± 5.3 mg/g</td>
-                                    <td>1.62 mg/g</td>
-                                    <td><span class="cluster-badge cluster-2">Cluster II (High Quality)</span></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <strong>TRI 2025</strong>
-                                    </td>
-                                    <td>Mass Cultivation Clone</td>
-                                    <td>63 ± 7.9 min</td>
-                                    <td>211.56 ± 6.7 mg/g</td>
-                                    <td>175.48 ± 2.5 mg/g</td>
-                                    <td>3.04 mg/g (High)</td>
-                                    <td><span class="cluster-badge cluster-1">Cluster I (Commercial)</span></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <strong>TRI 2016</strong>
-                                    </td>
-                                    <td>Standard Factory Clone</td>
-                                    <td>88 ± 9.6 min (Slow)</td>
-                                    <td>212.16 ± 5.7 mg/g</td>
-                                    <td>146.00 ± 6.1 mg/g</td>
-                                    <td>3.70 mg/g (Excessive)</td>
-                                    <td><span class="cluster-badge cluster-4">Cluster IV (Low Quality)</span></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <strong>ASM 4/10</strong>
-                                    </td>
-                                    <td>Assam Hybrid Variety</td>
-                                    <td>63 ± 7.3 min</td>
-                                    <td>218.32 ± 4.6 mg/g</td>
-                                    <td>154.78 ± 4.5 mg/g</td>
-                                    <td>3.42 mg/g</td>
-                                    <td><span class="cluster-badge cluster-1">Cluster I (Commercial)</span></td>
-                                </tr>
-                                <tr class="summary-row">
-                                    <td>
-                                        <strong>National Mean</strong>
-                                    </td>
-                                    <td>National Benchmark (35 Accessions)</td>
-                                    <td>54.25 min</td>
-                                    <td>214.81 mg/g</td>
-                                    <td>183.78 mg/g</td>
-                                    <td>2.44 mg/g</td>
-                                    <td><em>National Baseline Average</em></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="science-table-card">
+                        <div class="science-table-topbar">
+                            <div class="science-table-topbar-left">
+                                <span class="science-table-badge">TRI Sri Lanka Validated</span>
+                                <span class="science-table-meta">Ward’s Hierarchical Cluster Analysis &bull; 35 Accessions Surveyed</span>
+                            </div>
+                            <div class="science-table-topbar-right">
+                                <span class="science-scroll-hint">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    Swipe horizontally to view all parameters
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="science-table-wrapper">
+                            <table class="science-data-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-cultivar">Accession / Cultivar</th>
+                                        <th class="col-origin">Origin &amp; Category</th>
+                                        <th class="col-metric">
+                                            <span class="th-title">Fermentation</span>
+                                            <span class="th-sub">FM (min)</span>
+                                        </th>
+                                        <th class="col-metric">
+                                            <span class="th-title">Polyphenols</span>
+                                            <span class="th-sub">TPP (mg/g)</span>
+                                        </th>
+                                        <th class="col-metric">
+                                            <span class="th-title">Catechins</span>
+                                            <span class="th-sub">TCT (mg/g)</span>
+                                        </th>
+                                        <th class="col-metric">
+                                            <span class="th-title">Chlorophyll-a</span>
+                                            <span class="th-sub">Ch-a (mg/g)</span>
+                                        </th>
+                                        <th class="col-cluster">
+                                            <span class="th-title">TRI Quality Cluster</span>
+                                            <span class="th-sub">Biochemical Group</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="highlight-row">
+                                        <td class="col-cultivar">
+                                            <div class="cultivar-name-cell">
+                                                <div class="cultivar-main">
+                                                    <span class="cultivar-star">★</span>
+                                                    <strong>WT26 (Rock One Wild)</strong>
+                                                </div>
+                                                <span class="cultivar-pill-gold">Single Estate Selection</span>
+                                            </div>
+                                        </td>
+                                        <td class="col-origin">
+                                            <div class="origin-primary">Wellawela, Ettampitiya</div>
+                                            <div class="origin-sub">4,800 ft &bull; High Elevation</div>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val metric-gold">37 ± 7.4</span>
+                                            <span class="metric-tag tag-fast">Fast (37 min)</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val metric-gold">216.79 ± 4.9</span>
+                                            <span class="metric-unit">mg/g</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val metric-gold">194.02 ± 3.1</span>
+                                            <span class="metric-tag tag-elite">Elite Reserve</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">2.10</span>
+                                            <span class="metric-tag tag-opt">Optimal Low</span>
+                                        </td>
+                                        <td class="col-cluster">
+                                            <span class="cluster-badge cluster-2">Cluster II &bull; Elite Quality</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-cultivar">
+                                            <strong>DT1</strong>
+                                        </td>
+                                        <td class="col-origin">
+                                            <div class="origin-primary">Dimbula Elite Selection</div>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">49 ± 8.1</span>
+                                            <span class="metric-unit">min</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">217.56 ± 9.8</span>
+                                            <span class="metric-unit">mg/g</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">205.91 ± 5.3</span>
+                                            <span class="metric-unit">mg/g</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">1.62</span>
+                                            <span class="metric-unit">mg/g</span>
+                                        </td>
+                                        <td class="col-cluster">
+                                            <span class="cluster-badge cluster-2">Cluster II &bull; High Quality</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-cultivar">
+                                            <strong>TRI 2025</strong>
+                                        </td>
+                                        <td class="col-origin">
+                                            <div class="origin-primary">Mass Cultivation Clone</div>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">63 ± 7.9</span>
+                                            <span class="metric-unit">min</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">211.56 ± 6.7</span>
+                                            <span class="metric-unit">mg/g</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">175.48 ± 2.5</span>
+                                            <span class="metric-unit">mg/g</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">3.04</span>
+                                            <span class="metric-tag tag-warn">High Ch-a</span>
+                                        </td>
+                                        <td class="col-cluster">
+                                            <span class="cluster-badge cluster-1">Cluster I &bull; Commercial</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-cultivar">
+                                            <strong>TRI 2016</strong>
+                                        </td>
+                                        <td class="col-origin">
+                                            <div class="origin-primary">Standard Factory Clone</div>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">88 ± 9.6</span>
+                                            <span class="metric-tag tag-slow">Slow (88m)</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">212.16 ± 5.7</span>
+                                            <span class="metric-unit">mg/g</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">146.00 ± 6.1</span>
+                                            <span class="metric-unit">mg/g</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">3.70</span>
+                                            <span class="metric-tag tag-danger">Excessive</span>
+                                        </td>
+                                        <td class="col-cluster">
+                                            <span class="cluster-badge cluster-4">Cluster IV &bull; Low Quality</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-cultivar">
+                                            <strong>ASM 4/10</strong>
+                                        </td>
+                                        <td class="col-origin">
+                                            <div class="origin-primary">Assam Hybrid Variety</div>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">63 ± 7.3</span>
+                                            <span class="metric-unit">min</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">218.32 ± 4.6</span>
+                                            <span class="metric-unit">mg/g</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">154.78 ± 4.5</span>
+                                            <span class="metric-unit">mg/g</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val">3.42</span>
+                                            <span class="metric-unit">mg/g</span>
+                                        </td>
+                                        <td class="col-cluster">
+                                            <span class="cluster-badge cluster-1">Cluster I &bull; Commercial</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="science-summary-row">
+                                        <td class="col-cultivar">
+                                            <div class="summary-title-cell">
+                                                <span class="summary-icon">📊</span>
+                                                <strong>National Mean</strong>
+                                            </div>
+                                        </td>
+                                        <td class="col-origin">
+                                            <div class="origin-primary">National Benchmark</div>
+                                            <div class="origin-sub">35 Accessions Surveyed</div>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val summary-val">54.25</span>
+                                            <span class="metric-unit">min</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val summary-val">214.81</span>
+                                            <span class="metric-unit">mg/g</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val summary-val">183.78</span>
+                                            <span class="metric-unit">mg/g</span>
+                                        </td>
+                                        <td class="col-metric">
+                                            <span class="metric-val summary-val">2.44</span>
+                                            <span class="metric-unit">mg/g</span>
+                                        </td>
+                                        <td class="col-cluster">
+                                            <span class="cluster-summary-pill">National Baseline</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Academic Footnotes Bar -->
+                        <div class="science-table-footer">
+                            <div class="science-table-footer-item">
+                                <strong>FM:</strong> Fermentation duration to peak theaflavin synthesis (min)
+                            </div>
+                            <div class="science-table-footer-item">
+                                <strong>TPP:</strong> Total Polyphenols via ISO 14502-1 Folin-Ciocalteu assay
+                            </div>
+                            <div class="science-table-footer-item">
+                                <strong>TCT:</strong> Total Catechins (EGC, C, EC, EGCG, ECG) via HPLC
+                            </div>
+                            <div class="science-table-footer-item">
+                                <strong>Ch-a:</strong> Chlorophyll-a via spectrophotometry at 665nm
+                            </div>
+                            <div class="science-table-footer-item">
+                                <strong>Cluster II:</strong> Elite cup quality tier identified by TRI Ward's hierarchical grouping
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -2623,11 +2799,11 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <!-- Script Loads (Execution dependency order: i18n -> store -> components -> paypal -> app) -->
-    <script defer charset="utf-8" src="js/i18n.js?v=3.88.1"></script>
-    <script defer charset="utf-8" src="js/store.js?v=3.88.1"></script>
-    <script defer charset="utf-8" src="js/components.js?v=3.88.1"></script>
-    <script defer charset="utf-8" src="js/paypal.js?v=3.88.1"></script>
-    <script defer charset="utf-8" src="js/app.js?v=3.88.1"></script>
-    <script defer charset="utf-8" src="js/contrast-guard.js?v=3.88.1"></script>
+    <script defer charset="utf-8" src="js/i18n.js?v=3.88.2"></script>
+    <script defer charset="utf-8" src="js/store.js?v=3.89.10"></script>
+    <script defer charset="utf-8" src="js/components.js?v=3.89.11"></script>
+    <script defer charset="utf-8" src="js/paypal.js?v=3.88.2"></script>
+    <script defer charset="utf-8" src="js/app.js?v=3.89.11"></script>
+    <script defer charset="utf-8" src="js/contrast-guard.js?v=3.88.2"></script>
 </body>
 </html>

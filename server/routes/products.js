@@ -20,6 +20,7 @@ function formatProductRow(r) {
     const priceVal = Number(r.price_usd !== undefined ? r.price_usd : (r.price !== undefined ? r.price : 0)) || 0;
     const shippingVal = Number(r.shipping_fee_usd !== undefined ? r.shipping_fee_usd : (r.shippingCharge !== undefined ? r.shippingCharge : (r.shippingFee || 0))) || 0;
     const bg = typeof r.brewing_guide === 'string' ? JSON.parse(r.brewing_guide) : (r.brewing_guide || {});
+    const shippingLkrVal = Number(bg.shipping_lkr !== undefined ? bg.shipping_lkr : (bg.shippingCharge_lkr !== undefined ? bg.shippingCharge_lkr : (r.shipping_lkr !== undefined ? r.shipping_lkr : 500))) || 500;
     const fNotes = Array.isArray(r.flavor_notes) ? r.flavor_notes : (typeof r.flavor_notes === 'string' ? JSON.parse(r.flavor_notes) : (bg.tastingNotes || []));
     const radar = bg.sensoryRadar || { floral: 80, malty: 75, sweetness: 80, astringency: 40, body: 80, aroma: 90 };
     const fProfile = bg.flavorProfile || (fNotes.length > 0 ? fNotes.join(', ') : 'Single-Estate Reserve');
@@ -37,6 +38,8 @@ function formatProductRow(r) {
         shipping_fee_usd: shippingVal,
         shippingCharge: shippingVal,
         shippingFee: shippingVal,
+        shipping_lkr: shippingLkrVal,
+        shippingCharge_lkr: shippingLkrVal,
         leafGrade: r.grade || bg.leafGrade || 'Single-Estate Reserve',
         subcategory: bg.subcategory || r.subcategory || 'Hot Tea (Gongfu style)',
         weight: bg.weight || '100g Vintage Tin',
@@ -68,7 +71,7 @@ router.get('/', async (req, res) => {
 
         // 1. Turso Cloud (Primary)
         if (isTursoAvailable()) {
-            let query = 'SELECT * FROM products WHERE 1=1';
+            let query = "SELECT * FROM products WHERE id NOT IN ('prod-01', 'prod-02', 'prod-03', 'prod-04')";
             const params = [];
             if (category && category !== 'all') {
                 query += ' AND category = ?';
@@ -94,7 +97,7 @@ router.get('/', async (req, res) => {
 
         // 2. Supabase Cloud (Secondary Fallback)
         if (isSupabaseAvailable()) {
-            let query = supabase.from('products').select('*');
+            let query = supabase.from('products').select('*').not('id', 'in', '("prod-01","prod-02","prod-03","prod-04")');
             if (category && category !== 'all') {
                 query = query.eq('category', category);
             }
@@ -114,7 +117,7 @@ router.get('/', async (req, res) => {
         }
 
         // 3. Local SQLite (Offline Fallback)
-        let query = 'SELECT * FROM products WHERE 1=1';
+        let query = "SELECT * FROM products WHERE id NOT IN ('prod-01', 'prod-02', 'prod-03', 'prod-04')";
         const params = [];
         if (category && category !== 'all') {
             query += ' AND category = ?';
@@ -192,6 +195,7 @@ router.post('/', async (req, res) => {
 
         const finalPrice = Number(price_usd || price || 0);
         const finalShipping = Number(shipping_fee_usd !== undefined ? shipping_fee_usd : (shippingCharge !== undefined ? shippingCharge : (shippingFee || 0))) || 0;
+        const finalShippingLkr = Number(req.body.shipping_lkr !== undefined ? req.body.shipping_lkr : (req.body.shippingCharge_lkr !== undefined ? req.body.shippingCharge_lkr : 500)) || 500;
         if (!name || !finalPrice) {
             return res.status(400).json({ success: false, error: 'Name and price are required.' });
         }
@@ -220,6 +224,9 @@ router.post('/', async (req, res) => {
             steepSeconds: finalSteepSeconds,
             shippingCharge: finalShipping,
             shippingFee: finalShipping,
+            shipping_fee_usd: finalShipping,
+            shipping_lkr: finalShippingLkr,
+            shippingCharge_lkr: finalShippingLkr,
             subcategory: finalSubcategory,
             images: Array.isArray(req.body.images) && req.body.images.length > 0 ? req.body.images : [image]
         };
@@ -330,8 +337,9 @@ router.put('/:id', async (req, res) => {
         if (finalTNotes !== undefined) updates.flavor_notes = finalTNotes;
 
         const subcategory = req.body.subcategory || req.body.sub_category;
+        const shippingLkrReq = req.body.shipping_lkr !== undefined ? req.body.shipping_lkr : req.body.shippingCharge_lkr;
 
-        if (brewing_guide !== undefined || sensoryRadar !== undefined || flavorProfile !== undefined || finalTNotes !== undefined || steepSeconds !== undefined || weight !== undefined || symbol !== undefined || steepTemp !== undefined || steepTime !== undefined || stock !== undefined || updates.shipping_fee_usd !== undefined || subcategory !== undefined) {
+        if (brewing_guide !== undefined || sensoryRadar !== undefined || flavorProfile !== undefined || finalTNotes !== undefined || steepSeconds !== undefined || weight !== undefined || symbol !== undefined || steepTemp !== undefined || steepTime !== undefined || stock !== undefined || updates.shipping_fee_usd !== undefined || subcategory !== undefined || shippingLkrReq !== undefined) {
             const baseBg = typeof brewing_guide === 'object' && brewing_guide !== null ? brewing_guide : {};
             updates.brewing_guide = {
                 ...baseBg,
@@ -345,7 +353,8 @@ router.put('/:id', async (req, res) => {
                 ...(steepTime ? { time: steepTime } : {}),
                 ...(typeof stock === 'string' ? { stock_status: stock } : {}),
                 ...(subcategory ? { subcategory } : {}),
-                ...(updates.shipping_fee_usd !== undefined ? { shippingCharge: updates.shipping_fee_usd, shipping_fee: updates.shipping_fee_usd } : {}),
+                ...(updates.shipping_fee_usd !== undefined ? { shippingCharge: updates.shipping_fee_usd, shipping_fee: updates.shipping_fee_usd, shipping_fee_usd: updates.shipping_fee_usd } : {}),
+                ...(shippingLkrReq !== undefined ? { shipping_lkr: Number(shippingLkrReq), shippingCharge_lkr: Number(shippingLkrReq) } : {}),
                 ...(Array.isArray(req.body.images) ? { images: req.body.images } : {})
             };
         }

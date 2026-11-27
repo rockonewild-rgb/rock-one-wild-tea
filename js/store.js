@@ -455,6 +455,26 @@ const DEFAULT_HERO_SLIDES = [
     }
 ];
 
+const DEFAULT_TOUR_SETTINGS = {
+    packageName: "01. Gongfu-Style Black Tea Brewing Experience",
+    packageSubtitle: "Handcrafted Ceylon Black Tea from our wild forest garden in Sri Lanka’s Uva Medium Region.",
+    priceLkr: 1450,
+    priceUsd: 4.75,
+    transportFeeUsd: 25.00,
+    transportFeeLkr: 7625,
+    maxCapacity: 10,
+    operatingDays: "Monday – Saturday",
+    operatingHours: "9:00 AM – 5:00 PM",
+    sessionDuration: "~1.5 – 2.0 Hours",
+    bocAccount: "94945708",
+    bocBeneficiary: "P.G.P.B.S. Thilakarathna",
+    bocBranch: "Ettampitiya",
+    whatsappHotline: "+94 77 320 9950",
+    payOnArrivalEnabled: true,
+    bankTransferEnabled: true,
+    cashDepositEnabled: true
+};
+
 const CURRENCIES = {
     USD: { code: 'USD', symbol: '$', rate: 1.0, decimals: 2, label: 'USD ($)', symbolPosition: 'prefix' },
     EUR: { code: 'EUR', symbol: '€', rate: 0.92, decimals: 2, label: 'EUR (€)', symbolPosition: 'prefix' },
@@ -520,21 +540,29 @@ if (typeof window !== 'undefined') {
         return `${curr.symbol}${formattedNum} ${curr.code}`;
     };
 
-    window.calculateShippingFee = function(subtotalUSD, country, itemDefinedShipping = null) {
+    window.calculateShippingFee = function(subtotalUSD, country, itemDefinedShipping = null, itemDefinedShippingLkr = null) {
         const isDomestic = !country || country === 'Sri Lanka' || country.toLowerCase().includes('sri lanka');
         subtotalUSD = Number(subtotalUSD || 0);
 
-        if (itemDefinedShipping !== null && itemDefinedShipping !== undefined && Number(itemDefinedShipping) > 0) {
-            return Number(itemDefinedShipping);
-        }
-
         if (isDomestic) {
-            // Domestic SL Post EMS Express: Rs 650 (~$2.13 USD), complimentary for orders >= $80 USD
-            return subtotalUSD >= 80 ? 0 : 2.13;
+            // Domestic Sri Lanka Local Delivery: 500 LKR (~$1.64 USD)
+            const lkrFee = Number(itemDefinedShippingLkr !== null && itemDefinedShippingLkr !== undefined ? itemDefinedShippingLkr : 500) || 500;
+            return Number((lkrFee / 305).toFixed(2));
         } else {
-            // International SL Post EMS Priority Air Courier: $15.00 USD, complimentary for orders >= $150 USD
+            // International SL Post EMS Priority Air Courier
+            if (itemDefinedShipping !== null && itemDefinedShipping !== undefined && Number(itemDefinedShipping) > 0) {
+                return Number(itemDefinedShipping);
+            }
             return subtotalUSD >= 150 ? 0 : 15.0;
         }
+    };
+
+    window.calculateShippingFeeLkr = function(country, itemDefinedShippingLkr = null) {
+        const isDomestic = !country || country === 'Sri Lanka' || country.toLowerCase().includes('sri lanka');
+        if (isDomestic) {
+            return Number(itemDefinedShippingLkr !== null && itemDefinedShippingLkr !== undefined ? itemDefinedShippingLkr : 500) || 500;
+        }
+        return Math.round(15.0 * 305);
     };
 }
 
@@ -569,6 +597,17 @@ class TeaFactoryStore {
                     this.state.boxes = [];
                     needsSave = true;
                 }
+                if (Array.isArray(this.state.reviews)) {
+                    const beforeLen = this.state.reviews.length;
+                    this.state.reviews = this.state.reviews.filter(r => r && r.id !== 'REV-MWZ6761R' && r.author !== 'Sophia H.' && r.name !== 'Sophia H.');
+                    if (this.state.reviews.length !== beforeLen) {
+                        needsSave = true;
+                    }
+                }
+                const sampleProductIds = ['prod-01', 'prod-02', 'prod-03', 'prod-04'];
+                if (Array.isArray(this.state.products)) {
+                    this.state.products = this.state.products.filter(p => p && !sampleProductIds.includes(p.id));
+                }
                 if (!this.state.products || !Array.isArray(this.state.products) || this.state.products.length === 0) {
                     this.state.products = this.getDefaultProducts();
                     needsSave = true;
@@ -586,6 +625,8 @@ class TeaFactoryStore {
                             shipping_fee_usd: 19.0,
                             shippingCharge: 19.0,
                             shippingFee: 19.0,
+                            shipping_lkr: 500,
+                            shippingCharge_lkr: 500,
                             weight: '50g Pack',
                             netWeight: '50g per Pack'
                         });
@@ -596,6 +637,13 @@ class TeaFactoryStore {
                     } else {
                         this.state.products.unshift(premierProd);
                     }
+                    // Ensure all already added products include 500 LKR local Sri Lanka shipping
+                    this.state.products.forEach(p => {
+                        if (p) {
+                            if (p.shipping_lkr === undefined) p.shipping_lkr = 500;
+                            if (p.shippingCharge_lkr === undefined) p.shippingCharge_lkr = 500;
+                        }
+                    });
                     needsSave = true;
                 }
                 if (!this.state.bookings || !Array.isArray(this.state.bookings)) {
@@ -765,7 +813,7 @@ class TeaFactoryStore {
     }
 
     getReviews() {
-        return this.state.reviews || [];
+        return (this.state.reviews || []).filter(r => r && r.id !== 'REV-MWZ6761R' && r.author !== 'Sophia H.' && r.name !== 'Sophia H.');
     }
 
     addReview(reviewData) {
@@ -922,6 +970,8 @@ class TeaFactoryStore {
                 shipping_fee_usd: 19.0,
                 shippingCharge: 19.0,
                 shippingFee: 19.0,
+                shipping_lkr: 500,
+                shippingCharge_lkr: 500,
                 weight: '50g Pack',
                 netWeight: '50g per Pack',
                 stock: 'In Stock',
@@ -983,6 +1033,13 @@ class TeaFactoryStore {
             name: productData.name,
             category: productData.category,
             price: parseFloat(productData.price) || 0.00,
+            price_usd: parseFloat(productData.price) || 0.00,
+            price_lkr: parseFloat(productData.price_lkr) || Math.round((parseFloat(productData.price) || 0) * 305),
+            shippingCharge: productData.shippingCharge !== undefined ? parseFloat(productData.shippingCharge) : (productData.shippingFee !== undefined ? parseFloat(productData.shippingFee) : 19.00),
+            shippingFee: productData.shippingCharge !== undefined ? parseFloat(productData.shippingCharge) : (productData.shippingFee !== undefined ? parseFloat(productData.shippingFee) : 19.00),
+            shipping_fee_usd: productData.shipping_fee_usd !== undefined ? parseFloat(productData.shipping_fee_usd) : 19.00,
+            shippingCharge_lkr: productData.shippingCharge_lkr !== undefined ? parseFloat(productData.shippingCharge_lkr) : (productData.shipping_lkr !== undefined ? parseFloat(productData.shipping_lkr) : 500),
+            shipping_lkr: productData.shipping_lkr !== undefined ? parseFloat(productData.shipping_lkr) : 500,
             weight: productData.weight || "100g",
             image: productData.image || "images/Product.jpeg",
             images: Array.isArray(productData.images) && productData.images.length > 0 ? productData.images : [productData.image || "images/Product.jpeg"],
@@ -1030,6 +1087,13 @@ class TeaFactoryStore {
             name: updatedData.name !== undefined ? updatedData.name : current.name,
             category: updatedData.category !== undefined ? updatedData.category : current.category,
             price: updatedData.price !== undefined ? parseFloat(updatedData.price) : current.price,
+            price_usd: updatedData.price !== undefined ? parseFloat(updatedData.price) : (current.price_usd || current.price),
+            price_lkr: updatedData.price_lkr !== undefined ? parseFloat(updatedData.price_lkr) : (current.price_lkr || Math.round((current.price || 0) * 305)),
+            shippingCharge: updatedData.shippingCharge !== undefined ? parseFloat(updatedData.shippingCharge) : (current.shippingCharge !== undefined ? current.shippingCharge : 19.00),
+            shippingFee: updatedData.shippingFee !== undefined ? parseFloat(updatedData.shippingFee) : (current.shippingFee !== undefined ? current.shippingFee : 19.00),
+            shipping_fee_usd: updatedData.shipping_fee_usd !== undefined ? parseFloat(updatedData.shipping_fee_usd) : (current.shipping_fee_usd !== undefined ? current.shipping_fee_usd : 19.00),
+            shippingCharge_lkr: updatedData.shippingCharge_lkr !== undefined ? parseFloat(updatedData.shippingCharge_lkr) : (current.shippingCharge_lkr !== undefined ? current.shippingCharge_lkr : 500),
+            shipping_lkr: updatedData.shipping_lkr !== undefined ? parseFloat(updatedData.shipping_lkr) : (current.shipping_lkr !== undefined ? current.shipping_lkr : 500),
             weight: updatedData.weight !== undefined ? updatedData.weight : current.weight,
             image: updatedData.image !== undefined ? updatedData.image : current.image,
             images: updatedData.images !== undefined ? updatedData.images : (current.images || [current.image || "images/Product.jpeg"]),
@@ -1211,6 +1275,44 @@ class TeaFactoryStore {
             window.appApplyTheme(this.state.activeTheme || 'classic');
         }
         return this.state.themeSettings;
+    }
+
+    getTourSettings() {
+        if (!this.state.tourSettings) {
+            try {
+                const saved = localStorage.getItem('tea_factory_tour_settings');
+                if (saved) {
+                    this.state.tourSettings = { ...DEFAULT_TOUR_SETTINGS, ...JSON.parse(saved) };
+                } else {
+                    this.state.tourSettings = { ...DEFAULT_TOUR_SETTINGS };
+                }
+            } catch (e) {
+                this.state.tourSettings = { ...DEFAULT_TOUR_SETTINGS };
+            }
+        }
+        return this.state.tourSettings;
+    }
+
+    updateTourSettings(newSettings) {
+        this.getTourSettings();
+        this.state.tourSettings = {
+            ...this.state.tourSettings,
+            ...newSettings
+        };
+        try {
+            localStorage.setItem('tea_factory_tour_settings', JSON.stringify(this.state.tourSettings));
+            fetch('/api/tours/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(this.state.tourSettings)
+            }).catch(() => {});
+        } catch (e) {}
+        this.saveState();
+        return this.state.tourSettings;
+    }
+
+    getTourBookings() {
+        return (this.state.bookings || []).filter(b => b.type === 'tour');
     }
 
     convertCurrency(usdAmount, targetCurrency = null) {
@@ -1981,13 +2083,18 @@ class TeaFactoryStore {
 
     // Reset Tour slots
     resetTourSlots() {
+        const cfg = this.getTourSettings();
+        const pLkr = cfg.priceLkr || 1450;
+        const pUsd = cfg.priceUsd || 4.75;
+        const pkg = cfg.packageName || "01. Gongfu-Style Black Tea Brewing Experience";
         this.state.tourSlots = [
-            { id: 1, timeSlot: "09:30 AM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
-            { id: 2, timeSlot: "11:00 AM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
-            { id: 3, timeSlot: "01:30 PM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 },
-            { id: 4, timeSlot: "03:30 PM", status: "Available", booking: null, package: "01. Gongfu-Style Black Tea Brewing Experience", max_capacity: 10, price: 4.754 }
+            { id: 1, timeSlot: "09:30 AM", slotTitle: "Morning Mist Pluck", status: "Available", booking: null, package: pkg, max_capacity: cfg.maxCapacity || 10, price: pUsd, price_lkr: pLkr },
+            { id: 2, timeSlot: "11:00 AM", slotTitle: "Midday Factory Craft", status: "Available", booking: null, package: pkg, max_capacity: cfg.maxCapacity || 10, price: pUsd, price_lkr: pLkr },
+            { id: 3, timeSlot: "01:30 PM", slotTitle: "Afternoon Sommelier", status: "Available", booking: null, package: pkg, max_capacity: cfg.maxCapacity || 10, price: pUsd, price_lkr: pLkr },
+            { id: 4, timeSlot: "03:30 PM", slotTitle: "Highland Golden Hour", status: "Available", booking: null, package: pkg, max_capacity: cfg.maxCapacity || 10, price: pUsd, price_lkr: pLkr }
         ];
         this.saveState();
+        return this.state.tourSlots;
     }
 
     forceResetState() {
@@ -2869,6 +2976,19 @@ Direct Desk: +94 76 789 7817 (Voice) | +94 77 320 9950 (WhatsApp) | rockonewild@
 
     getCartShippingTotal(country = null) {
         if (!this.state.cart || !Array.isArray(this.state.cart) || this.state.cart.length === 0) return 0;
+        const activeCountry = country || (typeof window !== 'undefined' ? (window.lastSelectedCheckoutCountry || 'Sri Lanka') : 'Sri Lanka');
+        const isDomestic = !activeCountry || activeCountry === 'Sri Lanka' || activeCountry.toLowerCase().includes('sri lanka');
+
+        if (isDomestic) {
+            // Sri Lanka domestic delivery: 500 LKR (~$1.64 USD)
+            let maxLkr = 500;
+            this.state.cart.forEach(item => {
+                const sLkr = Number(item.shipping_lkr !== undefined ? item.shipping_lkr : (item.shippingCharge_lkr !== undefined ? item.shippingCharge_lkr : 500)) || 500;
+                if (sLkr > maxLkr) maxLkr = sLkr;
+            });
+            return Number((maxLkr / 305).toFixed(2));
+        }
+
         const itemShip = this.state.cart.reduce((sum, item) => {
             const ship = Number(item.shippingCharge !== undefined ? item.shippingCharge : (item.shippingFee || 0)) || 0;
             return sum + (ship * (item.quantity || 1));
@@ -2876,11 +2996,10 @@ Direct Desk: +94 76 789 7817 (Voice) | +94 77 320 9950 (WhatsApp) | rockonewild@
         if (itemShip > 0) return itemShip;
 
         const subtotal = this.getCartSubtotal();
-        const activeCountry = country || (typeof window !== 'undefined' ? (window.lastSelectedCheckoutCountry || 'Sri Lanka') : 'Sri Lanka');
         if (typeof window !== 'undefined' && window.calculateShippingFee) {
             return window.calculateShippingFee(subtotal, activeCountry);
         }
-        return activeCountry === 'Sri Lanka' ? (subtotal >= 80 ? 0 : 2.13) : (subtotal >= 150 ? 0 : 15.0);
+        return subtotal >= 150 ? 0 : 15.0;
     }
 
     getCartGrandTotal(country = null) {
@@ -3113,7 +3232,9 @@ Rock One Wild Tea Sanctuary Concierge Team
 
             // 1. Sync Products
             if (prodRes.status === 'fulfilled' && Array.isArray(prodRes.value)) {
-                this.state.products = prodRes.value.map(p => {
+                const sampleProductIds = ['prod-01', 'prod-02', 'prod-03', 'prod-04'];
+                const validProds = prodRes.value.filter(p => p && !sampleProductIds.includes(p.id));
+                const mappedProducts = validProds.map(p => {
                     const priceNum = Number(p.price !== undefined ? p.price : (p.price_usd !== undefined ? p.price_usd : 0)) || (p.id === 'prod-rock-one-black-tea' ? 17.0 : 0);
                     const shippingNum = Number(p.shipping_fee_usd !== undefined ? p.shipping_fee_usd : (p.shippingCharge !== undefined ? p.shippingCharge : (p.shippingFee !== undefined ? p.shippingFee : 0))) || (p.id === 'prod-rock-one-black-tea' ? 19.0 : 0);
                     const bg = typeof p.brewing_guide === 'string' ? JSON.parse(p.brewing_guide) : (p.brewing_guide || {});
@@ -3136,6 +3257,8 @@ Rock One Wild Tea Sanctuary Concierge Team
                         shipping_fee_usd: shippingNum,
                         shippingCharge: shippingNum,
                         shippingFee: shippingNum,
+                        shipping_lkr: Number(p.shipping_lkr !== undefined ? p.shipping_lkr : (p.shippingCharge_lkr !== undefined ? p.shippingCharge_lkr : (bg.shipping_lkr || bg.shippingCharge_lkr || 500))) || 500,
+                        shippingCharge_lkr: Number(p.shippingCharge_lkr !== undefined ? p.shippingCharge_lkr : (p.shipping_lkr !== undefined ? p.shipping_lkr : (bg.shippingCharge_lkr || bg.shipping_lkr || 500))) || 500,
                         weight: p.weight || bg.weight || '50g Pack',
                         stock: p.stock || (p.stock_quantity > 0 ? 'In Stock' : 'In Stock'),
                         stock_quantity: p.stock_quantity !== undefined ? p.stock_quantity : 50,
@@ -3175,6 +3298,8 @@ Rock One Wild Tea Sanctuary Concierge Team
                         symbol: p.symbol || ''
                     };
                 });
+
+                this.state.products = mappedProducts.length > 0 ? mappedProducts : this.getDefaultProducts();
 
                 // Ensure Rock One Wild Tea – Premium Black Tea is the premier featured product
                 this.state.products.sort((a, b) => {
@@ -3311,7 +3436,7 @@ Rock One Wild Tea Sanctuary Concierge Team
 
             // 8. Sync Tour Bookings
             if (bookRes.status === 'fulfilled' && Array.isArray(bookRes.value)) {
-                this.state.bookings = bookRes.value.map(b => ({
+                const tourList = bookRes.value.map(b => ({
                     id: b.id,
                     bookingId: b.id,
                     tourSlotId: b.tour_slot_id,
@@ -3322,20 +3447,32 @@ Rock One Wild Tea Sanctuary Concierge Team
                     phone: b.guest_phone || '',
                     guestCount: b.guest_count || 1,
                     guests: b.guest_count || 1,
-                    packageName: b.package_name || 'Highland Estate Factory Tour & Cupping',
+                    packageName: b.package_name || '01. Gongfu-Style Black Tea Brewing Experience',
                     totalPrice: Number(b.total_price) || 0,
                     price: Number(b.total_price) || 0,
                     currencyCode: b.currency_code || 'USD',
                     totalInCurrency: Number(b.total_in_currency) || 0,
                     paymentMethod: b.payment_method || 'bank',
-                    status: b.status === 'confirmed' ? 'Booked' : (b.status === 'deposit_pending' ? 'Pending Verification' : (b.status || 'Pending')),
+                    status: b.status === 'confirmed' ? 'Paid & Confirmed' : (b.status === 'deposit_pending' ? 'Pending Verification' : (b.status || 'Pending')),
                     notes: b.notes || '',
                     slipImage: b.slip_image || '',
                     type: 'tour',
                     date: b.created_at ? new Date(b.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Recent',
                     bookingDate: b.created_at
                 }));
+                const nonTourBookings = (this.state.bookings || []).filter(b => b.type !== 'tour');
+                this.state.bookings = [...tourList, ...nonTourBookings];
             }
+
+            // 8b. Sync Tour Operations Configuration
+            try {
+                const tourCfgRes = await fetch('/api/tours/settings');
+                const tourCfgJson = await tourCfgRes.json();
+                if (tourCfgJson && tourCfgJson.success && tourCfgJson.data) {
+                    this.state.tourSettings = { ...DEFAULT_TOUR_SETTINGS, ...tourCfgJson.data };
+                    localStorage.setItem('tea_factory_tour_settings', JSON.stringify(this.state.tourSettings));
+                }
+            } catch (tce) {}
 
             // 9. Sync Users
             if (userRes.status === 'fulfilled' && Array.isArray(userRes.value)) {

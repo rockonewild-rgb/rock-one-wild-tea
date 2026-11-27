@@ -17,9 +17,14 @@ if not exist "D:\" (
 )
 
 echo [Server] Starting Node server on http://localhost:3000 ...
+echo [Browser] Opening http://localhost:3000 in your browser...
 echo [Note] Keep this window open while using the website!
 echo.
 
+:: Open default browser to the website
+start "" http://localhost:3000
+
+:: Start the server process
 node server/server.js
 
 if %ERRORLEVEL% NEQ 0 (
